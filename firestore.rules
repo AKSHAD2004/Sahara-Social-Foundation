@@ -1,0 +1,135 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'super_admin' || 
+        getUserData().role == 'super_admin'
+      );
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        isSuperAdmin() ||
+        request.auth.token.role == 'admin' || 
+        getUserData().role == 'admin'
+      );
+    }
+
+    function isManager() {
+      return isAuthenticated() && (
+        isAdmin() ||
+        request.auth.token.role == 'manager' || 
+        getUserData().role == 'manager'
+      );
+    }
+
+    function isSalesEmployee() {
+      return isAuthenticated() && (
+        getUserData().role == 'sales_employee'
+      );
+    }
+
+    function isAffiliate() {
+      return isAuthenticated() && (
+        getUserData().role == 'affiliate'
+      );
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || request.auth.uid == userId;
+    }
+
+    // Customers Collection
+    match /customers/{customerId} {
+      allow read: if isAdmin() || isManager() || 
+        (isSalesEmployee() && resource.data.assignedEmployee == request.auth.uid) ||
+        (isAffiliate() && resource.data.assignedAffiliate == request.auth.uid);
+      allow create: if isAuthenticated() || true; // Allow website guest checkout to create customer
+      allow update, delete: if isAdmin() || isManager() || 
+        (isSalesEmployee() && resource.data.assignedEmployee == request.auth.uid);
+    }
+
+    // Leads Collection
+    match /leads/{leadId} {
+      allow read: if isAdmin() || isManager() || 
+        (isSalesEmployee() && resource.data.assignedEmployee == request.auth.uid) ||
+        (isAffiliate() && resource.data.assignedAffiliate == request.auth.uid);
+      allow create: if true; // Public website form enquiry
+      allow update, delete: if isAdmin() || isManager() || 
+        (isSalesEmployee() && resource.data.assignedEmployee == request.auth.uid);
+    }
+
+    // Orders Collection
+    match /orders/{orderId} {
+      allow read: if isAdmin() || isManager() || 
+        (isSalesEmployee() && resource.data.assignedEmployee == request.auth.uid) ||
+        (isAffiliate() && resource.data.assignedAffiliate == request.auth.uid);
+      allow create: if true; // Public website checkout
+      allow update, delete: if isAdmin() || isManager();
+    }
+
+    // Products Collection (Public Read, Admin Write)
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Commission Slabs & Rules (Admin Only)
+    match /commissionSlabs/{slabId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Commission Transactions (Affiliate can read own, Admin/Manager approve)
+    match /commissionTransactions/{txId} {
+      allow read: if isAdmin() || isManager() || 
+        (isAuthenticated() && resource.data.beneficiaryId == request.auth.uid);
+      allow create, update: if isAdmin() || isManager();
+      allow delete: if false; // Never permanently delete commission records
+    }
+
+    // Commission Payouts (Admin generate, Beneficiary read own)
+    match /commissionPayouts/{payoutId} {
+      allow read: if isAdmin() || 
+        (isAuthenticated() && resource.data.beneficiaryId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // Follow-ups Collection
+    match /followups/{followupId} {
+      allow read, write: if isAdmin() || isManager() || 
+        (isSalesEmployee() && resource.data.employeeId == request.auth.uid);
+    }
+
+    // Support Tickets Collection
+    match /supportTickets/{ticketId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Audit Logs (Immutable, Admin Read)
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Append-only audit logs
+    }
+
+    // System Settings
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
