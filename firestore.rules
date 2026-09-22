@@ -124,7 +124,7 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isAuthenticated();
       allow update, delete: if false; // Append-only audit logs
-    }
+    }j 
 
     // System Settings
     match /settings/{settingId} {

@@ -67,7 +67,7 @@ export default function CrmHeader({ onToggleMobile }) {
   return (
     <header className="crm-header">
       {/* Mobile Hamburger + Global Search */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div className="crm-header-left">
         <button 
           className="crm-sidebar-toggle" 
           style={{ display: 'flex' }}
@@ -77,12 +77,12 @@ export default function CrmHeader({ onToggleMobile }) {
           <Menu size={20} />
         </button>
 
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
           <div className="crm-header-search">
-            <Search size={16} />
+            <Search size={15} style={{ flexShrink: 0 }} />
             <input 
               type="text" 
-              placeholder="Search customers, leads, orders (e.g. Patil, ORD-2026)..." 
+              placeholder="Search customers, leads, orders (e.g. Patil, ORD)..." 
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -94,7 +94,8 @@ export default function CrmHeader({ onToggleMobile }) {
               position: 'absolute',
               top: '100%',
               left: 0,
-              width: '380px',
+              width: '100%',
+              minWidth: '380px',
               background: '#ffffff',
               borderRadius: '12px',
               boxShadow: '0 10px 25px rgba(0,0,0,0.15)',

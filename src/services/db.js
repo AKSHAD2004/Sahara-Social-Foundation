@@ -92,9 +92,19 @@ export function initDatabase() {
   initCollection('settings', initialSettings);
   initCollection('notifications', []);
 
-  // Connect Firestore real-time synchronization if configured
+  // Connect Firestore real-time synchronization if configured (deferred after window load so browser tab finishes loading immediately)
   if (isFirebaseConfigured && firestoreDb) {
-    setupFirestoreRealtimeSync();
+    if (typeof window !== 'undefined') {
+      if (document.readyState === 'complete') {
+        setTimeout(setupFirestoreRealtimeSync, 200);
+      } else {
+        window.addEventListener('load', () => {
+          setTimeout(setupFirestoreRealtimeSync, 200);
+        }, { once: true });
+      }
+    } else {
+      setupFirestoreRealtimeSync();
+    }
   }
 
   // Automatically sync/generate commissions for any pending paid orders
@@ -102,7 +112,7 @@ export function initDatabase() {
     try {
       dbService.syncAllOrderCommissions();
     } catch (e) {}
-  }, 100);
+  }, 300);
 }
 
 // Setup live listeners to Cloud Firestore

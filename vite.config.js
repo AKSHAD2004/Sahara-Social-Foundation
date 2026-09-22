@@ -27,6 +27,13 @@ function spaFallbackPlugin() {
           fs.mkdirSync(publicDir, { recursive: true })
         }
         fs.writeFileSync(path.resolve(publicDir, '_redirects'), '/*    /index.html   200\n', 'utf8')
+
+        // Ensure favicon.ico exists in public
+        const favIco = path.resolve(publicDir, 'favicon.ico')
+        const favPng = path.resolve(publicDir, 'favicon.png')
+        if (!fs.existsSync(favIco) && fs.existsSync(favPng)) {
+          fs.copyFileSync(favPng, favIco)
+        }
       } catch (err) {
         console.warn('Could not generate SPA redirect files automatically:', err)
       }

@@ -68,25 +68,8 @@ const Navbar = () => {
             </span>
           </div>
 
-          {/* Right Side Group: Phone + Affiliate + Language (Aligned to right in webview) */}
+          {/* Right Side Group: Affiliate + CRM + Language */}
           <div className="topbar-actions">
-            {/* Phone link */}
-            <a 
-              href={`tel:${organizationInfo.contact.primaryPhone}`} 
-              className="topbar-phone-link"
-              title="Call Kolhapur Office"
-            >
-              <Phone size={12} className="topbar-action-icon" />
-              <span className="topbar-phone-text-desktop">
-                {language === 'mr' ? 'कोल्हापूर: ८४२११५४०९०' : 'Kolhapur: 8421154090'}
-              </span>
-              <span className="topbar-phone-text-mobile">
-                ८४२११५४०९०
-              </span>
-            </a>
-
-            <span className="topbar-divider">|</span>
-
             {/* Affiliate Portal link */}
             <Link 
               to="/affiliate" 
