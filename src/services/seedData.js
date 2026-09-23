@@ -68,7 +68,7 @@ export const initialProducts = [
     stock: 100,
     commissionEligible: true,
     commissionType: 'standard',
-    image: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?w=400&auto=format&fit=crop&q=80',
+    image: '/antox-hlk-t.jpg',
     description: 'Comprehensive natural organ detoxifier and revitalizer supporting cardiac performance, liver enzyme balance, and kidney filtration wellness.',
     status: 'active'
   },
@@ -98,7 +98,7 @@ export const initialProducts = [
     stock: 100,
     commissionEligible: true,
     commissionType: 'standard',
-    image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400&auto=format&fit=crop&q=80',
+    image: '/antox-pn-kit.jpg',
     description: 'Therapeutic joint flexibility and pain soothing duo with anti-inflammatory herbs and traditional cold-pressed herbal oil for external massage.',
     status: 'active'
   },

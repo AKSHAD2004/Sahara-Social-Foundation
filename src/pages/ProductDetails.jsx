@@ -73,11 +73,15 @@ const ProductDetails = () => {
             <div style={{
               borderRadius: '18px',
               overflow: 'hidden',
-              backgroundColor: '#f8fafc',
+              backgroundColor: '#ffffff',
               border: '1px solid #e2e8f0',
               aspectRatio: '1/1',
               position: 'relative',
-              marginBottom: '1.25rem'
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1.5rem'
             }}>
               <img
                 src={product.image}
@@ -86,7 +90,7 @@ const ProductDetails = () => {
                   e.target.src = product.fallbackImage;
                 }}
                 alt={product.nameMr || product.nameEn}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
               {product.badgeEn && (
                 <div style={{

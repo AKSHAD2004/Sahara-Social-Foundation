@@ -37,7 +37,7 @@ const ProductCard = ({ product }) => {
       className="card product-card-animated"
     >
       {/* Product Image & Badge */}
-      <div style={{ position: 'relative', height: '220px', backgroundColor: '#f8fafc', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', height: '220px', backgroundColor: '#ffffff', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.85rem' }}>
         <img
           src={product.image}
           onError={(e) => {
@@ -45,7 +45,7 @@ const ProductCard = ({ product }) => {
             e.target.src = product.fallbackImage;
           }}
           alt={product.nameMr || product.nameEn}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.3s ease' }}
           className="product-card-img"
         />
 

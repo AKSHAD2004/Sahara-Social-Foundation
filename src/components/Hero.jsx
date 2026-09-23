@@ -87,11 +87,11 @@ const Hero = ({ onOpenConsultation }) => {
   };
 
   return (
-    <section style={{
+    <section className="hero-section" style={{
       position: 'relative',
       background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)',
       color: '#ffffff',
-      padding: '4.5rem 0 5.5rem 0',
+      padding: '0.5rem 0 2.5rem 0',
       overflow: 'hidden'
     }}>
       {/* Background Decorative Circles */}
@@ -120,7 +120,7 @@ const Hero = ({ onOpenConsultation }) => {
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1.1fr 0.9fr',
-          gap: '3rem',
+          gap: '2.5rem',
           alignItems: 'center'
         }} className="hero-grid">
           {/* Left Column: Heading & Content */}
@@ -140,7 +140,7 @@ const Hero = ({ onOpenConsultation }) => {
                 color: '#fef3c7',
                 fontSize: '0.88rem',
                 fontWeight: 600,
-                marginBottom: '1.25rem'
+                marginBottom: '0.65rem'
               }}
             >
               <Sparkles size={16} style={{ color: '#fbbf24' }} />
@@ -155,7 +155,7 @@ const Hero = ({ onOpenConsultation }) => {
               fontWeight: 800,
               color: '#ffffff',
               lineHeight: 1.2,
-              marginBottom: '1.25rem',
+              marginBottom: '0.85rem',
               letterSpacing: '-0.02em'
             }} className="hero-title">
               {language === 'mr' ? (
@@ -176,7 +176,7 @@ const Hero = ({ onOpenConsultation }) => {
               fontSize: '1.15rem',
               color: '#d1fae5',
               lineHeight: 1.6,
-              marginBottom: '1.75rem',
+              marginBottom: '1rem',
               maxWidth: '620px'
             }}>
               {language === 'mr'
@@ -188,11 +188,11 @@ const Hero = ({ onOpenConsultation }) => {
             <div style={{
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
               borderLeft: '4px solid #34d399',
-              padding: '0.85rem 1.15rem',
+              padding: '0.65rem 1rem',
               borderRadius: '8px',
               fontSize: '0.9rem',
               color: '#fef3c7',
-              marginBottom: '2rem',
+              marginBottom: '1.25rem',
               backdropFilter: 'blur(6px)',
               display: 'flex',
               alignItems: 'center',
@@ -210,7 +210,7 @@ const Hero = ({ onOpenConsultation }) => {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem',
+              gap: '0.85rem',
               flexWrap: 'wrap'
             }}>
               <button
@@ -253,10 +253,10 @@ const Hero = ({ onOpenConsultation }) => {
             <div 
               style={{
                 backgroundColor: '#ffffff',
-                borderRadius: '24px',
-                padding: '1.25rem',
+                borderRadius: '20px',
+                padding: '1rem',
                 color: '#1e293b',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.45)',
+                boxShadow: '0 20px 45px -12px rgba(0, 0, 0, 0.4)',
                 border: '1px solid rgba(255, 255, 255, 0.9)',
                 position: 'relative'
               }}
@@ -271,16 +271,16 @@ const Hero = ({ onOpenConsultation }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '0.75rem',
+                marginBottom: '0.5rem',
                 padding: '0 0.25rem'
               }}>
                 {/* Antox Herbal Care Brand Pill */}
                 <div style={{
                   backgroundColor: '#064e3b',
                   color: '#ffffff',
-                  fontSize: '0.76rem',
+                  fontSize: '0.74rem',
                   fontWeight: 700,
-                  padding: '0.28rem 0.75rem',
+                  padding: '0.25rem 0.65rem',
                   borderRadius: '9999px',
                   boxShadow: '0 2px 6px rgba(6, 78, 59, 0.25)',
                   display: 'flex',
@@ -295,24 +295,24 @@ const Hero = ({ onOpenConsultation }) => {
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem'
+                  gap: '0.4rem'
                 }}>
                   <span style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.7rem',
                     fontWeight: 700,
                     color: '#059669',
                     backgroundColor: '#ecfdf5',
-                    padding: '0.22rem 0.6rem',
+                    padding: '0.2rem 0.5rem',
                     borderRadius: '6px'
                   }}>
                     {language === 'mr' ? currentSlide.categoryMr : currentSlide.categoryEn}
                   </span>
                   <span style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.7rem',
                     fontWeight: 700,
                     color: '#475569',
                     backgroundColor: '#f1f5f9',
-                    padding: '0.22rem 0.55rem',
+                    padding: '0.2rem 0.5rem',
                     borderRadius: '6px'
                   }}>
                     {activeSlide + 1} / {slides.length}
@@ -323,9 +323,9 @@ const Hero = ({ onOpenConsultation }) => {
               {/* Slideshow Image Box Frame - Fitted perfectly to avoid cropping */}
               <div style={{
                 position: 'relative',
-                borderRadius: '16px',
+                borderRadius: '14px',
                 overflow: 'hidden',
-                marginBottom: '0.85rem',
+                marginBottom: '0.65rem',
                 aspectRatio: '16/9.5',
                 backgroundColor: '#f8fafc',
                 border: '1px solid #e2e8f0',
@@ -359,8 +359,8 @@ const Hero = ({ onOpenConsultation }) => {
                     top: '50%',
                     left: '8px',
                     transform: 'translateY(-50%)',
-                    width: '32px',
-                    height: '32px',
+                    width: '30px',
+                    height: '30px',
                     borderRadius: '50%',
                     backgroundColor: 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(4px)',
@@ -383,7 +383,7 @@ const Hero = ({ onOpenConsultation }) => {
                     e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
                   }}
                 >
-                  <ChevronLeft size={18} strokeWidth={2.5} />
+                  <ChevronLeft size={16} strokeWidth={2.5} />
                 </button>
 
                 {/* Right Navigation Arrow */}
@@ -396,8 +396,8 @@ const Hero = ({ onOpenConsultation }) => {
                     top: '50%',
                     right: '8px',
                     transform: 'translateY(-50%)',
-                    width: '32px',
-                    height: '32px',
+                    width: '30px',
+                    height: '30px',
                     borderRadius: '50%',
                     backgroundColor: 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(4px)',
@@ -420,7 +420,7 @@ const Hero = ({ onOpenConsultation }) => {
                     e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
                   }}
                 >
-                  <ChevronRight size={18} strokeWidth={2.5} />
+                  <ChevronRight size={16} strokeWidth={2.5} />
                 </button>
               </div>
 
@@ -428,9 +428,9 @@ const Hero = ({ onOpenConsultation }) => {
               <div style={{
                 display: 'flex',
                 justifyContent: 'center',
-                gap: '6px',
+                gap: '5px',
                 alignItems: 'center',
-                marginBottom: '0.85rem'
+                marginBottom: '0.65rem'
               }}>
                 {slides.map((_, idx) => (
                   <button
@@ -439,8 +439,8 @@ const Hero = ({ onOpenConsultation }) => {
                     onClick={() => setActiveSlide(idx)}
                     aria-label={`Go to slide ${idx + 1}`}
                     style={{
-                      width: activeSlide === idx ? '22px' : '7px',
-                      height: '7px',
+                      width: activeSlide === idx ? '20px' : '6px',
+                      height: '6px',
                       borderRadius: '9999px',
                       backgroundColor: activeSlide === idx ? '#059669' : '#cbd5e1',
                       border: 'none',
@@ -453,11 +453,11 @@ const Hero = ({ onOpenConsultation }) => {
               </div>
 
               {/* Slide Text Content & Highlights */}
-              <div style={{ minHeight: '68px', marginBottom: '0.85rem' }}>
-                <h3 style={{ fontSize: '1.12rem', fontWeight: 700, color: '#064e3b', margin: '0 0 0.25rem 0' }}>
+              <div style={{ minHeight: '56px', marginBottom: '0.65rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#064e3b', margin: '0 0 0.2rem 0' }}>
                   {language === 'mr' ? currentSlide.titleMr : currentSlide.titleEn}
                 </h3>
-                <p style={{ fontSize: '0.84rem', color: '#64748b', lineHeight: 1.45, margin: 0 }}>
+                <p style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.4, margin: 0 }}>
                   {language === 'mr' ? currentSlide.descriptionMr : currentSlide.descriptionEn}
                 </p>
               </div>
@@ -466,51 +466,51 @@ const Hero = ({ onOpenConsultation }) => {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '0.5rem',
-                paddingTop: '0.75rem',
+                gap: '0.4rem',
+                paddingTop: '0.6rem',
                 borderTop: '1px solid #e2e8f0',
-                marginBottom: '1rem'
+                marginBottom: '0.75rem'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <ShieldCheck size={16} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#334155' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <ShieldCheck size={15} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
                     {language === 'mr' ? '१००% आयुर्वेदिक' : '100% Ayurvedic'}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Activity size={16} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#334155' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Activity size={15} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
                     {language === 'mr' ? 'आहार व पथ्य' : 'Dietary Pathya'}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Phone size={16} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#334155' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Phone size={15} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
                     {language === 'mr' ? 'फोनवर मार्गदर्शन' : 'Phone Guidance'}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Heart size={16} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#334155' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Heart size={15} style={{ color: '#059669', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
                     {language === 'mr' ? 'हजारो लाभार्थी' : 'Statewide Reach'}
                   </span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                 <Link
                   to={currentSlide.link || '/shop'}
                   className="btn btn-primary"
                   style={{
-                    padding: '0.6rem 0.85rem',
-                    fontSize: '0.84rem',
+                    padding: '0.5rem 0.75rem',
+                    fontSize: '0.82rem',
                     justifyContent: 'center',
                     backgroundColor: '#065f46',
                     borderColor: '#065f46'
                   }}
                 >
-                  <ShoppingBag size={15} />
+                  <ShoppingBag size={14} />
                   <span>{language === 'mr' ? currentSlide.ctaMr : currentSlide.ctaEn}</span>
                 </Link>
 
@@ -519,13 +519,13 @@ const Hero = ({ onOpenConsultation }) => {
                   onClick={onOpenConsultation}
                   className="btn btn-outline"
                   style={{
-                    padding: '0.6rem 0.85rem',
-                    fontSize: '0.84rem',
+                    padding: '0.5rem 0.75rem',
+                    fontSize: '0.82rem',
                     justifyContent: 'center'
                   }}
                 >
                   <span>{language === 'mr' ? 'मोफत सल्ला' : 'Free Advice'}</span>
-                  <ArrowRight size={15} />
+                  <ArrowRight size={14} />
                 </button>
               </div>
 
@@ -533,8 +533,8 @@ const Hero = ({ onOpenConsultation }) => {
               <div style={{
                 display: 'flex',
                 gap: '6px',
-                marginTop: '0.85rem',
-                paddingTop: '0.75rem',
+                marginTop: '0.65rem',
+                paddingTop: '0.6rem',
                 borderTop: '1px solid #f1f5f9',
                 overflowX: 'auto',
                 paddingBottom: '2px',
@@ -546,8 +546,8 @@ const Hero = ({ onOpenConsultation }) => {
                     type="button"
                     onClick={() => setActiveSlide(idx)}
                     style={{
-                      width: '44px',
-                      height: '32px',
+                      width: '42px',
+                      height: '30px',
                       borderRadius: '6px',
                       overflow: 'hidden',
                       border: activeSlide === idx ? '2px solid #059669' : '1px solid #e2e8f0',
@@ -575,10 +575,16 @@ const Hero = ({ onOpenConsultation }) => {
       </div>
 
       <style>{`
+        .hero-section {
+          padding: 0.5rem 0 2.5rem 0;
+        }
         @media (max-width: 960px) {
+          .hero-section {
+            padding: 0.5rem 0 1.75rem 0 !important;
+          }
           .hero-grid {
             grid-template-columns: 1fr !important;
-            gap: 2.5rem !important;
+            gap: 2rem !important;
           }
           .hero-title {
             font-size: 2.15rem !important;
