@@ -125,9 +125,9 @@ const Hero = ({ onOpenConsultation }) => {
         }} className="hero-grid">
           {/* Left Column: Heading & Content */}
           <div>
-            {/* Campaign Badge */}
+            {/* Campaign Badge with Entrance and Glow Animation */}
             <div 
-              className="hero-slide-badge"
+              className="hero-slide-badge hero-animated-badge"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -143,13 +143,13 @@ const Hero = ({ onOpenConsultation }) => {
                 marginBottom: '0.65rem'
               }}
             >
-              <Sparkles size={16} style={{ color: '#fbbf24' }} />
+              <Sparkles size={16} className="hero-sparkle-icon" style={{ color: '#fbbf24' }} />
               <span>
                 {language === 'mr' ? 'मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियान' : 'National Health & De-Addiction Initiative'}
               </span>
             </div>
 
-            {/* Main Headline */}
+            {/* Main Headline with Animated Text Shimmer & Staggered Reveal */}
             <h1 style={{
               fontSize: '2.8rem',
               fontWeight: 800,
@@ -157,16 +157,16 @@ const Hero = ({ onOpenConsultation }) => {
               lineHeight: 1.2,
               marginBottom: '0.85rem',
               letterSpacing: '-0.02em'
-            }} className="hero-title">
+            }} className="hero-title hero-animated-title">
               {language === 'mr' ? (
                 <>
-                  <span style={{ color: '#a7f3d0' }}>सहारा सोशल फाऊंडेशन</span>, कोल्हापूर<br />
-                  <span style={{ color: '#fef3c7', fontSize: '2.4rem' }}>मधुमेह मुक्त भारत अभियान</span>
+                  <span className="hero-title-highlight">सहारा सोशल फाऊंडेशन</span>, कोल्हापूर<br />
+                  <span className="hero-campaign-highlight" style={{ fontSize: '2.4rem' }}>मधुमेह मुक्त भारत अभियान</span>
                 </>
               ) : (
                 <>
-                  <span style={{ color: '#a7f3d0' }}>Sahara Social Foundation</span><br />
-                  <span style={{ color: '#fef3c7', fontSize: '2.3rem' }}>Diabetes-Free India Campaign</span>
+                  <span className="hero-title-highlight">Sahara Social Foundation</span><br />
+                  <span className="hero-campaign-highlight" style={{ fontSize: '2.3rem' }}>Diabetes-Free India Campaign</span>
                 </>
               )}
             </h1>
@@ -578,6 +578,74 @@ const Hero = ({ onOpenConsultation }) => {
         .hero-section {
           padding: 0.5rem 0 2.5rem 0;
         }
+
+        /* Text & Badge Animations */
+        .hero-animated-badge {
+          animation: heroFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .hero-sparkle-icon {
+          animation: heroSparklePulse 2.4s ease-in-out infinite;
+        }
+
+        .hero-animated-title {
+          animation: heroFadeInUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+        }
+
+        .hero-title-highlight {
+          color: #a7f3d0;
+          background: linear-gradient(90deg, #a7f3d0 0%, #ffffff 40%, #6ee7b7 70%, #a7f3d0 100%);
+          background-size: 250% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: heroTextShimmer 5s ease-in-out infinite;
+          display: inline-block;
+        }
+
+        .hero-campaign-highlight {
+          color: #fef3c7;
+          background: linear-gradient(90deg, #fef3c7 0%, #ffffff 35%, #fbbf24 70%, #fef3c7 100%);
+          background-size: 250% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: heroTextShimmer 5s ease-in-out infinite 1.2s;
+          display: inline-block;
+        }
+
+        @keyframes heroFadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(16px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes heroTextShimmer {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        @keyframes heroSparklePulse {
+          0%, 100% {
+            transform: scale(1) rotate(0deg);
+            filter: drop-shadow(0 0 2px rgba(251, 191, 36, 0.4));
+          }
+          50% {
+            transform: scale(1.22) rotate(12deg);
+            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.9));
+          }
+        }
+
         @media (max-width: 960px) {
           .hero-section {
             padding: 0.5rem 0 1.75rem 0 !important;
