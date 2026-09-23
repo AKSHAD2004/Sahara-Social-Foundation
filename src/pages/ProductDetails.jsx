@@ -16,11 +16,13 @@ import WhatsAppIcon from '../components/WhatsAppIcon';
 import { productsData, organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { language } = useLanguage();
   const { addToCart } = useCart();
+  const { customerUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
 
@@ -31,6 +33,13 @@ const ProductDetails = () => {
   };
 
   const handleOrderNow = () => {
+    if (!customerUser) {
+      openCustomerAuthModal(() => {
+        addToCart(product, quantity);
+        navigate('/checkout');
+      });
+      return;
+    }
     addToCart(product, quantity);
     navigate('/checkout');
   };

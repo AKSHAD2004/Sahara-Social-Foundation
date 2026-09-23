@@ -7,17 +7,25 @@ import {
   Check, 
   Phone,
   ShieldCheck 
-} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { organizationInfo } from '../data/websiteData';
 
 const ProductCard = ({ product }) => {
   const { language } = useLanguage();
   const { addToCart } = useCart();
+  const { customerUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
 
   const handleOrderNow = () => {
+    if (!customerUser) {
+      openCustomerAuthModal(() => {
+        addToCart(product, 1);
+        navigate('/checkout');
+      });
+      return;
+    }
     addToCart(product, 1);
     navigate('/checkout');
   };

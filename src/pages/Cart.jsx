@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, 
   Trash2, 
@@ -11,11 +11,24 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { organizationInfo } from '../data/websiteData';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, subtotal, deliveryCharges, grandTotal } = useCart();
   const { language } = useLanguage();
+  const { customerUser, openCustomerAuthModal } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProceedToCheckout = () => {
+    if (!customerUser) {
+      openCustomerAuthModal(() => {
+        navigate('/checkout');
+      });
+      return;
+    }
+    navigate('/checkout');
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -273,14 +286,15 @@ const Cart = () => {
                 {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
               </div>
 
-              <Link
-                to="/checkout"
+              <button
+                type="button"
+                onClick={handleProceedToCheckout}
                 className="btn btn-primary btn-lg"
-                style={{ width: '100%', marginBottom: '1rem' }}
+                style={{ width: '100%', marginBottom: '1rem', cursor: 'pointer' }}
               >
                 <span>{language === 'mr' ? 'चेकआऊट करा (Proceed to Checkout)' : 'Proceed to Checkout'}</span>
                 <ArrowRight size={18} />
-              </Link>
+              </button>
 
               <div style={{ textAlign: 'center', fontSize: '0.82rem', color: '#64748b' }}>
                 <ShieldCheck size={14} style={{ display: 'inline', color: '#059669', marginRight: '4px' }} />

@@ -1,5 +1,5 @@
-// Authentication Context with Role-Based Access Control and Firebase Auth Integration
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// Authentication Context with Role-Based Access Control, Customer Auth, and Firebase Auth Integration
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { initialUsers } from '../services/seedData';
 import { dbService } from '../services/db';
 import { firebaseAuthService } from '../services/firebaseAuth';
@@ -8,6 +8,7 @@ import { isFirebaseConfigured, auth as fbAuth } from '../services/firebase';
 const AuthContext = createContext(null);
 
 const STORAGE_AUTH_KEY = 'sahara_crm_current_user';
+const CUSTOMER_STORAGE_KEY = 'sahara_customer_user';
 
 export function AuthProvider({ children }) {
   // Default to Super Admin so the CRM is immediately interactive
@@ -18,6 +19,18 @@ export function AuthProvider({ children }) {
     } catch (e) {}
     return initialUsers[0]; // Dr. Sharad Patil (Super Admin)
   });
+
+  // Customer Authentication for eCommerce Buyers
+  const [customerUser, setCustomerUser] = useState(() => {
+    try {
+      const savedCustomer = localStorage.getItem(CUSTOMER_STORAGE_KEY);
+      if (savedCustomer) return JSON.parse(savedCustomer);
+    } catch (e) {}
+    return null;
+  });
+
+  const [isCustomerAuthModalOpen, setIsCustomerAuthModalOpen] = useState(false);
+  const customerAuthCallbackRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
   const [availableUsers, setAvailableUsers] = useState(initialUsers);
@@ -126,6 +139,49 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Customer authentication methods
+  const openCustomerAuthModal = (onSuccessCallback) => {
+    customerAuthCallbackRef.current = onSuccessCallback || null;
+    setIsCustomerAuthModalOpen(true);
+  };
+
+  const closeCustomerAuthModal = () => {
+    setIsCustomerAuthModalOpen(false);
+    customerAuthCallbackRef.current = null;
+  };
+
+  const loginCustomer = (userData) => {
+    const customerObj = {
+      id: userData.id || `CUST-${Date.now()}`,
+      fullName: userData.fullName || userData.name || 'ग्राहक (Customer)',
+      phone: userData.phone || userData.mobile || '',
+      email: userData.email || '',
+      address: userData.address || '',
+      city: userData.city || '',
+      state: userData.state || 'Maharashtra',
+      pincode: userData.pincode || '',
+      loggedInAt: new Date().toISOString()
+    };
+
+    setCustomerUser(customerObj);
+    localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customerObj));
+
+    setIsCustomerAuthModalOpen(false);
+
+    if (customerAuthCallbackRef.current) {
+      const cb = customerAuthCallbackRef.current;
+      customerAuthCallbackRef.current = null;
+      cb(customerObj);
+    }
+
+    return customerObj;
+  };
+
+  const logoutCustomer = () => {
+    setCustomerUser(null);
+    localStorage.removeItem(CUSTOMER_STORAGE_KEY);
+  };
+
   // Helper permissions check
   const hasRole = (...roles) => {
     if (!currentUser) return false;
@@ -146,6 +202,13 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+    customerUser,
+    isCustomerLoggedIn: !!customerUser,
+    isCustomerAuthModalOpen,
+    openCustomerAuthModal,
+    closeCustomerAuthModal,
+    loginCustomer,
+    logoutCustomer,
     loading,
     availableUsers,
     isFirebaseConfigured,
@@ -172,3 +235,4 @@ export function useAuth() {
   }
   return context;
 }
+

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -8,31 +8,50 @@ import {
   CreditCard, 
   CheckCircle2, 
   ArrowLeft,
-  AlertCircle
+  AlertCircle,
+  User,
+  LogIn
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { organizationInfo } from '../data/websiteData';
 import { dbService } from '../services/db';
 
 const Checkout = () => {
   const { cartItems, subtotal, deliveryCharges, grandTotal, clearCart } = useCart();
   const { language } = useLanguage();
+  const { customerUser, isCustomerLoggedIn, openCustomerAuthModal, logoutCustomer } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
+    fullName: customerUser?.fullName || '',
+    phone: customerUser?.phone || '',
     altPhone: '',
-    email: '',
-    address: '',
+    email: customerUser?.email || '',
+    address: customerUser?.address || '',
     landmark: '',
-    city: '',
-    state: 'Maharashtra',
-    pincode: '',
+    city: customerUser?.city || '',
+    state: customerUser?.state || 'Maharashtra',
+    pincode: customerUser?.pincode || '',
     paymentMethod: 'cod',
     healthNotes: ''
   });
+
+  useEffect(() => {
+    if (customerUser) {
+      setFormData((prev) => ({
+        ...prev,
+        fullName: prev.fullName || customerUser.fullName || '',
+        phone: prev.phone || customerUser.phone || '',
+        email: prev.email || customerUser.email || '',
+        address: prev.address || customerUser.address || '',
+        city: prev.city || customerUser.city || '',
+        state: prev.state || customerUser.state || 'Maharashtra',
+        pincode: prev.pincode || customerUser.pincode || ''
+      }));
+    }
+  }, [customerUser]);
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,6 +99,13 @@ const Checkout = () => {
   const handlePlaceOrder = (e) => {
     e.preventDefault();
     if (!validate()) return;
+
+    if (!customerUser) {
+      openCustomerAuthModal((loggedInUser) => {
+        // Auto-filled with logged-in data, then continue
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -226,6 +252,72 @@ const Checkout = () => {
                 <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.25rem' }}>
                   {language === 'mr' ? '१. ग्राहक माहिती (Personal Details)' : '1. Customer Details'}
                 </h3>
+
+                {customerUser ? (
+                  <div style={{
+                    backgroundColor: '#ecfdf5',
+                    border: '1px solid #a7f3d0',
+                    borderRadius: '10px',
+                    padding: '0.75rem 1rem',
+                    marginBottom: '1.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    flexWrap: 'wrap'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <CheckCircle2 size={18} style={{ color: '#059669', flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.88rem', color: '#064e3b', fontWeight: 600 }}>
+                        {language === 'mr' ? 'लॉगिन केलेले ग्राहक:' : 'Logged in as:'} <strong>{customerUser.fullName}</strong> ({customerUser.phone})
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={logoutCustomer}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#dc2626',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {language === 'mr' ? 'बदला / लॉगआऊट' : 'Switch / Logout'}
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{
+                    backgroundColor: '#f8fafc',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '10px',
+                    padding: '0.75rem 1rem',
+                    marginBottom: '1.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    flexWrap: 'wrap'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <User size={18} style={{ color: '#059669', flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.86rem', color: '#334155' }}>
+                        {language === 'mr' ? 'आधीच खाते असल्यास त्वरित लॉगिन करा:' : 'Already have an account?'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => openCustomerAuthModal()}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '0.82rem', padding: '0.35rem 0.75rem' }}
+                    >
+                      <LogIn size={14} />
+                      <span>{language === 'mr' ? 'लॉगिन करा' : 'Login Now'}</span>
+                    </button>
+                  </div>
+                )}
 
                 <div className="form-group">
                   <label className="form-label">

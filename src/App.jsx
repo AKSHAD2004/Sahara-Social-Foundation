@@ -8,6 +8,7 @@ import FloatingActions from './components/FloatingActions';
 import MobileBottomBar from './components/MobileBottomBar';
 import Toast from './components/Toast';
 import ConsultationModal from './components/ConsultationModal';
+import CustomerAuthModal from './components/CustomerAuthModal';
 
 // Public Pages
 import Home from './pages/Home';
@@ -118,6 +119,7 @@ function PublicLayout() {
         isOpen={isConsultationOpen}
         onClose={() => setIsConsultationOpen(false)}
       />
+      <CustomerAuthModal />
     </div>
   );
 }
