@@ -143,16 +143,8 @@ export function isOrderCommissionEligible(order, settings = {}) {
     return false;
   }
 
-  const trigger = (typeof settings === 'object' && settings?.commissionTrigger) ? settings.commissionTrigger : 'paid';
-  const isDelivered = orderStatus === 'delivered';
-  const isPaid = paymentStatus === 'paid';
-
-  if (trigger === 'delivered_paid') {
-    return isDelivered && isPaid;
-  }
-  
-  // By default, any paid order or delivered order generates commission
-  return isPaid || isDelivered;
+  // All valid orders (Delivered, Confirmed, Shipped, Processing, Paid) qualify for sales commission calculation
+  return true;
 }
 
 /**

@@ -213,13 +213,22 @@ const OrderConfirmation = () => {
                 {language === 'mr' ? 'पेमेंट प्रकार:' : 'Payment Method:'}
               </div>
               <div style={{ fontWeight: 700, color: '#1e293b', marginTop: '0.2rem' }}>
-                {order.paymentMethod === 'cod' ? (language === 'mr' ? 'कॅश ऑन डिलिव्हरी (COD)' : 'Cash on Delivery') : 'Direct UPI'}
+                {order.paymentMethod?.includes('Razorpay') || order.paymentMethod === 'online'
+                  ? (language === 'mr' ? 'Razorpay ऑनलाईन (Paid)' : 'Razorpay Online (Paid)')
+                  : (order.paymentMethod === 'cod' || order.paymentMethod?.includes('Cash')
+                    ? (language === 'mr' ? 'कॅश ऑन डिलिव्हरी (COD)' : 'Cash on Delivery')
+                    : order.paymentMethod || 'Online Payment')}
               </div>
+              {order.transactionId && (
+                <div style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700, marginTop: '0.2rem' }}>
+                  Txn ID: {order.transactionId}
+                </div>
+              )}
               <div style={{ fontSize: '0.88rem', color: '#64748b', marginTop: '0.2rem' }}>
-                Status: Confirmed & Dispatched within 24 Hours
+                Status: {order.paymentStatus === 'Paid' ? 'Paid & Confirmed' : 'Confirmed & Dispatched within 24 Hours'}
               </div>
               <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '0.2rem' }}>
-                {language === 'mr' ? 'तारीख:' : 'Date:'} {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                {language === 'mr' ? 'तारीख:' : 'Date:'} {order.date || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
               </div>
             </div>
           </div>

@@ -7,6 +7,7 @@ import {
   Check, 
   Phone,
   ShieldCheck 
+} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';

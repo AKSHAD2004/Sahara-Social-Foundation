@@ -9,12 +9,14 @@ import {
   ShieldCheck, 
   User,
   Heart,
-  Users
+  Users,
+  LogOut
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import MissionLogoBadge from './MissionLogoBadge';
 
 const Navbar = () => {
@@ -22,6 +24,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
   const { totalCount } = useCart();
+  const { customerUser, logoutCustomer } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -188,10 +191,26 @@ const Navbar = () => {
             <Link
               to="/account"
               className="header-icon-btn"
-              title={language === 'mr' ? 'माझे खाते' : 'My Account'}
+              title={customerUser ? (customerUser.fullName || 'My Account') : (language === 'mr' ? 'माझे खाते' : 'My Account')}
               aria-label="User Account"
+              style={{ position: 'relative' }}
             >
               <User size={19} />
+              {customerUser && (
+                <span 
+                  style={{
+                    position: 'absolute',
+                    top: '2px',
+                    right: '2px',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#10b981',
+                    border: '1.5px solid #ffffff'
+                  }}
+                  title={language === 'mr' ? 'लॉगिन केलेले आहे' : 'Logged in'}
+                />
+              )}
             </Link>
 
             {/* Mobile Hamburger Menu Toggle */}
@@ -223,6 +242,54 @@ const Navbar = () => {
                     </li>
                   );
                 })}
+
+                {/* Mobile Drawer Account & Logout Link */}
+                <li style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.4rem', marginTop: '0.2rem' }}>
+                  <Link
+                    to="/account"
+                    className={`mobile-drawer-link ${location.pathname === '/account' ? 'active' : ''}`}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <User size={16} />
+                      {customerUser ? (customerUser.fullName || (language === 'mr' ? 'माझे खाते' : 'My Account')) : (language === 'mr' ? 'माझे खाते / लॉगिन' : 'My Account / Login')}
+                    </span>
+                    {customerUser && (
+                      <span style={{ fontSize: '0.72rem', backgroundColor: '#dcfce7', color: '#15803d', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
+                        {language === 'mr' ? 'लॉगिन' : 'Active'}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+
+                {customerUser && (
+                  <li>
+                    <button
+                      onClick={() => {
+                        logoutCustomer();
+                        setMobileMenuOpen(false);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        width: '100%',
+                        padding: '0.65rem 1rem',
+                        borderRadius: '8px',
+                        backgroundColor: '#fff1f2',
+                        color: '#e11d48',
+                        fontWeight: 700,
+                        fontSize: '0.92rem',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <LogOut size={16} />
+                      <span>{language === 'mr' ? 'खाते लॉग आऊट करा' : 'Logout Account'}</span>
+                    </button>
+                  </li>
+                )}
 
                 {/* Mobile Call & WhatsApp quick shortcuts in drawer */}
                 <li className="mobile-drawer-actions">

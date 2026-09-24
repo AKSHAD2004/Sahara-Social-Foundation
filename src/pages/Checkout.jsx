@@ -10,13 +10,17 @@ import {
   ArrowLeft,
   AlertCircle,
   User,
-  LogIn
+  LogIn,
+  Zap,
+  Lock,
+  Sparkles
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { organizationInfo } from '../data/websiteData';
 import { dbService } from '../services/db';
+import { initializeRazorpayPayment, getRazorpayKeyId } from '../services/razorpay';
 
 const Checkout = () => {
   const { cartItems, subtotal, deliveryCharges, grandTotal, clearCart } = useCart();
@@ -34,9 +38,11 @@ const Checkout = () => {
     city: customerUser?.city || '',
     state: customerUser?.state || 'Maharashtra',
     pincode: customerUser?.pincode || '',
-    paymentMethod: 'cod',
+    paymentMethod: 'razorpay', // 'razorpay' (Online UPI/Cards) or 'cod' (Cash on Delivery)
     healthNotes: ''
   });
+
+  const [paymentNotice, setPaymentNotice] = useState('');
 
   useEffect(() => {
     if (customerUser) {
@@ -96,24 +102,11 @@ const Checkout = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handlePlaceOrder = (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    if (!customerUser) {
-      openCustomerAuthModal((loggedInUser) => {
-        // Auto-filled with logged-in data, then continue
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
+  // Helper to persist order to CRM and redirect
+  const completeOrderPlacement = (orderId, paymentDetails = {}) => {
     const activeRefCode = localStorage.getItem('sahara_active_ref') || '';
     const users = dbService.getAll('users');
     const matchingAffiliate = users.find((u) => u.referralCode && u.referralCode.toUpperCase() === activeRefCode.toUpperCase());
-
-    const orderId = 'ORD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
 
     // 1. Create / Update Customer in CRM
     const customer = dbService.add('customers', {
@@ -126,10 +119,10 @@ const Checkout = () => {
       city: formData.city,
       state: formData.state,
       pincode: formData.pincode,
-      leadSource: activeRefCode ? 'Affiliate' : 'Website',
+      leadSource: activeRefCode ? 'Affiliate' : 'Website Direct',
       assignedEmployee: 'usr_emp_akash',
       assignedAffiliate: matchingAffiliate ? matchingAffiliate.id : '',
-      customerStatus: 'New',
+      customerStatus: 'Active Buyer',
       notes: formData.healthNotes ? `Health Notes: ${formData.healthNotes}` : 'Website Checkout Order'
     });
 
@@ -141,6 +134,8 @@ const Checkout = () => {
       price: Number(item.price || 0),
       total: Number(item.price || 0) * Number(item.quantity || 1)
     }));
+
+    const isPaidOnline = paymentDetails.status === 'Paid' || formData.paymentMethod === 'razorpay';
 
     // 3. Create Order in CRM
     const crmOrder = {
@@ -156,24 +151,26 @@ const Checkout = () => {
       shipping: deliveryCharges,
       grandTotal,
       eligibleAmount: grandTotal,
-      paymentStatus: formData.paymentMethod === 'online' ? 'Paid' : 'Pending',
+      paymentStatus: isPaidOnline ? 'Paid' : 'Pending',
       orderStatus: 'Confirmed',
       assignedEmployee: 'usr_emp_akash',
       assignedAffiliate: matchingAffiliate ? matchingAffiliate.id : '',
       affiliateName: matchingAffiliate ? matchingAffiliate.name : '',
-      commissionStatus: 'Pending Delivery',
+      commissionStatus: isPaidOnline ? 'Eligible' : 'Pending Delivery',
       orderDate: new Date().toISOString(),
       deliveredDate: null,
-      shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
-      paymentMethod: formData.paymentMethod === 'online' ? 'Online Payment' : 'Cash on Delivery'
+      shippingAddress: `${formData.address}, ${formData.landmark ? formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`,
+      paymentMethod: formData.paymentMethod === 'razorpay' ? 'Razorpay Online (UPI/Cards/NetBanking)' : 'Cash on Delivery (COD)',
+      transactionId: paymentDetails.paymentId || null,
+      gatewayResponse: paymentDetails || null
     };
 
     dbService.add('orders', crmOrder);
 
     // 4. Add CRM Notification
     dbService.addNotification({
-      title: 'New Website Order Placed',
-      message: `Order ${orderId} placed by ${formData.fullName} (₹${grandTotal}).`,
+      title: isPaidOnline ? 'New Paid Website Order' : 'New COD Order Placed',
+      message: `Order #${orderId} for ₹${grandTotal} by ${formData.fullName} (${crmOrder.paymentMethod}).`,
       type: 'order',
       link: '/crm/orders'
     });
@@ -184,18 +181,82 @@ const Checkout = () => {
       items: [...cartItems],
       customer: { ...formData },
       pricing: { subtotal, deliveryCharges, grandTotal },
-      paymentMethod: formData.paymentMethod,
+      paymentMethod: crmOrder.paymentMethod,
+      paymentStatus: crmOrder.paymentStatus,
+      transactionId: paymentDetails.paymentId || null,
       status: 'Confirmed'
     };
 
     // Store in localStorage for Order confirmation page
     localStorage.setItem('ssf_last_order', JSON.stringify(orderDetails));
 
-    setTimeout(() => {
-      clearCart();
-      setIsSubmitting(false);
-      navigate('/order-confirmation', { state: { order: orderDetails } });
-    }, 600);
+    clearCart();
+    setIsSubmitting(false);
+    navigate('/order-confirmation', { state: { order: orderDetails } });
+  };
+
+  const handlePlaceOrder = (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    if (!customerUser) {
+      openCustomerAuthModal((loggedInUser) => {
+        // Auto-filled with logged-in data, then continue
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setPaymentNotice('');
+
+    const orderId = 'ORD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+
+    // Online Payment via Razorpay
+    if (formData.paymentMethod === 'razorpay') {
+      initializeRazorpayPayment({
+        amountInRupees: grandTotal,
+        orderId: orderId,
+        customer: {
+          fullName: formData.fullName,
+          phone: formData.phone,
+          email: formData.email,
+          address: formData.address,
+          city: formData.city
+        },
+        notes: {
+          healthNotes: formData.healthNotes || 'Direct Checkout'
+        },
+        onSuccess: (paymentResponse) => {
+          completeOrderPlacement(orderId, {
+            ...paymentResponse,
+            status: 'Paid'
+          });
+        },
+        onDismiss: () => {
+          setIsSubmitting(false);
+          setPaymentNotice(
+            language === 'mr'
+              ? 'पेमेंट रद्द करण्यात आले. आपण पुन्हा प्रयत्न करू शकता किंवा "कॅश ऑन डिलिव्हरी" पर्याय निवडू शकता.'
+              : 'Payment window was closed. You can retry or choose Cash on Delivery (COD).'
+          );
+        },
+        onError: (err) => {
+          setIsSubmitting(false);
+          console.warn('Razorpay checkout note:', err);
+          // Fallback or demo completion if sandbox
+          setPaymentNotice(
+            language === 'mr'
+              ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. आपण कॅश ऑन डिलिव्हरी (COD) पर्याय निवडू शकता.'
+              : 'Online payment error. You may choose Cash on Delivery to place order.'
+          );
+        }
+      });
+    } else {
+      // Cash on Delivery (COD)
+      setTimeout(() => {
+        completeOrderPlacement(orderId, { status: 'Pending', method: 'COD' });
+      }, 500);
+    }
   };
 
   return (
@@ -219,8 +280,26 @@ const Checkout = () => {
         </div>
 
         <h1 style={{ fontSize: '2.2rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.5rem' }}>
-          {language === 'mr' ? 'डिलिव्हरी पत्ता व पेमेंट तपशील' : 'Delivery & Checkout'}
+          {language === 'mr' ? 'डिलिव्हरी पत्ता व पेमेंट तपशील' : 'Delivery & Secure Checkout'}
         </h1>
+
+        {paymentNotice && (
+          <div style={{
+            backgroundColor: '#fffbeb',
+            border: '1px solid #fde68a',
+            color: '#92400e',
+            padding: '1rem 1.25rem',
+            borderRadius: '12px',
+            marginBottom: '1.5rem',
+            fontSize: '0.92rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.6rem'
+          }}>
+            <AlertCircle size={20} style={{ flexShrink: 0 }} />
+            <span>{paymentNotice}</span>
+          </div>
+        )}
 
         <form onSubmit={handlePlaceOrder}>
           <div style={{
@@ -229,13 +308,13 @@ const Checkout = () => {
             gap: '2.5rem',
             alignItems: 'flex-start'
           }} className="checkout-layout-grid">
-            {/* Left Column: Delivery Details */}
+            {/* Left Column: Delivery & Payment Details */}
             <div>
               {/* Mandatory Guideline Banner */}
               <div className="notice-strip" style={{ marginBottom: '1.75rem' }}>
                 <ShieldCheck size={22} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
                 <div>
-                  <strong>{language === 'mr' ? 'डिलिव्हरी नंतरचे मार्गदर्शन:' : 'Post-Delivery Notice:'}</strong><br />
+                  <strong>{language === 'mr' ? 'डिलिव्हरी नंतरचे मोफत मार्गदर्शन:' : 'Post-Delivery Expert Regimen:'}</strong><br />
                   {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
                 </div>
               </div>
@@ -249,132 +328,75 @@ const Checkout = () => {
                 boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
                 marginBottom: '1.75rem'
               }}>
-                <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.25rem' }}>
-                  {language === 'mr' ? '१. ग्राहक माहिती (Personal Details)' : '1. Customer Details'}
-                </h3>
-
-                {customerUser ? (
-                  <div style={{
-                    backgroundColor: '#ecfdf5',
-                    border: '1px solid #a7f3d0',
-                    borderRadius: '10px',
-                    padding: '0.75rem 1rem',
-                    marginBottom: '1.25rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '0.75rem',
-                    flexWrap: 'wrap'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <CheckCircle2 size={18} style={{ color: '#059669', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.88rem', color: '#064e3b', fontWeight: 600 }}>
-                        {language === 'mr' ? 'लॉगिन केलेले ग्राहक:' : 'Logged in as:'} <strong>{customerUser.fullName}</strong> ({customerUser.phone})
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={logoutCustomer}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#dc2626',
-                        fontSize: '0.8rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        textDecoration: 'underline'
-                      }}
-                    >
-                      {language === 'mr' ? 'बदला / लॉगआऊट' : 'Switch / Logout'}
-                    </button>
-                  </div>
-                ) : (
-                  <div style={{
-                    backgroundColor: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '10px',
-                    padding: '0.75rem 1rem',
-                    marginBottom: '1.25rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '0.75rem',
-                    flexWrap: 'wrap'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <User size={18} style={{ color: '#059669', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.86rem', color: '#334155' }}>
-                        {language === 'mr' ? 'आधीच खाते असल्यास त्वरित लॉगिन करा:' : 'Already have an account?'}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => openCustomerAuthModal()}
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: '0.82rem', padding: '0.35rem 0.75rem' }}
-                    >
-                      <LogIn size={14} />
-                      <span>{language === 'mr' ? 'लॉगिन करा' : 'Login Now'}</span>
-                    </button>
-                  </div>
-                )}
-
-                <div className="form-group">
-                  <label className="form-label">
-                    {language === 'mr' ? 'पूर्ण नाव *' : 'Full Name *'}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder={language === 'mr' ? 'उदा. बाबासाहेब जाधव' : 'e.g. Babasaheb Jadhav'}
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  />
-                  {errors.fullName && <div className="form-error">{errors.fullName}</div>}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, margin: 0 }}>
+                    {language === 'mr' ? '१. लाभार्थी / ग्राहकाची माहिती' : '1. Customer Details'}
+                  </h3>
+                  {customerUser && (
+                    <span style={{ fontSize: '0.78rem', backgroundColor: '#ecfdf5', color: '#059669', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
+                      ✓ {language === 'mr' ? 'लॉगिन केलेले खाते' : 'Logged In'}
+                    </span>
+                  )}
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div className="form-group">
                     <label className="form-label">
-                      {language === 'mr' ? 'प्राथमिक मोबाईल नंबर *' : 'Primary Phone Number *'}
+                      {language === 'mr' ? 'पूर्ण नाव *' : 'Full Name *'}
                     </label>
                     <input
-                      type="tel"
+                      type="text"
                       className="form-input"
-                      placeholder="9876543210"
-                      maxLength={10}
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder={language === 'mr' ? 'उदा. बाबासाहेब जाधव' : 'Ramesh Patil'}
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     />
-                    {errors.phone && <div className="form-error">{errors.phone}</div>}
+                    {errors.fullName && <div className="form-error">{errors.fullName}</div>}
                   </div>
 
                   <div className="form-group">
                     <label className="form-label">
-                      {language === 'mr' ? 'पर्यायी फोन (पर्यायी)' : 'Alternative Phone (Optional)'}
+                      {language === 'mr' ? '१० अंकी मोबाईल नंबर *' : 'Mobile Number *'}
                     </label>
                     <input
                       type="tel"
                       className="form-input"
-                      placeholder="9876543210"
                       maxLength={10}
-                      value={formData.altPhone}
-                      onChange={(e) => setFormData({ ...formData, altPhone: e.target.value })}
+                      placeholder="8421154090"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
                     />
+                    {errors.phone && <div className="form-error">{errors.phone}</div>}
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">
-                    {language === 'mr' ? 'ईमेल (पर्यायी)' : 'Email Address (Optional)'}
-                  </label>
-                  <input
-                    type="email"
-                    className="form-input"
-                    placeholder="example@mail.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">
+                      {language === 'mr' ? 'पर्यायी मोबाईल (Optional)' : 'Alt Phone (Optional)'}
+                    </label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      maxLength={10}
+                      placeholder="98XXXXXXXX"
+                      value={formData.altPhone}
+                      onChange={(e) => setFormData({ ...formData, altPhone: e.target.value.replace(/\D/g, '') })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">
+                      {language === 'mr' ? 'ईमेल (पावतीसाठी)' : 'Email (For Bill)'}
+                    </label>
+                    <input
+                      type="email"
+                      className="form-input"
+                      placeholder="user@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -482,7 +504,7 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Payment Method Option */}
+              {/* Payment Method Option with Razorpay Integration */}
               <div style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '20px',
@@ -490,22 +512,67 @@ const Checkout = () => {
                 border: '1px solid #e2e8f0',
                 boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
               }}>
-                <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.25rem' }}>
-                  {language === 'mr' ? '३. पेमेंट पर्याय (Payment Method)' : '3. Payment Option'}
-                </h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, margin: 0 }}>
+                    {language === 'mr' ? '३. पेमेंट पर्याय (Payment Gateway)' : '3. Payment Method'}
+                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#059669', fontSize: '0.78rem', fontWeight: 700 }}>
+                    <Lock size={13} />
+                    <span>256-Bit SSL Secure</span>
+                  </div>
+                </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  {/* COD */}
+                  {/* Option 1: Razorpay Online Payment */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1rem',
-                    padding: '1rem',
-                    borderRadius: '12px',
-                    border: '1.5px solid',
+                    padding: '1.1rem',
+                    borderRadius: '14px',
+                    border: '2px solid',
+                    borderColor: formData.paymentMethod === 'razorpay' ? '#059669' : '#e2e8f0',
+                    backgroundColor: formData.paymentMethod === 'razorpay' ? '#f0fdf4' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="razorpay"
+                      checked={formData.paymentMethod === 'razorpay'}
+                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      style={{ accentColor: '#059669', width: '18px', height: '18px' }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <div style={{ fontWeight: 800, color: '#064e3b', fontSize: '0.98rem' }}>
+                          {language === 'mr' ? 'ऑनलाईन पेमेंट (Razorpay - UPI / PhonePe / GPay / Cards)' : 'Online Payment (Razorpay - UPI / Cards / NetBanking)'}
+                        </div>
+                        <span style={{ fontSize: '0.72rem', backgroundColor: '#064e3b', color: '#ffffff', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
+                          {language === 'mr' ? 'जलद व सुरक्षित' : 'Fast & Secure'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '0.25rem' }}>
+                        {language === 'mr' 
+                          ? 'Google Pay, PhonePe, Paytm, डेबिट/क्रेडिट कार्ड किंवा नेटबँकिंग द्वारे त्वरित पेमेंट' 
+                          : 'Pay instantly via UPI, Google Pay, PhonePe, Debit/Credit Card, NetBanking'}
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* Option 2: COD */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '1.1rem',
+                    borderRadius: '14px',
+                    border: '2px solid',
                     borderColor: formData.paymentMethod === 'cod' ? '#059669' : '#e2e8f0',
-                    backgroundColor: formData.paymentMethod === 'cod' ? '#ecfdf5' : '#ffffff',
-                    cursor: 'pointer'
+                    backgroundColor: formData.paymentMethod === 'cod' ? '#f0fdf4' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
                   }}>
                     <input
                       type="radio"
@@ -513,42 +580,14 @@ const Checkout = () => {
                       value="cod"
                       checked={formData.paymentMethod === 'cod'}
                       onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      style={{ accentColor: '#059669', width: '18px', height: '18px' }}
                     />
                     <div>
-                      <div style={{ fontWeight: 700, color: '#064e3b' }}>
+                      <div style={{ fontWeight: 800, color: '#064e3b', fontSize: '0.98rem' }}>
                         {language === 'mr' ? 'कॅश ऑन डिलिव्हरी (Cash on Delivery)' : 'Cash on Delivery (COD)'}
                       </div>
-                      <div style={{ fontSize: '0.82rem', color: '#64748b' }}>
-                        {language === 'mr' ? 'पार्सल हातात आल्यावर पैसे द्या' : 'Pay when the parcel arrives at your door'}
-                      </div>
-                    </div>
-                  </label>
-
-                  {/* UPI / Online placeholder */}
-                  <label style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    padding: '1rem',
-                    borderRadius: '12px',
-                    border: '1.5px solid',
-                    borderColor: formData.paymentMethod === 'upi' ? '#059669' : '#e2e8f0',
-                    backgroundColor: formData.paymentMethod === 'upi' ? '#ecfdf5' : '#ffffff',
-                    cursor: 'pointer'
-                  }}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="upi"
-                      checked={formData.paymentMethod === 'upi'}
-                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                    />
-                    <div>
-                      <div style={{ fontWeight: 700, color: '#064e3b' }}>
-                        {language === 'mr' ? 'ऑनलाईन UPI / PhonePe / GPay' : 'Online UPI / PhonePe / Google Pay'}
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: '#64748b' }}>
-                        {language === 'mr' ? 'ऑर्डर पुष्टीकरणानंतर थेट UPI द्वारे पेमेंट' : 'Direct UPI verification support'}
+                      <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '0.25rem' }}>
+                        {language === 'mr' ? 'पार्सल हातात आल्यावर रोख पैसे द्या' : 'Pay in cash when parcel is delivered at your address'}
                       </div>
                     </div>
                   </label>
@@ -598,7 +637,7 @@ const Checkout = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
                     <span>{language === 'mr' ? 'डिलिव्हरी' : 'Delivery'}</span>
                     <span style={{ fontWeight: 700, color: '#059669' }}>
-                      {deliveryCharges === 0 ? 'मोफत (FREE)' : `₹${deliveryCharges}`}
+                      {deliveryCharges === 0 ? (language === 'mr' ? 'मोफत (FREE)' : 'FREE') : `₹${deliveryCharges}`}
                     </span>
                   </div>
 
@@ -620,12 +659,19 @@ const Checkout = () => {
                   type="submit"
                   disabled={isSubmitting}
                   className="btn btn-primary btn-lg"
-                  style={{ width: '100%', marginBottom: '1.25rem' }}
+                  style={{
+                    width: '100%',
+                    marginBottom: '1.25rem',
+                    backgroundColor: formData.paymentMethod === 'razorpay' ? '#065f46' : '#047857',
+                    boxShadow: '0 4px 15px rgba(6, 95, 70, 0.3)'
+                  }}
                 >
-                  <CheckCircle2 size={18} />
+                  {formData.paymentMethod === 'razorpay' ? <Zap size={18} /> : <CheckCircle2 size={18} />}
                   <span>
                     {isSubmitting
-                      ? (language === 'mr' ? 'ऑर्डर नोंदवत आहे...' : 'Placing Order...')
+                      ? (language === 'mr' ? 'ऑर्डर पुढे नेली जात आहे...' : 'Processing...')
+                      : formData.paymentMethod === 'razorpay'
+                      ? (language === 'mr' ? `Razorpay ने पेमेंट करा (₹${grandTotal})` : `Pay with Razorpay (₹${grandTotal})`)
                       : (language === 'mr' ? `ऑर्डर कन्फर्म करा (₹${grandTotal})` : `Confirm Order (₹${grandTotal})`)}
                   </span>
                 </button>
