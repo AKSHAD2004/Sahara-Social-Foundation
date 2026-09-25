@@ -27,50 +27,49 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
       className="card product-card-animated"
     >
       {/* Campaign Image */}
-      <div style={{ position: 'relative', height: '240px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
         <img
           src={campaign.image}
           alt={campaign.titleMr || campaign.titleEn}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
         />
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)'
+          background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)'
         }} />
         <div 
-          className="hero-slide-badge"
           style={{
             position: 'absolute',
-            top: '1rem',
-            left: '1rem',
-            backgroundColor: '#059669',
+            top: '0.85rem',
+            left: '0.85rem',
+            backgroundColor: '#087E8B',
             color: '#ffffff',
-            padding: '0.35rem 0.85rem',
+            padding: '0.3rem 0.75rem',
             borderRadius: '9999px',
-            fontSize: '0.78rem',
+            fontSize: '0.75rem',
             fontWeight: 700,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)'
+            boxShadow: '0 2px 8px rgba(8,126,139,0.35)'
           }}
         >
           {language === 'mr' ? campaign.badgeMr : campaign.badgeEn}
         </div>
         <div style={{
           position: 'absolute',
-          bottom: '1rem',
-          left: '1.25rem',
-          right: '1.25rem',
+          bottom: '0.85rem',
+          left: '1rem',
+          right: '1rem',
           color: '#ffffff'
         }}>
-          <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
+          <h3 style={{ fontSize: '1.28rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.25 }}>
             {language === 'mr' ? campaign.titleMr : campaign.titleEn}
           </h3>
         </div>
       </div>
 
       {/* Body Content */}
-      <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <p style={{ fontSize: '0.95rem', color: '#475569', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+      <div style={{ padding: '1.35rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <p style={{ fontSize: '0.92rem', color: '#374765', lineHeight: 1.6, marginBottom: '1.15rem' }}>
           {language === 'mr' ? campaign.descriptionMr : campaign.descriptionEn}
         </p>
 
@@ -78,27 +77,27 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.65rem',
-          marginBottom: '1.5rem',
-          backgroundColor: '#f8fafc',
-          padding: '1rem',
+          gap: '0.55rem',
+          marginBottom: '1.35rem',
+          backgroundColor: '#f0f4f9',
+          padding: '0.85rem 1rem',
           borderRadius: '12px',
-          border: '1px solid #e2e8f0'
+          border: '1px solid #e2eaf4'
         }}>
           {campaign.points.map((pt, idx) => (
-            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.86rem', color: '#334155' }}>
-              <CheckCircle size={16} style={{ color: '#059669', flexShrink: 0, marginTop: '2px' }} />
+            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.84rem', color: '#172033' }}>
+              <CheckCircle size={15} style={{ color: '#087E8B', flexShrink: 0, marginTop: '2px' }} />
               <span>{language === 'mr' ? pt.mr : pt.en}</span>
             </div>
           ))}
         </div>
 
         {/* Action Buttons */}
-        <div style={{ marginTop: 'auto', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ marginTop: 'auto', display: 'flex', gap: '0.65rem' }}>
           <Link
             to="/shop"
             className="btn btn-primary"
-            style={{ flex: 1, minWidth: '160px' }}
+            style={{ flex: 1 }}
           >
             <ShoppingBag size={16} />
             <span>{language === 'mr' ? campaign.ctaTextMr : campaign.ctaTextEn}</span>
@@ -107,8 +106,9 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
           <a
             href={`tel:${organizationInfo.contact.primaryPhone}`}
             className="btn btn-outline"
-            style={{ padding: '0.7rem 1rem' }}
+            style={{ padding: '0.65rem 0.95rem' }}
             title="Call Helpline"
+            aria-label="Call Helpline"
           >
             <Phone size={16} />
           </a>

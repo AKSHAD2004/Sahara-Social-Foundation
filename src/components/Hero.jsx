@@ -1,229 +1,161 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { 
   Phone, 
-  ShoppingBag, 
   ShieldCheck, 
   Heart, 
-  Activity, 
   Sparkles, 
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight
+  ChevronDown, 
+  ChevronUp, 
+  CheckCircle2 
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
-import { organizationInfo, heroSlidesData } from '../data/websiteData';
+import { organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 
 const Hero = ({ onOpenConsultation }) => {
   const { language } = useLanguage();
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [imageErrorMap, setImageErrorMap] = useState({});
-  const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
-
-  const slides = heroSlidesData && heroSlidesData.length > 0 ? heroSlidesData : [
-    {
-      id: 1,
-      titleEn: "Antox D & T Formula",
-      titleMr: "Antox D & T (मधुमेह नियंत्रण आणि डिटॉक्स)",
-      badgeEn: "Antox Herbal Care",
-      badgeMr: "Antox आयुर्वेदिक मालिका",
-      image: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
-      fallbackImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
-      descriptionEn: "Natural Ayurvedic formula for blood sugar balance, pancreatic health, and metabolic detox.",
-      descriptionMr: "रक्तातील साखर नियंत्रण, स्वादुपिंड पोषण आणि शरीर शुद्धीकरणासाठी प्रभावी आयुर्वेदिक फॉर्म्युला.",
-      link: "/shop",
-      ctaEn: "Order Formula",
-      ctaMr: "फॉर्म्युला मागवा"
-    }
-  ];
-
-  const currentSlide = slides[activeSlide] || slides[0];
-
-  // Auto-play interval
-  useEffect(() => {
-    if (isPaused) return;
-    const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % slides.length);
-    }, 4500);
-
-    return () => clearInterval(interval);
-  }, [isPaused, slides.length]);
-
-  const handlePrev = (e) => {
-    if (e) e.stopPropagation();
-    setActiveSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  };
-
-  const handleNext = (e) => {
-    if (e) e.stopPropagation();
-    setActiveSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchMove = (e) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return;
-    const diff = touchStartX.current - touchEndX.current;
-    if (diff > 50) {
-      handleNext();
-    } else if (diff < -50) {
-      handlePrev();
-    }
-    touchStartX.current = 0;
-    touchEndX.current = 0;
-  };
-
-  const handleImageError = (slideId) => {
-    setImageErrorMap((prev) => ({ ...prev, [slideId]: true }));
-  };
+  const [showMore, setShowMore] = useState(false);
 
   return (
-    <section className="hero-section" style={{
-      position: 'relative',
-      background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)',
-      color: '#ffffff',
-      padding: '0.5rem 0 2.5rem 0',
-      overflow: 'hidden'
-    }}>
-      {/* Background Decorative Circles */}
-      <div style={{
-        position: 'absolute',
-        top: '-10%',
-        right: '-5%',
-        width: '500px',
-        height: '500px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(6, 78, 59, 0) 70%)',
-        pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: '-10%',
-        left: '-5%',
-        width: '400px',
-        height: '400px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, rgba(6, 78, 59, 0) 70%)',
-        pointerEvents: 'none'
-      }} />
+    <section className="hero-section">
+      {/* Desktop Background Camp Image with soft left gradient */}
+      <div className="hero-bg-image-overlay" />
 
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1.1fr 0.9fr',
-          gap: '2.5rem',
-          alignItems: 'center'
-        }} className="hero-grid">
-          {/* Left Column: Heading & Content */}
-          <div>
-            {/* Campaign Badge with Entrance and Glow Animation */}
-            <div 
-              className="hero-slide-badge hero-animated-badge"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                backdropFilter: 'blur(8px)',
-                padding: '0.45rem 1rem',
-                borderRadius: '9999px',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                color: '#fef3c7',
-                fontSize: '0.88rem',
-                fontWeight: 600,
-                marginBottom: '0.65rem'
+        <div className="hero-content-wrapper">
+          {/* Campaign Badge */}
+          <div className="hero-slide-badge hero-animated-badge">
+            <Sparkles size={15} className="hero-sparkle-icon" style={{ color: '#F4A261' }} />
+            <span>
+              {language === 'mr' ? 'मधुमेह मुक्त भारत व व्यसनमुक्त भारत अभियान' : 'National Health & De-Addiction Initiative'}
+            </span>
+          </div>
+
+          {/* Mobile Dedicated Photo Card (Shows full clear image on mobile devices) */}
+          <div className="hero-mobile-image-card">
+            <img 
+              src="/hero-camp-bg.jpg" 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/hero-bg.jpg';
               }}
-            >
-              <Sparkles size={16} className="hero-sparkle-icon" style={{ color: '#fbbf24' }} />
-              <span>
-                {language === 'mr' ? 'मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियान' : 'National Health & De-Addiction Initiative'}
-              </span>
+              alt="Sahara Social Foundation Health Camp" 
+              className="hero-mobile-img"
+            />
+            <div className="hero-mobile-img-badge">
+              <ShieldCheck size={13} style={{ color: '#3cd0e2' }} />
+              <span>{language === 'mr' ? 'अधिकृत आरोग्य शिबिर • कोल्हापूर' : 'Official Health Camp • Kolhapur'}</span>
             </div>
+          </div>
 
-            {/* Main Headline with Animated Text Shimmer & Staggered Reveal */}
-            <h1 style={{
-              fontSize: '2.8rem',
-              fontWeight: 800,
-              color: '#ffffff',
-              lineHeight: 1.2,
-              marginBottom: '0.85rem',
-              letterSpacing: '-0.02em'
-            }} className="hero-title hero-animated-title">
-              {language === 'mr' ? (
-                <>
-                  <span className="hero-title-highlight">सहारा सोशल फाऊंडेशन</span>, कोल्हापूर<br />
-                  <span className="hero-campaign-highlight" style={{ fontSize: '2.4rem' }}>मधुमेह मुक्त भारत अभियान</span>
-                </>
-              ) : (
-                <>
-                  <span className="hero-title-highlight">Sahara Social Foundation</span><br />
-                  <span className="hero-campaign-highlight" style={{ fontSize: '2.3rem' }}>Diabetes-Free India Campaign</span>
-                </>
-              )}
-            </h1>
+          {/* Main Headline */}
+          <h1 className="hero-title hero-animated-title">
+            {language === 'mr' ? (
+              <>
+                <span className="hero-title-highlight">सहारा सोशल फाऊंडेशन</span>, कोल्हापूर<br />
+                <span className="hero-campaign-highlight">मधुमेह मुक्त भारत अभियान</span>
+              </>
+            ) : (
+              <>
+                <span className="hero-title-highlight">Sahara Social Foundation</span><br />
+                <span className="hero-campaign-highlight">Diabetes-Free India Campaign</span>
+              </>
+            )}
+          </h1>
 
-            {/* Supporting Text */}
-            <p style={{
-              fontSize: '1.15rem',
-              color: '#d1fae5',
-              lineHeight: 1.6,
-              marginBottom: '1rem',
-              maxWidth: '620px'
-            }}>
+          {/* Supporting Subtext with Read More / Less Toggle */}
+          <div className="hero-subtext-container">
+            <p className="hero-subtext">
               {language === 'mr'
                 ? 'आधार मधुमेह-मुक्ती मार्गदर्शन केंद्राच्या सहयोगाने नैसर्गिक आयुर्वेदिक फॉर्म्युला, योग्य आहाराचे पथ्य आणि समुपदेशनाद्वारे रक्तातील साखर व व्यसनावर मात करण्यासाठी प्रभावी मार्गदर्शन.'
                 : 'In collaboration with Aadhar Madhumeh-Mukti Margdarshan Kendra, delivering authentic Ayurvedic wellness formulas, dietary counseling, and dedicated guidance for diabetes control and de-addiction.'}
             </p>
 
-            {/* Key Notice Strip in Hero */}
-            <div style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderLeft: '4px solid #34d399',
-              padding: '0.65rem 1rem',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              color: '#fef3c7',
-              marginBottom: '1.25rem',
-              backdropFilter: 'blur(6px)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.65rem'
-            }}>
-              <ShieldCheck size={20} style={{ color: '#34d399', flexShrink: 0 }} />
+            {/* Read More / Less Button */}
+            <button
+              type="button"
+              onClick={() => setShowMore(prev => !prev)}
+              className="hero-read-more-btn"
+              aria-expanded={showMore}
+            >
               <span>
-                {language === 'mr'
-                  ? 'नोंदणीकृत सामाजिक संस्था (Reg. No. MAH/582/2014/KOP) • अधिकृत आयुर्वेद सल्ला'
-                  : 'Registered Foundation (Reg. No. MAH/582/2014/KOP) • Authentic Ayurvedic Guidance'}
+                {showMore 
+                  ? (language === 'mr' ? 'कमी माहिती दाखवा' : 'Show Less')
+                  : (language === 'mr' ? 'अधिक माहिती वाचा (Read More)' : 'Read More Details')}
               </span>
-            </div>
+              {showMore ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
 
-            {/* CTA Action Buttons */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.85rem',
-              flexWrap: 'wrap'
-            }}>
-              <button
-                onClick={onOpenConsultation}
-                className="btn btn-accent btn-lg"
-                style={{
-                  boxShadow: '0 8px 25px rgba(245, 158, 11, 0.4)'
-                }}
-              >
-                <Heart size={18} />
-                <span>{language === 'mr' ? 'मोफत मार्गदर्शन अर्ज' : 'Free Consultation'}</span>
-              </button>
+            {/* Expandable Full Content */}
+            {showMore && (
+              <div className="hero-expanded-content">
+                <div className="hero-expanded-grid">
+                  <div className="hero-expanded-item">
+                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <strong>{language === 'mr' ? 'मधुमेह नियंत्रण:' : 'Diabetes Support:'}</strong>{' '}
+                      {language === 'mr' 
+                        ? 'स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नैसर्गिकरीत्या नियंत्रित ठेवण्यास मदत.'
+                        : 'Natural support for cellular insulin uptake and blood glucose balance.'}
+                    </div>
+                  </div>
 
+                  <div className="hero-expanded-item">
+                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <strong>{language === 'mr' ? 'आहाराचे पथ्य:' : 'Dietary Pathya:'}</strong>{' '}
+                      {language === 'mr'
+                        ? 'प्रत्येक रुग्णाला फोन व प्रत्यक्ष भेटीत आहाराचे शास्त्रीय नियोजन व पथ्य मार्गदर्शन.'
+                        : 'Scientific nutritional schedule and personalized dietary guidelines.'}
+                    </div>
+                  </div>
+
+                  <div className="hero-expanded-item">
+                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <strong>{language === 'mr' ? 'व्यसनमुक्ती अभियान:' : 'De-Addiction Drive:'}</strong>{' '}
+                      {language === 'mr'
+                        ? 'दारू, तंबाखू व सिगारेटची तीव्र तलफ नैसर्गिक हर्बल फॉर्म्युलाने कमी करणे.'
+                        : 'Safe herbal support to curb urges for alcohol, tobacco, and smoking.'}
+                    </div>
+                  </div>
+
+                  <div className="hero-expanded-item">
+                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <strong>{language === 'mr' ? 'मोफत फोन सल्ला:' : 'Free Helpline:'}</strong>{' '}
+                      {language === 'mr'
+                        ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर कार्यालयाशी थेट संपर्क: ८४२११५४०९०.'
+                        : 'Direct counselor support at Kolhapur center: 8421154090.'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Key Notice Strip */}
+          <div className="hero-trust-strip">
+            <ShieldCheck size={17} style={{ color: '#3cd0e2', flexShrink: 0 }} />
+            <span>
+              {language === 'mr'
+                ? 'नोंदणीकृत सामाजिक संस्था (Reg. No. MAH/582/2014/KOP) • अधिकृत आयुर्वेद सल्ला'
+                : 'Registered Foundation (Reg. No. MAH/582/2014/KOP) • Authentic Ayurvedic Guidance'}
+            </span>
+          </div>
+
+          {/* CTA Action Buttons */}
+          <div className="hero-cta-group">
+            <button
+              type="button"
+              onClick={onOpenConsultation}
+              className="btn btn-accent btn-lg hero-main-cta"
+            >
+              <Heart size={18} />
+              <span>{language === 'mr' ? 'मोफत मार्गदर्शन नोंदणी' : 'Free Consultation'}</span>
+            </button>
+
+            <div className="hero-secondary-cta-row">
               <a
                 href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
                   language === 'mr'
@@ -232,343 +164,19 @@ const Hero = ({ onOpenConsultation }) => {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-whatsapp btn-lg"
+                className="btn btn-whatsapp btn-lg hero-sub-cta"
               >
-                <WhatsAppIcon size={18} />
-                <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅपवर बोला' : 'WhatsApp Us'}</span>
+                <WhatsAppIcon size={18} animated={true} />
+                <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
               </a>
 
               <a
                 href={`tel:${organizationInfo.contact.primaryPhone}`}
-                className="btn btn-call btn-lg"
+                className="btn btn-call btn-lg hero-sub-cta"
               >
-                <Phone size={18} />
-                <span>{language === 'mr' ? 'कॉल करा: ८४२११५४०९०' : 'Call: 8421154090'}</span>
+                <Phone size={17} />
+                <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
               </a>
-            </div>
-          </div>
-
-          {/* Right Column: Hero Visual Slideshow Card */}
-          <div style={{ position: 'relative' }}>
-            <div 
-              style={{
-                backgroundColor: '#ffffff',
-                borderRadius: '20px',
-                padding: '1rem',
-                color: '#1e293b',
-                boxShadow: '0 20px 45px -12px rgba(0, 0, 0, 0.4)',
-                border: '1px solid rgba(255, 255, 255, 0.9)',
-                position: 'relative'
-              }}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              {/* Card Top Header Strip */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '0.5rem',
-                padding: '0 0.25rem'
-              }}>
-                {/* Antox Herbal Care Brand Pill */}
-                <div style={{
-                  backgroundColor: '#064e3b',
-                  color: '#ffffff',
-                  fontSize: '0.74rem',
-                  fontWeight: 700,
-                  padding: '0.25rem 0.65rem',
-                  borderRadius: '9999px',
-                  boxShadow: '0 2px 6px rgba(6, 78, 59, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem'
-                }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#34d399' }} />
-                  {language === 'mr' ? currentSlide.badgeMr : currentSlide.badgeEn}
-                </div>
-
-                {/* Slide Index Badge */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem'
-                }}>
-                  <span style={{
-                    fontSize: '0.7rem',
-                    fontWeight: 700,
-                    color: '#059669',
-                    backgroundColor: '#ecfdf5',
-                    padding: '0.2rem 0.5rem',
-                    borderRadius: '6px'
-                  }}>
-                    {language === 'mr' ? currentSlide.categoryMr : currentSlide.categoryEn}
-                  </span>
-                  <span style={{
-                    fontSize: '0.7rem',
-                    fontWeight: 700,
-                    color: '#475569',
-                    backgroundColor: '#f1f5f9',
-                    padding: '0.2rem 0.5rem',
-                    borderRadius: '6px'
-                  }}>
-                    {activeSlide + 1} / {slides.length}
-                  </span>
-                </div>
-              </div>
-
-              {/* Slideshow Image Box Frame - Fitted perfectly to avoid cropping */}
-              <div style={{
-                position: 'relative',
-                borderRadius: '14px',
-                overflow: 'hidden',
-                marginBottom: '0.65rem',
-                aspectRatio: '16/9.5',
-                backgroundColor: '#f8fafc',
-                border: '1px solid #e2e8f0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04)'
-              }}>
-                {/* Active Slide Image - object-fit contain so all text & graphics are 100% visible */}
-                <img
-                  key={currentSlide.id}
-                  src={imageErrorMap[currentSlide.id] ? currentSlide.fallbackImage : currentSlide.image}
-                  alt={language === 'mr' ? currentSlide.titleMr : currentSlide.titleEn}
-                  onError={() => handleImageError(currentSlide.id)}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    display: 'block',
-                    backgroundColor: '#ffffff'
-                  }}
-                />
-
-                {/* Left Navigation Arrow */}
-                <button
-                  type="button"
-                  onClick={handlePrev}
-                  aria-label="Previous Slide"
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '8px',
-                    transform: 'translateY(-50%)',
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    color: '#064e3b',
-                    border: '1px solid rgba(0,0,0,0.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    boxShadow: '0 3px 8px rgba(0,0,0,0.18)',
-                    transition: 'all 0.2s ease',
-                    zIndex: 4
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#ffffff';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.92)';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                  }}
-                >
-                  <ChevronLeft size={16} strokeWidth={2.5} />
-                </button>
-
-                {/* Right Navigation Arrow */}
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  aria-label="Next Slide"
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    right: '8px',
-                    transform: 'translateY(-50%)',
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    color: '#064e3b',
-                    border: '1px solid rgba(0,0,0,0.08)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    boxShadow: '0 3px 8px rgba(0,0,0,0.18)',
-                    transition: 'all 0.2s ease',
-                    zIndex: 4
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = '#ffffff';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.92)';
-                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                  }}
-                >
-                  <ChevronRight size={16} strokeWidth={2.5} />
-                </button>
-              </div>
-
-              {/* Pagination Dots Placed Cleanly Below Image */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: '5px',
-                alignItems: 'center',
-                marginBottom: '0.65rem'
-              }}>
-                {slides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setActiveSlide(idx)}
-                    aria-label={`Go to slide ${idx + 1}`}
-                    style={{
-                      width: activeSlide === idx ? '20px' : '6px',
-                      height: '6px',
-                      borderRadius: '9999px',
-                      backgroundColor: activeSlide === idx ? '#059669' : '#cbd5e1',
-                      border: 'none',
-                      padding: 0,
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Slide Text Content & Highlights */}
-              <div style={{ minHeight: '56px', marginBottom: '0.65rem' }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#064e3b', margin: '0 0 0.2rem 0' }}>
-                  {language === 'mr' ? currentSlide.titleMr : currentSlide.titleEn}
-                </h3>
-                <p style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.4, margin: 0 }}>
-                  {language === 'mr' ? currentSlide.descriptionMr : currentSlide.descriptionEn}
-                </p>
-              </div>
-
-              {/* Key Trust Badges Grid */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '0.4rem',
-                paddingTop: '0.6rem',
-                borderTop: '1px solid #e2e8f0',
-                marginBottom: '0.75rem'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <ShieldCheck size={15} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
-                    {language === 'mr' ? '१००% आयुर्वेदिक' : '100% Ayurvedic'}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Activity size={15} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
-                    {language === 'mr' ? 'आहार व पथ्य' : 'Dietary Pathya'}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Phone size={15} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
-                    {language === 'mr' ? 'फोनवर मार्गदर्शन' : 'Phone Guidance'}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Heart size={15} style={{ color: '#059669', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>
-                    {language === 'mr' ? 'हजारो लाभार्थी' : 'Statewide Reach'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <Link
-                  to={currentSlide.link || '/shop'}
-                  className="btn btn-primary"
-                  style={{
-                    padding: '0.5rem 0.75rem',
-                    fontSize: '0.82rem',
-                    justifyContent: 'center',
-                    backgroundColor: '#065f46',
-                    borderColor: '#065f46'
-                  }}
-                >
-                  <ShoppingBag size={14} />
-                  <span>{language === 'mr' ? currentSlide.ctaMr : currentSlide.ctaEn}</span>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={onOpenConsultation}
-                  className="btn btn-outline"
-                  style={{
-                    padding: '0.5rem 0.75rem',
-                    fontSize: '0.82rem',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <span>{language === 'mr' ? 'मोफत सल्ला' : 'Free Advice'}</span>
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-
-              {/* Interactive Thumbnail Carousel Strip */}
-              <div style={{
-                display: 'flex',
-                gap: '6px',
-                marginTop: '0.65rem',
-                paddingTop: '0.6rem',
-                borderTop: '1px solid #f1f5f9',
-                overflowX: 'auto',
-                paddingBottom: '2px',
-                scrollbarWidth: 'none'
-              }}>
-                {slides.map((slide, idx) => (
-                  <button
-                    key={slide.id}
-                    type="button"
-                    onClick={() => setActiveSlide(idx)}
-                    style={{
-                      width: '42px',
-                      height: '30px',
-                      borderRadius: '6px',
-                      overflow: 'hidden',
-                      border: activeSlide === idx ? '2px solid #059669' : '1px solid #e2e8f0',
-                      padding: 0,
-                      backgroundColor: '#f8fafc',
-                      cursor: 'pointer',
-                      flexShrink: 0,
-                      opacity: activeSlide === idx ? 1 : 0.6,
-                      transition: 'all 0.2s ease',
-                      boxShadow: activeSlide === idx ? '0 0 0 2px rgba(5,150,105,0.2)' : 'none'
-                    }}
-                    title={language === 'mr' ? slide.titleMr : slide.titleEn}
-                  >
-                    <img
-                      src={imageErrorMap[slide.id] ? slide.fallbackImage : slide.image}
-                      alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'contain', backgroundColor: '#ffffff' }}
-                    />
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -576,86 +184,378 @@ const Hero = ({ onOpenConsultation }) => {
 
       <style>{`
         .hero-section {
-          padding: 0.5rem 0 2.5rem 0;
+          position: relative;
+          background-color: #12355B;
+          color: #ffffff;
+          padding: 2.75rem 0 3.75rem 0;
+          overflow: hidden;
+          font-family: var(--font-family);
         }
 
-        /* Text & Badge Animations */
+        /* Desktop Background Image */
+        .hero-bg-image-overlay {
+          position: absolute;
+          inset: 0;
+          background-image: 
+            linear-gradient(
+              to right, 
+              rgba(18, 53, 91, 0.96) 0%, 
+              rgba(18, 53, 91, 0.85) 42%, 
+              rgba(8, 126, 139, 0.45) 75%, 
+              rgba(18, 53, 91, 0.12) 100%
+            ),
+            url('/hero-camp-bg.jpg'),
+            url('/hero-bg.jpg');
+          background-size: cover;
+          background-position: center right;
+          background-repeat: no-repeat;
+          opacity: 1;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .hero-content-wrapper {
+          max-width: 860px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        /* Mobile Photo Card: Hidden on desktop, shown on mobile */
+        .hero-mobile-image-card {
+          display: none;
+        }
+
         .hero-animated-badge {
-          animation: heroFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+          background: linear-gradient(135deg, rgba(18, 53, 91, 0.95) 0%, rgba(8, 126, 139, 0.85) 100%);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          padding: 0.45rem 1.1rem;
+          border-radius: 9999px;
+          border: 1px solid rgba(244, 162, 97, 0.5);
+          color: #ffffff;
+          font-size: 0.92rem;
+          font-weight: 700;
+          letter-spacing: 0.015em;
+          margin-bottom: 0.9rem;
+          width: fit-content;
+          max-width: 100%;
+          box-shadow: 0 4px 18px rgba(10, 27, 46, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
         }
 
         .hero-sparkle-icon {
           animation: heroSparklePulse 2.4s ease-in-out infinite;
+          flex-shrink: 0;
         }
 
-        .hero-animated-title {
-          animation: heroFadeInUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+        .hero-title {
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+          font-size: clamp(2rem, 4.5vw + 0.8rem, 3.4rem);
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1.22;
+          margin-bottom: 1rem;
+          letter-spacing: -0.01em;
+          text-shadow: 0 3px 16px rgba(10, 27, 46, 0.8);
         }
 
         .hero-title-highlight {
-          color: #a7f3d0;
-          background: linear-gradient(90deg, #a7f3d0 0%, #ffffff 40%, #6ee7b7 70%, #a7f3d0 100%);
-          background-size: 250% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: heroTextShimmer 5s ease-in-out infinite;
-          display: inline-block;
+          color: #ffffff;
+          font-weight: 800;
+          text-shadow: 0 3px 16px rgba(10, 27, 46, 0.9);
         }
 
         .hero-campaign-highlight {
-          color: #fef3c7;
-          background: linear-gradient(90deg, #fef3c7 0%, #ffffff 35%, #fbbf24 70%, #fef3c7 100%);
-          background-size: 250% auto;
+          font-family: 'Baloo 2', 'Rozha One', sans-serif;
+          font-weight: 800;
+          color: #F4A261;
+          background: linear-gradient(135deg, #ffffff 0%, #fff3ec 25%, #F4A261 65%, #f7b785 100%);
+          background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: heroTextShimmer 5s ease-in-out infinite 1.2s;
+          font-size: clamp(1.75rem, 3.6vw + 0.5rem, 2.7rem);
+          filter: drop-shadow(0 3px 12px rgba(10, 27, 46, 0.9));
           display: inline-block;
         }
 
-        @keyframes heroFadeInUp {
-          0% {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .hero-subtext-container {
+          width: 100%;
+          margin-bottom: 1.35rem;
         }
 
-        @keyframes heroTextShimmer {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+        .hero-subtext {
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+          font-size: clamp(1.05rem, 1.25vw + 0.5rem, 1.22rem);
+          font-weight: 500;
+          color: #e2eaf4;
+          line-height: 1.7;
+          margin-bottom: 0.55rem;
+          max-width: 760px;
+          text-shadow: 0 1px 8px rgba(10, 27, 46, 0.85);
+        }
+
+        .hero-read-more-btn {
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+          background: rgba(255, 255, 255, 0.14);
+          border: 1px solid rgba(244, 162, 97, 0.45);
+          color: #fff3ec;
+          padding: 0.38rem 0.95rem;
+          border-radius: 9999px;
+          font-size: 0.88rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          transition: all 0.25s ease;
+          touch-action: manipulation;
+          margin-bottom: 0.75rem;
+          box-shadow: 0 3px 10px rgba(10, 27, 46, 0.25);
+        }
+
+        .hero-read-more-btn:hover,
+        .hero-read-more-btn:active {
+          background: rgba(255, 255, 255, 0.25);
+          color: #ffffff;
+          border-color: #F4A261;
+          transform: translateY(-1px);
+        }
+
+        .hero-expanded-content {
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+          background: rgba(18, 53, 91, 0.94);
+          border: 1px solid rgba(8, 126, 139, 0.4);
+          border-radius: 14px;
+          padding: 1.1rem;
+          margin-bottom: 0.85rem;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          animation: heroFadeSlide 0.25s ease-out;
+          box-shadow: 0 8px 24px rgba(10, 27, 46, 0.4);
+        }
+
+        @keyframes heroFadeSlide {
+          from { opacity: 0; transform: translateY(-6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-expanded-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.85rem;
+        }
+
+        .hero-expanded-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.55rem;
+          font-size: 0.92rem;
+          color: #f1f5f9;
+          line-height: 1.5;
+        }
+
+        .hero-expanded-item strong {
+          color: #f7b785;
+          font-weight: 700;
+        }
+
+        .hero-trust-strip {
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+          font-weight: 600;
+          background-color: rgba(18, 53, 91, 0.88);
+          border-left: 4px solid #087E8B;
+          padding: 0.75rem 1.15rem;
+          border-radius: 12px;
+          font-size: 0.95rem;
+          color: #ffffff;
+          margin-bottom: 1.6rem;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border-top: 1px solid rgba(255, 255, 255, 0.18);
+          border-right: 1px solid rgba(255, 255, 255, 0.18);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+          display: flex;
+          align-items: center;
+          gap: 0.65rem;
+          max-width: 100%;
+          box-shadow: 0 6px 20px rgba(10, 27, 46, 0.35);
+        }
+
+        .hero-cta-group {
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+          flex-wrap: wrap;
+          margin-bottom: 0.5rem;
+          width: 100%;
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+        }
+
+        .hero-main-cta {
+          flex: 0 0 auto;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          box-shadow: 0 4px 16px rgba(220, 106, 27, 0.4);
+        }
+
+        .hero-secondary-cta-row {
+          display: flex;
+          gap: 0.75rem;
+          align-items: center;
+        }
+
+        .hero-sub-cta {
+          font-weight: 700;
         }
 
         @keyframes heroSparklePulse {
-          0%, 100% {
-            transform: scale(1) rotate(0deg);
-            filter: drop-shadow(0 0 2px rgba(251, 191, 36, 0.4));
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.2); }
+        }
+
+        /* Mobile Breakpoint (<= 640px) */
+        @media (max-width: 640px) {
+          .hero-section {
+            padding: 1.25rem 0 2rem 0 !important;
+            background-color: #12355B !important;
           }
-          50% {
-            transform: scale(1.22) rotate(12deg);
-            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.9));
+
+          /* Hide desktop absolute background on mobile so mobile photo card is crisp */
+          .hero-bg-image-overlay {
+            display: none !important;
+          }
+
+          /* Dedicated Crisp Photo Card on Mobile */
+          .hero-mobile-image-card {
+            display: block;
+            position: relative;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(10, 27, 46, 0.45);
+            border: 1.5px solid rgba(8, 126, 139, 0.35);
+            margin-bottom: 1.15rem;
+            background-color: #0a1b2e;
+          }
+
+          .hero-mobile-img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            object-position: center 30%;
+            display: block;
+          }
+
+          .hero-mobile-img-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(18, 53, 91, 0.92);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: #ffffff;
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            border: 1px solid rgba(8, 126, 139, 0.35);
+            font-family: 'Baloo 2', 'Poppins', sans-serif;
+          }
+
+          .hero-animated-badge {
+            font-size: 0.8rem;
+            padding: 0.38rem 0.85rem;
+            margin-bottom: 0.75rem;
+          }
+
+          .hero-title {
+            font-size: clamp(1.4rem, 5.8vw, 1.95rem) !important;
+            line-height: 1.25 !important;
+            margin-bottom: 0.65rem !important;
+          }
+
+          .hero-campaign-highlight {
+            font-size: clamp(1.25rem, 5vw, 1.65rem) !important;
+          }
+
+          .hero-subtext-container {
+            margin-bottom: 0.9rem !important;
+          }
+
+          .hero-subtext {
+            font-size: 0.92rem !important;
+            line-height: 1.58 !important;
+            margin-bottom: 0.4rem !important;
+            color: #e2eaf4 !important;
+          }
+
+          .hero-read-more-btn {
+            font-size: 0.8rem !important;
+            padding: 0.32rem 0.8rem !important;
+            margin-bottom: 0.6rem !important;
+          }
+
+          .hero-expanded-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.65rem !important;
+          }
+
+          .hero-expanded-item {
+            font-size: 0.82rem !important;
+          }
+
+          .hero-trust-strip {
+            font-size: 0.8rem !important;
+            padding: 0.55rem 0.85rem !important;
+            margin-bottom: 1.15rem !important;
+            line-height: 1.4 !important;
+          }
+
+          /* Smart 2-row Mobile CTA buttons */
+          .hero-cta-group {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 0.6rem !important;
+            margin-bottom: 0.5rem !important;
+          }
+
+          .hero-main-cta {
+            width: 100% !important;
+            justify-content: center !important;
+            font-size: 1rem !important;
+            padding: 0.8rem !important;
+          }
+
+          .hero-secondary-cta-row {
+            display: flex;
+            width: 100%;
+            gap: 0.6rem;
+          }
+
+          .hero-sub-cta {
+            flex: 1 !important;
+            justifyContent: center !important;
+            font-size: 0.9rem !important;
+            padding: 0.7rem !important;
+            min-height: 46px;
           }
         }
 
-        @media (max-width: 960px) {
-          .hero-section {
-            padding: 0.5rem 0 1.75rem 0 !important;
-          }
-          .hero-grid {
-            grid-template-columns: 1fr !important;
-            gap: 2rem !important;
-          }
+        @media (max-width: 360px) {
           .hero-title {
-            font-size: 2.15rem !important;
+            font-size: 1.3rem !important;
+          }
+          .hero-campaign-highlight {
+            font-size: 1.15rem !important;
           }
         }
       `}</style>

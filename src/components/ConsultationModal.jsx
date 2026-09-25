@@ -80,24 +80,12 @@ const ConsultationModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="modal-overlay" onClick={handleReset}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ padding: '2rem' }}>
+      <div className="modal-content modal-consultation-content" onClick={(e) => e.stopPropagation()}>
         <button
+          type="button"
           onClick={handleReset}
-          style={{
-            position: 'absolute',
-            top: '1.25rem',
-            right: '1.25rem',
-            background: '#f1f5f9',
-            border: 'none',
-            borderRadius: '50%',
-            width: '36px',
-            height: '36px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: '#475569'
-          }}
+          className="modal-close-trigger"
+          aria-label="Close modal"
         >
           <X size={20} />
         </button>
@@ -105,12 +93,12 @@ const ConsultationModal = ({ isOpen, onClose }) => {
         {!isSubmitted ? (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-              <Calendar size={24} style={{ color: '#059669' }} />
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#064e3b' }}>
+              <Calendar size={22} style={{ color: '#087E8B', flexShrink: 0 }} />
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#12355B', margin: 0, fontFamily: 'var(--font-heading)' }}>
                 {language === 'mr' ? 'मोफत आरोग्य समुपदेशन नोंदणी' : 'Free Health Counseling Booking'}
               </h3>
             </div>
-            <p style={{ fontSize: '0.88rem', color: '#64748b', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '0.86rem', color: '#4f6182', marginBottom: '1.25rem', lineHeight: 1.5 }}>
               {language === 'mr'
                 ? 'खालील फॉर्म भरा. सहारा सोशल फाऊंडेशनचे तज्ज्ञ समुपदेशक तुम्हाला आहार व आयुर्वेदिक उपचारांसाठी फोनवर मार्गदर्शन करतील.'
                 : 'Fill the form below. Our health counselor will contact you for dietary advice and natural Ayurvedic support.'}
@@ -131,7 +119,7 @@ const ConsultationModal = ({ isOpen, onClose }) => {
                 {errors.name && <div className="form-error">{errors.name}</div>}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="modal-form-row">
                 <div className="form-group">
                   <label className="form-label">
                     {language === 'mr' ? 'मोबाईल नंबर *' : 'Mobile Number *'}
@@ -142,7 +130,7 @@ const ConsultationModal = ({ isOpen, onClose }) => {
                     placeholder="9876543210"
                     maxLength={10}
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
                   />
                   {errors.phone && <div className="form-error">{errors.phone}</div>}
                 </div>
@@ -187,70 +175,108 @@ const ConsultationModal = ({ isOpen, onClose }) => {
                 </label>
                 <textarea
                   className="form-textarea"
-                  rows={3}
+                  rows={2}
                   placeholder={language === 'mr' ? 'उदा. गेल्या ५ वर्षांपासून साखर जास्त आहे...' : 'Briefly describe your symptoms...'}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 />
               </div>
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.85rem' }}>
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', minHeight: '46px' }}>
                 <Send size={16} />
                 <span>{language === 'mr' ? 'समुपदेशनासाठी विनंती पाठवा' : 'Submit Consultation Request'}</span>
               </button>
             </form>
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+          <div style={{ textAlign: 'center', padding: '1rem 0' }}>
             <div style={{
-              width: '64px',
-              height: '64px',
+              width: '60px',
+              height: '60px',
               borderRadius: '50%',
-              backgroundColor: '#ecfdf5',
-              color: '#059669',
+              backgroundColor: '#dbf7fa',
+              color: '#087E8B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 1.25rem auto'
+              margin: '0 auto 1rem auto'
             }}>
-              <CheckCircle size={36} />
+              <CheckCircle size={34} />
             </div>
 
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#064e3b', marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#12355B', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'आपली नोंदणी यशस्वी झाली आहे!' : 'Request Received Successfully!'}
             </h3>
 
-            <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.88rem', color: '#4f6182', lineHeight: 1.6, marginBottom: '1.25rem' }}>
               {language === 'mr'
                 ? `धन्यवाद ${formData.name}. आमचे समुपदेशक लवकरच ${formData.phone} वर संपर्क करतील.`
                 : `Thank you ${formData.name}. Our health counseling team will call you shortly on ${formData.phone}.`}
             </p>
 
             <div style={{
-              backgroundColor: '#f8fafc',
-              padding: '1rem',
+              backgroundColor: '#F5F7FA',
+              padding: '0.85rem',
               borderRadius: '12px',
-              border: '1px solid #e2e8f0',
-              marginBottom: '1.5rem'
+              border: '1px solid #e2eaf4',
+              marginBottom: '1.25rem'
             }}>
-              <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '0.35rem' }}>
+              <div style={{ fontSize: '0.82rem', color: '#4f6182', marginBottom: '0.3rem' }}>
                 {language === 'mr' ? 'तातडीच्या मार्गदर्शनासाठी थेट कॉल करा:' : 'For immediate guidance, call directly:'}
               </div>
               <a
                 href={`tel:${organizationInfo.contact.primaryPhone}`}
-                style={{ fontSize: '1.2rem', fontWeight: 800, color: '#059669' }}
+                style={{ fontSize: '1.15rem', fontWeight: 800, color: '#087E8B' }}
               >
-                <Phone size={16} style={{ display: 'inline', marginRight: '6px' }} />
+                <Phone size={15} style={{ display: 'inline', marginRight: '6px' }} />
                 {organizationInfo.contact.primaryPhone}
               </a>
             </div>
 
-            <button onClick={handleReset} className="btn btn-outline" style={{ width: '100%' }}>
+            <button type="button" onClick={handleReset} className="btn btn-outline" style={{ width: '100%' }}>
               <span>{language === 'mr' ? 'बंद करा' : 'Close'}</span>
             </button>
           </div>
         )}
       </div>
+
+      <style>{`
+        .modal-consultation-content {
+          padding: 1.75rem;
+        }
+
+        .modal-close-trigger {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background-color: #f1f5f9;
+          border: none;
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: #475569;
+        }
+
+        .modal-form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        @media (max-width: 480px) {
+          .modal-consultation-content {
+            padding: 1.25rem 1rem;
+          }
+          .modal-form-row {
+            grid-template-columns: 1fr !important;
+            gap: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };

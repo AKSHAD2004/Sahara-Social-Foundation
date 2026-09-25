@@ -78,27 +78,27 @@ const VideoCard = ({ video }) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         pointerEvents: 'none',
-        background: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%)'
+        background: 'linear-gradient(180deg, rgba(10,27,46,0.85) 0%, transparent 100%)'
       }}>
         <div style={{
-          backgroundColor: 'rgba(6, 78, 59, 0.92)',
+          backgroundColor: 'rgba(8, 126, 139, 0.92)',
           backdropFilter: 'blur(6px)',
-          color: '#a7f3d0',
+          color: '#ffffff',
           fontSize: '0.72rem',
           fontWeight: 700,
           padding: '0.25rem 0.65rem',
           borderRadius: '9999px',
-          border: '1px solid rgba(52, 211, 153, 0.3)',
+          border: '1px solid rgba(8, 126, 139, 0.4)',
           display: 'flex',
           alignItems: 'center',
           gap: '0.3rem'
         }}>
-          <Sparkles size={11} />
+          <Sparkles size={11} style={{ color: '#F4A261' }} />
           <span>{video.category}</span>
         </div>
 
         <div style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: 'rgba(18, 53, 91, 0.85)',
           backdropFilter: 'blur(6px)',
           color: '#ffffff',
           fontSize: '0.72rem',
@@ -110,7 +110,7 @@ const VideoCard = ({ video }) => {
           gap: '0.3rem',
           border: '1px solid rgba(255, 255, 255, 0.15)'
         }}>
-          <Clock size={11} style={{ color: '#34d399' }} />
+          <Clock size={11} style={{ color: '#F4A261' }} />
           <span>{video.duration}</span>
         </div>
       </div>
@@ -136,12 +136,12 @@ const VideoCard = ({ video }) => {
             width: '68px',
             height: '68px',
             borderRadius: '50%',
-            backgroundColor: '#059669',
+            backgroundColor: '#087E8B',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 0 8px rgba(16, 185, 129, 0.35), 0 10px 30px rgba(0, 0, 0, 0.7)',
+            boxShadow: '0 0 0 8px rgba(8, 126, 139, 0.35), 0 10px 30px rgba(0, 0, 0, 0.7)',
             transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
             transform: 'scale(1)'
           }}
@@ -151,7 +151,7 @@ const VideoCard = ({ video }) => {
           </div>
 
           <span style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backgroundColor: 'rgba(18, 53, 91, 0.85)',
             backdropFilter: 'blur(4px)',
             color: '#ffffff',
             fontSize: '0.75rem',
@@ -171,7 +171,7 @@ const VideoCard = ({ video }) => {
         position: 'relative',
         zIndex: 3,
         padding: '1rem 0.85rem 0.85rem 0.85rem',
-        background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 75%, transparent 100%)',
+        background: 'linear-gradient(0deg, rgba(10,27,46,0.95) 0%, rgba(10,27,46,0.7) 75%, transparent 100%)',
         display: 'flex',
         flexDirection: 'column',
         gap: '0.45rem',
@@ -183,14 +183,14 @@ const VideoCard = ({ video }) => {
           alignItems: 'center',
           gap: '0.3rem',
           fontSize: '0.78rem',
-          color: '#d1fae5',
+          color: '#e2effc',
           fontWeight: 600
         }}>
-          <User size={12} style={{ color: '#34d399' }} />
+          <User size={12} style={{ color: '#087E8B' }} />
           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {video.patientName}
           </span>
-          <CheckCircle size={12} style={{ color: '#10b981', flexShrink: 0 }} />
+          <CheckCircle size={12} style={{ color: '#087E8B', flexShrink: 0 }} />
         </div>
 
         {/* Video Title */}

@@ -6,7 +6,6 @@ import {
   Mail, 
   ShieldAlert, 
   Heart, 
-  CheckCircle2, 
   ExternalLink,
   Users
 } from 'lucide-react';
@@ -37,89 +36,54 @@ const Footer = () => {
   const { language } = useLanguage();
 
   return (
-    <footer style={{
-      backgroundColor: '#064e3b',
-      color: '#d1fae5',
-      paddingTop: '4rem',
-      paddingBottom: '2rem',
-      borderTop: '4px solid #059669',
-      marginTop: 'auto'
-    }}>
+    <footer className="site-footer">
       <div className="container">
         {/* Top Notice Box in Footer */}
-        <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '1.25rem 1.5rem',
-          marginBottom: '3.5rem',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '1rem',
-          flexWrap: 'wrap'
-        }}>
-          <div style={{
-            backgroundColor: '#d97706',
-            color: '#ffffff',
-            padding: '0.4rem',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0
-          }}>
+        <div className="footer-notice-box">
+          <div className="footer-notice-icon-box">
             <ShieldAlert size={20} />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, color: '#fef3c7', fontSize: '1rem', marginBottom: '0.2rem' }}>
+            <div style={{ fontWeight: 700, color: '#fef3c7', fontSize: '0.98rem', marginBottom: '0.2rem' }}>
               {language === 'mr' ? 'महत्त्वाची सूचना व मार्गदर्शन:' : 'Important Notice & Regimen Guidance:'}
             </div>
-            <p style={{ fontSize: '0.9rem', color: '#e2e8f0', lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontSize: '0.88rem', color: '#e2e8f0', lineHeight: 1.5, margin: 0 }}>
               {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
             </p>
           </div>
         </div>
 
         {/* 4-Column Main Grid */}
-        <div className="grid-4" style={{ marginBottom: '3.5rem' }}>
+        <div className="grid-4 footer-main-grid">
           {/* Col 1: Brand Info */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1rem' }}>
-              <MissionLogoBadge size={52} style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))', flexShrink: 0 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+              <MissionLogoBadge size={46} style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))', flexShrink: 0 }} />
               <div>
-                <h3 style={{ fontSize: '1.18rem', color: '#ffffff', fontWeight: 800 }}>
+                <h3 style={{ fontSize: '1.12rem', color: '#ffffff', fontWeight: 800, margin: 0 }}>
                   {language === 'mr' ? organizationInfo.nameMr : organizationInfo.name}
                 </h3>
-                <span style={{ fontSize: '0.78rem', color: '#a7f3d0' }}>
+                <span style={{ fontSize: '0.76rem', color: '#a7f3d0' }}>
                   {language === 'mr' ? 'कोल्हापूर (महाराष्ट्र)' : 'Kolhapur (Maharashtra)'}
                 </span>
               </div>
             </div>
 
-            <p style={{ fontSize: '0.88rem', color: '#a7f3d0', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.86rem', color: '#a7f3d0', lineHeight: 1.6, marginBottom: '1.25rem' }}>
               {language === 'mr' 
                 ? 'मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियानांतर्गत समाजातील प्रत्येक व्यक्तीला निरोगी बनवण्यासाठी कटिबद्ध सामाजिक संस्था.'
                 : 'A dedicated social welfare foundation promoting nationwide diabetes awareness, addiction-free rehabilitation, and Ayurvedic wellness.'}
             </p>
 
             {/* Official Social Media Links */}
-            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
               <a
                 href={socialLinks.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255,255,255,0.12)',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'background 0.2s'
-                }}
+                className="footer-social-btn"
                 title="Facebook"
+                aria-label="Facebook"
               >
                 <FacebookIcon size={18} />
               </a>
@@ -128,18 +92,9 @@ const Footer = () => {
                 href={socialLinks.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255,255,255,0.12)',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'background 0.2s'
-                }}
+                className="footer-social-btn"
                 title="Instagram"
+                aria-label="Instagram"
               >
                 <InstagramIcon size={18} />
               </a>
@@ -148,18 +103,9 @@ const Footer = () => {
                 href={socialLinks.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(255,255,255,0.12)',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'background 0.2s'
-                }}
+                className="footer-social-btn"
                 title="YouTube"
+                aria-label="YouTube"
               >
                 <YoutubeIcon size={18} />
               </a>
@@ -168,24 +114,15 @@ const Footer = () => {
                 href={socialLinks.whatsappGroup}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  backgroundColor: '#25d366',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'background 0.2s'
-                }}
+                className="footer-social-btn footer-wa-btn"
                 title="Join WhatsApp Group"
+                aria-label="WhatsApp Group"
               >
                 <WhatsAppIcon size={19} color="#ffffff" animated={true} />
               </a>
             </div>
 
-            <div style={{ fontSize: '0.82rem', color: '#ecfdf5', opacity: 0.9 }}>
+            <div style={{ fontSize: '0.8rem', color: '#ecfdf5', opacity: 0.9 }}>
               <strong>{language === 'mr' ? 'सहयोगी केंद्र:' : 'Associated Center:'}</strong><br />
               {language === 'mr' ? organizationInfo.associatedCenterMr : organizationInfo.associatedCenter}
             </div>
@@ -193,38 +130,38 @@ const Footer = () => {
 
           {/* Col 2: Quick Links */}
           <div>
-            <h4 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, marginBottom: '1.2rem', borderBottom: '2px solid #059669', paddingBottom: '0.4rem', display: 'inline-block' }}>
+            <h4 className="footer-col-title">
               {language === 'mr' ? 'मुख्य लिंक्स' : 'Quick Navigation'}
             </h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.9rem' }}>
+            <ul className="footer-links-list">
               <li>
-                <Link to="/" style={{ color: '#a7f3d0' }}>
+                <Link to="/" className="footer-link">
                   → {language === 'mr' ? 'मुख्यपृष्ठ (Home)' : 'Home'}
                 </Link>
               </li>
               <li>
-                <Link to="/about" style={{ color: '#a7f3d0' }}>
+                <Link to="/about" className="footer-link">
                   → {language === 'mr' ? 'संस्थेविषयी (About Us)' : 'About Us'}
                 </Link>
               </li>
               <li>
-                <Link to="/services" style={{ color: '#a7f3d0' }}>
-                  → {language === 'mr' ? 'आरोग्य सेवा व वर्ग (Health Services)' : 'Health Services'}
+                <Link to="/services" className="footer-link">
+                  → {language === 'mr' ? 'आरोग्य सेवा व वर्ग' : 'Health Services'}
                 </Link>
               </li>
               <li>
-                <Link to="/shop" style={{ color: '#a7f3d0' }}>
-                  → {language === 'mr' ? 'आयुर्वेदिक उत्पादने (Shop / Formulas)' : 'Shop / Formulas'}
+                <Link to="/shop" className="footer-link">
+                  → {language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Shop / Formulas'}
                 </Link>
               </li>
               <li>
-                <Link to="/photos" style={{ color: '#a7f3d0' }}>
-                  → {language === 'mr' ? 'छायाचित्रे (Photo Gallery)' : 'Photo Gallery'}
+                <Link to="/photos" className="footer-link">
+                  → {language === 'mr' ? 'छायाचित्रे (Gallery)' : 'Photo Gallery'}
                 </Link>
               </li>
               <li>
-                <Link to="/videos" style={{ color: '#a7f3d0' }}>
-                  → {language === 'mr' ? 'रुग्णांचे व्हिडिओ (Result Videos)' : 'Result Videos'}
+                <Link to="/videos" className="footer-link">
+                  → {language === 'mr' ? 'रुग्णांचे व्हिडिओ' : 'Result Videos'}
                 </Link>
               </li>
             </ul>
@@ -232,38 +169,38 @@ const Footer = () => {
 
           {/* Col 3: Campaigns & Policies */}
           <div>
-            <h4 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, marginBottom: '1.2rem', borderBottom: '2px solid #059669', paddingBottom: '0.4rem', display: 'inline-block' }}>
+            <h4 className="footer-col-title">
               {language === 'mr' ? 'अभियान व धोरणे' : 'Campaigns & Policies'}
             </h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.9rem' }}>
+            <ul className="footer-links-list">
               <li>
-                <Link to="/services" style={{ color: '#a7f3d0' }}>
+                <Link to="/services" className="footer-link">
                   • {language === 'mr' ? 'मधुमेह मुक्त भारत अभियान' : 'Madhumeh Mukt Bharat'}
                 </Link>
               </li>
               <li>
-                <Link to="/services" style={{ color: '#a7f3d0' }}>
-                  • {language === 'mr' ? 'व्यसनमुक्त भारत अभियान' : 'Vyasanmukt Bharat Abhiyan'}
+                <Link to="/services" className="footer-link">
+                  • {language === 'mr' ? 'व्यसनमुक्त भारत अभियान' : 'Vyasanmukt Bharat'}
                 </Link>
               </li>
               <li>
-                <Link to="/account" style={{ color: '#a7f3d0' }}>
+                <Link to="/account" className="footer-link">
                   • {language === 'mr' ? 'माझे खाते (My Account)' : 'My Account'}
                 </Link>
               </li>
               <li>
-                <Link to="/affiliate" style={{ color: '#a7f3d0' }}>
-                  • {language === 'mr' ? 'समाज सेवक / Affiliate नोंदणी' : 'Affiliate Program'}
+                <Link to="/affiliate" className="footer-link">
+                  • {language === 'mr' ? 'समाज सेवक नोंदणी' : 'Affiliate Program'}
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" style={{ color: '#a7f3d0' }}>
-                  • {language === 'mr' ? 'गोपनीयता धोरण (Privacy Policy)' : 'Privacy Policy'}
+                <Link to="/privacy-policy" className="footer-link">
+                  • {language === 'mr' ? 'गोपनीयता धोरण' : 'Privacy Policy'}
                 </Link>
               </li>
               <li>
-                <Link to="/refund-policy" style={{ color: '#a7f3d0' }}>
-                  • {language === 'mr' ? 'परतावा धोरण (Refund Policy)' : 'Refund & Returns'}
+                <Link to="/refund-policy" className="footer-link">
+                  • {language === 'mr' ? 'परतावा धोरण' : 'Refund & Returns'}
                 </Link>
               </li>
             </ul>
@@ -271,19 +208,19 @@ const Footer = () => {
 
           {/* Col 4: Contact & Office */}
           <div>
-            <h4 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, marginBottom: '1.2rem', borderBottom: '2px solid #059669', paddingBottom: '0.4rem', display: 'inline-block' }}>
+            <h4 className="footer-col-title">
               {language === 'mr' ? 'कार्यालय संपर्क' : 'Contact Us'}
             </h4>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', fontSize: '0.88rem' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.86rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
                 <MapPin size={18} style={{ color: '#34d399', flexShrink: 0, marginTop: '2px' }} />
                 <span>
                   {language === 'mr' ? organizationInfo.contact.address.fullAddressMr : organizationInfo.contact.address.fullAddressEn}
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Phone size={18} style={{ color: '#34d399', flexShrink: 0 }} />
                 <div>
                   <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#ffffff', fontWeight: 700 }}>
@@ -296,7 +233,7 @@ const Footer = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <WhatsAppIcon size={18} color="#34d399" />
                 <a
                   href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
@@ -309,7 +246,7 @@ const Footer = () => {
               </div>
 
               <div style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                backgroundColor: 'rgba(0, 0, 0, 0.25)',
                 padding: '0.6rem 0.8rem',
                 borderRadius: '8px',
                 fontSize: '0.78rem',
@@ -323,42 +260,146 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar & Disclaimer */}
-        <div style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-          paddingTop: '1.5rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          fontSize: '0.82rem',
-          color: '#a7f3d0'
-        }}>
+        <div className="footer-bottom-bar">
           <div>
-            © {new Date().getFullYear()} {organizationInfo.name} ({organizationInfo.nameMr}) | Founded & Led by <strong>Sana Sayyad</strong>. All Rights Reserved.
+            © {new Date().getFullYear()} {organizationInfo.name} ({organizationInfo.nameMr}) | Founded & Led by <strong>Sana Sayyad</strong>.
           </div>
 
-          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
             <Link to="/privacy-policy" style={{ color: '#d1fae5' }}>Privacy Policy</Link>
-            <Link to="/refund-policy" style={{ color: '#d1fae5' }}>Refund & Returns</Link>
+            <Link to="/refund-policy" style={{ color: '#d1fae5' }}>Refund Policy</Link>
             <Link to="/contact" style={{ color: '#d1fae5' }}>Help & Support</Link>
           </div>
         </div>
 
-        <div style={{
-          marginTop: '1rem',
-          paddingTop: '0.75rem',
-          borderTop: '1px dashed rgba(255, 255, 255, 0.1)',
-          fontSize: '0.75rem',
-          color: '#94a3b8',
-          textAlign: 'center',
-          lineHeight: 1.4
-        }}>
+        <div className="footer-medical-disclaimer">
           {language === 'mr'
             ? 'वैद्यकीय अस्वीकरण: या संकेतस्थळावरील माहिती केवळ जनजागृती आणि शैक्षणिक उद्देशाने आहे. गंभीर आजारांच्या बाबतीत आपल्या तज्ज्ञ डॉक्टरांचा व समुपदेशकांचा सल्ला अवश्य घ्या.'
-            : 'Medical Disclaimer: Information on this website is for educational and public wellness purposes. Consult qualified health counselors or physicians for personalized clinical care.'}
+            : 'Medical Disclaimer: Information on this website is for educational and public wellness purposes. Consult qualified health counselors or physicians for clinical care.'}
         </div>
       </div>
+
+      <style>{`
+        .site-footer {
+          background-color: #0a1b2e;
+          color: #e2eaf4;
+          padding-top: 3.5rem;
+          padding-bottom: 2rem;
+          border-top: 4px solid #087E8B;
+          margin-top: auto;
+        }
+
+        .footer-notice-box {
+          background-color: rgba(255, 255, 255, 0.08);
+          border-radius: 14px;
+          padding: 1.15rem 1.35rem;
+          margin-bottom: 2.75rem;
+          border: 1px solid rgba(244, 162, 97, 0.3);
+          display: flex;
+          align-items: flex-start;
+          gap: 0.85rem;
+          flex-wrap: wrap;
+        }
+
+        .footer-notice-icon-box {
+          background: linear-gradient(135deg, #F4A261, #dc6a1b);
+          color: #ffffff;
+          padding: 0.4rem;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .footer-main-grid {
+          margin-bottom: 2.75rem;
+        }
+
+        .footer-col-title {
+          color: #ffffff;
+          font-size: 0.98rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          border-bottom: 2px solid #087E8B;
+          padding-bottom: 0.35rem;
+          display: inline-block;
+        }
+
+        .footer-links-list {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 0.55rem;
+          font-size: 0.88rem;
+        }
+
+        .footer-link {
+          color: #b8d4f6;
+          transition: color 0.2s ease;
+          display: inline-block;
+        }
+
+        .footer-link:hover {
+          color: #F4A261;
+        }
+
+        .footer-social-btn {
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
+          background-color: rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s;
+        }
+
+        .footer-social-btn:hover {
+          background-color: rgba(8, 126, 139, 0.4);
+          color: #ffffff;
+        }
+
+        .footer-wa-btn {
+          background-color: #25d366 !important;
+        }
+
+        .footer-bottom-bar {
+          border-top: 1px solid rgba(255, 255, 255, 0.12);
+          padding-top: 1.25rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 1rem;
+          font-size: 0.82rem;
+          color: #b8d4f6;
+        }
+
+        .footer-medical-disclaimer {
+          margin-top: 1rem;
+          padding-top: 0.75rem;
+          border-top: 1px dashed rgba(255, 255, 255, 0.1);
+          font-size: 0.74rem;
+          color: #9cb0ce;
+          text-align: center;
+          line-height: 1.4;
+        }
+
+        @media (max-width: 640px) {
+          .site-footer {
+            padding-top: 2.5rem;
+          }
+          .footer-notice-box {
+            margin-bottom: 2rem;
+            padding: 0.85rem 1rem;
+          }
+          .footer-main-grid {
+            margin-bottom: 2rem;
+          }
+        }
+      `}</style>
     </footer>
   );
 };

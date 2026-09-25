@@ -29,13 +29,13 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 30) {
+      if (window.scrollY > 20) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -43,6 +43,18 @@ const Navbar = () => {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   const navLinks = [
     { nameEn: 'Home', nameMr: 'मुख्यपृष्ठ', path: '/' },
@@ -56,22 +68,34 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top Announcement Bar (Auto-adjusting across Mobile, Tablet, Desktop) */}
+      {/* Top Announcement Bar */}
       <div className="top-announcement-bar">
         <div className="container topbar-container">
-          {/* Mission Tagline (Left side in webview) */}
+          {/* Mission Tagline with Left-to-Right moving animation */}
           <div className="topbar-mission">
-            <span className="topbar-mission-text">
-              <ShieldCheck size={14} className="topbar-icon" />
-              <span>
-                {language === 'mr' 
-                  ? 'मधुमेह मुक्त भारत व व्यसनमुक्त भारत अभियान' 
-                  : 'Madhumeh Mukt Bharat & Vyasanmukt Bharat Abhiyan'}
-              </span>
-            </span>
+            <div className="topbar-marquee-wrapper">
+              <div className="topbar-marquee-track">
+                <span className="topbar-mission-text">
+                  <ShieldCheck size={14} className="topbar-icon" />
+                  <span>
+                    {language === 'mr' 
+                      ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ८४२११५४०९०' 
+                      : 'Madhumeh Mukt Bharat & Vyasanmukt Bharat Abhiyan • Helpline: 8421154090'}
+                  </span>
+                </span>
+                <span className="topbar-mission-text">
+                  <ShieldCheck size={14} className="topbar-icon" />
+                  <span>
+                    {language === 'mr' 
+                      ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP' 
+                      : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP'}
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* Right Side Group: Affiliate + CRM + Language */}
+          {/* Right Group: Affiliate + CRM + Language */}
           <div className="topbar-actions">
             {/* Affiliate Portal link */}
             <Link 
@@ -79,7 +103,7 @@ const Navbar = () => {
               className="topbar-affiliate-link"
               title="Affiliate / समाज सेवक पोर्टल"
             >
-              <Users size={12} className="topbar-affiliate-icon" />
+              <Users size={13} className="topbar-affiliate-icon" />
               <span>{language === 'mr' ? 'समाज सेवक' : 'Affiliate'}</span>
             </Link>
 
@@ -88,11 +112,10 @@ const Navbar = () => {
             {/* CRM Admin Portal link */}
             <Link 
               to="/crm" 
-              className="topbar-affiliate-link"
-              style={{ color: '#fde047', fontWeight: 600 }}
+              className="topbar-crm-link"
               title="Sahara CRM & Sales Management Portal"
             >
-              <ShieldCheck size={12} className="topbar-affiliate-icon" />
+              <ShieldCheck size={13} className="topbar-affiliate-icon" />
               <span>{language === 'mr' ? 'प्रशासन CRM' : 'Staff CRM'}</span>
             </Link>
 
@@ -114,8 +137,8 @@ const Navbar = () => {
       <header className={`main-header ${isScrolled ? 'main-header-scrolled' : ''}`}>
         <div className="container header-container">
           {/* Logo & Brand Identity */}
-          <Link to="/" className="brand-identity-link">
-            <MissionLogoBadge size={isScrolled ? 38 : 46} style={{ filter: 'none', flexShrink: 0 }} />
+          <Link to="/" className="brand-identity-link" onClick={() => setMobileMenuOpen(false)}>
+            <MissionLogoBadge size={isScrolled ? 38 : 44} style={{ filter: 'none', flexShrink: 0 }} />
             <div className="brand-text-block">
               <div className="brand-title">
                 {language === 'mr' ? organizationInfo.nameMr : organizationInfo.name}
@@ -127,7 +150,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="desktop-nav-menu">
+          <nav className="desktop-nav-menu" aria-label="Main Navigation">
             <ul className="desktop-nav-list">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
@@ -153,7 +176,7 @@ const Navbar = () => {
               href={`tel:${organizationInfo.contact.primaryPhone}`}
               className="btn btn-call btn-sm desktop-action-btn"
             >
-              <Phone size={15} />
+              <Phone size={14} />
               <span>{organizationInfo.contact.primaryPhone}</span>
             </a>
 
@@ -168,7 +191,7 @@ const Navbar = () => {
               rel="noopener noreferrer"
               className="btn btn-whatsapp btn-sm desktop-action-btn"
             >
-              <WhatsAppIcon size={16} animated={true} />
+              <WhatsAppIcon size={15} animated={true} />
               <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
             </a>
 
@@ -193,17 +216,16 @@ const Navbar = () => {
               className="header-icon-btn"
               title={customerUser ? (customerUser.fullName || 'My Account') : (language === 'mr' ? 'माझे खाते' : 'My Account')}
               aria-label="User Account"
-              style={{ position: 'relative' }}
             >
               <User size={19} />
               {customerUser && (
                 <span 
                   style={{
                     position: 'absolute',
-                    top: '2px',
-                    right: '2px',
-                    width: '8px',
-                    height: '8px',
+                    top: '3px',
+                    right: '3px',
+                    width: '9px',
+                    height: '9px',
                     borderRadius: '50%',
                     backgroundColor: '#10b981',
                     border: '1.5px solid #ffffff'
@@ -213,187 +235,241 @@ const Navbar = () => {
               )}
             </Link>
 
-            {/* Mobile Hamburger Menu Toggle */}
+            {/* Mobile Hamburger Menu Toggle (Min 44x44px touch target) */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMobileMenuOpen((prev) => !prev);
+              }}
               className="mobile-hamburger-btn"
-              aria-label="Toggle navigation menu"
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="mobile-drawer">
-            <div className="container">
-              <ul className="mobile-drawer-list">
-                {navLinks.map((link) => {
-                  const isActive = location.pathname === link.path;
-                  return (
-                    <li key={link.path}>
-                      <Link
-                        to={link.path}
-                        className={`mobile-drawer-link ${isActive ? 'active' : ''}`}
-                      >
-                        {language === 'mr' ? link.nameMr : link.nameEn}
-                      </Link>
-                    </li>
-                  );
-                })}
-
-                {/* Mobile Drawer Account & Logout Link */}
-                <li style={{ borderTop: '1px solid #f1f5f9', paddingTop: '0.4rem', marginTop: '0.2rem' }}>
-                  <Link
-                    to="/account"
-                    className={`mobile-drawer-link ${location.pathname === '/account' ? 'active' : ''}`}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                  >
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <User size={16} />
-                      {customerUser ? (customerUser.fullName || (language === 'mr' ? 'माझे खाते' : 'My Account')) : (language === 'mr' ? 'माझे खाते / लॉगिन' : 'My Account / Login')}
-                    </span>
-                    {customerUser && (
-                      <span style={{ fontSize: '0.72rem', backgroundColor: '#dcfce7', color: '#15803d', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
-                        {language === 'mr' ? 'लॉगिन' : 'Active'}
-                      </span>
-                    )}
-                  </Link>
-                </li>
-
-                {customerUser && (
-                  <li>
-                    <button
-                      onClick={() => {
-                        logoutCustomer();
-                        setMobileMenuOpen(false);
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        width: '100%',
-                        padding: '0.65rem 1rem',
-                        borderRadius: '8px',
-                        backgroundColor: '#fff1f2',
-                        color: '#e11d48',
-                        fontWeight: 700,
-                        fontSize: '0.92rem',
-                        border: 'none',
-                        cursor: 'pointer',
-                        textAlign: 'left'
-                      }}
-                    >
-                      <LogOut size={16} />
-                      <span>{language === 'mr' ? 'खाते लॉग आऊट करा' : 'Logout Account'}</span>
-                    </button>
-                  </li>
-                )}
-
-                {/* Mobile Call & WhatsApp quick shortcuts in drawer */}
-                <li className="mobile-drawer-actions">
-                  <a
-                    href={`tel:${organizationInfo.contact.primaryPhone}`}
-                    className="btn btn-call btn-sm"
-                    style={{ flex: 1 }}
-                  >
-                    <Phone size={15} />
-                    <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
-                  </a>
-                  <a
-                    href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-whatsapp btn-sm"
-                    style={{ flex: 1 }}
-                  >
-                    <WhatsAppIcon size={16} animated={true} />
-                    <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
       </header>
 
-      {/* Embedded CSS for Adaptive Viewport Layout */}
+      {/* Mobile Navigation Drawer & Backdrop (Rendered outside header to avoid backdrop-filter/stacking clipping) */}
+      {mobileMenuOpen && (
+        <div 
+          className="mobile-drawer-overlay" 
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div 
+            className="mobile-drawer-container" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mobile-drawer-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '1rem 1.15rem', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', boxSizing: 'border-box' }}>
+              <div className="mobile-drawer-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0, flex: 1, marginRight: '0.75rem' }}>
+                <MissionLogoBadge size={34} />
+                <span className="mobile-drawer-brand-title" style={{ fontSize: '0.88rem', fontWeight: 800, color: '#064e3b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                  {language === 'mr' ? organizationInfo.nameMr : organizationInfo.name}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mobile-drawer-close-btn"
+                aria-label="Close menu"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40px',
+                  height: '40px',
+                  minWidth: '40px',
+                  minHeight: '40px',
+                  borderRadius: '10px',
+                  border: '1px solid #cbd5e1',
+                  backgroundColor: '#ffffff',
+                  color: '#334155',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  marginLeft: 'auto',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <ul className="mobile-drawer-list">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <li key={link.path}>
+                    <Link
+                      to={link.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`mobile-drawer-link ${isActive ? 'active' : ''}`}
+                    >
+                      <span>{language === 'mr' ? link.nameMr : link.nameEn}</span>
+                      {isActive && <span className="mobile-link-dot" />}
+                    </Link>
+                  </li>
+                );
+              })}
+
+              {/* Mobile Drawer Account & Logout Link */}
+              <li style={{ borderTop: '1px solid #e2e8f0', paddingTop: '0.6rem', marginTop: '0.4rem' }}>
+                <Link
+                  to="/account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`mobile-drawer-link ${location.pathname === '/account' ? 'active' : ''}`}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <User size={18} style={{ color: '#059669' }} />
+                    <span>{customerUser ? (customerUser.fullName || (language === 'mr' ? 'माझे खाते' : 'My Account')) : (language === 'mr' ? 'माझे खाते / लॉगिन' : 'My Account / Login')}</span>
+                  </span>
+                  {customerUser && (
+                    <span style={{ fontSize: '0.72rem', backgroundColor: '#dcfce7', color: '#15803d', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
+                      {language === 'mr' ? 'लॉगिन' : 'Active'}
+                    </span>
+                  )}
+                </Link>
+              </li>
+
+              {customerUser && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logoutCustomer();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="mobile-drawer-logout-btn"
+                  >
+                    <LogOut size={16} />
+                    <span>{language === 'mr' ? 'खाते लॉग आऊट करा' : 'Logout Account'}</span>
+                  </button>
+                </li>
+              )}
+
+              {/* Language Switcher in Drawer */}
+              <li style={{ paddingTop: '0.4rem' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleLanguage();
+                  }}
+                  className="mobile-drawer-lang-toggle"
+                >
+                  <Globe size={16} />
+                  <span>{language === 'mr' ? 'Switch to English' : 'मराठी भाषेत पहा'}</span>
+                </button>
+              </li>
+
+              {/* Mobile Call & WhatsApp quick shortcuts in drawer */}
+              <li className="mobile-drawer-actions">
+                <a
+                  href={`tel:${organizationInfo.contact.primaryPhone}`}
+                  className="btn btn-call btn-sm"
+                  style={{ flex: 1 }}
+                >
+                  <Phone size={15} />
+                  <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
+                </a>
+                <a
+                  href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-whatsapp btn-sm"
+                  style={{ flex: 1 }}
+                >
+                  <WhatsAppIcon size={16} animated={true} />
+                  <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* Embedded Styles for Header and Mobile Drawer */}
       <style>{`
         /* Top Announcement Bar */
         .top-announcement-bar {
-          background-color: #064e3b;
-          color: #d1fae5;
+          background: linear-gradient(90deg, #0a1b2e 0%, #12355B 50%, #087E8B 100%);
+          color: #e2effc;
           font-size: 0.82rem;
           padding: 0.35rem 0;
-          border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+          border-bottom: 1px solid rgba(8, 126, 139, 0.3);
           width: 100%;
         }
 
         .topbar-container {
           display: flex;
-          justifyContent: space-between;
+          justify-content: space-between;
           align-items: center;
           width: 100%;
-          gap: 1rem;
+          gap: 0.75rem;
         }
 
         .topbar-mission {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
           min-width: 0;
+          flex: 1;
+          overflow: hidden;
+          margin-right: 0.75rem;
+        }
+
+        .topbar-marquee-wrapper {
+          overflow: hidden;
+          white-space: nowrap;
+          width: 100%;
+          position: relative;
+        }
+
+        .topbar-marquee-track {
+          display: inline-flex;
+          align-items: center;
+          gap: 3rem;
+          white-space: nowrap;
+          animation: moveRightToLeft 16s linear infinite;
+          will-change: transform;
+        }
+
+        .topbar-marquee-track:hover {
+          animation-play-state: paused;
+        }
+
+        @keyframes moveRightToLeft {
+          0% {
+            transform: translateX(100%);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
         }
 
         .topbar-mission-text {
           display: inline-flex;
           align-items: center;
-          gap: 0.35rem;
+          gap: 0.4rem;
           font-weight: 700;
-          color: #fef3c7;
+          color: #ffffff;
           white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          font-size: 0.82rem;
+          flex-shrink: 0;
         }
 
         .topbar-icon {
-          color: #f59e0b;
+          color: #F4A261;
           flex-shrink: 0;
         }
 
         .topbar-actions {
           display: flex;
           align-items: center;
-          gap: 0.85rem;
+          gap: 0.75rem;
           margin-left: auto;
           flex-shrink: 0;
-        }
-
-        .topbar-phone-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          color: #d1fae5;
-          font-size: 0.8rem;
-          font-weight: 600;
-          text-decoration: none;
-          transition: color 0.2s ease;
-        }
-
-        .topbar-phone-link:hover {
-          color: #ffffff;
-        }
-
-        .topbar-action-icon {
-          color: #34d399;
-        }
-
-        .topbar-phone-text-desktop {
-          display: inline;
-        }
-
-        .topbar-phone-text-mobile {
-          display: none;
         }
 
         .topbar-divider {
@@ -406,14 +482,29 @@ const Navbar = () => {
           display: inline-flex;
           align-items: center;
           gap: 0.3rem;
-          color: #a7f3d0;
+          color: #dbf7fa;
           font-size: 0.8rem;
-          font-weight: 600;
+          font-weight: 700;
           text-decoration: underline;
           transition: color 0.2s ease;
         }
 
         .topbar-affiliate-link:hover {
+          color: #ffffff;
+        }
+
+        .topbar-crm-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          color: #F4A261;
+          font-size: 0.8rem;
+          font-weight: 700;
+          text-decoration: none;
+          transition: color 0.2s ease;
+        }
+
+        .topbar-crm-link:hover {
           color: #ffffff;
         }
 
@@ -424,16 +515,17 @@ const Navbar = () => {
           background: rgba(255, 255, 255, 0.16);
           border: 1px solid rgba(255, 255, 255, 0.3);
           color: #ffffff;
-          padding: 0.2rem 0.55rem;
+          padding: 0.25rem 0.6rem;
           border-radius: 6px;
           cursor: pointer;
-          font-size: 0.75rem;
+          font-size: 0.76rem;
           font-weight: 700;
           transition: all 0.2s ease;
+          min-height: 28px;
         }
 
         .topbar-lang-btn:hover {
-          background: rgba(255, 255, 255, 0.25);
+          background: rgba(255, 255, 255, 0.28);
           border-color: #ffffff;
         }
 
@@ -444,16 +536,17 @@ const Navbar = () => {
           z-index: 1000;
           background-color: #ffffff;
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid #e2e8f0;
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid #e2eaf4;
           padding: 0.75rem 0;
-          transition: all 0.3s ease;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          transition: all 0.25s ease;
+          box-shadow: 0 1px 3px rgba(18, 53, 91, 0.05);
         }
 
         .main-header-scrolled {
           background-color: rgba(255, 255, 255, 0.98);
           padding: 0.5rem 0;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 4px 20px rgba(18, 53, 91, 0.08);
         }
 
         .header-container {
@@ -472,21 +565,6 @@ const Navbar = () => {
           flex-shrink: 1;
         }
 
-        .brand-logo-img {
-          width: 44px;
-          height: 44px;
-          object-fit: contain;
-          border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(6, 95, 70, 0.2);
-          flex-shrink: 0;
-          transition: all 0.3s ease;
-        }
-
-        .main-header-scrolled .brand-logo-img {
-          width: 38px;
-          height: 38px;
-        }
-
         .brand-text-block {
           min-width: 0;
         }
@@ -494,10 +572,10 @@ const Navbar = () => {
         .brand-title {
           font-size: 1.08rem;
           font-weight: 800;
-          color: #064e3b;
+          color: #12355B;
           line-height: 1.15;
           text-transform: uppercase;
-          letter-spacing: 0.025em;
+          letter-spacing: 0.02em;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -505,7 +583,7 @@ const Navbar = () => {
 
         .brand-subtitle {
           font-size: 0.68rem;
-          color: #059669;
+          color: #087E8B;
           font-weight: 700;
           margin-top: 1px;
           white-space: nowrap;
@@ -522,7 +600,7 @@ const Navbar = () => {
           display: flex;
           align-items: center;
           list-style: none;
-          gap: 0.65rem;
+          gap: 0.5rem;
           margin: 0;
           padding: 0;
         }
@@ -530,30 +608,30 @@ const Navbar = () => {
         .desktop-nav-item {
           font-size: 0.88rem;
           font-weight: 600;
-          color: #334155;
+          color: #243048;
           position: relative;
-          padding: 0.4rem 0.45rem;
+          padding: 0.45rem 0.65rem;
           text-decoration: none;
           white-space: nowrap;
           display: inline-block;
           transition: all 0.2s ease;
-          border-radius: 6px;
+          border-radius: 8px;
         }
 
         .desktop-nav-item:hover,
         .desktop-nav-item.active {
-          color: #047857;
-          background-color: #f0fdf4;
+          color: #087E8B;
+          background-color: #eefcfd;
           font-weight: 700;
         }
 
         .nav-active-indicator {
           position: absolute;
           bottom: 2px;
-          left: 6px;
-          right: 6px;
+          left: 8px;
+          right: 8px;
           height: 2.5px;
-          background-color: #047857;
+          background-color: #087E8B;
           border-radius: 2px;
         }
 
@@ -571,91 +649,213 @@ const Navbar = () => {
 
         .header-icon-btn {
           position: relative;
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          background-color: #f1f5f9;
-          color: #1e293b;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          background-color: #f0f4f9;
+          color: #172033;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid #e2e8f0;
+          border: 1px solid #e2eaf4;
           text-decoration: none;
           transition: all 0.2s ease;
+          touch-action: manipulation;
         }
 
-        .header-icon-btn:hover {
-          background-color: #e2e8f0;
-          color: #064e3b;
+        .header-icon-btn:hover,
+        .header-icon-btn:active {
+          background-color: #e2effc;
+          color: #12355B;
         }
 
         .cart-badge-count {
           position: absolute;
-          top: -5px;
-          right: -5px;
-          background-color: #059669;
-          color: #ffffff;
+          top: -4px;
+          right: -4px;
+          background-color: #F4A261;
+          color: #172033;
           font-size: 0.7rem;
           font-weight: 800;
-          width: 18px;
-          height: 18px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          border: 2px solid #ffffff;
         }
 
         .mobile-hamburger-btn {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
-          border: 1px solid #e2e8f0;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          border: 1px solid #cbd7e8;
           background-color: #f8fafc;
           cursor: pointer;
-          color: #1e293b;
+          color: #12355B;
           transition: all 0.2s ease;
+          touch-action: manipulation;
         }
 
-        .mobile-hamburger-btn:hover {
-          background-color: #e2e8f0;
+        .mobile-hamburger-btn:hover,
+        .mobile-hamburger-btn:active {
+          background-color: #eefcfd;
+          border-color: #087E8B;
         }
 
         /* Mobile Drawer */
-        .mobile-drawer {
+        .mobile-drawer-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100vw;
+          height: 100vh;
+          height: 100dvh;
+          background-color: rgba(10, 27, 46, 0.75);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          z-index: 999999;
+          display: flex;
+          justifyContent: flex-end;
+          animation: fadeInOverlay 0.2s ease-out;
+          touch-action: pan-y;
+        }
+
+        .mobile-drawer-container {
           background-color: #ffffff;
-          border-top: 1px solid #e2e8f0;
-          padding: 1.25rem 0;
-          animation: fadeIn 0.2s ease-out;
+          width: min(85vw, 360px);
+          height: 100%;
+          height: 100dvh;
+          display: flex;
+          flex-direction: column;
+          box-shadow: -10px 0 35px rgba(10, 27, 46, 0.35);
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          animation: slideInRightDrawer 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+          position: relative;
+          z-index: 1000000;
+        }
+
+        @keyframes fadeInOverlay {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slideInRightDrawer {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+
+        .mobile-drawer-header {
+          display: flex;
+          align-items: center;
+          justifyContent: space-between;
+          padding: 1.1rem 1.25rem;
+          border-bottom: 1px solid #e2eaf4;
+          background-color: #f8fafc;
+        }
+
+        .mobile-drawer-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+        }
+
+        .mobile-drawer-brand-title {
+          font-size: 0.92rem;
+          font-weight: 800;
+          color: #12355B;
+        }
+
+        .mobile-drawer-close-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          border: 1px solid #cbd7e8;
+          background-color: #ffffff;
+          color: #172033;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
         }
 
         .mobile-drawer-list {
           list-style: none;
           display: flex;
           flex-direction: column;
-          gap: 0.4rem;
+          gap: 0.35rem;
+          padding: 1.25rem 1rem;
         }
 
         .mobile-drawer-link {
-          display: block;
-          padding: 0.65rem 1rem;
-          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.8rem 1rem;
+          border-radius: 10px;
           background-color: transparent;
-          color: #1e293b;
-          font-weight: 500;
-          font-size: 0.98rem;
+          color: #172033;
+          font-weight: 600;
+          font-size: 1rem;
           text-decoration: none;
           transition: all 0.2s ease;
+          min-height: 44px;
         }
 
-        .mobile-drawer-link:hover,
+        .mobile-drawer-link:active,
         .mobile-drawer-link.active {
-          background-color: #ecfdf5;
-          color: #065f46;
+          background-color: #eefcfd;
+          color: #087E8B;
           font-weight: 700;
+        }
+
+        .mobile-link-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background-color: #087E8B;
+        }
+
+        .mobile-drawer-logout-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 10px;
+          backgroundColor: #fff1f2;
+          color: #e11d48;
+          font-weight: 700;
+          font-size: 0.92rem;
+          border: 1px solid #fecdd3;
+          cursor: pointer;
+          text-align: left;
+          min-height: 44px;
+        }
+
+        .mobile-drawer-lang-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          width: 100%;
+          padding: 0.7rem 1rem;
+          border-radius: 10px;
+          background-color: #f1f5f9;
+          color: #0f172a;
+          font-weight: 700;
+          font-size: 0.88rem;
+          border: 1px solid #cbd5e1;
+          cursor: pointer;
+          min-height: 44px;
         }
 
         .mobile-drawer-actions {
@@ -666,9 +866,7 @@ const Navbar = () => {
           margin-top: 0.5rem;
         }
 
-        /* =========================================================
-           RESPONSIVE VIEWPORT BREAKPOINTS (MOBILE, TABLET, DESKTOP)
-           ========================================================= */
+        /* Breakpoints */
         @media (min-width: 1024px) {
           .desktop-nav-menu {
             display: block !important;
@@ -681,12 +879,7 @@ const Navbar = () => {
           }
         }
 
-        /* Tablet View (768px - 1023px) */
         @media (max-width: 1023px) and (min-width: 768px) {
-          .brand-logo-img {
-            width: 40px;
-            height: 40px;
-          }
           .brand-title {
             font-size: 0.98rem;
           }
@@ -698,27 +891,38 @@ const Navbar = () => {
           }
         }
 
-        /* Mobile View (< 768px) */
         @media (max-width: 767px) {
           .top-announcement-bar {
-            padding: 0.35rem 0;
+            padding: 0.3rem 0;
+            overflow: hidden;
           }
 
           .topbar-container {
             flex-direction: column;
             align-items: stretch;
-            gap: 0.3rem;
+            gap: 0.25rem;
           }
 
           .topbar-mission {
-            justify-content: center;
             width: 100%;
+            margin-right: 0;
+            overflow: hidden;
+            justify-content: flex-start;
+          }
+
+          .topbar-marquee-wrapper {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          .topbar-marquee-track {
+            animation: moveRightToLeft 13s linear infinite;
+            gap: 2rem;
           }
 
           .topbar-mission-text {
             font-size: 0.74rem;
-            text-align: center;
-            white-space: normal;
+            white-space: nowrap;
             line-height: 1.25;
           }
 
@@ -727,36 +931,22 @@ const Navbar = () => {
             width: 100%;
             margin-left: 0;
             padding: 0 0.25rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.12);
-            padding-top: 0.3rem;
-          }
-
-          .topbar-phone-text-desktop {
-            display: none;
-          }
-
-          .topbar-phone-text-mobile {
-            display: inline;
-            color: #fef3c7;
-            font-weight: 700;
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+            padding-top: 0.25rem;
           }
 
           .topbar-divider {
             display: none;
           }
 
-          .topbar-affiliate-link {
+          .topbar-affiliate-link,
+          .topbar-crm-link {
             font-size: 0.75rem;
           }
 
           .topbar-lang-btn {
             padding: 0.15rem 0.5rem;
             font-size: 0.72rem;
-          }
-
-          .brand-logo-img {
-            width: 38px;
-            height: 38px;
           }
 
           .brand-title {
@@ -768,22 +958,25 @@ const Navbar = () => {
           }
         }
 
-        /* Very Small Mobile View (< 380px) */
-        @media (max-width: 380px) {
-          .brand-logo-img {
-            width: 34px;
-            height: 34px;
-          }
+        @media (max-width: 480px) {
           .brand-title {
-            font-size: 0.82rem;
+            font-size: clamp(0.82rem, 3.6vw, 0.92rem);
+            max-width: 180px;
           }
           .brand-subtitle {
-            display: none;
+            font-size: 0.62rem;
+            max-width: 180px;
           }
           .header-icon-btn,
           .mobile-hamburger-btn {
-            width: 34px;
-            height: 34px;
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            min-height: 38px;
+            border-radius: 10px;
+          }
+          .header-actions {
+            gap: 0.35rem;
           }
         }
       `}</style>

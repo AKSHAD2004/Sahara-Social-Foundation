@@ -61,20 +61,20 @@ const Affiliate = () => {
     <div className="affiliate-page">
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
         padding: '3.5rem 0',
         textAlign: 'center'
       }}>
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fef3c7' }}>
+          <div className="section-badge" style={{ backgroundColor: 'rgba(244,162,97,0.2)', color: '#F4A261', border: '1px solid rgba(244,162,97,0.4)' }}>
             <Users size={16} />
             <span>{language === 'mr' ? 'समाज सेवक / आरोग्य दूत' : 'Social Ambassador Program'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'सहारा सोशल फाऊंडेशन आरोग्य दूत नोंदणी' : 'Sahara Health Ambassador & Affiliate'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', maxWidth: '700px', margin: '0 auto' }}>
+          <p style={{ fontSize: '1.1rem', color: '#e2effc', maxWidth: '700px', margin: '0 auto' }}>
             {language === 'mr'
               ? 'मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियानात सहभागी होऊन आपल्या भागातील रुग्णांना मदत करा.'
               : 'Join the nationwide health campaign to refer patients and spread health awareness.'}
@@ -82,7 +82,7 @@ const Affiliate = () => {
         </div>
       </div>
 
-      <section className="section" style={{ backgroundColor: '#f8fafc' }}>
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container" style={{ maxWidth: '880px' }}>
           {/* Navigation Switch */}
           <div style={{
@@ -99,10 +99,12 @@ const Affiliate = () => {
                 fontWeight: 700,
                 fontSize: '0.95rem',
                 border: '1.5px solid',
-                borderColor: activeTab === 'register' ? '#059669' : '#cbd5e1',
-                backgroundColor: activeTab === 'register' ? '#059669' : '#ffffff',
-                color: activeTab === 'register' ? '#ffffff' : '#475569',
-                cursor: 'pointer'
+                borderColor: activeTab === 'register' ? '#087E8B' : '#e2eaf4',
+                backgroundColor: activeTab === 'register' ? '#087E8B' : '#ffffff',
+                color: activeTab === 'register' ? '#ffffff' : '#172033',
+                cursor: 'pointer',
+                boxShadow: activeTab === 'register' ? '0 4px 12px rgba(8, 126, 139, 0.25)' : 'none',
+                transition: 'all 0.2s ease'
               }}
             >
               {language === 'mr' ? 'नवीन समाज सेवक नोंदणी' : 'Ambassador Registration'}
@@ -116,10 +118,12 @@ const Affiliate = () => {
                 fontWeight: 700,
                 fontSize: '0.95rem',
                 border: '1.5px solid',
-                borderColor: activeTab === 'dashboard' ? '#059669' : '#cbd5e1',
-                backgroundColor: activeTab === 'dashboard' ? '#059669' : '#ffffff',
-                color: activeTab === 'dashboard' ? '#ffffff' : '#475569',
-                cursor: 'pointer'
+                borderColor: activeTab === 'dashboard' ? '#087E8B' : '#e2eaf4',
+                backgroundColor: activeTab === 'dashboard' ? '#087E8B' : '#ffffff',
+                color: activeTab === 'dashboard' ? '#ffffff' : '#172033',
+                cursor: 'pointer',
+                boxShadow: activeTab === 'dashboard' ? '0 4px 12px rgba(8, 126, 139, 0.25)' : 'none',
+                transition: 'all 0.2s ease'
               }}
             >
               {language === 'mr' ? 'डॅशबोर्ड पूर्वदृश्य (Demo)' : 'Dashboard Preview'}
@@ -131,23 +135,23 @@ const Affiliate = () => {
               backgroundColor: '#ffffff',
               borderRadius: '24px',
               padding: '2.5rem',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.04)'
+              border: '1px solid #e2eaf4',
+              boxShadow: '0 8px 30px rgba(18,53,91,0.04)'
             }}>
               {!submitted ? (
                 <div>
-                  <h3 style={{ fontSize: '1.4rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.5rem' }}>
+                  <h3 style={{ fontSize: '1.4rem', color: '#12355B', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
                     {language === 'mr' ? 'आरोग्यदूत / समाज सेवक नोंदणी अर्ज' : 'Partner Registration Form'}
                   </h3>
-                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1.75rem' }}>
+                  <p style={{ fontSize: '0.9rem', color: '#4f6182', marginBottom: '1.75rem' }}>
                     {language === 'mr'
                       ? 'आपल्या गावातील किंवा परिसरातील गरजू रुग्णांना मधुमेह व व्यसनमुक्तीचे मार्गदर्शन देण्यासाठी नोंदणी करा.'
                       : 'Become an authorized social coordinator in your local region.'}
                   </p>
 
                   <form onSubmit={handleRegister}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <div className="form-group">
+                    <div className="grid-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
                         <label className="form-label">{language === 'mr' ? 'पूर्ण नाव *' : 'Full Name *'}</label>
                         <input
                           type="text"
@@ -158,7 +162,7 @@ const Affiliate = () => {
                         />
                       </div>
 
-                      <div className="form-group">
+                      <div className="form-group" style={{ marginBottom: 0 }}>
                         <label className="form-label">{language === 'mr' ? 'मोबाईल नंबर *' : 'Mobile *'}</label>
                         <input
                           type="tel"
@@ -171,8 +175,8 @@ const Affiliate = () => {
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <div className="form-group">
+                    <div className="grid-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
                         <label className="form-label">{language === 'mr' ? 'गाव / तालुका / शहर' : 'City / Town'}</label>
                         <input
                           type="text"
@@ -182,7 +186,7 @@ const Affiliate = () => {
                         />
                       </div>
 
-                      <div className="form-group">
+                      <div className="form-group" style={{ marginBottom: 0 }}>
                         <label className="form-label">{language === 'mr' ? 'व्यवसाय' : 'Occupation'}</label>
                         <input
                           type="text"
@@ -215,8 +219,8 @@ const Affiliate = () => {
                     width: '64px',
                     height: '64px',
                     borderRadius: '50%',
-                    backgroundColor: '#ecfdf5',
-                    color: '#059669',
+                    backgroundColor: '#dbf7fa',
+                    color: '#087E8B',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -224,10 +228,10 @@ const Affiliate = () => {
                   }}>
                     <CheckCircle2 size={36} />
                   </div>
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#064e3b', marginBottom: '0.5rem' }}>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#12355B', marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
                     {language === 'mr' ? 'नोंदणी अर्ज यशस्वीरित्या प्राप्त झाला!' : 'Registration Completed!'}
                   </h3>
-                  <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                  <p style={{ color: '#4f6182', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
                     {language === 'mr'
                       ? 'सहारा सोशल फाऊंडेशनची टीम आपल्याशी संपर्क करून मार्गदर्शक पुस्तिका आणि संदर्भ कोड (Referral ID) देईल.'
                       : 'Our foundation team will contact you with promotional materials and your unique Ambassador ID.'}
@@ -241,51 +245,51 @@ const Affiliate = () => {
               borderRadius: '24px',
               padding: '2.5rem',
               border: '1px solid #e2e8f0',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.04)'
+              boxShadow: '0 8px 30px rgba(18,53,91,0.04)'
             }}>
-              <h3 style={{ fontSize: '1.35rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.35rem', color: '#12355B', fontWeight: 800, marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>
                 {language === 'mr' ? 'आरोग्यदूत डॅशबोर्ड (Ambassador Dashboard)' : 'Ambassador Portal'}
               </h3>
 
               <div className="grid-3" style={{ marginBottom: '2rem' }}>
-                <div style={{ backgroundColor: '#f0fdf4', padding: '1.25rem', borderRadius: '14px', border: '1px solid #bbf7d0' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#065f46', fontWeight: 600 }}>
+                <div style={{ backgroundColor: '#dbf7fa', padding: '1.25rem', borderRadius: '14px', border: '1px solid #abedf5' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#087E8B', fontWeight: 600 }}>
                     {language === 'mr' ? 'एकूण संदर्भित रुग्ण' : 'Referred Patients'}
                   </div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#064e3b' }}>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#12355B' }}>
                     18
                   </div>
                 </div>
 
-                <div style={{ backgroundColor: '#eff6ff', padding: '1.25rem', borderRadius: '14px', border: '1px solid #bfdbfe' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#1e40af', fontWeight: 600 }}>
+                <div style={{ backgroundColor: '#e2effc', padding: '1.25rem', borderRadius: '14px', border: '1px solid #b8d4f6' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#12355B', fontWeight: 600 }}>
                     {language === 'mr' ? 'यशस्वी मार्गदर्शन' : 'Counseling Completed'}
                   </div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#1e3a8a' }}>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#12355B' }}>
                     14
                   </div>
                 </div>
 
-                <div style={{ backgroundColor: '#fffbeb', padding: '1.25rem', borderRadius: '14px', border: '1px solid #fde68a' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#92400e', fontWeight: 600 }}>
+                <div style={{ backgroundColor: '#fff3ec', padding: '1.25rem', borderRadius: '14px', border: '1px solid #ffd4b8' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#7c2d12', fontWeight: 600 }}>
                     {language === 'mr' ? 'सक्रिय अभियान' : 'Active Campaign'}
                   </div>
-                  <div style={{ fontSize: '1rem', fontWeight: 800, color: '#78350f', marginTop: '0.5rem' }}>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: '#7c2d12', marginTop: '0.5rem' }}>
                     मधुमेह मुक्त भारत
                   </div>
                 </div>
               </div>
 
               <div style={{
-                backgroundColor: '#f8fafc',
+                backgroundColor: '#F5F7FA',
                 borderRadius: '12px',
                 padding: '1rem 1.25rem',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #e2eaf4',
                 fontSize: '0.9rem',
-                color: '#475569'
+                color: '#4f6182'
               }}>
-                <strong>{language === 'mr' ? 'आपली विशेष संदर्भ लिंक:' : 'Your Referral Link:'}</strong><br />
-                <code style={{ color: '#059669', fontSize: '0.88rem' }}>
+                <strong style={{ color: '#12355B' }}>{language === 'mr' ? 'आपली विशेष संदर्भ लिंक:' : 'Your Referral Link:'}</strong><br />
+                <code style={{ color: '#087E8B', fontSize: '0.88rem', fontWeight: 700 }}>
                   https://samarthkolhapur.com/?ref=SSF-AMB-8421
                 </code>
               </div>

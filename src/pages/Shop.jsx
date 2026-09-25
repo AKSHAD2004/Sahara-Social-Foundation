@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { 
   ShoppingBag, 
   Search, 
-  Filter, 
   ShieldCheck, 
-  Phone,
-  ArrowRight
+  Phone
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { productsData, organizationInfo } from '../data/websiteData';
@@ -41,20 +39,20 @@ const Shop = () => {
     <div className="shop-page">
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
-        padding: '3.5rem 0',
+        padding: '3rem 0',
         textAlign: 'center'
       }}>
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fef3c7' }}>
-            <ShoppingBag size={16} />
+          <div className="section-badge" style={{ backgroundColor: 'rgba(244,162,97,0.2)', color: '#F4A261', border: '1px solid rgba(244,162,97,0.4)' }}>
+            <ShoppingBag size={15} />
             <span>{language === 'mr' ? 'Antox आयुर्वेदिक औषधी' : 'Antox Ayurvedic Formulas'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: '#ffffff', marginBottom: '0.65rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'आयुर्वेदिक उत्पादने व फॉर्म्युला' : 'Authentic Ayurvedic Products'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', maxWidth: '700px', margin: '0 auto' }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', color: '#e2effc', maxWidth: '700px', margin: '0 auto' }}>
             {language === 'mr'
               ? '१००% शुद्ध आयुर्वेदिक औषधी, मोफत होम डिलिव्हरी आणि पार्सल मिळाल्यावर फोनवर वैयक्तिक पथ्य मार्गदर्शन.'
               : 'Pure Ayurvedic wellness solutions with free shipping and dedicated telephone guidance upon delivery.'}
@@ -62,69 +60,76 @@ const Shop = () => {
         </div>
       </div>
 
-      <section className="section" style={{ backgroundColor: '#f8fafc' }}>
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           {/* Post-order Call Guideline Notice */}
-          <div className="notice-strip" style={{ marginBottom: '2.5rem' }}>
-            <ShieldCheck size={24} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
+          <div className="notice-strip" style={{ marginBottom: '2rem' }}>
+            <ShieldCheck size={22} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <strong style={{ fontSize: '1rem' }}>
+              <strong style={{ fontSize: '0.95rem', color: '#12355B' }}>
                 {language === 'mr' ? 'महत्त्वाची सूचना (Important Notice):' : 'Important Notice:'}
               </strong><br />
-              {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
+              <span style={{ color: '#172033' }}>
+                {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
+              </span>
             </div>
           </div>
 
           {/* Filter & Search Bar */}
-          <div style={{
+          <div className="shop-filter-bar" style={{
             backgroundColor: '#ffffff',
             borderRadius: '16px',
-            padding: '1.25rem',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-            border: '1px solid #e2e8f0',
-            marginBottom: '2.5rem',
+            padding: '1rem 1.25rem',
+            boxShadow: '0 4px 15px rgba(18,53,91,0.06)',
+            border: '1px solid #e2eaf4',
+            marginBottom: '2rem',
             display: 'flex',
             flexDirection: 'column',
-            gap: '1rem'
+            gap: '0.85rem'
           }}>
             {/* Search Input */}
             <div style={{ position: 'relative' }}>
-              <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#087E8B' }} />
               <input
                 type="text"
                 className="form-input"
-                style={{ paddingLeft: '2.8rem' }}
+                style={{ paddingLeft: '2.8rem', borderColor: '#e2eaf4' }}
                 placeholder={language === 'mr' ? 'उत्पादन शोधा (उदा. Antox D, व्यसनमुक्ती, सांधेदुखी...)' : 'Search formulas (e.g. Antox D, Diabetes, Addiction)...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            {/* Category Chips */}
+            {/* Category Chips (Smooth Horizontal Scroll on Touch) */}
             <div style={{
               display: 'flex',
-              gap: '0.5rem',
+              gap: '0.45rem',
               overflowX: 'auto',
-              paddingBottom: '0.25rem'
+              paddingBottom: '0.35rem',
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch'
             }}>
               {categories.map((cat) => {
                 const isActive = selectedCategory === cat.id;
                 return (
                   <button
                     key={cat.id}
+                    type="button"
                     onClick={() => setSelectedCategory(cat.id)}
                     style={{
-                      padding: '0.5rem 1rem',
+                      padding: '0.45rem 0.95rem',
                       borderRadius: '9999px',
-                      fontSize: '0.85rem',
-                      fontWeight: 600,
-                      border: '1px solid',
-                      borderColor: isActive ? '#059669' : '#e2e8f0',
-                      backgroundColor: isActive ? '#059669' : '#ffffff',
-                      color: isActive ? '#ffffff' : '#475569',
+                      fontSize: '0.84rem',
+                      fontWeight: 700,
+                      border: '1.5px solid',
+                      borderColor: isActive ? '#087E8B' : '#e2eaf4',
+                      backgroundColor: isActive ? '#087E8B' : '#ffffff',
+                      color: isActive ? '#ffffff' : '#172033',
                       cursor: 'pointer',
                       whiteSpace: 'nowrap',
-                      transition: 'all 0.2s ease'
+                      transition: 'all 0.2s ease',
+                      minHeight: '38px',
+                      boxShadow: isActive ? '0 2px 8px rgba(8,126,139,0.25)' : 'none'
                     }}
                   >
                     {language === 'mr' ? cat.nameMr : cat.nameEn}
@@ -136,7 +141,7 @@ const Shop = () => {
 
           {/* Products Grid */}
           {filteredProducts.length > 0 ? (
-            <div className="grid-3" style={{ marginBottom: '3rem' }}>
+            <div className="products-grid" style={{ marginBottom: '2.5rem' }}>
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -144,19 +149,21 @@ const Shop = () => {
           ) : (
             <div style={{
               textAlign: 'center',
-              padding: '4rem 1rem',
+              padding: '3.5rem 1rem',
               backgroundColor: '#ffffff',
               borderRadius: '16px',
-              border: '1px dashed #cbd5e1'
+              border: '1px dashed #cbd5e1',
+              marginBottom: '2.5rem'
             }}>
-              <ShoppingBag size={48} style={{ color: '#94a3b8', margin: '0 auto 1rem auto' }} />
-              <h3 style={{ fontSize: '1.25rem', color: '#1e293b', marginBottom: '0.5rem' }}>
+              <ShoppingBag size={44} style={{ color: '#087E8B', margin: '0 auto 0.75rem auto', opacity: 0.6 }} />
+              <h3 style={{ fontSize: '1.2rem', color: '#12355B', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
                 {language === 'mr' ? 'कोणतीही उत्पादने सापडली नाहीत' : 'No Products Found'}
               </h3>
-              <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              <p style={{ color: '#4f6182', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
                 {language === 'mr' ? 'कृपया वेगळा शब्द शोधून पहा किंवा श्रेणी बदला.' : 'Try a different search term or category.'}
               </p>
               <button
+                type="button"
                 onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
                 className="btn btn-outline btn-sm"
               >
@@ -167,21 +174,22 @@ const Shop = () => {
 
           {/* Direct Phone Order Banner */}
           <div style={{
-            backgroundColor: '#064e3b',
+            background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
             color: '#ffffff',
             borderRadius: '18px',
-            padding: '2rem 2.5rem',
+            padding: '1.75rem 2rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '1.5rem'
+            gap: '1.25rem',
+            boxShadow: '0 8px 24px rgba(18,53,91,0.18)'
           }}>
             <div>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.35rem' }}>
+              <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.3rem', fontFamily: 'var(--font-heading)' }}>
                 {language === 'mr' ? 'थेट फोनवर ऑर्डर करायची आहे?' : 'Prefer to Order Directly by Phone?'}
               </h3>
-              <p style={{ fontSize: '0.95rem', color: '#a7f3d0', margin: 0 }}>
+              <p style={{ fontSize: '0.92rem', color: '#e2effc', margin: 0 }}>
                 {language === 'mr'
                   ? 'आमच्या प्रतिनिधींशी बोलून घरबसल्या कॅश ऑन डिलिव्हरी किंवा ऑनलाईन मागवा.'
                   : 'Call our Kolhapur helpline to place your order with complete guidance.'}
@@ -190,11 +198,11 @@ const Shop = () => {
 
             <a
               href={`tel:${organizationInfo.contact.primaryPhone}`}
-              className="btn btn-call btn-lg"
-              style={{ backgroundColor: '#059669', color: '#ffffff' }}
+              className="btn btn-accent btn-lg"
+              style={{ backgroundColor: '#F4A261', color: '#12355B', fontWeight: 800 }}
             >
               <Phone size={18} />
-              <span>{language === 'mr' ? 'कॉल करा: ८४२११५४०९०' : 'Call: 8421154090'}</span>
+              <span>{language === 'mr' ? 'कॉल: ८४२११५४०९०' : 'Call 8421154090'}</span>
             </a>
           </div>
         </div>

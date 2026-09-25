@@ -49,23 +49,23 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
           width: '54px',
           height: '54px',
           borderRadius: '14px',
-          backgroundColor: '#ecfdf5',
-          color: '#059669',
+          backgroundColor: '#dbf7fa',
+          color: '#087E8B',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: '1.25rem',
-          border: '1px solid #a7f3d0'
+          border: '1px solid #abedf5'
         }}
       >
         <IconComponent size={26} />
       </div>
 
-      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#064e3b', marginBottom: '0.5rem' }}>
+      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#12355B', marginBottom: '0.5rem' }}>
         {language === 'mr' ? service.nameMr : service.nameEn}
       </h3>
 
-      <p style={{ fontSize: '0.88rem', color: '#64748b', lineHeight: 1.55, marginBottom: '1.25rem' }}>
+      <p style={{ fontSize: '0.88rem', color: '#4f6182', lineHeight: 1.55, marginBottom: '1.25rem' }}>
         {language === 'mr' ? service.descMr : service.descEn}
       </p>
 
@@ -73,12 +73,12 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
         <div style={{
           marginTop: 'auto',
           paddingTop: '0.85rem',
-          borderTop: '1px dashed #e2e8f0',
+          borderTop: '1px dashed #e2eaf4',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 600 }}>
+          <span style={{ fontSize: '0.78rem', color: '#087E8B', fontWeight: 600 }}>
             {service.popularProduct}
           </span>
           <Link
@@ -86,7 +86,7 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
             style={{
               fontSize: '0.82rem',
               fontWeight: 700,
-              color: '#047857',
+              color: '#087E8B',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.25rem'

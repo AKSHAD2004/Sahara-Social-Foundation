@@ -9,23 +9,20 @@ import {
   CheckCircle2, 
   ArrowLeft,
   AlertCircle,
-  User,
-  LogIn,
   Zap,
-  Lock,
-  Sparkles
+  Lock
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { organizationInfo } from '../data/websiteData';
 import { dbService } from '../services/db';
-import { initializeRazorpayPayment, getRazorpayKeyId } from '../services/razorpay';
+import { initializeRazorpayPayment } from '../services/razorpay';
 
 const Checkout = () => {
   const { cartItems, subtotal, deliveryCharges, grandTotal, clearCart } = useCart();
   const { language } = useLanguage();
-  const { customerUser, isCustomerLoggedIn, openCustomerAuthModal, logoutCustomer } = useAuth();
+  const { customerUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -64,9 +61,9 @@ const Checkout = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div style={{ backgroundColor: '#f8fafc', padding: '5rem 0', minHeight: '60vh', textAlign: 'center' }}>
+      <div style={{ backgroundColor: '#F5F7FA', padding: '5rem 0', minHeight: '60vh', textAlign: 'center' }}>
         <div className="container" style={{ maxWidth: '600px' }}>
-          <h2 style={{ fontSize: '1.8rem', color: '#064e3b', fontWeight: 800, marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '1.8rem', color: '#12355B', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'कार्टमध्ये कोणतीही उत्पादने नाहीत' : 'No items to checkout'}
           </h2>
           <Link to="/shop" className="btn btn-primary">
@@ -102,7 +99,6 @@ const Checkout = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Helper to persist order to CRM and redirect
   const completeOrderPlacement = (orderId, paymentDetails = {}) => {
     const activeRefCode = localStorage.getItem('sahara_active_ref') || '';
     const users = dbService.getAll('users');
@@ -187,7 +183,6 @@ const Checkout = () => {
       status: 'Confirmed'
     };
 
-    // Store in localStorage for Order confirmation page
     localStorage.setItem('ssf_last_order', JSON.stringify(orderDetails));
 
     clearCart();
@@ -200,8 +195,8 @@ const Checkout = () => {
     if (!validate()) return;
 
     if (!customerUser) {
-      openCustomerAuthModal((loggedInUser) => {
-        // Auto-filled with logged-in data, then continue
+      openCustomerAuthModal(() => {
+        // Continue after auth
       });
       return;
     }
@@ -242,8 +237,6 @@ const Checkout = () => {
         },
         onError: (err) => {
           setIsSubmitting(false);
-          console.warn('Razorpay checkout note:', err);
-          // Fallback or demo completion if sandbox
           setPaymentNotice(
             language === 'mr'
               ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. आपण कॅश ऑन डिलिव्हरी (COD) पर्याय निवडू शकता.'
@@ -260,18 +253,18 @@ const Checkout = () => {
   };
 
   return (
-    <div className="checkout-page" style={{ backgroundColor: '#f8fafc', padding: '3rem 0 5rem 0' }}>
+    <div className="checkout-page" style={{ backgroundColor: '#F5F7FA', padding: '2.5rem 0 4.5rem 0' }}>
       <div className="container">
-        <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ marginBottom: '1.25rem' }}>
           <Link
             to="/cart"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              color: '#059669',
-              fontSize: '0.9rem',
-              fontWeight: 600
+              color: '#087E8B',
+              fontSize: '0.88rem',
+              fontWeight: 700
             }}
           >
             <ArrowLeft size={16} />
@@ -279,67 +272,69 @@ const Checkout = () => {
           </Link>
         </div>
 
-        <h1 style={{ fontSize: '2.2rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.5rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', color: '#12355B', fontWeight: 800, marginBottom: '1.25rem', fontFamily: 'var(--font-heading)' }}>
           {language === 'mr' ? 'डिलिव्हरी पत्ता व पेमेंट तपशील' : 'Delivery & Secure Checkout'}
         </h1>
 
         {paymentNotice && (
           <div style={{
-            backgroundColor: '#fffbeb',
-            border: '1px solid #fde68a',
-            color: '#92400e',
-            padding: '1rem 1.25rem',
+            backgroundColor: '#fff3ec',
+            border: '1px solid #ffd4b8',
+            color: '#7c2d12',
+            padding: '0.85rem 1rem',
             borderRadius: '12px',
-            marginBottom: '1.5rem',
-            fontSize: '0.92rem',
+            marginBottom: '1.25rem',
+            fontSize: '0.88rem',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.6rem'
+            gap: '0.5rem'
           }}>
-            <AlertCircle size={20} style={{ flexShrink: 0 }} />
+            <AlertCircle size={18} style={{ flexShrink: 0, color: '#F4A261' }} />
             <span>{paymentNotice}</span>
           </div>
         )}
 
         <form onSubmit={handlePlaceOrder}>
-          <div style={{
+          <div className="checkout-layout-grid" style={{
             display: 'grid',
             gridTemplateColumns: '1.35fr 0.85fr',
-            gap: '2.5rem',
+            gap: '2rem',
             alignItems: 'flex-start'
-          }} className="checkout-layout-grid">
+          }}>
             {/* Left Column: Delivery & Payment Details */}
             <div>
               {/* Mandatory Guideline Banner */}
-              <div className="notice-strip" style={{ marginBottom: '1.75rem' }}>
-                <ShieldCheck size={22} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
+              <div className="notice-strip" style={{ marginBottom: '1.5rem' }}>
+                <ShieldCheck size={20} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
                 <div>
-                  <strong>{language === 'mr' ? 'डिलिव्हरी नंतरचे मोफत मार्गदर्शन:' : 'Post-Delivery Expert Regimen:'}</strong><br />
-                  {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
+                  <strong style={{ color: '#12355B' }}>{language === 'mr' ? 'डिलिव्हरी नंतरचे मोफत मार्गदर्शन:' : 'Post-Delivery Expert Regimen:'}</strong><br />
+                  <span style={{ color: '#172033' }}>
+                    {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
+                  </span>
                 </div>
               </div>
 
               {/* Personal Info Card */}
-              <div style={{
+              <div className="checkout-card" style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '20px',
-                padding: '2rem',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
-                marginBottom: '1.75rem'
+                padding: '1.75rem',
+                border: '1px solid #e2eaf4',
+                boxShadow: '0 4px 15px rgba(18,53,91,0.04)',
+                marginBottom: '1.5rem'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.15rem' }}>
+                  <h3 style={{ fontSize: '1.2rem', color: '#12355B', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
                     {language === 'mr' ? '१. लाभार्थी / ग्राहकाची माहिती' : '1. Customer Details'}
                   </h3>
                   {customerUser && (
-                    <span style={{ fontSize: '0.78rem', backgroundColor: '#ecfdf5', color: '#059669', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
-                      ✓ {language === 'mr' ? 'लॉगिन केलेले खाते' : 'Logged In'}
+                    <span style={{ fontSize: '0.74rem', backgroundColor: '#dbf7fa', color: '#087E8B', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 700 }}>
+                      ✓ {language === 'mr' ? 'खाते सक्रिय' : 'Logged In'}
                     </span>
                   )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="checkout-form-row">
                   <div className="form-group">
                     <label className="form-label">
                       {language === 'mr' ? 'पूर्ण नाव *' : 'Full Name *'}
@@ -370,7 +365,7 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="checkout-form-row">
                   <div className="form-group">
                     <label className="form-label">
                       {language === 'mr' ? 'पर्यायी मोबाईल (Optional)' : 'Alt Phone (Optional)'}
@@ -401,15 +396,15 @@ const Checkout = () => {
               </div>
 
               {/* Shipping Address Card */}
-              <div style={{
+              <div className="checkout-card" style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '20px',
-                padding: '2rem',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
-                marginBottom: '1.75rem'
+                padding: '1.75rem',
+                border: '1px solid #e2eaf4',
+                boxShadow: '0 4px 15px rgba(18,53,91,0.04)',
+                marginBottom: '1.5rem'
               }}>
-                <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.25rem' }}>
+                <h3 style={{ fontSize: '1.2rem', color: '#12355B', fontWeight: 800, marginBottom: '1.15rem', fontFamily: 'var(--font-heading)' }}>
                   {language === 'mr' ? '२. डिलिव्हरी पत्ता (Shipping Address)' : '2. Shipping Address'}
                 </h3>
 
@@ -427,7 +422,7 @@ const Checkout = () => {
                   {errors.address && <div className="form-error">{errors.address}</div>}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="checkout-form-row">
                   <div className="form-group">
                     <label className="form-label">
                       {language === 'mr' ? 'प्रसिद्ध खूण (Landmark)' : 'Landmark'}
@@ -456,7 +451,7 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="checkout-form-row">
                   <div className="form-group">
                     <label className="form-label">
                       {language === 'mr' ? 'राज्य' : 'State'}
@@ -505,34 +500,34 @@ const Checkout = () => {
               </div>
 
               {/* Payment Method Option with Razorpay Integration */}
-              <div style={{
+              <div className="checkout-card" style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '20px',
-                padding: '2rem',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+                padding: '1.75rem',
+                border: '1px solid #e2eaf4',
+                boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, margin: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.15rem' }}>
+                  <h3 style={{ fontSize: '1.2rem', color: '#12355B', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
                     {language === 'mr' ? '३. पेमेंट पर्याय (Payment Gateway)' : '3. Payment Method'}
                   </h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#059669', fontSize: '0.78rem', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#087E8B', fontSize: '0.78rem', fontWeight: 700 }}>
                     <Lock size={13} />
                     <span>256-Bit SSL Secure</span>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {/* Option 1: Razorpay Online Payment */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '1rem',
-                    padding: '1.1rem',
+                    gap: '0.85rem',
+                    padding: '1rem',
                     borderRadius: '14px',
                     border: '2px solid',
-                    borderColor: formData.paymentMethod === 'razorpay' ? '#059669' : '#e2e8f0',
-                    backgroundColor: formData.paymentMethod === 'razorpay' ? '#f0fdf4' : '#ffffff',
+                    borderColor: formData.paymentMethod === 'razorpay' ? '#087E8B' : '#e2eaf4',
+                    backgroundColor: formData.paymentMethod === 'razorpay' ? '#dbf7fa' : '#ffffff',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease'
                   }}>
@@ -542,18 +537,18 @@ const Checkout = () => {
                       value="razorpay"
                       checked={formData.paymentMethod === 'razorpay'}
                       onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                      style={{ accentColor: '#059669', width: '18px', height: '18px' }}
+                      style={{ accentColor: '#087E8B', width: '18px', height: '18px', flexShrink: 0 }}
                     />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.4rem' }}>
-                        <div style={{ fontWeight: 800, color: '#064e3b', fontSize: '0.98rem' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.3rem' }}>
+                        <div style={{ fontWeight: 800, color: '#12355B', fontSize: '0.95rem' }}>
                           {language === 'mr' ? 'ऑनलाईन पेमेंट (Razorpay - UPI / PhonePe / GPay / Cards)' : 'Online Payment (Razorpay - UPI / Cards / NetBanking)'}
                         </div>
-                        <span style={{ fontSize: '0.72rem', backgroundColor: '#064e3b', color: '#ffffff', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
+                        <span style={{ fontSize: '0.7rem', backgroundColor: '#12355B', color: '#ffffff', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 700 }}>
                           {language === 'mr' ? 'जलद व सुरक्षित' : 'Fast & Secure'}
                         </span>
                       </div>
-                      <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '0.25rem' }}>
+                      <div style={{ fontSize: '0.8rem', color: '#4f6182', marginTop: '0.2rem' }}>
                         {language === 'mr' 
                           ? 'Google Pay, PhonePe, Paytm, डेबिट/क्रेडिट कार्ड किंवा नेटबँकिंग द्वारे त्वरित पेमेंट' 
                           : 'Pay instantly via UPI, Google Pay, PhonePe, Debit/Credit Card, NetBanking'}
@@ -565,12 +560,12 @@ const Checkout = () => {
                   <label style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '1rem',
-                    padding: '1.1rem',
+                    gap: '0.85rem',
+                    padding: '1rem',
                     borderRadius: '14px',
                     border: '2px solid',
-                    borderColor: formData.paymentMethod === 'cod' ? '#059669' : '#e2e8f0',
-                    backgroundColor: formData.paymentMethod === 'cod' ? '#f0fdf4' : '#ffffff',
+                    borderColor: formData.paymentMethod === 'cod' ? '#087E8B' : '#e2eaf4',
+                    backgroundColor: formData.paymentMethod === 'cod' ? '#dbf7fa' : '#ffffff',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease'
                   }}>
@@ -580,13 +575,13 @@ const Checkout = () => {
                       value="cod"
                       checked={formData.paymentMethod === 'cod'}
                       onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                      style={{ accentColor: '#059669', width: '18px', height: '18px' }}
+                      style={{ accentColor: '#087E8B', width: '18px', height: '18px', flexShrink: 0 }}
                     />
                     <div>
-                      <div style={{ fontWeight: 800, color: '#064e3b', fontSize: '0.98rem' }}>
+                      <div style={{ fontWeight: 800, color: '#12355B', fontSize: '0.95rem' }}>
                         {language === 'mr' ? 'कॅश ऑन डिलिव्हरी (Cash on Delivery)' : 'Cash on Delivery (COD)'}
                       </div>
-                      <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '0.25rem' }}>
+                      <div style={{ fontSize: '0.8rem', color: '#4f6182', marginTop: '0.2rem' }}>
                         {language === 'mr' ? 'पार्सल हातात आल्यावर रोख पैसे द्या' : 'Pay in cash when parcel is delivered at your address'}
                       </div>
                     </div>
@@ -597,58 +592,58 @@ const Checkout = () => {
 
             {/* Right Column: Order Review */}
             <div>
-              <div style={{
+              <div className="checkout-card" style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '20px',
-                padding: '2rem',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
+                padding: '1.75rem',
+                border: '1px solid #e2eaf4',
+                boxShadow: '0 4px 15px rgba(18,53,91,0.04)',
                 position: 'sticky',
-                top: '6rem'
+                top: '5.5rem'
               }}>
-                <h3 style={{ fontSize: '1.3rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.25rem' }}>
+                <h3 style={{ fontSize: '1.25rem', color: '#12355B', fontWeight: 800, marginBottom: '1.15rem', fontFamily: 'var(--font-heading)' }}>
                   {language === 'mr' ? 'ऑर्डर सारांश' : 'Order Review'}
                 </h3>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem', maxHeight: '220px', overflowY: 'auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.25rem', maxHeight: '200px', overflowY: 'auto' }}>
                   {cartItems.map((item) => (
-                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.5rem' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, color: '#1e293b' }}>
+                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.86rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.45rem' }}>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, color: '#172033', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {language === 'mr' ? item.nameMr : item.nameEn}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        <div style={{ fontSize: '0.74rem', color: '#4f6182' }}>
                           {item.quantity} × ₹{item.price}
                         </div>
                       </div>
-                      <div style={{ fontWeight: 700, color: '#064e3b' }}>
+                      <div style={{ fontWeight: 700, color: '#12355B', flexShrink: 0, marginLeft: '0.5rem' }}>
                         ₹{item.price * item.quantity}
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem', fontSize: '0.92rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.25rem', fontSize: '0.9rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4f6182' }}>
                     <span>{language === 'mr' ? 'उपएकूण' : 'Subtotal'}</span>
-                    <span style={{ fontWeight: 600, color: '#1e293b' }}>₹{subtotal}</span>
+                    <span style={{ fontWeight: 700, color: '#172033' }}>₹{subtotal}</span>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4f6182' }}>
                     <span>{language === 'mr' ? 'डिलिव्हरी' : 'Delivery'}</span>
-                    <span style={{ fontWeight: 700, color: '#059669' }}>
+                    <span style={{ fontWeight: 700, color: '#087E8B' }}>
                       {deliveryCharges === 0 ? (language === 'mr' ? 'मोफत (FREE)' : 'FREE') : `₹${deliveryCharges}`}
                     </span>
                   </div>
 
                   <div style={{
-                    paddingTop: '0.85rem',
-                    borderTop: '2px dashed #e2e8f0',
+                    paddingTop: '0.75rem',
+                    borderTop: '2px dashed #e2eaf4',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    fontSize: '1.3rem',
+                    fontSize: '1.25rem',
                     fontWeight: 800,
-                    color: '#064e3b'
+                    color: '#12355B'
                   }}>
                     <span>{language === 'mr' ? 'एकूण देय रक्कम' : 'Final Amount'}</span>
                     <span>₹{grandTotal}</span>
@@ -661,9 +656,7 @@ const Checkout = () => {
                   className="btn btn-primary btn-lg"
                   style={{
                     width: '100%',
-                    marginBottom: '1.25rem',
-                    backgroundColor: formData.paymentMethod === 'razorpay' ? '#065f46' : '#047857',
-                    boxShadow: '0 4px 15px rgba(6, 95, 70, 0.3)'
+                    marginBottom: '1rem'
                   }}
                 >
                   {formData.paymentMethod === 'razorpay' ? <Zap size={18} /> : <CheckCircle2 size={18} />}
@@ -676,7 +669,7 @@ const Checkout = () => {
                   </span>
                 </button>
 
-                <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#64748b', lineHeight: 1.4 }}>
+                <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#4f6182', lineHeight: 1.4 }}>
                   {language === 'mr'
                     ? 'ऑर्डरनंतर २४ तासांत पार्सल रवाना केले जाईल. काही अडचण असल्यास ८४२११५४०९० वर संपर्क करा.'
                     : 'Dispatched within 24 hours. For questions call 8421154090.'}
@@ -688,9 +681,26 @@ const Checkout = () => {
       </div>
 
       <style>{`
+        .checkout-form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
         @media (max-width: 960px) {
           .checkout-layout-grid {
             grid-template-columns: 1fr !important;
+            gap: 1.5rem !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .checkout-card {
+            padding: 1.25rem 1rem !important;
+          }
+          .checkout-form-row {
+            grid-template-columns: 1fr !important;
+            gap: 0;
           }
         }
       `}</style>

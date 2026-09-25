@@ -245,14 +245,14 @@ const Account = () => {
   };
 
   return (
-    <div className="account-page" style={{ backgroundColor: '#f8fafc', padding: '3.5rem 0 5.5rem 0', minHeight: '80vh' }}>
+    <div className="account-page" style={{ backgroundColor: '#F5F7FA', padding: '3.5rem 0 5.5rem 0', minHeight: '80vh' }}>
       <div className="container" style={{ maxWidth: '960px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.2rem', color: '#064e3b', fontWeight: 800, margin: 0 }}>
+            <h1 style={{ fontSize: '2.2rem', color: '#12355B', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'माझे खाते (Customer Account)' : 'Customer Account'}
             </h1>
-            <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.25rem 0 0 0' }}>
+            <p style={{ color: '#4f6182', fontSize: '0.95rem', margin: '0.25rem 0 0 0' }}>
               {language === 'mr' 
                 ? 'आपल्या ऑर्डर्स, पत्ता व ग्राहक प्रोफाइल व्यवस्थापित करा' 
                 : 'Manage your orders, delivery address, and beneficiary profile'}
@@ -291,8 +291,8 @@ const Account = () => {
             backgroundColor: '#ffffff',
             borderRadius: '24px',
             padding: '2.5rem',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01)',
+            border: '1px solid #e2eaf4',
+            boxShadow: '0 10px 25px -5px rgba(18, 53, 91, 0.06), 0 8px 10px -6px rgba(18, 53, 91, 0.02)',
             maxWidth: '520px',
             margin: '0 auto'
           }}>
@@ -302,22 +302,22 @@ const Account = () => {
                 width: '64px',
                 height: '64px',
                 borderRadius: '50%',
-                backgroundColor: '#ecfdf5',
-                color: '#059669',
+                backgroundColor: '#dbf7fa',
+                color: '#087E8B',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '1rem',
-                border: '2px solid #a7f3d0'
+                border: '2px solid #abedf5'
               }}>
                 <User size={32} />
               </div>
-              <h2 style={{ fontSize: '1.45rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.35rem' }}>
+              <h2 style={{ fontSize: '1.45rem', color: '#12355B', fontWeight: 800, marginBottom: '0.35rem', fontFamily: 'var(--font-heading)' }}>
                 {authMode === 'existing' 
                   ? (language === 'mr' ? 'आधीच्या खात्यात लॉगिन करा' : 'Login to Existing Account')
                   : (language === 'mr' ? 'नवीन ग्राहक नोंदणी' : 'Create Customer Account')}
               </h2>
-              <p style={{ color: '#64748b', fontSize: '0.88rem', margin: 0 }}>
+              <p style={{ color: '#4f6182', fontSize: '0.88rem', margin: 0 }}>
                 {authMode === 'existing'
                   ? (language === 'mr' ? 'आपला नोंदणीकृत १० अंकी मोबाईल नंबर टाकून लॉगिन करा' : 'Enter your registered 10-digit mobile number to access your account')
                   : (language === 'mr' ? 'आपल्या पहिल्या खरेदीसाठी व ऑर्डर ट्रॅकिंगसाठी नाव व मोबाईल नोंदवा' : 'Register your details for instant order tracking & delivery')}
@@ -327,10 +327,11 @@ const Account = () => {
             {/* Switch Tabs: Existing Account vs New Registration */}
             <div style={{
               display: 'flex',
-              backgroundColor: '#f1f5f9',
+              backgroundColor: '#F5F7FA',
               borderRadius: '12px',
               padding: '0.35rem',
-              marginBottom: '1.75rem'
+              marginBottom: '1.75rem',
+              border: '1px solid #e2eaf4'
             }}>
               <button
                 type="button"
@@ -341,7 +342,7 @@ const Account = () => {
                   borderRadius: '9px',
                   border: 'none',
                   backgroundColor: authMode === 'existing' ? '#ffffff' : 'transparent',
-                  color: authMode === 'existing' ? '#065f46' : '#64748b',
+                  color: authMode === 'existing' ? '#087E8B' : '#4f6182',
                   fontWeight: authMode === 'existing' ? 700 : 600,
                   fontSize: '0.88rem',
                   display: 'flex',
@@ -349,7 +350,7 @@ const Account = () => {
                   justifyContent: 'center',
                   gap: '0.4rem',
                   cursor: 'pointer',
-                  boxShadow: authMode === 'existing' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                  boxShadow: authMode === 'existing' ? '0 2px 6px rgba(18,53,91,0.08)' : 'none',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -366,7 +367,7 @@ const Account = () => {
                   borderRadius: '9px',
                   border: 'none',
                   backgroundColor: authMode === 'new' ? '#ffffff' : 'transparent',
-                  color: authMode === 'new' ? '#065f46' : '#64748b',
+                  color: authMode === 'new' ? '#087E8B' : '#4f6182',
                   fontWeight: authMode === 'new' ? 700 : 600,
                   fontSize: '0.88rem',
                   display: 'flex',
@@ -374,7 +375,7 @@ const Account = () => {
                   justifyContent: 'center',
                   gap: '0.4rem',
                   cursor: 'pointer',
-                  boxShadow: authMode === 'new' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                  boxShadow: authMode === 'new' ? '0 2px 6px rgba(18,53,91,0.08)' : 'none',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -406,7 +407,7 @@ const Account = () => {
             {authMode === 'existing' ? (
               <form onSubmit={handleExistingCustomerLogin}>
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#172033', marginBottom: '0.4rem' }}>
                     {language === 'mr' ? 'नोंदणीकृत १० अंकी मोबाईल नंबर (Mobile Number) *' : 'Registered 10-Digit Mobile Number *'}
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -415,7 +416,7 @@ const Account = () => {
                       left: '12px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      color: '#475569',
+                      color: '#087E8B',
                       fontWeight: 700,
                       fontSize: '0.9rem'
                     }}>
@@ -432,7 +433,7 @@ const Account = () => {
                         width: '100%',
                         padding: '0.75rem 1rem 0.75rem 3.2rem',
                         borderRadius: '10px',
-                        border: '1.5px solid #cbd5e1',
+                        border: '1.5px solid #e2eaf4',
                         fontSize: '1rem',
                         outline: 'none',
                         letterSpacing: '1px',
@@ -442,7 +443,7 @@ const Account = () => {
                       required
                     />
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '0.35rem' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#4f6182', marginTop: '0.35rem' }}>
                     {language === 'mr' 
                       ? 'आपल्या पूर्वीच्या ऑर्डरमध्ये दिलेला मोबाईल नंबर येथे प्रविष्ट करा.' 
                       : 'Enter the mobile number used during your previous purchase or consultation.'}
@@ -583,9 +584,7 @@ const Account = () => {
                     fontSize: '1rem',
                     fontWeight: 700,
                     borderRadius: '12px',
-                    justifyContent: 'center',
-                    backgroundColor: '#065f46',
-                    boxShadow: '0 4px 14px rgba(6, 95, 70, 0.25)'
+                    justifyContent: 'center'
                   }}
                 >
                   <UserPlus size={18} />
@@ -594,7 +593,7 @@ const Account = () => {
 
                 {/* Switch helper link */}
                 <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
-                  <span style={{ fontSize: '0.86rem', color: '#64748b' }}>
+                  <span style={{ fontSize: '0.86rem', color: '#4f6182' }}>
                     {language === 'mr' ? 'आधीपासून खाते आहे का? ' : 'Already have an existing account? '}
                   </span>
                   <button
@@ -603,7 +602,7 @@ const Account = () => {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: '#059669',
+                      color: '#087E8B',
                       fontWeight: 700,
                       fontSize: '0.86rem',
                       cursor: 'pointer',
@@ -624,10 +623,10 @@ const Account = () => {
               justifyContent: 'center',
               gap: '0.4rem',
               marginTop: '1.5rem',
-              color: '#64748b',
+              color: '#4f6182',
               fontSize: '0.78rem'
             }}>
-              <ShieldCheck size={15} style={{ color: '#059669' }} />
+              <ShieldCheck size={15} style={{ color: '#087E8B' }} />
               <span>{language === 'mr' ? 'सहारा सोशल फाऊंडेशन • १००% सुरक्षित ग्राहक खाते' : 'Sahara Social Foundation • 100% Secure Account'}</span>
             </div>
           </div>
@@ -644,8 +643,8 @@ const Account = () => {
               backgroundColor: '#ffffff',
               borderRadius: '18px',
               padding: '1.25rem',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+              border: '1px solid #e2eaf4',
+              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
             }}>
               {/* Profile Card Header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.5rem 1.25rem 0.5rem', borderBottom: '1px solid #f1f5f9', marginBottom: '0.75rem' }}>
@@ -653,8 +652,8 @@ const Account = () => {
                   width: '48px',
                   height: '48px',
                   borderRadius: '50%',
-                  backgroundColor: '#ecfdf5',
-                  color: '#059669',
+                  backgroundColor: '#dbf7fa',
+                  color: '#087E8B',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -665,10 +664,10 @@ const Account = () => {
                   {customerUser.fullName ? customerUser.fullName.charAt(0).toUpperCase() : <User size={22} />}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: '#064e3b', fontSize: '0.98rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div style={{ fontWeight: 700, color: '#12355B', fontSize: '0.98rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: 'var(--font-heading)' }}>
                     {customerUser.fullName || (language === 'mr' ? 'आरोग्य लाभार्थी' : 'Health Beneficiary')}
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#4f6182' }}>
                     {customerUser.phone || 'Sahara Member'}
                   </div>
                 </div>
@@ -685,8 +684,8 @@ const Account = () => {
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
                     border: 'none',
-                    backgroundColor: activeTab === 'orders' ? '#ecfdf5' : 'transparent',
-                    color: activeTab === 'orders' ? '#065f46' : '#475569',
+                    backgroundColor: activeTab === 'orders' ? '#dbf7fa' : 'transparent',
+                    color: activeTab === 'orders' ? '#087E8B' : '#172033',
                     fontWeight: activeTab === 'orders' ? 700 : 600,
                     fontSize: '0.92rem',
                     cursor: 'pointer',
@@ -707,8 +706,8 @@ const Account = () => {
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
                     border: 'none',
-                    backgroundColor: activeTab === 'profile' ? '#ecfdf5' : 'transparent',
-                    color: activeTab === 'profile' ? '#065f46' : '#475569',
+                    backgroundColor: activeTab === 'profile' ? '#dbf7fa' : 'transparent',
+                    color: activeTab === 'profile' ? '#087E8B' : '#172033',
                     fontWeight: activeTab === 'profile' ? 700 : 600,
                     fontSize: '0.92rem',
                     cursor: 'pointer',
@@ -721,7 +720,7 @@ const Account = () => {
                 </button>
 
                 {/* Divider */}
-                <div style={{ height: '1px', backgroundColor: '#e2e8f0', margin: '0.6rem 0' }} />
+                <div style={{ height: '1px', backgroundColor: '#e2eaf4', margin: '0.6rem 0' }} />
 
                 {/* Logout Option Below Navigation */}
                 <button
@@ -759,17 +758,17 @@ const Account = () => {
               backgroundColor: '#ffffff',
               borderRadius: '20px',
               padding: '2rem',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+              border: '1px solid #e2eaf4',
+              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
             }}>
               {/* Tab 1: Orders */}
               {activeTab === 'orders' && (
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <h3 style={{ fontSize: '1.3rem', color: '#064e3b', fontWeight: 800, margin: 0 }}>
+                    <h3 style={{ fontSize: '1.3rem', color: '#12355B', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
                       {language === 'mr' ? 'मागील ऑर्डर्स व ट्रॅकिंग' : 'Order History & Status'}
                     </h3>
-                    <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.85rem', color: '#4f6182', fontWeight: 600 }}>
                       {orders.length} {language === 'mr' ? 'ऑर्डर्स' : 'Orders'}
                     </span>
                   </div>
@@ -787,21 +786,23 @@ const Account = () => {
                       <div
                         key={orderId}
                         style={{
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid #e2eaf4',
                           borderRadius: '14px',
                           padding: '1.25rem',
                           marginBottom: '1rem',
-                          backgroundColor: '#f8fafc'
+                          backgroundColor: '#F5F7FA'
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                           <div>
-                            <span style={{ fontWeight: 700, color: '#064e3b', fontSize: '1rem' }}>{orderId}</span>
-                            <span style={{ color: '#64748b', fontSize: '0.82rem', marginLeft: '0.75rem' }}>{orderDate}</span>
+                            <span style={{ fontWeight: 700, color: '#12355B', fontSize: '1rem' }}>{orderId}</span>
+                            <span style={{ color: '#4f6182', fontSize: '0.82rem', marginLeft: '0.75rem' }}>{orderDate}</span>
                           </div>
                           <span style={{
-                            backgroundColor: orderStatus.toLowerCase().includes('deliver') ? '#dcfce7' : '#e0f2fe',
-                            color: orderStatus.toLowerCase().includes('deliver') ? '#15803d' : '#0369a1',
+                            backgroundColor: orderStatus.toLowerCase().includes('deliver') ? '#fff3ec' : '#dbf7fa',
+                            color: orderStatus.toLowerCase().includes('deliver') ? '#7c2d12' : '#087E8B',
+                            border: '1px solid',
+                            borderColor: orderStatus.toLowerCase().includes('deliver') ? '#ffd4b8' : '#abedf5',
                             fontSize: '0.78rem',
                             fontWeight: 700,
                             padding: '0.25rem 0.65rem',
@@ -811,15 +812,15 @@ const Account = () => {
                           </span>
                         </div>
 
-                        <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#1e293b', marginBottom: '0.35rem' }}>
+                        <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#172033', marginBottom: '0.35rem' }}>
                           {itemsName}
                         </div>
 
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed #cbd5e1' }}>
-                          <span style={{ fontSize: '0.85rem', color: '#059669', fontWeight: 600 }}>
+                          <span style={{ fontSize: '0.85rem', color: '#087E8B', fontWeight: 600 }}>
                             {ord.counselingStatus || (language === 'mr' ? 'तज्ज्ञ मार्गदर्शन सक्रिय (८४२११५४०९०)' : 'Free Expert Guidance (8421154090)')}
                           </span>
-                          <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#064e3b' }}>
+                          <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#12355B' }}>
                             ₹{amount}
                           </span>
                         </div>
@@ -828,16 +829,18 @@ const Account = () => {
                   })}
 
                   <div style={{
-                    backgroundColor: '#fffbeb',
+                    backgroundColor: '#fff3ec',
                     borderRadius: '12px',
                     padding: '1rem',
-                    border: '1px solid #fde68a',
+                    border: '1px solid #ffd4b8',
                     marginTop: '1.5rem',
                     fontSize: '0.88rem',
-                    color: '#92400e'
+                    color: '#7c2d12'
                   }}>
-                    <strong>{language === 'mr' ? 'टीप:' : 'Note:'}</strong>{' '}
-                    {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
+                    <strong style={{ color: '#12355B' }}>{language === 'mr' ? 'टीप:' : 'Note:'}</strong>{' '}
+                    <span style={{ color: '#172033' }}>
+                      {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
+                    </span>
                   </div>
                 </div>
               )}
@@ -845,17 +848,17 @@ const Account = () => {
               {/* Tab 2: Profile & Details */}
               {activeTab === 'profile' && (
                 <div>
-                  <h3 style={{ fontSize: '1.3rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.25rem' }}>
+                  <h3 style={{ fontSize: '1.3rem', color: '#12355B', fontWeight: 800, marginBottom: '1.25rem', fontFamily: 'var(--font-heading)' }}>
                     {language === 'mr' ? 'वैयक्तिक माहिती व पत्ता' : 'Personal Profile & Address'}
                   </h3>
 
                   {saveSuccess && (
                     <div style={{
-                      backgroundColor: '#dcfce7',
-                      color: '#166534',
+                      backgroundColor: '#dbf7fa',
+                      color: '#087E8B',
                       padding: '0.75rem 1rem',
                       borderRadius: '10px',
-                      border: '1px solid #86efac',
+                      border: '1px solid #abedf5',
                       marginBottom: '1.25rem',
                       fontSize: '0.9rem',
                       fontWeight: 600,

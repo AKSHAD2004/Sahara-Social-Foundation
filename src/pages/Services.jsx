@@ -23,20 +23,20 @@ const Services = () => {
     <div className="services-page">
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
         padding: '3.5rem 0',
         textAlign: 'center'
       }}>
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fef3c7' }}>
+          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.18)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.3)' }}>
             <Activity size={16} />
             <span>{language === 'mr' ? 'आरोग्य मार्गदर्शन व सेवा' : 'Health Guidance & Services'}</span>
           </div>
           <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
             {language === 'mr' ? 'आरोग्य सेवा व विशेष अभियाने' : 'Health Services & Campaigns'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', maxWidth: '700px', margin: '0 auto' }}>
+          <p style={{ fontSize: '1.1rem', color: '#dbf7fa', maxWidth: '700px', margin: '0 auto' }}>
             {language === 'mr'
               ? 'मधुमेह नियंत्रण, व्यसनमुक्ती, सांधेदुखी व जुनाट विकारांवर शास्त्रीय आयुर्वेदिक मार्गदर्शन आणि आहाराचे नियोजन.'
               : 'Holistic Ayurvedic care, dietary pathya, and lifestyle counseling for lifestyle health conditions.'}
@@ -75,7 +75,7 @@ const Services = () => {
       </section>
 
       {/* All Health Categories Grid */}
-      <section className="section" style={{ backgroundColor: '#f0fdf4' }}>
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
@@ -107,16 +107,16 @@ const Services = () => {
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '2.5rem',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
-            border: '1px solid #e2e8f0',
+            boxShadow: '0 10px 30px rgba(18,53,91,0.08)',
+            border: '1px solid #e2eaf4',
             textAlign: 'center',
             maxWidth: '800px',
             margin: '0 auto'
           }}>
-            <h3 style={{ fontSize: '1.6rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.75rem' }}>
+            <h3 style={{ fontSize: '1.6rem', color: '#12355B', fontWeight: 800, marginBottom: '0.75rem' }}>
               {language === 'mr' ? 'आपल्या आरोग्यासाठी मोफत तज्ज्ञ सल्ला हवा आहे?' : 'Need Free Health Guidance for Your Condition?'}
             </h3>
-            <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+            <p style={{ fontSize: '1rem', color: '#4f6182', lineHeight: 1.6, marginBottom: '1.75rem' }}>
               {language === 'mr'
                 ? 'सहारा सोशल फाऊंडेशनच्या समुपदेशकांशी थेट बोला किंवा मोफत मार्गदर्शनासाठी नोंदणी करा.'
                 : 'Call our dedicated Kolhapur helpline directly or register your counseling request.'}

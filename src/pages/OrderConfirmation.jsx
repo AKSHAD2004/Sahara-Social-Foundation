@@ -38,9 +38,9 @@ const OrderConfirmation = () => {
 
   if (!order) {
     return (
-      <div style={{ backgroundColor: '#f8fafc', padding: '5rem 0', textAlign: 'center' }}>
+      <div style={{ backgroundColor: '#F5F7FA', padding: '5rem 0', textAlign: 'center' }}>
         <div className="container" style={{ maxWidth: '600px' }}>
-          <h2>{language === 'mr' ? 'कोणतीही ऑर्डर आढळली नाही' : 'No Order Found'}</h2>
+          <h2 style={{ color: '#12355B', fontFamily: 'var(--font-heading)' }}>{language === 'mr' ? 'कोणतीही ऑर्डर आढळली नाही' : 'No Order Found'}</h2>
           <Link to="/shop" className="btn btn-primary" style={{ marginTop: '1rem' }}>
             {language === 'mr' ? 'दुकान पहा' : 'Visit Shop'}
           </Link>
@@ -50,22 +50,22 @@ const OrderConfirmation = () => {
   }
 
   return (
-    <div className="order-confirmation-page" style={{ backgroundColor: '#f8fafc', padding: '3.5rem 0 5.5rem 0' }}>
+    <div className="order-confirmation-page" style={{ backgroundColor: '#F5F7FA', padding: '3.5rem 0 5.5rem 0' }}>
       <div className="container" style={{ maxWidth: '820px' }}>
         
         {/* Printable Official Invoice Header (Visible only on Print) */}
         <div className="print-only-header" style={{ display: 'none' }}>
-          <div style={{ borderBottom: '2px solid #064e3b', paddingBottom: '1rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-            <h1 style={{ fontSize: '1.6rem', color: '#064e3b', margin: 0, fontWeight: 800 }}>
+          <div style={{ borderBottom: '2px solid #12355B', paddingBottom: '1rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+            <h1 style={{ fontSize: '1.6rem', color: '#12355B', margin: 0, fontWeight: 800, fontFamily: 'var(--font-heading)' }}>
               सहारा सोशल फाऊंडेशन, कोल्हापूर (Sahara Social Foundation)
             </h1>
-            <p style={{ margin: '0.25rem 0', fontSize: '0.85rem', color: '#475569' }}>
+            <p style={{ margin: '0.25rem 0', fontSize: '0.85rem', color: '#4f6182' }}>
               नोंदणीकृत सामाजिक संस्था (Reg. No. MAH/582/2014/KOP) • अधिकृत आरोग्य व औषधोपचार सेवा
             </p>
-            <p style={{ margin: '0.25rem 0', fontSize: '0.85rem', color: '#065f46', fontWeight: 700 }}>
+            <p style={{ margin: '0.25rem 0', fontSize: '0.85rem', color: '#087E8B', fontWeight: 700 }}>
               हेल्पलाईन / समुपदेशन: {organizationInfo.contact.primaryPhone} • WhatsApp: {organizationInfo.contact.whatsappNumber}
             </p>
-            <div style={{ display: 'inline-block', backgroundColor: '#ecfdf5', color: '#065f46', padding: '0.25rem 1rem', borderRadius: '4px', fontWeight: 800, marginTop: '0.5rem', fontSize: '0.9rem' }}>
+            <div style={{ display: 'inline-block', backgroundColor: '#dbf7fa', color: '#087E8B', padding: '0.25rem 1rem', borderRadius: '4px', fontWeight: 800, marginTop: '0.5rem', fontSize: '0.9rem' }}>
               ग्राहक पावती / OFFICIAL ORDER INVOICE
             </div>
           </div>
@@ -76,8 +76,8 @@ const OrderConfirmation = () => {
           backgroundColor: '#ffffff',
           borderRadius: '24px',
           padding: '2.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+          border: '1px solid #e2eaf4',
+          boxShadow: '0 10px 30px rgba(18,53,91,0.06)',
           textAlign: 'center',
           marginBottom: '2rem'
         }}>
@@ -85,8 +85,8 @@ const OrderConfirmation = () => {
             width: '72px',
             height: '72px',
             borderRadius: '50%',
-            backgroundColor: '#ecfdf5',
-            color: '#059669',
+            backgroundColor: '#dbf7fa',
+            color: '#087E8B',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -95,18 +95,18 @@ const OrderConfirmation = () => {
             <CheckCircle2 size={42} />
           </div>
 
-          <h1 style={{ fontSize: '2rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2rem', color: '#12355B', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'आपली ऑर्डर यशस्वीरित्या नोंदवली गेली आहे!' : 'Order Placed Successfully!'}
           </h1>
-          <p style={{ fontSize: '1rem', color: '#475569', marginBottom: '1.25rem' }}>
+          <p style={{ fontSize: '1rem', color: '#4f6182', marginBottom: '1.25rem' }}>
             {language === 'mr' ? 'ऑर्डर क्रमांक:' : 'Order ID:'}{' '}
-            <strong style={{ color: '#064e3b', fontSize: '1.1rem' }}>{order.orderId}</strong>
+            <strong style={{ color: '#12355B', fontSize: '1.1rem' }}>{order.orderId}</strong>
           </p>
 
           {/* CRITICAL POST-DELIVERY REGIMEN NOTICE */}
           <div style={{
-            backgroundColor: '#fffbeb',
-            border: '2px solid #f59e0b',
+            backgroundColor: '#fff3ec',
+            border: '2px solid #F4A261',
             borderRadius: '14px',
             padding: '1.25rem 1.5rem',
             textAlign: 'left',
@@ -115,12 +115,12 @@ const OrderConfirmation = () => {
             gap: '1rem',
             margin: '1.5rem 0'
           }}>
-            <ShieldAlert size={26} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
+            <ShieldAlert size={26} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#92400e', marginBottom: '0.35rem' }}>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#7c2d12', marginBottom: '0.35rem' }}>
                 {language === 'mr' ? 'अतिशय महत्त्वाची सूचना (Important Regimen Notice):' : 'Mandatory Regimen Notice:'}
               </div>
-              <p style={{ fontSize: '0.98rem', color: '#78350f', lineHeight: 1.6, margin: 0 }}>
+              <p style={{ fontSize: '0.98rem', color: '#172033', lineHeight: 1.6, margin: 0 }}>
                 {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
               </p>
             </div>
@@ -150,10 +150,8 @@ const OrderConfirmation = () => {
             <button
               type="button"
               onClick={handlePrint}
-              className="btn btn-primary"
+              className="btn btn-secondary"
               style={{
-                backgroundColor: '#065f46',
-                borderColor: '#065f46',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.45rem'
@@ -170,12 +168,12 @@ const OrderConfirmation = () => {
           backgroundColor: '#ffffff',
           borderRadius: '20px',
           padding: '2rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+          border: '1px solid #e2eaf4',
+          boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.85rem' }}>
-            <h3 style={{ fontSize: '1.25rem', color: '#064e3b', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <FileText size={20} style={{ color: '#059669' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid #e2eaf4', paddingBottom: '0.85rem' }}>
+            <h3 style={{ fontSize: '1.25rem', color: '#12355B', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-heading)' }}>
+              <FileText size={20} style={{ color: '#087E8B' }} />
               <span>{language === 'mr' ? 'ऑर्डर माहिती व बिल' : 'Order Information & Bill'}</span>
             </h3>
 
@@ -193,26 +191,26 @@ const OrderConfirmation = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.75rem' }}>
             <div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.8rem', color: '#4f6182', fontWeight: 600 }}>
                 {language === 'mr' ? 'डिलिव्हरी पत्ता:' : 'Shipping Address:'}
               </div>
-              <div style={{ fontWeight: 700, color: '#1e293b', marginTop: '0.2rem' }}>
+              <div style={{ fontWeight: 700, color: '#172033', marginTop: '0.2rem' }}>
                 {order.customer.fullName}
               </div>
-              <div style={{ fontSize: '0.9rem', color: '#475569' }}>
+              <div style={{ fontSize: '0.9rem', color: '#4f6182' }}>
                 {order.customer.address}, {order.customer.landmark ? order.customer.landmark + ', ' : ''}
                 {order.customer.city}, {order.customer.state} - {order.customer.pincode}
               </div>
-              <div style={{ fontSize: '0.88rem', color: '#059669', fontWeight: 600, marginTop: '0.2rem' }}>
+              <div style={{ fontSize: '0.88rem', color: '#087E8B', fontWeight: 600, marginTop: '0.2rem' }}>
                 Phone: {order.customer.phone}
               </div>
             </div>
 
             <div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.8rem', color: '#4f6182', fontWeight: 600 }}>
                 {language === 'mr' ? 'पेमेंट प्रकार:' : 'Payment Method:'}
               </div>
-              <div style={{ fontWeight: 700, color: '#1e293b', marginTop: '0.2rem' }}>
+              <div style={{ fontWeight: 700, color: '#172033', marginTop: '0.2rem' }}>
                 {order.paymentMethod?.includes('Razorpay') || order.paymentMethod === 'online'
                   ? (language === 'mr' ? 'Razorpay ऑनलाईन (Paid)' : 'Razorpay Online (Paid)')
                   : (order.paymentMethod === 'cod' || order.paymentMethod?.includes('Cash')
@@ -220,29 +218,29 @@ const OrderConfirmation = () => {
                     : order.paymentMethod || 'Online Payment')}
               </div>
               {order.transactionId && (
-                <div style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700, marginTop: '0.2rem' }}>
+                <div style={{ fontSize: '0.8rem', color: '#087E8B', fontWeight: 700, marginTop: '0.2rem' }}>
                   Txn ID: {order.transactionId}
                 </div>
               )}
-              <div style={{ fontSize: '0.88rem', color: '#64748b', marginTop: '0.2rem' }}>
+              <div style={{ fontSize: '0.88rem', color: '#4f6182', marginTop: '0.2rem' }}>
                 Status: {order.paymentStatus === 'Paid' ? 'Paid & Confirmed' : 'Confirmed & Dispatched within 24 Hours'}
               </div>
-              <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '0.2rem' }}>
+              <div style={{ fontSize: '0.82rem', color: '#4f6182', marginTop: '0.2rem' }}>
                 {language === 'mr' ? 'तारीख:' : 'Date:'} {order.date || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
               </div>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem' }}>
-            <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.75rem' }}>
+          <div style={{ borderTop: '1px solid #e2eaf4', paddingTop: '1.25rem' }}>
+            <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#172033', marginBottom: '0.75rem' }}>
               {language === 'mr' ? 'मागवलेली उत्पादने:' : 'Ordered Items:'}
             </h4>
 
             <div style={{ width: '100%', marginBottom: '0.5rem' }}>
               {order.items.map((it, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.92rem', marginBottom: '0.5rem', paddingBottom: '0.35rem', borderBottom: '1px solid #f8fafc' }}>
-                  <span>{it.quantity} × {language === 'mr' ? it.nameMr : it.nameEn}</span>
-                  <span style={{ fontWeight: 700, color: '#064e3b' }}>₹{it.price * it.quantity}</span>
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.92rem', marginBottom: '0.5rem', paddingBottom: '0.35rem', borderBottom: '1px solid #F5F7FA' }}>
+                  <span style={{ color: '#172033' }}>{it.quantity} × {language === 'mr' ? it.nameMr : it.nameEn}</span>
+                  <span style={{ fontWeight: 700, color: '#12355B' }}>₹{it.price * it.quantity}</span>
                 </div>
               ))}
             </div>
@@ -252,9 +250,9 @@ const OrderConfirmation = () => {
               justifyContent: 'space-between',
               fontWeight: 800,
               fontSize: '1.2rem',
-              color: '#064e3b',
+              color: '#12355B',
               paddingTop: '0.75rem',
-              borderTop: '2px dashed #e2e8f0',
+              borderTop: '2px dashed #e2eaf4',
               marginTop: '0.75rem'
             }}>
               <span>{language === 'mr' ? 'एकूण रक्कम:' : 'Total Amount:'}</span>
@@ -269,8 +267,6 @@ const OrderConfirmation = () => {
               onClick={handlePrint}
               className="btn btn-primary"
               style={{
-                backgroundColor: '#065f46',
-                borderColor: '#065f46',
                 padding: '0.7rem 1.5rem',
                 fontSize: '0.95rem'
               }}

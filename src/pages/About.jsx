@@ -8,8 +8,6 @@ import {
   Users, 
   Phone, 
   MapPin, 
-  Award,
-  CheckCircle2,
   Building
 } from 'lucide-react';
 import { organizationInfo } from '../data/websiteData';
@@ -23,20 +21,20 @@ const About = () => {
     <div className="about-page">
       {/* Page Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
-        padding: '3.5rem 0',
+        padding: '3rem 0',
         textAlign: 'center'
       }}>
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fef3c7' }}>
-            <ShieldCheck size={16} />
+          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.18)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.3)' }}>
+            <ShieldCheck size={15} />
             <span>{language === 'mr' ? 'सहारा सोशल फाऊंडेशन' : 'Sahara Social Foundation'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: '#ffffff', marginBottom: '0.65rem' }}>
             {language === 'mr' ? organizationInfo.about.titleMr : organizationInfo.about.titleEn}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', maxWidth: '700px', margin: '0 auto' }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', color: '#dbf7fa', maxWidth: '700px', margin: '0 auto' }}>
             {language === 'mr' ? organizationInfo.about.subtitleMr : organizationInfo.about.subtitleEn}
           </p>
         </div>
@@ -45,37 +43,40 @@ const About = () => {
       {/* Main Content Section */}
       <section className="section" style={{ backgroundColor: '#ffffff' }}>
         <div className="container">
-          <div style={{
+          <div className="about-details-grid" style={{
             display: 'grid',
             gridTemplateColumns: '1.2fr 0.8fr',
-            gap: '3.5rem',
+            gap: '3rem',
             alignItems: 'center',
-            marginBottom: '4rem'
-          }} className="about-details-grid">
+            marginBottom: '3.5rem'
+          }}>
             <div>
-              <h2 style={{ fontSize: '2rem', color: '#064e3b', marginBottom: '1.25rem' }}>
+              <h2 style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', color: '#12355B', marginBottom: '1rem' }}>
                 {language === 'mr' ? 'संस्थेची पार्श्वभूमी व कार्य' : 'Organization Overview & Purpose'}
               </h2>
-              <p style={{ fontSize: '1.05rem', color: '#334155', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '1rem', color: '#172033', lineHeight: 1.65, marginBottom: '1.15rem' }}>
                 {language === 'mr' ? organizationInfo.about.descriptionMr : organizationInfo.about.descriptionEn}
               </p>
-              <p style={{ fontSize: '1rem', color: '#475569', lineHeight: 1.7, marginBottom: '1.75rem' }}>
+              <p style={{ fontSize: '0.95rem', color: '#4f6182', lineHeight: 1.65, marginBottom: '1.5rem' }}>
                 {language === 'mr'
                   ? 'आमच्या कोल्हापूर येथील कार्यालयातून (रॉयल प्रेस्टीज संकुल, शाहूपुरी) तसेच दूरध्वनी प्रणालीद्वारे दररोज शेकडो रुग्णांना त्यांच्या आजारानुसार पथ्य आणि योग्य आयुर्वेदिक उपायांचे मोफत समुपदेशन केले जाते.'
                   : 'From our central Kolhapur center (Royal Prestige, Shahupuri) and statewide telephone counseling support, we provide free diet guidance and herbal solutions to hundreds of families daily.'}
               </p>
 
               <div style={{
-                backgroundColor: '#f0fdf4',
-                borderLeft: '4px solid #059669',
-                padding: '1.25rem',
-                borderRadius: '8px',
-                marginBottom: '1.75rem'
+                backgroundColor: '#eefcfd',
+                borderLeft: '4px solid #087E8B',
+                padding: '1.15rem',
+                borderRadius: '10px',
+                marginBottom: '1.5rem',
+                borderTop: '1px solid #abedf5',
+                borderRight: '1px solid #abedf5',
+                borderBottom: '1px solid #abedf5'
               }}>
-                <div style={{ fontWeight: 700, color: '#065f46', marginBottom: '0.25rem' }}>
+                <div style={{ fontWeight: 700, color: '#05464d', marginBottom: '0.2rem' }}>
                   {language === 'mr' ? 'सहयोगी संस्था व केंद्र:' : 'Collaborating Guidance Center:'}
                 </div>
-                <div style={{ fontSize: '0.95rem', color: '#1e293b' }}>
+                <div style={{ fontSize: '0.92rem', color: '#172033' }}>
                   {language === 'mr' ? organizationInfo.associatedCenterMr : organizationInfo.associatedCenter}
                 </div>
               </div>
@@ -85,22 +86,22 @@ const About = () => {
               <div style={{
                 borderRadius: '20px',
                 overflow: 'hidden',
-                boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
-                border: '1px solid #e2e8f0',
+                boxShadow: '0 12px 30px rgba(18,53,91,0.08)',
+                border: '1px solid #e2eaf4',
                 backgroundColor: '#ffffff',
-                padding: '2rem',
+                padding: '1.75rem 1.25rem',
                 textAlign: 'center',
-                background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)'
+                background: 'linear-gradient(135deg, #ffffff 0%, #e2effc 100%)'
               }}>
-                <div style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'center' }}>
-                  <MissionLogoBadge size={220} />
+                <div style={{ marginBottom: '1.15rem', display: 'flex', justifyContent: 'center' }}>
+                  <MissionLogoBadge size={190} />
                 </div>
-                <div style={{ padding: '0.75rem 0 0', borderTop: '1px solid #e2e8f0' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: '#064e3b', fontWeight: 700, marginBottom: '0.25rem' }}>
-                    <MapPin size={18} style={{ color: '#059669' }} />
+                <div style={{ padding: '0.75rem 0 0', borderTop: '1px solid #e2eaf4' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', color: '#12355B', fontWeight: 700, marginBottom: '0.25rem', fontSize: '0.92rem' }}>
+                    <MapPin size={16} style={{ color: '#087E8B' }} />
                     <span>{language === 'mr' ? 'शाहूपुरी, कोल्हापूर (महाराष्ट्र)' : 'Shahupuri, Kolhapur (Maharashtra)'}</span>
                   </div>
-                  <div style={{ fontSize: '0.84rem', color: '#64748b' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#4f6182' }}>
                     {language === 'mr' ? organizationInfo.contact.visitingNoteMr : organizationInfo.contact.visitingNote}
                   </div>
                 </div>
@@ -109,63 +110,63 @@ const About = () => {
           </div>
 
           {/* Mission & Vision Pillars */}
-          <div className="grid-2" style={{ marginBottom: '4rem' }}>
+          <div className="grid-2" style={{ marginBottom: '3.5rem' }}>
             <div style={{
               backgroundColor: '#ffffff',
-              borderRadius: '18px',
-              padding: '2rem',
-              border: '1px solid #e2e8f0',
-              borderTop: '5px solid #059669',
-              boxShadow: '0 8px 25px rgba(0,0,0,0.04)'
+              borderRadius: '16px',
+              padding: '1.75rem',
+              border: '1px solid #e2eaf4',
+              borderTop: '5px solid #087E8B',
+              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.85rem' }}>
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  backgroundColor: '#ecfdf5',
-                  color: '#059669',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  backgroundColor: '#dbf7fa',
+                  color: '#087E8B',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
-                  <Target size={26} />
+                  <Target size={22} />
                 </div>
-                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#064e3b' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#12355B', margin: 0 }}>
                   {language === 'mr' ? 'आमचे ध्येय (Mission)' : 'Our Mission'}
                 </h3>
               </div>
-              <p style={{ fontSize: '0.98rem', color: '#475569', lineHeight: 1.7 }}>
+              <p style={{ fontSize: '0.92rem', color: '#4f6182', lineHeight: 1.65, margin: 0 }}>
                 {language === 'mr' ? organizationInfo.about.missionMr : organizationInfo.about.missionEn}
               </p>
             </div>
 
             <div style={{
               backgroundColor: '#ffffff',
-              borderRadius: '18px',
-              padding: '2rem',
-              border: '1px solid #e2e8f0',
-              borderTop: '5px solid #d97706',
-              boxShadow: '0 8px 25px rgba(0,0,0,0.04)'
+              borderRadius: '16px',
+              padding: '1.75rem',
+              border: '1px solid #e2eaf4',
+              borderTop: '5px solid #F4A261',
+              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.85rem' }}>
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  backgroundColor: '#fffbeb',
-                  color: '#d97706',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  backgroundColor: '#fff3ec',
+                  color: '#F4A261',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
-                  <Eye size={26} />
+                  <Eye size={22} />
                 </div>
-                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#78350f' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#c2530c', margin: 0 }}>
                   {language === 'mr' ? 'आमची दूरदृष्टी (Vision)' : 'Our Vision'}
                 </h3>
               </div>
-              <p style={{ fontSize: '0.98rem', color: '#475569', lineHeight: 1.7 }}>
+              <p style={{ fontSize: '0.92rem', color: '#4f6182', lineHeight: 1.65, margin: 0 }}>
                 {language === 'mr' ? organizationInfo.about.visionMr : organizationInfo.about.visionEn}
               </p>
             </div>
@@ -175,7 +176,7 @@ const About = () => {
           <div>
             <div className="section-header">
               <div className="section-badge">
-                <Heart size={16} />
+                <Heart size={15} />
                 <span>{language === 'mr' ? 'मूल्ये आणि तत्त्वे' : 'Our Values'}</span>
               </div>
               <h2>
@@ -188,17 +189,17 @@ const About = () => {
                 <div
                   key={idx}
                   style={{
-                    backgroundColor: '#f8fafc',
+                    backgroundColor: '#F5F7FA',
                     borderRadius: '16px',
-                    padding: '1.75rem',
-                    border: '1px solid #e2e8f0'
+                    padding: '1.5rem',
+                    border: '1px solid #e2eaf4'
                   }}
                   className="card"
                 >
-                  <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#064e3b', marginBottom: '0.6rem' }}>
+                  <h4 style={{ fontSize: '1.08rem', fontWeight: 700, color: '#12355B', marginBottom: '0.5rem' }}>
                     {language === 'mr' ? val.titleMr : val.titleEn}
                   </h4>
-                  <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: 1.6 }}>
+                  <p style={{ fontSize: '0.88rem', color: '#4f6182', lineHeight: 1.55, margin: 0 }}>
                     {language === 'mr' ? val.descMr : val.descEn}
                   </p>
                 </div>
@@ -212,7 +213,7 @@ const About = () => {
         @media (max-width: 960px) {
           .about-details-grid {
             grid-template-columns: 1fr !important;
-            gap: 2.5rem !important;
+            gap: 2rem !important;
           }
         }
       `}</style>

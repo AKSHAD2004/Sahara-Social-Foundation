@@ -8,10 +8,7 @@ import {
   Phone, 
   Heart, 
   Sparkles,
-  MapPin,
-  Clock,
-  Calendar,
-  CheckCircle2
+  Calendar
 } from 'lucide-react';
 import Hero from '../components/Hero';
 import QuickActionBar from '../components/QuickActionBar';
@@ -48,6 +45,57 @@ const Home = () => {
       {/* Quick Action Bar */}
       <QuickActionBar onOpenConsultation={() => setIsConsultationOpen(true)} />
 
+      {/* Product / Shop Section (Moved Upside First) */}
+      <section className="section" style={{ backgroundColor: '#ffffff', paddingTop: '3.5rem' }}>
+        <div className="container">
+          {/* Important Notice Before Shop */}
+          <div className="notice-strip" style={{ 
+            marginBottom: '2.5rem',
+            backgroundColor: '#fff8f3',
+            border: '1px solid #ffd4b8',
+            borderRadius: '16px',
+            padding: '1rem 1.25rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.85rem'
+          }}>
+            <ShieldCheck size={22} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
+            <div style={{ color: '#7c2d12', fontSize: '0.92rem', lineHeight: 1.55 }}>
+              <strong style={{ color: '#12355B' }}>{language === 'mr' ? 'महत्त्वाची सूचना:' : 'Important Regimen Note:'}</strong>{' '}
+              {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
+            </div>
+          </div>
+
+          <div className="section-header">
+            <div className="section-badge">
+              <ShoppingBag size={15} />
+              <span>{language === 'mr' ? 'Antox आयुर्वेदिक उत्पादने' : 'Antox Formulations'}</span>
+            </div>
+            <h2>
+              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Ayurvedic Formulas'}
+            </h2>
+            <p>
+              {language === 'mr'
+                ? 'शास्त्रीय पद्धतीनुसार तयार केलेले १००% शुद्ध व सुरक्षित आयुर्वेदिक फॉर्म्युला.'
+                : 'Authentic botanical health products manufactured with stringent quality and safety.'}
+            </p>
+          </div>
+
+          <div className="products-grid" style={{ marginBottom: '2.5rem' }}>
+            {productsData.slice(0, 6).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center' }}>
+            <Link to="/shop" className="btn btn-primary btn-lg">
+              <ShoppingBag size={18} />
+              <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा' : 'Explore Complete Shop'}</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Trust & Scientific Ayurvedic Highlights */}
       <TrustSection />
 
@@ -59,7 +107,7 @@ const Home = () => {
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
-              <Sparkles size={16} />
+              <Sparkles size={15} />
               <span>{language === 'mr' ? 'प्रमुख राष्ट्रीय मोहिमा' : 'Flagship Campaigns'}</span>
             </div>
             <h2>
@@ -84,12 +132,12 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Health Categories / Services Grid */}
-      <section className="section" style={{ backgroundColor: '#f0fdf4' }}>
+      {/* Health Categories / Services Grid (Placed below Product Section) */}
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
-              <ShieldCheck size={16} />
+              <ShieldCheck size={15} />
               <span>{language === 'mr' ? 'आरोग्य मार्गदर्शन वर्ग' : 'Health Categories'}</span>
             </div>
             <h2>
@@ -121,54 +169,12 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Product / Shop Section */}
-      <section className="section" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container">
-          {/* Important Notice Before Shop */}
-          <div className="notice-strip" style={{ marginBottom: '2.5rem' }}>
-            <ShieldCheck size={22} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <strong>{language === 'mr' ? 'महत्त्वाची सूचना:' : 'Important Regimen Note:'}</strong>{' '}
-              {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
-            </div>
-          </div>
-
-          <div className="section-header">
-            <div className="section-badge">
-              <ShoppingBag size={16} />
-              <span>{language === 'mr' ? 'Antox आयुर्वेदिक उत्पादने' : 'Antox Formulations'}</span>
-            </div>
-            <h2>
-              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Ayurvedic Formulas'}
-            </h2>
-            <p>
-              {language === 'mr'
-                ? 'शास्त्रीय पद्धतीनुसार तयार केलेले १००% शुद्ध व सुरक्षित आयुर्वेदिक फॉर्म्युला.'
-                : 'Authentic botanical health products manufactured with stringent quality and safety.'}
-            </p>
-          </div>
-
-          <div className="grid-3" style={{ marginBottom: '2.5rem' }}>
-            {productsData.slice(0, 6).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <Link to="/shop" className="btn btn-primary btn-lg">
-              <ShoppingBag size={18} />
-              <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा' : 'Explore Complete Shop'}</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Result Videos Section */}
-      <section className="section" style={{ backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+      <section className="section" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
-              <Play size={16} />
+              <Play size={15} />
               <span>{language === 'mr' ? 'प्रत्यक्ष परिणाम व अनुभव' : 'Patient Experiences'}</span>
             </div>
             <h2>
@@ -198,11 +204,11 @@ const Home = () => {
       </section>
 
       {/* Testimonials / Reviews Section */}
-      <section className="section" style={{ backgroundColor: '#ffffff' }}>
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
-              <Heart size={16} />
+              <Heart size={15} />
               <span>{language === 'mr' ? 'रुग्णांचा विश्वास' : 'Patient Reviews'}</span>
             </div>
             <h2>
@@ -224,7 +230,7 @@ const Home = () => {
       </section>
 
       {/* Gallery Preview */}
-      <section className="section-sm" style={{ backgroundColor: '#f0fdf4' }}>
+      <section className="section-sm" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
         <div className="container">
           <div style={{
             display: 'flex',
@@ -239,7 +245,7 @@ const Home = () => {
                 <Sparkles size={14} />
                 <span>{language === 'mr' ? 'छायाचित्रे' : 'Photo Gallery'}</span>
               </div>
-              <h2 style={{ fontSize: '1.85rem', color: '#064e3b' }}>
+              <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.85rem)', color: '#12355B', margin: 0 }}>
                 {language === 'mr' ? 'संस्थेचे आरोग्य उपक्रम व शिबिरे' : 'Health Camps & Field Activities'}
               </h2>
             </div>
@@ -259,8 +265,8 @@ const Home = () => {
                   overflow: 'hidden',
                   position: 'relative',
                   height: '240px',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.06)',
-                  backgroundColor: '#0f172a'
+                  boxShadow: '0 4px 15px rgba(18,53,91,0.08)',
+                  backgroundColor: '#0a1b2e'
                 }}
               >
                 <img
@@ -275,7 +281,7 @@ const Home = () => {
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)'
+                  background: 'linear-gradient(to top, rgba(10,27,46,0.85) 0%, transparent 60%)'
                 }} />
                 <div style={{
                   position: 'absolute',
@@ -294,13 +300,12 @@ const Home = () => {
         </div>
       </section>
 
-
       {/* Frequently Asked Questions */}
-      <section className="section-sm" style={{ backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+      <section className="section-sm" style={{ backgroundColor: '#F5F7FA', borderTop: '1px solid #e2eaf4' }}>
         <div className="container" style={{ maxWidth: '880px' }}>
           <div className="section-header" style={{ marginBottom: '2.5rem' }}>
             <div className="section-badge">
-              <ShieldCheck size={16} />
+              <ShieldCheck size={15} />
               <span>{language === 'mr' ? 'वारंवार विचारले जाणारे प्रश्न' : 'Frequently Asked Questions'}</span>
             </div>
             <h2>{language === 'mr' ? 'महत्त्वाचे प्रश्न आणि उत्तरे' : 'Important Questions Answered'}</h2>
@@ -313,15 +318,15 @@ const Home = () => {
                 style={{
                   backgroundColor: '#ffffff',
                   borderRadius: '14px',
-                  padding: '1.25rem 1.5rem',
-                  border: '1px solid #e2e8f0',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                  padding: '1.25rem 1.4rem',
+                  border: '1px solid #e2eaf4',
+                  boxShadow: '0 2px 8px rgba(18,53,91,0.04)'
                 }}
               >
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#064e3b', marginBottom: '0.4rem' }}>
+                <h3 style={{ fontSize: '1.02rem', fontWeight: 700, color: '#12355B', marginBottom: '0.35rem' }}>
                   Q: {language === 'mr' ? faq.qMr : faq.qEn}
                 </h3>
-                <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                <p style={{ fontSize: '0.9rem', color: '#4f6182', lineHeight: 1.6, margin: 0 }}>
                   {language === 'mr' ? faq.aMr : faq.aEn}
                 </p>
               </div>
@@ -332,25 +337,25 @@ const Home = () => {
 
       {/* Final Call to Action Banner */}
       <section style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #047857 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
-        padding: '4.5rem 0',
+        padding: '3.5rem 0',
         textAlign: 'center'
       }}>
         <div className="container" style={{ maxWidth: '780px' }}>
-          <h2 style={{ fontSize: '2.4rem', fontWeight: 800, color: '#ffffff', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: 'clamp(1.6rem, 3vw + 0.5rem, 2.3rem)', fontWeight: 800, color: '#ffffff', marginBottom: '0.85rem' }}>
             {language === 'mr'
               ? 'आजच निरोगी आणि व्यसनमुक्त आयुष्याकडे पाऊल टाका'
               : 'Take the Step Towards a Healthier, Addiction-Free Life Today'}
           </h2>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', lineHeight: 1.6, marginBottom: '2rem' }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 1vw + 0.5rem, 1.1rem)', color: '#e2effc', lineHeight: 1.6, marginBottom: '1.75rem' }}>
             {language === 'mr'
               ? 'सहारा सोशल फाऊंडेशनच्या तज्ज्ञ समुपदेशकांकडून मोफत फोन मार्गदर्शन मिळवण्यासाठी आताच संपर्क साधा किंवा फॉर्म्युला मागवा.'
               : 'Contact our helpline at 8421154090 or explore our authentic Ayurvedic kits.'}
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link to="/shop" className="btn btn-light-primary btn-lg">
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+            <Link to="/shop" className="btn btn-light-primary btn-lg" style={{ backgroundColor: '#F4A261', color: '#172033', fontWeight: 700 }}>
               <ShoppingBag size={18} />
               <span>{language === 'mr' ? 'फॉर्म्युला ऑर्डर करा' : 'Order Formula Online'}</span>
             </Link>
@@ -360,13 +365,14 @@ const Home = () => {
               className="btn btn-call btn-lg"
             >
               <Phone size={18} />
-              <span>{language === 'mr' ? 'कॉल करा: ८४२११५४०९०' : 'Call 8421154090'}</span>
+              <span>{language === 'mr' ? 'कॉल: ८४२११५४०९०' : 'Call 8421154090'}</span>
             </a>
 
             <button
+              type="button"
               onClick={() => setIsConsultationOpen(true)}
               className="btn btn-outline btn-lg"
-              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+              style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#ffffff', backgroundColor: 'rgba(255,255,255,0.1)' }}
             >
               <Calendar size={18} />
               <span>{language === 'mr' ? 'मोफत नोंदणी' : 'Book Consultation'}</span>

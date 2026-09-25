@@ -28,17 +28,17 @@ const TestimonialCard = ({ testimonial }) => {
         {/* Rating Stars */}
         <div style={{ display: 'flex', gap: '0.2rem' }}>
           {[...Array(testimonial.rating || 5)].map((_, i) => (
-            <Star key={i} size={16} fill="#f59e0b" color="#f59e0b" />
+            <Star key={i} size={16} fill="#F4A261" color="#F4A261" />
           ))}
         </div>
 
-        <Quote size={28} style={{ color: '#cbd5e1', opacity: 0.6 }} />
+        <Quote size={28} style={{ color: '#087E8B', opacity: 0.3 }} />
       </div>
 
       {/* Review text */}
       <p style={{
         fontSize: '0.92rem',
-        color: '#334155',
+        color: '#172033',
         lineHeight: 1.65,
         marginBottom: '1.25rem',
         flex: 1,
@@ -50,7 +50,7 @@ const TestimonialCard = ({ testimonial }) => {
       {/* Patient info */}
       <div style={{
         paddingTop: '0.85rem',
-        borderTop: '1px solid #f1f5f9',
+        borderTop: '1px solid #e2eaf4',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -58,25 +58,26 @@ const TestimonialCard = ({ testimonial }) => {
         gap: '0.5rem'
       }}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#064e3b' }}>
+          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#12355B' }}>
             {testimonial.name}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.78rem', color: '#64748b' }}>
-            <MapPin size={12} style={{ color: '#059669' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.78rem', color: '#4f6182' }}>
+            <MapPin size={12} style={{ color: '#087E8B' }} />
             <span>{testimonial.location}</span>
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#ecfdf5',
-          color: '#065f46',
+          backgroundColor: '#dbf7fa',
+          color: '#087E8B',
           fontSize: '0.72rem',
           fontWeight: 700,
           padding: '0.25rem 0.6rem',
           borderRadius: '9999px',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.25rem'
+          gap: '0.25rem',
+          border: '1px solid #abedf5'
         }}>
           <CheckCircle2 size={12} />
           <span>{testimonial.conditionEn}</span>

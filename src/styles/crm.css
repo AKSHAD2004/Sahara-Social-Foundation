@@ -1,33 +1,41 @@
 /* =========================================================
    SAMARTH KOLHAPUR / SAHARA SOCIAL FOUNDATION CRM STYLES
+   Theme 2: Navy (#12355B) + Teal (#087E8B) + Orange (#F4A261)
    ========================================================= */
 
 :root {
-  --crm-primary: #1b4d3e;          /* Deep Ayurvedic Herbal Green */
-  --crm-primary-light: #2a6b57;
-  --crm-primary-dark: #12352b;
-  --crm-primary-subtle: #e8f4f0;
-  --crm-accent: #c69214;           /* Royal Brass / Saffron Gold */
-  --crm-accent-light: #fef8e7;
+  --crm-primary: #12355B;          /* Deep Navy */
+  --crm-primary-light: #194474;
+  --crm-primary-dark: #0a1b2e;
+  --crm-primary-subtle: #e2effc;
   
-  --crm-bg: #f4f6f9;
+  --crm-secondary: #087E8B;        /* Main Teal */
+  --crm-secondary-light: #0da3b3;
+  --crm-secondary-dark: #05464d;
+  --crm-secondary-subtle: #dbf7fa;
+
+  --crm-accent: #F4A261;           /* Soft Orange */
+  --crm-accent-hover: #dc6a1b;
+  --crm-accent-light: #fff3ec;
+  
+  --crm-bg: #F5F7FA;
   --crm-surface: #ffffff;
   --crm-surface-hover: #f8fafc;
-  --crm-border: #e2e8f0;
-  --crm-border-dark: #cbd5e1;
+  --crm-border: #e2eaf4;
+  --crm-border-dark: #cbd7e8;
 
-  --crm-text: #1e293b;
-  --crm-text-muted: #64748b;
-  --crm-text-light: #94a3b8;
+  --crm-text: #172033;
+  --crm-text-muted: #4f6182;
+  --crm-text-light: #9cb0ce;
 
-  --crm-success: #10b981;
-  --crm-success-bg: #ecfdf5;
-  --crm-warning: #f59e0b;
-  --crm-warning-bg: #fffbeb;
+  --crm-success: #087E8B;
+  --crm-success-bg: #dbf7fa;
+  --crm-warning: #F4A261;
+  --crm-warning-bg: #fff3ec;
   --crm-danger: #ef4444;
   --crm-danger-bg: #fef2f2;
-  --crm-info: #0284c7;
-  --crm-info-bg: #f0f9ff;
+  --crm-info: #12355B;
+  --crm-info-bg: #e2effc;
 
   --crm-sidebar-width: 270px;
   --crm-sidebar-collapsed: 72px;
@@ -35,9 +43,9 @@
   --crm-radius: 12px;
   --crm-radius-sm: 8px;
   --crm-radius-lg: 16px;
-  --crm-shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --crm-shadow: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  --crm-shadow-lg: 0 12px 28px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.04);
+  --crm-shadow-sm: 0 1px 3px rgba(18, 53, 91, 0.06), 0 1px 2px rgba(18, 53, 91, 0.04);
+  --crm-shadow: 0 4px 12px rgba(18, 53, 91, 0.08), 0 1px 3px rgba(18, 53, 91, 0.04);
+  --crm-shadow-lg: 0 12px 28px rgba(18, 53, 91, 0.12), 0 4px 10px rgba(18, 53, 91, 0.04);
 }
 
 /* CRM Main App Layout */
@@ -46,14 +54,14 @@
   min-height: 100vh;
   background-color: var(--crm-bg);
   color: var(--crm-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Devanagari', Oxygen, Ubuntu, sans-serif;
+  font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
 }
 
 /* Sidebar */
 .crm-sidebar {
   width: var(--crm-sidebar-width);
-  background: #0f2d24;
-  color: #e2e8f0;
+  background: #0a1b2e;
+  color: #e2eaf4;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -63,7 +71,8 @@
   left: 0;
   z-index: 100;
   transition: width 0.25s ease;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  box-shadow: 2px 0 16px rgba(10, 27, 46, 0.25);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .crm-sidebar.collapsed {
@@ -95,14 +104,15 @@
   width: 38px;
   height: 38px;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--crm-accent), #eab308);
+  background: linear-gradient(135deg, var(--crm-secondary), var(--crm-accent));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0f2d24;
+  color: #ffffff;
   font-weight: 900;
   font-size: 1.2rem;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(8, 126, 139, 0.35);
 }
 
 .crm-sidebar-toggle {
@@ -167,10 +177,10 @@
 }
 
 .crm-nav-link.active {
-  background: linear-gradient(90deg, var(--crm-primary-light), #1b4d3e);
+  background: linear-gradient(90deg, var(--crm-secondary), var(--crm-primary));
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(8, 126, 139, 0.35);
 }
 
 .crm-nav-subitems {
@@ -200,7 +210,7 @@
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
   background: var(--crm-accent);
-  color: #0f2d24;
+  color: #172033;
   font-weight: 700;
 }
 
@@ -244,8 +254,8 @@
   font-size: 0.68rem;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
-  background: rgba(198, 146, 20, 0.25);
-  color: #fde047;
+  background: rgba(244, 162, 97, 0.25);
+  color: #f7b785;
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -640,13 +650,15 @@
 }
 
 .crm-btn-primary {
-  background: var(--crm-primary);
+  background: linear-gradient(135deg, var(--crm-primary-light), var(--crm-primary));
   color: #ffffff;
   border-color: var(--crm-primary-dark);
+  box-shadow: 0 2px 6px rgba(18, 53, 91, 0.25);
 }
 .crm-btn-primary:hover {
-  background: var(--crm-primary-light);
+  background: linear-gradient(135deg, var(--crm-secondary), var(--crm-primary-dark));
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(18, 53, 91, 0.35);
 }
 
 .crm-btn-secondary {
@@ -660,11 +672,24 @@
 }
 
 .crm-btn-accent {
-  background: var(--crm-accent);
+  background: linear-gradient(135deg, var(--crm-accent), var(--crm-accent-hover));
   color: #ffffff;
+  box-shadow: 0 2px 6px rgba(220, 106, 27, 0.3);
 }
 .crm-btn-accent:hover {
-  background: #b5830e;
+  background: linear-gradient(135deg, var(--crm-accent-hover), #c2530c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 106, 27, 0.4);
+}
+
+.crm-btn-teal {
+  background: linear-gradient(135deg, var(--crm-secondary), var(--crm-secondary-dark));
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(8, 126, 139, 0.25);
+}
+.crm-btn-teal:hover {
+  background: linear-gradient(135deg, var(--crm-secondary-light), var(--crm-secondary));
+  transform: translateY(-1px);
 }
 
 .crm-btn-sm {

@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { 
   Phone, 
   MapPin, 
-  Mail, 
-  Clock, 
   Send, 
   CheckCircle2, 
-  ShieldAlert,
-  Building 
+  ShieldAlert
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
@@ -79,20 +76,20 @@ const Contact = () => {
     <div className="contact-page">
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
-        padding: '3.5rem 0',
+        padding: '3rem 0',
         textAlign: 'center'
       }}>
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fef3c7' }}>
-            <Phone size={16} />
+          <div className="section-badge" style={{ backgroundColor: 'rgba(244,162,97,0.2)', color: '#F4A261', border: '1px solid rgba(244,162,97,0.4)' }}>
+            <Phone size={15} />
             <span>{language === 'mr' ? 'संपर्क व मार्गदर्शन' : 'Contact & Guidance'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: '#ffffff', marginBottom: '0.65rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'सहारा सोशल फाऊंडेशनाशी संपर्क साधा' : 'Contact Sahara Social Foundation'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', maxWidth: '700px', margin: '0 auto' }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', color: '#e2effc', maxWidth: '700px', margin: '0 auto' }}>
             {language === 'mr'
               ? 'कार्यालय पत्ता, दूरध्वनी क्रमांक, व्हॉट्सअ‍ॅप आणि थेट समुपदेशन सेवा माहिती.'
               : 'Official Kolhapur office address, phone helplines, WhatsApp and consultation desk.'}
@@ -100,51 +97,50 @@ const Contact = () => {
         </div>
       </div>
 
-      <section className="section" style={{ backgroundColor: '#f8fafc' }}>
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           {/* Main 2-Col Layout */}
-          <div style={{
+          <div className="contact-layout-grid" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1.25fr',
-            gap: '3rem',
+            gap: '2.5rem',
             alignItems: 'flex-start',
-            marginBottom: '3.5rem'
-          }} className="contact-layout-grid">
+            marginBottom: '3rem'
+          }}>
             {/* Left Column: Authentic Info Cards */}
             <div>
-              <div style={{
+              <div className="contact-info-card" style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '20px',
                 padding: '2rem',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
-                marginBottom: '1.75rem'
+                border: '1px solid #e2eaf4',
+                boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
               }}>
-                <h3 style={{ fontSize: '1.3rem', color: '#064e3b', fontWeight: 800, marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.25rem', color: '#12355B', fontWeight: 800, marginBottom: '1.25rem', fontFamily: 'var(--font-heading)' }}>
                   {language === 'mr' ? 'अधिकृत संपर्क माहिती' : 'Official Contact Info'}
                 </h3>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.35rem' }}>
                   {/* Address */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
                     <div style={{
-                      width: '42px',
-                      height: '42px',
+                      width: '40px',
+                      height: '40px',
                       borderRadius: '10px',
-                      backgroundColor: '#ecfdf5',
-                      color: '#059669',
+                      backgroundColor: '#dbf7fa',
+                      color: '#087E8B',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0
                     }}>
-                      <MapPin size={22} />
+                      <MapPin size={20} />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, color: '#064e3b', marginBottom: '0.2rem' }}>
-                        {language === 'mr' ? 'कार्यालय पत्ता (Office Address):' : 'Office Address:'}
+                      <div style={{ fontWeight: 700, color: '#12355B', marginBottom: '0.2rem' }}>
+                        {language === 'mr' ? 'कार्यालय पत्ता:' : 'Office Address:'}
                       </div>
-                      <p style={{ fontSize: '0.92rem', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+                      <p style={{ fontSize: '0.9rem', color: '#4f6182', lineHeight: 1.55, margin: 0 }}>
                         {language === 'mr' ? organizationInfo.contact.address.fullAddressMr : organizationInfo.contact.address.fullAddressEn}
                       </p>
                     </div>
@@ -153,28 +149,28 @@ const Contact = () => {
                   {/* Phone */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
                     <div style={{
-                      width: '42px',
-                      height: '42px',
+                      width: '40px',
+                      height: '40px',
                       borderRadius: '10px',
-                      backgroundColor: '#f0fdf4',
-                      color: '#0284c7',
+                      backgroundColor: '#e2effc',
+                      color: '#12355B',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0
                     }}>
-                      <Phone size={22} />
+                      <Phone size={20} />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, color: '#064e3b', marginBottom: '0.2rem' }}>
+                      <div style={{ fontWeight: 700, color: '#12355B', marginBottom: '0.2rem' }}>
                         {language === 'mr' ? 'हेल्पलाईन फोन नंबर:' : 'Helpline Numbers:'}
                       </div>
-                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                        <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#0284c7', fontWeight: 700, fontSize: '1.05rem' }}>
+                      <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+                        <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#087E8B', fontWeight: 700, fontSize: '1.02rem' }}>
                           {organizationInfo.contact.primaryPhone}
                         </a>
                         <span style={{ color: '#cbd5e1' }}>|</span>
-                        <a href={`tel:${organizationInfo.contact.secondaryPhone}`} style={{ color: '#0284c7', fontWeight: 700, fontSize: '1.05rem' }}>
+                        <a href={`tel:${organizationInfo.contact.secondaryPhone}`} style={{ color: '#087E8B', fontWeight: 700, fontSize: '1.02rem' }}>
                           {organizationInfo.contact.secondaryPhone}
                         </a>
                       </div>
@@ -184,27 +180,27 @@ const Contact = () => {
                   {/* WhatsApp */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
                     <div style={{
-                      width: '42px',
-                      height: '42px',
+                      width: '40px',
+                      height: '40px',
                       borderRadius: '10px',
-                      backgroundColor: '#ecfdf5',
+                      backgroundColor: '#dbf7fa',
                       color: '#25d366',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0
                     }}>
-                      <WhatsAppIcon size={24} color="#25d366" animated={true} />
+                      <WhatsAppIcon size={22} color="#25d366" animated={true} />
                     </div>
                     <div>
-                      <div style={{ fontWeight: 700, color: '#064e3b', marginBottom: '0.2rem' }}>
+                      <div style={{ fontWeight: 700, color: '#12355B', marginBottom: '0.2rem' }}>
                         {language === 'mr' ? 'व्हॉट्सअ‍ॅप संवाद:' : 'WhatsApp Support:'}
                       </div>
                       <a
                         href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: '#16a34a', fontWeight: 700, fontSize: '1.05rem', textDecoration: 'underline' }}
+                        style={{ color: '#087E8B', fontWeight: 700, fontSize: '1.02rem', textDecoration: 'underline' }}
                       >
                         +91 {organizationInfo.contact.primaryPhone}
                       </a>
@@ -214,37 +210,39 @@ const Contact = () => {
 
                 {/* Important Visiting Note */}
                 <div style={{
-                  backgroundColor: '#fffbeb',
-                  borderLeft: '4px solid #d97706',
-                  padding: '1rem',
+                  backgroundColor: '#fff3ec',
+                  borderLeft: '4px solid #F4A261',
+                  padding: '0.85rem 1rem',
                   borderRadius: '8px',
-                  marginTop: '1.75rem',
-                  fontSize: '0.88rem',
-                  color: '#92400e',
+                  marginTop: '1.5rem',
+                  fontSize: '0.85rem',
+                  color: '#7c2d12',
                   lineHeight: 1.5
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, marginBottom: '0.2rem' }}>
-                    <ShieldAlert size={16} />
-                    <span>{language === 'mr' ? 'महत्त्वाची सूचना:' : 'Visiting Note:'}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 700, marginBottom: '0.2rem' }}>
+                    <ShieldAlert size={15} style={{ color: '#F4A261' }} />
+                    <span style={{ color: '#12355B' }}>{language === 'mr' ? 'महत्त्वाची सूचना:' : 'Visiting Note:'}</span>
                   </div>
-                  {language === 'mr' ? organizationInfo.contact.visitingNoteMr : organizationInfo.contact.visitingNote}
+                  <span style={{ color: '#172033' }}>
+                    {language === 'mr' ? organizationInfo.contact.visitingNoteMr : organizationInfo.contact.visitingNote}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Right Column: Contact Form */}
             <div>
-              <div style={{
+              <div className="contact-form-card" style={{
                 backgroundColor: '#ffffff',
                 borderRadius: '20px',
-                padding: '2.5rem',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+                padding: '2rem',
+                border: '1px solid #e2eaf4',
+                boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
               }}>
-                <h3 style={{ fontSize: '1.35rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.5rem' }}>
+                <h3 style={{ fontSize: '1.25rem', color: '#12355B', fontWeight: 800, marginBottom: '0.35rem', fontFamily: 'var(--font-heading)' }}>
                   {language === 'mr' ? 'ऑनलाईन संदेश / चौकशी फॉर्म' : 'Send An Online Enquiry'}
                 </h3>
-                <p style={{ fontSize: '0.88rem', color: '#64748b', marginBottom: '1.75rem' }}>
+                <p style={{ fontSize: '0.86rem', color: '#4f6182', marginBottom: '1.35rem' }}>
                   {language === 'mr'
                     ? 'आपला प्रश्न किंवा समस्या खाली लिहा, आमची टीम लवकरच मार्गदर्शन करेल.'
                     : 'Submit your questions regarding campaigns or products. We will respond promptly.'}
@@ -252,7 +250,7 @@ const Contact = () => {
 
                 {!isSubmitted ? (
                   <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="contact-form-row">
                       <div className="form-group">
                         <label className="form-label">
                           {language === 'mr' ? 'आपले नाव *' : 'Your Name *'}
@@ -277,7 +275,7 @@ const Contact = () => {
                           placeholder="9876543210"
                           maxLength={10}
                           value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
                         />
                         {errors.phone && <div className="form-error">{errors.phone}</div>}
                       </div>
@@ -314,9 +312,9 @@ const Contact = () => {
                         {language === 'mr' ? 'आपला संदेश / प्रश्न *' : 'Your Message / Inquiry *'}
                       </label>
                       <textarea
-                        rows={4}
+                        rows={3}
                         className="form-textarea"
-                        placeholder={language === 'mr' ? 'आपल्या आरोग्याविषयी किंवा फॉर्म्युलाविषयी प्रश्न लिहा...' : 'Write your detailed message here...'}
+                        placeholder={language === 'mr' ? 'आपल्या आरोग्याविषयी किंवा फॉर्म्युलाविषयी प्रश्न लिहा...' : 'Write your message here...'}
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       />
@@ -329,29 +327,30 @@ const Contact = () => {
                     </button>
                   </form>
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                  <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
                     <div style={{
-                      width: '64px',
-                      height: '64px',
+                      width: '56px',
+                      height: '56px',
                       borderRadius: '50%',
-                      backgroundColor: '#ecfdf5',
-                      color: '#059669',
+                      backgroundColor: '#dbf7fa',
+                      color: '#087E8B',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 1.25rem auto'
+                      margin: '0 auto 1rem auto'
                     }}>
-                      <CheckCircle2 size={36} />
+                      <CheckCircle2 size={32} />
                     </div>
-                    <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#064e3b', marginBottom: '0.5rem' }}>
+                    <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#12355B', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
                       {language === 'mr' ? 'संदेश यशस्वीरित्या प्राप्त झाला!' : 'Message Sent Successfully!'}
                     </h4>
-                    <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                    <p style={{ color: '#4f6182', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
                       {language === 'mr'
                         ? 'धन्यवाद! सहारा सोशल फाऊंडेशनची टीम लवकरच आपल्याशी संपर्क करेल.'
                         : 'Thank you! Our counseling team will contact you shortly.'}
                     </p>
                     <button
+                      type="button"
                       onClick={() => {
                         setIsSubmitted(false);
                         setFormData({ name: '', phone: '', email: '', subject: '', message: '' });
@@ -369,18 +368,18 @@ const Contact = () => {
           {/* Embedded Google Map Section */}
           <div style={{
             backgroundColor: '#ffffff',
-            borderRadius: '24px',
+            borderRadius: '20px',
             overflow: 'hidden',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+            border: '1px solid #e2eaf4',
+            boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
           }}>
-            <div style={{ padding: '1.25rem 1.75rem', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <MapPin size={20} style={{ color: '#059669' }} />
-              <span style={{ fontWeight: 700, color: '#064e3b' }}>
+            <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e2eaf4', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <MapPin size={18} style={{ color: '#087E8B' }} />
+              <span style={{ fontWeight: 700, color: '#12355B', fontSize: '0.92rem', fontFamily: 'var(--font-heading)' }}>
                 {language === 'mr' ? 'कार्यालय नकाशा स्थान: शाहूपुरी, कोल्हापूर' : 'Office Location: Shahupuri, Kolhapur'}
               </span>
             </div>
-            <div style={{ width: '100%', height: '360px' }}>
+            <div style={{ width: '100%', height: '320px' }}>
               <iframe
                 title="Sahara Social Foundation Location Map"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15286.082522731876!2d74.2255745!3d16.7028124!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc1001a1829e1eb%3A0x6b86cf2ff2be9ec5!2sShahupuri%2C%20Kolhapur%2C%20Maharashtra%20416001!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
@@ -397,9 +396,26 @@ const Contact = () => {
       </section>
 
       <style>{`
+        .contact-form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
         @media (max-width: 960px) {
           .contact-layout-grid {
             grid-template-columns: 1fr !important;
+            gap: 1.75rem !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .contact-info-card, .contact-form-card {
+            padding: 1.25rem 1rem !important;
+          }
+          .contact-form-row {
+            grid-template-columns: 1fr !important;
+            gap: 0;
           }
         }
       `}</style>

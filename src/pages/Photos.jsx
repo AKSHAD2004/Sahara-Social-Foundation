@@ -26,20 +26,20 @@ const Photos = () => {
     <div className="photos-page">
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
         padding: '3.5rem 0',
         textAlign: 'center'
       }}>
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fef3c7' }}>
+          <div className="section-badge" style={{ backgroundColor: 'rgba(244,162,97,0.2)', color: '#F4A261', border: '1px solid rgba(244,162,97,0.4)' }}>
             <ImageIcon size={16} />
             <span>{language === 'mr' ? 'छायाचित्रे संग्रह' : 'Official Photo Gallery'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'सहारा सोशल फाऊंडेशनचे आरोग्य उपक्रम व शिबिरे' : 'Field Activities & Health Camps'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', maxWidth: '750px', margin: '0 auto' }}>
+          <p style={{ fontSize: '1.1rem', color: '#e2effc', maxWidth: '750px', margin: '0 auto' }}>
             {language === 'mr'
               ? 'मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियानाची महाराष्ट्रभरातील शिबिरे, रुग्ण संवाद आणि अधिकृत उपक्रमांचे फोटो.'
               : 'Official photo documentation of nationwide health checkup drives, patient counseling sessions, and social outreach.'}
@@ -47,7 +47,7 @@ const Photos = () => {
         </div>
       </div>
 
-      <section className="section" style={{ backgroundColor: '#f8fafc' }}>
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           {/* Category Filter Chips */}
           <div style={{
@@ -69,11 +69,11 @@ const Photos = () => {
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     border: '1.5px solid',
-                    borderColor: isActive ? '#059669' : '#e2e8f0',
-                    backgroundColor: isActive ? '#059669' : '#ffffff',
-                    color: isActive ? '#ffffff' : '#475569',
+                    borderColor: isActive ? '#087E8B' : '#e2eaf4',
+                    backgroundColor: isActive ? '#087E8B' : '#ffffff',
+                    color: isActive ? '#ffffff' : '#172033',
                     cursor: 'pointer',
-                    boxShadow: isActive ? '0 4px 12px rgba(5, 150, 105, 0.25)' : '0 2px 6px rgba(0,0,0,0.03)',
+                    boxShadow: isActive ? '0 4px 12px rgba(8, 126, 139, 0.25)' : '0 2px 6px rgba(18,53,91,0.04)',
                     transition: 'all 0.2s ease'
                   }}
                 >
@@ -94,10 +94,10 @@ const Photos = () => {
                   overflow: 'hidden',
                   position: 'relative',
                   height: '300px',
-                  boxShadow: '0 6px 20px rgba(0,0,0,0.06)',
+                  boxShadow: '0 6px 20px rgba(18,53,91,0.06)',
                   cursor: 'pointer',
-                  backgroundColor: '#0f172a',
-                  border: '1px solid #e2e8f0'
+                  backgroundColor: '#0a1b2e',
+                  border: '1px solid #e2eaf4'
                 }}
                 className="card"
               >
@@ -119,7 +119,7 @@ const Photos = () => {
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(to top, rgba(6, 78, 59, 0.9) 0%, rgba(6, 78, 59, 0.2) 50%, transparent 80%)',
+                  background: 'linear-gradient(to top, rgba(18, 53, 91, 0.95) 0%, rgba(18, 53, 91, 0.3) 50%, transparent 80%)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'flex-end',
@@ -132,7 +132,7 @@ const Photos = () => {
                     marginBottom: '0.4rem'
                   }}>
                     <span style={{
-                      backgroundColor: '#059669',
+                      backgroundColor: '#087E8B',
                       color: '#ffffff',
                       fontSize: '0.72rem',
                       fontWeight: 700,
@@ -158,7 +158,7 @@ const Photos = () => {
                     </span>
                   </div>
 
-                  <h3 style={{ fontSize: '1rem', color: '#ffffff', fontWeight: 700, lineHeight: 1.35 }}>
+                  <h3 style={{ fontSize: '1rem', color: '#ffffff', fontWeight: 700, lineHeight: 1.35, fontFamily: 'var(--font-heading)' }}>
                     {language === 'mr' ? photo.titleMr : photo.titleEn}
                   </h3>
                 </div>
@@ -172,16 +172,16 @@ const Photos = () => {
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '2.5rem',
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.04)',
+            border: '1px solid #e2eaf4',
+            boxShadow: '0 10px 30px rgba(18,53,91,0.05)',
             textAlign: 'center',
             maxWidth: '840px',
             margin: '4rem auto 0 auto'
           }}>
-            <h3 style={{ fontSize: '1.5rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.5rem', color: '#12355B', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'आमच्या पुढील आरोग्य शिबिरात सहभागी व्हा' : 'Join Our Next Health Checkup Camp'}
             </h3>
-            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+            <p style={{ color: '#4f6182', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
               {language === 'mr'
                 ? 'अधिक माहितीसाठी किंवा आपल्या गावात/संस्थेत शिबीर आयोजित करण्यासाठी संपर्क साधा.'
                 : 'Call our Kolhapur helpline to organize or participate in upcoming awareness camps.'}
@@ -232,7 +232,7 @@ const Photos = () => {
 
             <div style={{
               padding: '1.25rem 1.5rem',
-              backgroundColor: '#064e3b',
+              backgroundColor: '#12355B',
               color: '#ffffff',
               display: 'flex',
               justifyContent: 'space-between',
@@ -241,10 +241,10 @@ const Photos = () => {
               gap: '1rem'
             }}>
               <div>
-                <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.2rem' }}>
+                <h4 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.2rem', fontFamily: 'var(--font-heading)' }}>
                   {language === 'mr' ? activePhoto.titleMr : activePhoto.titleEn}
                 </h4>
-                <span style={{ fontSize: '0.82rem', color: '#a7f3d0' }}>
+                <span style={{ fontSize: '0.82rem', color: '#e2effc' }}>
                   Sahara Social Foundation • Category: {activePhoto.category}
                 </span>
               </div>

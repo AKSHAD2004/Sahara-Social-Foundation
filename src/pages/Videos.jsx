@@ -27,20 +27,20 @@ const Videos = () => {
     <div className="videos-page">
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
         color: '#ffffff',
         padding: '3.5rem 0',
         textAlign: 'center'
       }}>
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#fef3c7' }}>
+          <div className="section-badge" style={{ backgroundColor: 'rgba(244,162,97,0.2)', color: '#F4A261', border: '1px solid rgba(244,162,97,0.4)' }}>
             <VideoIcon size={16} />
             <span>{language === 'mr' ? 'अधिकृत व्हिडिओ संग्रह' : 'Official Result Videos'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'लाभार्थ्यांचे मनोगत व प्रत्यक्ष निकाल व्हिडिओ' : 'Patient Recovery & Beneficiary Videos'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#d1fae5', maxWidth: '750px', margin: '0 auto' }}>
+          <p style={{ fontSize: '1.1rem', color: '#e2effc', maxWidth: '750px', margin: '0 auto' }}>
             {language === 'mr'
               ? 'मधुमेह मुक्त भारत व व्यसनमुक्त भारत अभियानांतर्गत सहारा सोशल फाऊंडेशनच्या संपर्कात येऊन आजारांवर मात केलेल्या रुग्णांचे प्रत्यक्ष मनोगत.'
               : 'Authentic recorded testimonials and clinical counseling videos directly from Sahara Social Foundation, Kolhapur.'}
@@ -48,7 +48,7 @@ const Videos = () => {
         </div>
       </div>
 
-      <section className="section" style={{ backgroundColor: '#f8fafc' }}>
+      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           {/* Category Filter Chips */}
           <div style={{
@@ -70,11 +70,11 @@ const Videos = () => {
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     border: '1.5px solid',
-                    borderColor: isActive ? '#059669' : '#e2e8f0',
-                    backgroundColor: isActive ? '#059669' : '#ffffff',
-                    color: isActive ? '#ffffff' : '#475569',
+                    borderColor: isActive ? '#087E8B' : '#e2eaf4',
+                    backgroundColor: isActive ? '#087E8B' : '#ffffff',
+                    color: isActive ? '#ffffff' : '#172033',
                     cursor: 'pointer',
-                    boxShadow: isActive ? '0 4px 12px rgba(5, 150, 105, 0.25)' : '0 2px 6px rgba(0,0,0,0.03)',
+                    boxShadow: isActive ? '0 4px 12px rgba(8, 126, 139, 0.25)' : '0 2px 6px rgba(18,53,91,0.04)',
                     transition: 'all 0.2s ease'
                   }}
                 >
@@ -96,16 +96,16 @@ const Videos = () => {
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '2.5rem',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
-            border: '1px solid #e2e8f0',
+            boxShadow: '0 10px 30px rgba(18,53,91,0.05)',
+            border: '1px solid #e2eaf4',
             textAlign: 'center',
             maxWidth: '840px',
             margin: '0 auto'
           }}>
-            <h3 style={{ fontSize: '1.5rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.5rem', color: '#12355B', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'आपलाही अनुभव शेअर करायचा आहे किंवा सल्ला हवा आहे?' : 'Want to Share Your Story or Consult With Our Health Staff?'}
             </h3>
-            <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+            <p style={{ color: '#4f6182', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
               {language === 'mr'
                 ? 'सहारा सोशल फाऊंडेशनच्या कोल्हापूर कार्यालयाशी थेट संपर्क साधा आणि मोफत फोन मार्गदर्शन मिळवा.'
                 : 'Call our dedicated Kolhapur helpline directly or connect on WhatsApp for personalized guidance.'}

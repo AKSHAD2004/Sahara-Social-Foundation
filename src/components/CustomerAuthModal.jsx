@@ -220,7 +220,7 @@ const CustomerAuthModal = () => {
       >
         {/* Modal Top Accent Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+          background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
           color: '#ffffff',
           padding: '1.5rem 1.5rem 1.25rem 1.5rem',
           position: 'relative'
@@ -251,8 +251,8 @@ const CustomerAuthModal = () => {
           </button>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.4rem' }}>
-            <Sparkles size={16} style={{ color: '#fbbf24' }} />
-            <span style={{ fontSize: '0.78rem', color: '#a7f3d0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <Sparkles size={16} style={{ color: '#F4A261' }} />
+            <span style={{ fontSize: '0.78rem', color: '#dbf7fa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {language === 'mr' ? 'सुरक्षित ग्राहक खरेदी पोर्टल' : 'Secure Customer Checkout'}
             </span>
           </div>
@@ -262,7 +262,7 @@ const CustomerAuthModal = () => {
               ? (language === 'mr' ? 'आधीच्या खात्याने खरेदी करा' : 'Login to Existing Account')
               : (language === 'mr' ? 'नवीन ग्राहक नोंदणी व खरेदी' : 'Customer Account Register')}
           </h2>
-          <p style={{ fontSize: '0.85rem', color: '#d1fae5', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: '0.85rem', color: '#e2effc', margin: 0, lineHeight: 1.4 }}>
             {authMode === 'existing'
               ? (language === 'mr' ? 'आपला १० अंकी नोंदणीकृत मोबाईल नंबर टाका आणि खरेदी पुढे न्या.' : 'Enter your registered mobile number to proceed with order.')
               : (language === 'mr' ? 'उत्पादन खरेदी व मोफत मार्गदर्शनासाठी नाव व मोबाईल नंबर प्रविष्ट करा.' : 'Please enter your name & mobile number to proceed.')}
@@ -270,7 +270,7 @@ const CustomerAuthModal = () => {
         </div>
 
         {/* Auth Mode Toggle Tabs (Existing vs New vs Password) */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', padding: '0.35rem', gap: '0.35rem' }}>
+        <div style={{ display: 'flex', borderBottom: '1px solid #e2eaf4', backgroundColor: '#F5F7FA', padding: '0.35rem', gap: '0.35rem' }}>
           <button
             type="button"
             onClick={() => { setAuthMode('existing'); setError(''); }}
@@ -280,7 +280,7 @@ const CustomerAuthModal = () => {
               borderRadius: '8px',
               border: 'none',
               backgroundColor: authMode === 'existing' ? '#ffffff' : 'transparent',
-              color: authMode === 'existing' ? '#065f46' : '#64748b',
+              color: authMode === 'existing' ? '#12355B' : '#4f6182',
               fontWeight: authMode === 'existing' ? 700 : 600,
               fontSize: '0.82rem',
               cursor: 'pointer',
@@ -288,7 +288,7 @@ const CustomerAuthModal = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.35rem',
-              boxShadow: authMode === 'existing' ? '0 2px 5px rgba(0,0,0,0.05)' : 'none',
+              boxShadow: authMode === 'existing' ? '0 2px 5px rgba(18,53,91,0.08)' : 'none',
               transition: 'all 0.2s ease'
             }}
           >
@@ -305,7 +305,7 @@ const CustomerAuthModal = () => {
               borderRadius: '8px',
               border: 'none',
               backgroundColor: authMode === 'new' ? '#ffffff' : 'transparent',
-              color: authMode === 'new' ? '#065f46' : '#64748b',
+              color: authMode === 'new' ? '#12355B' : '#4f6182',
               fontWeight: authMode === 'new' ? 700 : 600,
               fontSize: '0.82rem',
               cursor: 'pointer',
@@ -313,7 +313,7 @@ const CustomerAuthModal = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.35rem',
-              boxShadow: authMode === 'new' ? '0 2px 5px rgba(0,0,0,0.05)' : 'none',
+              boxShadow: authMode === 'new' ? '0 2px 5px rgba(18,53,91,0.08)' : 'none',
               transition: 'all 0.2s ease'
             }}
           >
@@ -330,7 +330,7 @@ const CustomerAuthModal = () => {
               borderRadius: '8px',
               border: 'none',
               backgroundColor: authMode === 'password' ? '#ffffff' : 'transparent',
-              color: authMode === 'password' ? '#065f46' : '#64748b',
+              color: authMode === 'password' ? '#12355B' : '#4f6182',
               fontWeight: authMode === 'password' ? 700 : 600,
               fontSize: '0.82rem',
               cursor: 'pointer',
@@ -338,7 +338,7 @@ const CustomerAuthModal = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.35rem',
-              boxShadow: authMode === 'password' ? '0 2px 5px rgba(0,0,0,0.05)' : 'none',
+              boxShadow: authMode === 'password' ? '0 2px 5px rgba(18,53,91,0.08)' : 'none',
               transition: 'all 0.2s ease'
             }}
           >
@@ -351,9 +351,9 @@ const CustomerAuthModal = () => {
         <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
           {error && (
             <div style={{
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              color: '#dc2626',
+              backgroundColor: '#fff1f2',
+              border: '1px solid #fecdd3',
+              color: '#be123c',
               borderRadius: '10px',
               padding: '0.65rem 0.85rem',
               fontSize: '0.84rem',
@@ -369,11 +369,11 @@ const CustomerAuthModal = () => {
           {/* Mode 1: Existing Customer Login (Just Mobile) */}
           {authMode === 'existing' && (
             <div style={{ marginBottom: '1.25rem' }}>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#172033', marginBottom: '0.35rem' }}>
                 {language === 'mr' ? 'नोंदणीकृत १० अंकी मोबाईल नंबर (Registered Mobile) *' : 'Registered 10-Digit Mobile Number *'}
               </label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#475569', fontWeight: 700, fontSize: '0.88rem' }}>+91</span>
+                <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#4f6182', fontWeight: 700, fontSize: '0.88rem' }}>+91</span>
                 <input
                   type="tel"
                   required
@@ -394,7 +394,7 @@ const CustomerAuthModal = () => {
                   }}
                 />
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '0.35rem' }}>
+              <div style={{ fontSize: '0.78rem', color: '#4f6182', marginTop: '0.35rem' }}>
                 {language === 'mr' ? 'मोबाईल नंबर टाकून थेट खात्यात प्रवेश करा' : 'Login instantly with your registered mobile number'}
               </div>
             </div>
@@ -404,7 +404,7 @@ const CustomerAuthModal = () => {
           {authMode === 'new' && (
             <>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#172033', marginBottom: '0.35rem' }}>
                   {language === 'mr' ? 'आपले पूर्ण नाव (Full Name) *' : 'Full Name *'}
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -428,11 +428,11 @@ const CustomerAuthModal = () => {
               </div>
 
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#172033', marginBottom: '0.35rem' }}>
                   {language === 'mr' ? 'मोबाईल नंबर (Mobile Number) *' : 'Mobile Number (10 Digits) *'}
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#475569', fontWeight: 700, fontSize: '0.88rem' }}>+91</span>
+                  <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#4f6182', fontWeight: 700, fontSize: '0.88rem' }}>+91</span>
                   <input
                     type="tel"
                     required
@@ -454,7 +454,7 @@ const CustomerAuthModal = () => {
               </div>
 
               <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#172033', marginBottom: '0.35rem' }}>
                   {language === 'mr' ? 'डिलिव्हरी शहर / गाव (City / Village)' : 'Delivery City / Town (Optional)'}
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -482,7 +482,7 @@ const CustomerAuthModal = () => {
           {authMode === 'password' && (
             <>
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#172033', marginBottom: '0.35rem' }}>
                   {language === 'mr' ? 'ईमेल किंवा मोबाईल नंबर *' : 'Email or Mobile Number *'}
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -513,7 +513,7 @@ const CustomerAuthModal = () => {
               </div>
 
               <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#172033', marginBottom: '0.35rem' }}>
                   {language === 'mr' ? 'पासवर्ड *' : 'Password *'}
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -545,8 +545,8 @@ const CustomerAuthModal = () => {
             className="btn btn-primary btn-lg"
             style={{
               width: '100%',
-              backgroundColor: '#065f46',
-              borderColor: '#065f46',
+              backgroundColor: '#12355B',
+              borderColor: '#12355B',
               padding: '0.75rem',
               fontSize: '0.98rem',
               display: 'flex',
@@ -554,7 +554,7 @@ const CustomerAuthModal = () => {
               justifyContent: 'center',
               gap: '0.5rem',
               borderRadius: '12px',
-              boxShadow: '0 8px 20px rgba(6, 95, 70, 0.25)',
+              boxShadow: '0 8px 20px rgba(18, 53, 91, 0.25)',
               cursor: isSubmitting ? 'not-allowed' : 'pointer'
             }}
           >
@@ -574,23 +574,23 @@ const CustomerAuthModal = () => {
 
           {/* Switch link below submit */}
           {authMode === 'existing' ? (
-            <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.84rem', color: '#64748b' }}>
+            <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.84rem', color: '#4f6182' }}>
               <span>{language === 'mr' ? 'नवीन ग्राहक आहात? ' : 'New customer? '}</span>
               <button
                 type="button"
                 onClick={() => { setAuthMode('new'); setError(''); }}
-                style={{ background: 'none', border: 'none', color: '#059669', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: '#087E8B', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
               >
                 {language === 'mr' ? 'येथे नवीन नोंदणी करा' : 'Create an Account'}
               </button>
             </div>
           ) : authMode === 'new' ? (
-            <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.84rem', color: '#64748b' }}>
+            <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.84rem', color: '#4f6182' }}>
               <span>{language === 'mr' ? 'आधीपासून खाते आहे? ' : 'Already registered? '}</span>
               <button
                 type="button"
                 onClick={() => { setAuthMode('existing'); setError(''); }}
-                style={{ background: 'none', border: 'none', color: '#059669', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                style={{ background: 'none', border: 'none', color: '#087E8B', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
               >
                 {language === 'mr' ? 'येथे लॉगिन करा' : 'Sign In with Mobile'}
               </button>
@@ -604,10 +604,10 @@ const CustomerAuthModal = () => {
             justifyContent: 'center',
             gap: '0.4rem',
             marginTop: '1.25rem',
-            color: '#64748b',
+            color: '#4f6182',
             fontSize: '0.78rem'
           }}>
-            <ShieldCheck size={16} style={{ color: '#059669' }} />
+            <ShieldCheck size={16} style={{ color: '#087E8B' }} />
             <span>
               {language === 'mr'
                 ? 'नोंदणीकृत संस्था (MAH/582/2014/KOP) • आपली माहिती १००% सुरक्षित आहे'

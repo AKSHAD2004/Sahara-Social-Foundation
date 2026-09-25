@@ -1,23 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, 
   Star, 
   ArrowRight, 
-  Check, 
   Phone,
-  ShieldCheck 
+  Heart,
+  Truck,
+  Sparkles
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { organizationInfo } from '../data/websiteData';
 
 const ProductCard = ({ product }) => {
   const { language } = useLanguage();
   const { addToCart } = useCart();
   const { customerUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  const discountPercent = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
+    : null;
 
   const handleOrderNow = () => {
     if (!customerUser) {
@@ -31,157 +36,253 @@ const ProductCard = ({ product }) => {
     navigate('/checkout');
   };
 
+  const handleToggleWishlist = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsWishlisted(!isWishlisted);
+  };
+
   return (
     <div
       style={{
         backgroundColor: '#ffffff',
-        borderRadius: '18px',
-        border: '1px solid #e2e8f0',
+        borderRadius: '16px',
+        border: '1px solid #e2eaf4',
         overflow: 'hidden',
-        boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+        boxShadow: '0 3px 12px rgba(18, 53, 91, 0.05)',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative'
+        position: 'relative',
+        transition: 'all 0.25s ease'
       }}
-      className="card product-card-animated"
+      className="card product-card-modern"
     >
-      {/* Product Image & Badge */}
-      <div style={{ position: 'relative', height: '220px', backgroundColor: '#ffffff', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.85rem' }}>
-        <img
-          src={product.image}
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = product.fallbackImage;
-          }}
-          alt={product.nameMr || product.nameEn}
-          style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.3s ease' }}
-          className="product-card-img"
-        />
+      {/* Product Image Container */}
+      <div 
+        style={{ 
+          position: 'relative', 
+          width: '100%',
+          aspectRatio: '1 / 1',
+          maxHeight: '220px',
+          backgroundColor: '#f8fafc', 
+          overflow: 'hidden', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          padding: '0.65rem'
+        }}
+      >
+        <Link 
+          to={`/shop/${product.id}`}
+          style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <img
+            src={product.image}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = product.fallbackImage;
+            }}
+            alt={product.nameMr || product.nameEn}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.3s ease' }}
+            className="product-card-img"
+          />
+        </Link>
 
+        {/* Top-Left Badge (Bestseller / Category) */}
         {product.badgeEn && (
           <div 
-            className="hero-slide-badge"
             style={{
               position: 'absolute',
-              top: '0.75rem',
-              left: '0.75rem',
-              backgroundColor: '#059669',
+              top: '0.5rem',
+              left: '0.5rem',
+              backgroundColor: '#087E8B',
               color: '#ffffff',
-              padding: '0.25rem 0.65rem',
+              padding: '0.2rem 0.5rem',
               borderRadius: '6px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
+              fontSize: '0.65rem',
+              fontWeight: 800,
               textTransform: 'uppercase',
-              boxShadow: '0 2px 8px rgba(5,150,105,0.3)'
+              letterSpacing: '0.03em',
+              boxShadow: '0 2px 6px rgba(8,126,139,0.3)',
+              zIndex: 2
             }}
           >
             {language === 'mr' ? product.badgeMr : product.badgeEn}
           </div>
         )}
 
+        {/* Top-Right Heart / Wishlist Button */}
+        <button
+          type="button"
+          onClick={handleToggleWishlist}
+          style={{
+            position: 'absolute',
+            top: '0.5rem',
+            right: '0.5rem',
+            width: '30px',
+            height: '30px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(226, 234, 244, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+            zIndex: 2,
+            transition: 'all 0.2s ease',
+            color: isWishlisted ? '#e11d48' : '#64748b'
+          }}
+          title={isWishlisted ? 'Saved' : 'Add to wishlist'}
+          aria-label="Wishlist"
+        >
+          <Heart 
+            size={16} 
+            fill={isWishlisted ? '#e11d48' : 'none'} 
+            color={isWishlisted ? '#e11d48' : '#64748b'} 
+          />
+        </button>
+
+        {/* Bottom-Left Floating Rating Badge (Ref: Image 2) */}
         <div style={{
           position: 'absolute',
-          bottom: '0.75rem',
-          right: '0.75rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.92)',
+          bottom: '0.5rem',
+          left: '0.5rem',
+          backgroundColor: 'rgba(255, 255, 255, 0.94)',
           backdropFilter: 'blur(4px)',
-          padding: '0.2rem 0.5rem',
+          padding: '0.15rem 0.45rem',
           borderRadius: '6px',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.25rem',
-          fontSize: '0.78rem',
+          gap: '0.2rem',
+          fontSize: '0.72rem',
           fontWeight: 700,
-          color: '#b45309',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+          color: '#172033',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+          border: '1px solid rgba(226, 234, 244, 0.6)',
+          zIndex: 2
         }}>
-          <Star size={13} fill="#f59e0b" color="#f59e0b" />
-          <span>{product.rating}</span>
-          <span style={{ color: '#64748b', fontWeight: 500, fontSize: '0.7rem' }}>({product.reviewsCount})</span>
+          <span style={{ fontWeight: 800 }}>{product.rating}</span>
+          <Star size={11} fill="#F4A261" color="#F4A261" />
+          <span style={{ color: '#94a3b8', fontSize: '0.68rem', fontWeight: 500 }}>| {product.reviewsCount}</span>
         </div>
       </div>
 
-      {/* Product Details */}
-      <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+      {/* Product Details Section */}
+      <div style={{ 
+        padding: '0.75rem', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        flex: 1 
+      }}>
+        {/* Category / Brand Subheading */}
+        <div style={{ 
+          fontSize: '0.68rem', 
+          color: '#087E8B', 
+          fontWeight: 800, 
+          textTransform: 'uppercase', 
+          letterSpacing: '0.04em',
+          marginBottom: '0.2rem' 
+        }}>
           {language === 'mr' ? product.categoryNameMr : product.categoryNameEn}
         </div>
 
-        <Link to={`/shop/${product.id}`}>
+        {/* Product Title */}
+        <Link to={`/shop/${product.id}`} style={{ textDecoration: 'none' }}>
           <h3 style={{
-            fontSize: '1.08rem',
+            fontSize: '0.92rem',
             fontWeight: 700,
-            color: '#064e3b',
-            marginBottom: '0.5rem',
-            lineHeight: 1.35,
-            minHeight: '2.7rem'
+            color: '#12355B',
+            marginBottom: '0.35rem',
+            lineHeight: 1.3,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            minHeight: '2.4rem'
           }}>
             {language === 'mr' ? product.nameMr : product.nameEn}
           </h3>
         </Link>
 
-        <p style={{
-          fontSize: '0.84rem',
-          color: '#64748b',
-          lineHeight: 1.5,
-          marginBottom: '1rem',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden'
+        {/* Pricing Row with Down-Arrow Discount (Ref: Image 2) */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'baseline', 
+          gap: '0.35rem', 
+          flexWrap: 'wrap',
+          marginBottom: '0.35rem', 
+          marginTop: 'auto' 
         }}>
-          {language === 'mr' ? product.shortDescMr : product.shortDescEn}
-        </p>
-
-        {/* Pricing */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', marginBottom: '1.25rem', marginTop: 'auto' }}>
-          <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#064e3b' }}>
-            ₹{product.price}
-          </span>
+          {discountPercent && (
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#087E8B' }}>
+              ↓{discountPercent}%
+            </span>
+          )}
           {product.originalPrice && (
-            <span style={{ fontSize: '0.9rem', color: '#94a3b8', textDecoration: 'line-through' }}>
+            <span style={{ fontSize: '0.78rem', color: '#9cb0ce', textDecoration: 'line-through' }}>
               ₹{product.originalPrice}
             </span>
           )}
-          <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 700, marginLeft: 'auto' }}>
-            {language === 'mr' ? 'मोफत डिलिव्हरी' : 'Free Delivery'}
+          <span style={{ fontSize: '1.08rem', fontWeight: 800, color: '#12355B' }}>
+            ₹{product.price}
           </span>
         </div>
 
-        {/* Post-order Call Reminder */}
-        <div style={{
-          fontSize: '0.72rem',
-          color: '#92400e',
-          backgroundColor: '#fef3c7',
-          padding: '0.35rem 0.6rem',
-          borderRadius: '6px',
-          marginBottom: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.35rem'
+        {/* Delivery Tag */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '0.25rem', 
+          fontSize: '0.7rem', 
+          color: '#087E8B', 
+          fontWeight: 700,
+          marginBottom: '0.55rem'
         }}>
-          <Phone size={12} style={{ flexShrink: 0 }} />
-          <span>{language === 'mr' ? 'ऑर्डर मिळाल्यावर ८४२११५४०९० वर कॉल करा' : 'Call 8421154090 on delivery'}</span>
+          <Truck size={12} />
+          <span>{language === 'mr' ? 'मोफत डिलिव्हरी' : 'Free Delivery'}</span>
         </div>
 
-        {/* CTA Buttons */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+        {/* CTA Buttons Row */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr', 
+          gap: '0.35rem',
+          marginTop: '0.2rem'
+        }}>
           <button
+            type="button"
             onClick={() => addToCart(product, 1)}
             className="btn btn-secondary btn-sm"
-            style={{ width: '100%', fontSize: '0.82rem' }}
+            style={{ 
+              width: '100%', 
+              padding: '0.4rem 0.3rem',
+              fontSize: '0.75rem',
+              minHeight: '36px',
+              gap: '0.25rem'
+            }}
+            title={language === 'mr' ? 'कार्टमध्ये टाका' : 'Add to Cart'}
           >
-            <ShoppingCart size={14} />
-            <span>{language === 'mr' ? 'कार्टमध्ये टाका' : 'Add to Cart'}</span>
+            <ShoppingCart size={13} />
+            <span>{language === 'mr' ? 'कार्ट' : 'Cart'}</span>
           </button>
 
           <button
+            type="button"
             onClick={handleOrderNow}
             className="btn btn-primary btn-sm"
-            style={{ width: '100%', fontSize: '0.82rem' }}
+            style={{ 
+              width: '100%', 
+              padding: '0.4rem 0.3rem',
+              fontSize: '0.75rem',
+              minHeight: '36px',
+              gap: '0.25rem'
+            }}
+            title={language === 'mr' ? 'थेट ऑर्डर करा' : 'Buy Now'}
           >
-            <span>{language === 'mr' ? 'ऑर्डर करा' : 'Order Now'}</span>
-            <ArrowRight size={14} />
+            <span>{language === 'mr' ? 'ऑर्डर' : 'Buy Now'}</span>
+            <ArrowRight size={13} />
           </button>
         </div>
       </div>
@@ -190,3 +291,4 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
+
