@@ -10,7 +10,8 @@ import {
   User,
   Heart,
   Users,
-  LogOut
+  LogOut,
+  ChevronDown
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
@@ -18,11 +19,19 @@ import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import MissionLogoBadge from './MissionLogoBadge';
+import LanguageModal from './LanguageModal';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { language, toggleLanguage, t } = useLanguage();
+  const { 
+    language, 
+    openLanguageModal, 
+    selectLanguage, 
+    currentLanguageObj, 
+    languagesList, 
+    t 
+  } = useLanguage();
   const { totalCount } = useCart();
   const { customerUser, logoutCustomer } = useAuth();
   const location = useLocation();
@@ -119,15 +128,17 @@ const Navbar = () => {
               <span>{language === 'mr' ? 'प्रशासन CRM' : 'Staff CRM'}</span>
             </Link>
 
-            {/* Language Switcher */}
+            {/* Language Switcher (Pan-India) */}
             <button 
-              onClick={toggleLanguage}
+              onClick={openLanguageModal}
               className="topbar-lang-btn"
               title="Change Language / भाषा बदला"
-              aria-label="Toggle language"
+              aria-label="Change language"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
             >
-              <Globe size={13} />
-              <span>{language === 'mr' ? 'English' : 'मराठी'}</span>
+              <Globe size={13} style={{ color: '#F4A261' }} />
+              <span>{currentLanguageObj?.name || 'मराठी'}</span>
+              <ChevronDown size={11} style={{ opacity: 0.8 }} />
             </button>
           </div>
         </div>
@@ -314,8 +325,32 @@ const Navbar = () => {
                 );
               })}
 
+              {/* Mobile Drawer Cart Link */}
+              <li style={{ borderTop: '1px solid #e2eaf4', paddingTop: '0.6rem', marginTop: '0.4rem' }}>
+                <Link
+                  to="/cart"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`mobile-drawer-link ${location.pathname === '/cart' ? 'active' : ''}`}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <ShoppingCart size={18} style={{ color: '#087E8B' }} />
+                    <span>{language === 'mr' ? 'माझी कार्ट (खरेदी)' : 'My Cart'}</span>
+                  </span>
+                  {totalCount > 0 ? (
+                    <span style={{ fontSize: '0.74rem', backgroundColor: '#F4A261', color: '#172033', padding: '0.2rem 0.65rem', borderRadius: '9999px', fontWeight: 800 }}>
+                      {totalCount} {language === 'mr' ? 'वस्तू' : 'items'}
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                      {language === 'mr' ? 'रिकामी' : 'Empty'}
+                    </span>
+                  )}
+                </Link>
+              </li>
+
               {/* Mobile Drawer Account & Logout Link */}
-              <li style={{ borderTop: '1px solid #e2e8f0', paddingTop: '0.6rem', marginTop: '0.4rem' }}>
+              <li>
                 <Link
                   to="/account"
                   onClick={() => setMobileMenuOpen(false)}
@@ -323,12 +358,12 @@ const Navbar = () => {
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                 >
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <User size={18} style={{ color: '#059669' }} />
+                    <User size={18} style={{ color: '#087E8B' }} />
                     <span>{customerUser ? (customerUser.fullName || (language === 'mr' ? 'माझे खाते' : 'My Account')) : (language === 'mr' ? 'माझे खाते / लॉगिन' : 'My Account / Login')}</span>
                   </span>
                   {customerUser && (
-                    <span style={{ fontSize: '0.72rem', backgroundColor: '#dcfce7', color: '#15803d', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
-                      {language === 'mr' ? 'लॉगिन' : 'Active'}
+                    <span style={{ fontSize: '0.72rem', backgroundColor: '#dbf7fa', color: '#087E8B', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
+                      {language === 'mr' ? 'सक्रिय' : 'Active'}
                     </span>
                   )}
                 </Link>
@@ -350,18 +385,47 @@ const Navbar = () => {
                 </li>
               )}
 
-              {/* Language Switcher in Drawer */}
-              <li style={{ paddingTop: '0.4rem' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    toggleLanguage();
-                  }}
-                  className="mobile-drawer-lang-toggle"
-                >
-                  <Globe size={16} />
-                  <span>{language === 'mr' ? 'Switch to English' : 'मराठी भाषेत पहा'}</span>
-                </button>
+              {/* Pan-India Language Selector in Drawer */}
+              <li style={{ borderTop: '1px solid #e2eaf4', paddingTop: '0.85rem', marginTop: '0.4rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', padding: '0 0.25rem' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#4f6182', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Globe size={14} style={{ color: '#087E8B' }} />
+                    <span>भाषा / Language ({currentLanguageObj?.name})</span>
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={() => { openLanguageModal(); setMobileMenuOpen(false); }}
+                    style={{ background: 'none', border: 'none', color: '#087E8B', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                  >
+                    सर्व भाषा (All)
+                  </button>
+                </div>
+
+                {/* Quick Language Chips */}
+                <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.35rem', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                  {languagesList.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => selectLanguage(lang.code)}
+                      style={{
+                        padding: '0.4rem 0.75rem',
+                        borderRadius: '8px',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        border: language === lang.code ? '1.5px solid #087E8B' : '1px solid #e2eaf4',
+                        backgroundColor: language === lang.code ? '#dbf7fa' : '#ffffff',
+                        color: language === lang.code ? '#087E8B' : '#12355B',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        boxShadow: language === lang.code ? '0 2px 6px rgba(8,126,139,0.2)' : 'none'
+                      }}
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
               </li>
 
               {/* Mobile Call & WhatsApp quick shortcuts in drawer */}
@@ -879,15 +943,25 @@ const Navbar = () => {
           }
         }
 
-        @media (max-width: 1023px) and (min-width: 768px) {
+        @media (max-width: 1023px) {
+          .header-icon-btn {
+            display: none !important;
+          }
+          .brand-identity-link {
+            flex: 1;
+            gap: 0.65rem;
+          }
           .brand-title {
-            font-size: 0.98rem;
+            font-size: clamp(0.95rem, 3.6vw, 1.12rem);
+            max-width: none !important;
+            white-space: normal !important;
+            line-height: 1.25;
           }
           .brand-subtitle {
-            font-size: 0.65rem;
-          }
-          .topbar-mission-text {
-            font-size: 0.78rem;
+            font-size: clamp(0.68rem, 2.4vw, 0.78rem);
+            max-width: none !important;
+            white-space: normal !important;
+            line-height: 1.3;
           }
         }
 
@@ -948,31 +1022,28 @@ const Navbar = () => {
             padding: 0.15rem 0.5rem;
             font-size: 0.72rem;
           }
-
-          .brand-title {
-            font-size: 0.92rem;
-          }
-
-          .brand-subtitle {
-            font-size: 0.64rem;
-          }
         }
 
         @media (max-width: 480px) {
+          .header-container {
+            gap: 0.5rem;
+          }
+          .brand-identity-link {
+            gap: 0.55rem;
+          }
           .brand-title {
-            font-size: clamp(0.82rem, 3.6vw, 0.92rem);
-            max-width: 180px;
+            font-size: clamp(0.92rem, 3.8vw, 1.05rem) !important;
+            max-width: none !important;
           }
           .brand-subtitle {
-            font-size: 0.62rem;
-            max-width: 180px;
+            font-size: clamp(0.66rem, 2.5vw, 0.74rem) !important;
+            max-width: none !important;
           }
-          .header-icon-btn,
           .mobile-hamburger-btn {
-            width: 38px;
-            height: 38px;
-            min-width: 38px;
-            min-height: 38px;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
             border-radius: 10px;
           }
           .header-actions {
@@ -980,6 +1051,9 @@ const Navbar = () => {
           }
         }
       `}</style>
+
+      {/* Pan-India Language Selection Modal */}
+      <LanguageModal />
     </>
   );
 };

@@ -3,10 +3,10 @@ import {
   Phone, 
   ShieldCheck, 
   Heart, 
-  Sparkles, 
-  ChevronDown, 
-  ChevronUp, 
-  CheckCircle2 
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle2
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
@@ -63,67 +63,101 @@ const Hero = ({ onOpenConsultation }) => {
             )}
           </h1>
 
-          {/* Supporting Subtext with Read More / Less Toggle */}
-          <div className="hero-subtext-container">
-            <p className="hero-subtext">
-              {language === 'mr'
-                ? 'आधार मधुमेह-मुक्ती मार्गदर्शन केंद्राच्या सहयोगाने नैसर्गिक आयुर्वेदिक फॉर्म्युला, योग्य आहाराचे पथ्य आणि समुपदेशनाद्वारे रक्तातील साखर व व्यसनावर मात करण्यासाठी प्रभावी मार्गदर्शन.'
-                : 'In collaboration with Aadhar Madhumeh-Mukti Margdarshan Kendra, delivering authentic Ayurvedic wellness formulas, dietary counseling, and dedicated guidance for diabetes control and de-addiction.'}
-            </p>
-
-            {/* Read More / Less Button */}
+          {/* Interactive More Details Toggle (Only shows information when clicked) */}
+          <div className="hero-subtext-container" style={{ marginBottom: '1.25rem' }}>
             <button
               type="button"
               onClick={() => setShowMore(prev => !prev)}
               className="hero-read-more-btn"
               aria-expanded={showMore}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                backgroundColor: showMore ? 'rgba(8, 126, 139, 0.4)' : 'rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                color: '#ffffff',
+                padding: '0.45rem 0.95rem',
+                borderRadius: '9999px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                backdropFilter: 'blur(6px)',
+                transition: 'all 0.25s ease'
+              }}
             >
               <span>
                 {showMore 
-                  ? (language === 'mr' ? 'कमी माहिती दाखवा' : 'Show Less')
-                  : (language === 'mr' ? 'अधिक माहिती वाचा (Read More)' : 'Read More Details')}
+                  ? (language === 'mr' ? 'कमी माहिती दाखवा (Show Less)' : 'Show Less')
+                  : (language === 'mr' ? 'अधिक माहिती वाचा (More Details)' : 'More Details')}
               </span>
-              {showMore ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              {showMore ? <ChevronUp size={15} style={{ color: '#F4A261' }} /> : <ChevronDown size={15} style={{ color: '#F4A261' }} />}
             </button>
 
-            {/* Expandable Full Content */}
+            {/* Expandable Information Section */}
             {showMore && (
-              <div className="hero-expanded-content">
-                <div className="hero-expanded-grid">
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+              <div 
+                className="hero-expanded-content"
+                style={{
+                  marginTop: '0.85rem',
+                  backgroundColor: 'rgba(10, 27, 46, 0.85)',
+                  border: '1px solid rgba(8, 126, 139, 0.4)',
+                  borderRadius: '16px',
+                  padding: '1.15rem',
+                  backdropFilter: 'blur(10px)',
+                  animation: 'fadeIn 0.3s ease-out'
+                }}
+              >
+                <p style={{
+                  color: '#e2effc',
+                  fontSize: '0.88rem',
+                  lineHeight: 1.6,
+                  marginBottom: '0.95rem'
+                }}>
+                  {language === 'mr'
+                    ? 'आधार मधुमेह-मुक्ती मार्गदर्शन केंद्राच्या सहयोगाने नैसर्गिक आयुर्वेदिक फॉर्म्युला, योग्य आहाराचे पथ्य आणि समुपदेशनाद्वारे रक्तातील साखर व व्यसनावर मात करण्यासाठी प्रभावी मार्गदर्शन.'
+                    : 'In collaboration with Aadhar Madhumeh-Mukti Margdarshan Kendra, delivering authentic Ayurvedic wellness formulas, dietary counseling, and dedicated guidance for diabetes control and de-addiction.'}
+                </p>
+
+                <div className="hero-expanded-grid" style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '0.75rem'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', fontSize: '0.82rem', color: '#ffffff' }}>
+                    <CheckCircle2 size={15} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
                     <div>
-                      <strong>{language === 'mr' ? 'मधुमेह नियंत्रण:' : 'Diabetes Support:'}</strong>{' '}
+                      <strong style={{ color: '#3cd0e2' }}>{language === 'mr' ? 'मधुमेह नियंत्रण:' : 'Diabetes Support:'}</strong>{' '}
                       {language === 'mr' 
                         ? 'स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नैसर्गिकरीत्या नियंत्रित ठेवण्यास मदत.'
                         : 'Natural support for cellular insulin uptake and blood glucose balance.'}
                     </div>
                   </div>
 
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', fontSize: '0.82rem', color: '#ffffff' }}>
+                    <CheckCircle2 size={15} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
                     <div>
-                      <strong>{language === 'mr' ? 'आहाराचे पथ्य:' : 'Dietary Pathya:'}</strong>{' '}
+                      <strong style={{ color: '#3cd0e2' }}>{language === 'mr' ? 'आहाराचे पथ्य:' : 'Dietary Pathya:'}</strong>{' '}
                       {language === 'mr'
                         ? 'प्रत्येक रुग्णाला फोन व प्रत्यक्ष भेटीत आहाराचे शास्त्रीय नियोजन व पथ्य मार्गदर्शन.'
                         : 'Scientific nutritional schedule and personalized dietary guidelines.'}
                     </div>
                   </div>
 
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', fontSize: '0.82rem', color: '#ffffff' }}>
+                    <CheckCircle2 size={15} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
                     <div>
-                      <strong>{language === 'mr' ? 'व्यसनमुक्ती अभियान:' : 'De-Addiction Drive:'}</strong>{' '}
+                      <strong style={{ color: '#3cd0e2' }}>{language === 'mr' ? 'व्यसनमुक्ती अभियान:' : 'De-Addiction Drive:'}</strong>{' '}
                       {language === 'mr'
                         ? 'दारू, तंबाखू व सिगारेटची तीव्र तलफ नैसर्गिक हर्बल फॉर्म्युलाने कमी करणे.'
                         : 'Safe herbal support to curb urges for alcohol, tobacco, and smoking.'}
                     </div>
                   </div>
 
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={16} style={{ color: '#3cd0e2', flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', fontSize: '0.82rem', color: '#ffffff' }}>
+                    <CheckCircle2 size={15} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
                     <div>
-                      <strong>{language === 'mr' ? 'मोफत फोन सल्ला:' : 'Free Helpline:'}</strong>{' '}
+                      <strong style={{ color: '#3cd0e2' }}>{language === 'mr' ? 'मोफत फोन सल्ला:' : 'Free Helpline:'}</strong>{' '}
                       {language === 'mr'
                         ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर कार्यालयाशी थेट संपर्क: ८४२११५४०९०.'
                         : 'Direct counselor support at Kolhapur center: 8421154090.'}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -7,11 +7,12 @@ import {
   Play, 
   Phone, 
   Heart, 
-  Sparkles,
-  Calendar
+  Sparkles, 
+  Calendar,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import Hero from '../components/Hero';
-import QuickActionBar from '../components/QuickActionBar';
 import TrustSection from '../components/TrustSection';
 import AboutSection from '../components/AboutSection';
 import CampaignCard from '../components/CampaignCard';
@@ -36,36 +37,23 @@ import { useLanguage } from '../context/LanguageContext';
 const Home = () => {
   const { language } = useLanguage();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
+  const reelsScrollRef = useRef(null);
+
+  const scrollReels = (direction) => {
+    if (reelsScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -300 : 300;
+      reelsScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="home-page">
       {/* Hero Section */}
       <Hero onOpenConsultation={() => setIsConsultationOpen(true)} />
 
-      {/* Quick Action Bar */}
-      <QuickActionBar onOpenConsultation={() => setIsConsultationOpen(true)} />
-
       {/* Product / Shop Section (Moved Upside First) */}
       <section className="section" style={{ backgroundColor: '#ffffff', paddingTop: '3.5rem' }}>
         <div className="container">
-          {/* Important Notice Before Shop */}
-          <div className="notice-strip" style={{ 
-            marginBottom: '2.5rem',
-            backgroundColor: '#fff8f3',
-            border: '1px solid #ffd4b8',
-            borderRadius: '16px',
-            padding: '1rem 1.25rem',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '0.85rem'
-          }}>
-            <ShieldCheck size={22} style={{ color: '#F4A261', flexShrink: 0, marginTop: '2px' }} />
-            <div style={{ color: '#7c2d12', fontSize: '0.92rem', lineHeight: 1.55 }}>
-              <strong style={{ color: '#12355B' }}>{language === 'mr' ? 'महत्त्वाची सूचना:' : 'Important Regimen Note:'}</strong>{' '}
-              {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
-            </div>
-          </div>
-
           <div className="section-header">
             <div className="section-badge">
               <ShoppingBag size={15} />
@@ -91,6 +79,124 @@ const Home = () => {
             <Link to="/shop" className="btn btn-primary btn-lg">
               <ShoppingBag size={18} />
               <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा' : 'Explore Complete Shop'}</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Result Videos / Reels Horizontal Slider Section */}
+      <section className="section" style={{ backgroundColor: '#F5F7FA', borderTop: '1px solid #e2eaf4' }}>
+        <div className="container">
+          <div className="section-header" style={{ marginBottom: '1.75rem' }}>
+            <div className="section-badge">
+              <Play size={15} />
+              <span>{language === 'mr' ? 'प्रत्यक्ष परिणाम व अनुभव' : 'Patient Experiences'}</span>
+            </div>
+            <h2>
+              {language === 'mr' ? 'लाभार्थ्यांचे मनोगत व व्हिडिओ' : 'Result & Beneficiary Videos'}
+            </h2>
+            <p>
+              {language === 'mr'
+                ? 'मधुमेह नियंत्रण, व्यसनमुक्ती आणि सांधेदुखीत आराम मिळालेल्या रुग्णांचे प्रत्यक्ष अनुभव.'
+                : 'Real video experiences of patients who regained health through our counseling and formulas.'}
+            </p>
+          </div>
+
+          {/* Slider Controls Bar */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem',
+            padding: '0 0.25rem'
+          }}>
+            <div style={{ fontSize: '0.86rem', color: '#4f6182', fontWeight: 600 }}>
+              {language === 'mr' ? '👈 डावीकडे / उजवीकडे स्वाइप करा' : '👈 Swipe / Slide horizontally 👉'}
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => scrollReels('left')}
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  border: '1.5px solid #e2eaf4',
+                  color: '#12355B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(18,53,91,0.08)',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
+                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+                aria-label="Previous reel"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => scrollReels('right')}
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  border: '1.5px solid #e2eaf4',
+                  color: '#12355B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(18,53,91,0.08)',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
+                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+                aria-label="Next reel"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Horizontal Reels Slider Track */}
+          <div
+            ref={reelsScrollRef}
+            style={{
+              display: 'flex',
+              gap: '1.15rem',
+              overflowX: 'auto',
+              scrollSnapType: 'x mandatory',
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: '1.5rem',
+              marginBottom: '1.5rem'
+            }}
+            className="reels-slider-track"
+          >
+            {resultVideos.map((video) => (
+              <div
+                key={video.id}
+                style={{
+                  flex: '0 0 clamp(250px, 72vw, 290px)',
+                  scrollSnapAlign: 'start'
+                }}
+              >
+                <VideoCard video={video} />
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center' }}>
+            <Link to="/videos" className="btn btn-outline btn-lg" style={{ gap: '0.6rem' }}>
+              <Play size={18} />
+              <span>{language === 'mr' ? 'सर्व व्हिडिओ व रील्स पहा' : 'Explore All Videos & Reels'}</span>
             </Link>
           </div>
         </div>
@@ -132,7 +238,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Health Categories / Services Grid (Placed below Product Section) */}
+      {/* Health Categories / Services Grid */}
       <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
         <div className="container">
           <div className="section-header">
@@ -169,42 +275,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Result Videos Section */}
-      <section className="section" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
-        <div className="container">
-          <div className="section-header">
-            <div className="section-badge">
-              <Play size={15} />
-              <span>{language === 'mr' ? 'प्रत्यक्ष परिणाम व अनुभव' : 'Patient Experiences'}</span>
-            </div>
-            <h2>
-              {language === 'mr' ? 'लाभार्थ्यांचे मनोगत व व्हिडिओ' : 'Result & Beneficiary Videos'}
-            </h2>
-            <p>
-              {language === 'mr'
-                ? 'मधुमेह नियंत्रण, व्यसनमुक्ती आणि सांधेदुखीत आराम मिळालेल्या रुग्णांचे प्रत्यक्ष अनुभव.'
-                : 'Real video experiences of patients who regained health through our counseling and formulas.'}
-            </p>
-          </div>
-
-          {/* 9:16 Vertical Reels Grid (Featured 4) */}
-          <div className="grid-reels" style={{ marginBottom: '2.5rem' }}>
-            {resultVideos.slice(0, 4).map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <Link to="/videos" className="btn btn-outline btn-lg" style={{ gap: '0.6rem' }}>
-              <Play size={18} />
-              <span>{language === 'mr' ? 'सर्व १२ व्हिडिओ व रील्स पहा' : 'View All 12 Videos & Reels'}</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials / Reviews Section */}
-      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
+      <section className="section" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">

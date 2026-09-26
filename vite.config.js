@@ -1,88 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import fs from 'fs'
-import path from 'path'
-
-// Vite plugin to ensure Vercel and Netlify SPA routing rewrite rules are always generated and updated
-function spaFallbackPlugin() {
-  return {
-    name: 'spa-fallback-generator',
-    buildStart() {
-      try {
-        // Generate root vercel.json
-        const vercelPath = path.resolve(__dirname, 'vercel.json')
-        const vercelConfig = {
-          rewrites: [
-            {
-              source: '/(.*)',
-              destination: '/index.html'
-            }
-          ]
-        }
-        fs.writeFileSync(vercelPath, JSON.stringify(vercelConfig, null, 2) + '\n', 'utf8')
-
-        // Generate public/_redirects for Netlify / Cloudflare
-        const publicDir = path.resolve(__dirname, 'public')
-        if (!fs.existsSync(publicDir)) {
-          fs.mkdirSync(publicDir, { recursive: true })
-        }
-        fs.writeFileSync(path.resolve(publicDir, '_redirects'), '/*    /index.html   200\n', 'utf8')
-
-        // Ensure official logo is synced to favicon files
-        const logoPng = path.resolve(publicDir, 'logo.png')
-        const favIco = path.resolve(publicDir, 'favicon.ico')
-        const favPng = path.resolve(publicDir, 'favicon.png')
-        const favSvg = path.resolve(publicDir, 'favicon.svg')
-
-        if (fs.existsSync(logoPng)) {
-          fs.copyFileSync(logoPng, favPng)
-          fs.copyFileSync(logoPng, favIco)
-        }
-
-        // Generate crisp SVG vector favicon
-        const svgContent = `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <path id="textArc" d="M 60,250 A 190,190 0 1,1 440,250" fill="none"/>
-    <linearGradient id="flame" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#EA580C"/>
-      <stop offset="50%" stop-color="#F97316"/>
-      <stop offset="100%" stop-color="#FBBF24"/>
-    </linearGradient>
-    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FDE047"/>
-      <stop offset="100%" stop-color="#CA8A04"/>
-    </radialGradient>
-  </defs>
-  <circle cx="250" cy="250" r="236" fill="#FFFFFF"/>
-  <circle cx="250" cy="250" r="230" fill="none" stroke="#0F4C2C" stroke-width="16"/>
-  <text fill="#0F4C2C" font-size="28" font-weight="900" font-family="Arial, sans-serif" letter-spacing="3">
-    <textPath href="#textArc" startOffset="50%" text-anchor="middle">MISION DIABETES FREE INDIA</textPath>
-  </text>
-  <circle cx="250" cy="290" r="115" fill="url(#sun)"/>
-  <path d="M 130,170 C 120,130 150,105 180,95 C 175,115 195,120 215,110 C 235,100 245,115 270,140 C 230,150 250,175 220,175 C 190,175 180,160 160,172 Z" fill="url(#flame)"/>
-  <path d="M 120,170 L 195,170 C 197,175 197,180 195,185 L 120,185 Z" fill="#FFFFFF" stroke="#0F4C2C" stroke-width="5"/>
-  <path d="M 125,185 L 190,185 C 185,210 170,225 160,245 L 155,245 C 145,225 130,210 125,185 Z" fill="#FFFFFF" stroke="#0F4C2C" stroke-width="5"/>
-  <rect x="215" y="238" width="185" height="62" rx="8" fill="#0F4C2C" stroke="#FFFFFF" stroke-width="4"/>
-  <text x="307" y="282" text-anchor="middle" fill="#FFFFFF" font-size="38" font-weight="900" font-family="sans-serif">मधुमेह</text>
-  <rect x="145" y="298" width="270" height="66" rx="8" fill="#0F4C2C" stroke="#FFFFFF" stroke-width="4"/>
-  <text x="280" y="346" text-anchor="middle" fill="#FFFFFF" font-size="40" font-weight="900" font-family="sans-serif">मुक्तभारत</text>
-  <rect x="158" y="360" width="235" height="65" rx="8" fill="#0F4C2C" stroke="#FFFFFF" stroke-width="4"/>
-  <text x="275" y="408" text-anchor="middle" fill="#FFFFFF" font-size="40" font-weight="900" font-family="sans-serif">अभियान</text>
-</svg>`
-        fs.writeFileSync(favSvg, svgContent, 'utf8')
-      } catch (err) {
-        console.warn('Could not generate SPA redirect files automatically:', err)
-      }
-    }
-  }
-}
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), spaFallbackPlugin()],
+  plugins: [react()],
   server: {
     port: 5173,
     open: false
   }
 })
+
 
