@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -33,6 +33,310 @@ import {
   faqsData
 } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
+
+// 9. Testimonials Smooth Auto-sliding Carousel Component
+const TestimonialsCarousel = () => {
+  const { language } = useLanguage();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const total = testimonialsData.length;
+
+  // Auto-slide every 5.5s, pause on hover
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % total);
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [isPaused, total]);
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? total - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % total);
+  };
+
+  // Visible items (pair of 2 for desktop, 1 for mobile)
+  const firstItem = testimonialsData[currentIndex];
+  const secondItem = testimonialsData[(currentIndex + 1) % total];
+
+  return (
+    <section 
+      className="section testimonials-section" 
+      style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4', position: 'relative' }}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="container">
+        <div className="section-header" style={{ marginBottom: '2rem' }}>
+          <div className="section-badge">
+            <Heart size={15} />
+            <span>{language === 'mr' ? 'रुग्णांचा विश्वास' : 'Patient Reviews'}</span>
+          </div>
+          <h2>
+            {language === 'mr' ? 'समाधानी रुग्णांचे अभिप्राय' : 'What Our Beneficiaries Say'}
+          </h2>
+          <p>
+            {language === 'mr'
+              ? 'कोल्हापूर, सांगली, सातारा, पुणे व महाराष्ट्रातील रुग्णांनी नोंदवलेले प्रामाणिक अनुभव.'
+              : 'Genuine feedback from individuals and families supported by Sahara Social Foundation.'}
+          </p>
+        </div>
+
+        {/* Carousel Container */}
+        <div style={{ position: 'relative', maxWidth: '1080px', margin: '0 auto' }}>
+          <div className="testimonials-carousel-grid">
+            <div className="testimonials-slide-anim">
+              <TestimonialCard testimonial={firstItem} />
+            </div>
+            <div className="testimonials-slide-anim desktop-only-slide">
+              <TestimonialCard testimonial={secondItem} />
+            </div>
+          </div>
+
+          {/* Nav Controls */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '1.25rem',
+            marginTop: '1.75rem'
+          }}>
+            <button
+              type="button"
+              onClick={handlePrev}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                border: '1.5px solid #cbd5e1',
+                color: '#12355B',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(18,53,91,0.08)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* Pagination Dots */}
+            <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
+              {testimonialsData.map((_, dotIdx) => (
+                <button
+                  key={dotIdx}
+                  type="button"
+                  onClick={() => setCurrentIndex(dotIdx)}
+                  style={{
+                    width: dotIdx === currentIndex ? '24px' : '8px',
+                    height: '8px',
+                    borderRadius: '9999px',
+                    backgroundColor: dotIdx === currentIndex ? '#087E8B' : '#cbd5e1',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }}
+                  aria-label={`Go to slide ${dotIdx + 1}`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                border: '1.5px solid #cbd5e1',
+                color: '#12355B',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(18,53,91,0.08)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+              aria-label="Next testimonial"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .testimonials-carousel-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+        }
+
+        .testimonials-slide-anim {
+          animation: testimonialSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes testimonialSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(14px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .testimonials-carousel-grid {
+            grid-template-columns: 1fr;
+          }
+          .desktop-only-slide {
+            display: none;
+          }
+        }
+      `}</style>
+    </section>
+  );
+};
+
+// 8. Gallery Staggered Reveal Component (0ms, 100ms, 200ms scale 0.95 -> 1, opacity 0 -> 1)
+const GalleryStaggeredPreview = () => {
+  const { language } = useLanguage();
+  const [inView, setInView] = useState(false);
+  const galleryRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (galleryRef.current) observer.observe(galleryRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={galleryRef} className={`section-sm gallery-section ${inView ? 'gallery-in-view' : ''}`} style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
+      <div className="container">
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          marginBottom: '2rem',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <div>
+            <div className="section-badge">
+              <Sparkles size={14} />
+              <span>{language === 'mr' ? 'छायाचित्रे' : 'Photo Gallery'}</span>
+            </div>
+            <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.85rem)', color: '#12355B', margin: 0 }}>
+              {language === 'mr' ? 'संस्थेचे आरोग्य उपक्रम व शिबिरे' : 'Health Camps & Field Activities'}
+            </h2>
+          </div>
+
+          <Link to="/photos" className="btn btn-outline btn-sm">
+            <span>{language === 'mr' ? 'सर्व फोटो पहा' : 'View Full Gallery'}</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        <div className="grid-3 gallery-stagger-grid">
+          {galleryPhotos.slice(0, 3).map((photo, index) => (
+            <div
+              key={photo.id}
+              className={`gallery-reveal-card gallery-delay-${index + 1}`}
+              style={{
+                borderRadius: '16px',
+                overflow: 'hidden',
+                position: 'relative',
+                height: '240px',
+                boxShadow: '0 4px 15px rgba(18,53,91,0.08)',
+                backgroundColor: '#0a1b2e'
+              }}
+            >
+              <img
+                src={photo.image}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = photo.fallback;
+                }}
+                alt={photo.titleMr || photo.titleEn}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                className="gallery-zoom-img"
+              />
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(to top, rgba(10,27,46,0.85) 0%, transparent 60%)'
+              }} />
+              <div style={{
+                position: 'absolute',
+                bottom: '1rem',
+                left: '1rem',
+                right: '1rem',
+                color: '#ffffff',
+                fontSize: '0.9rem',
+                fontWeight: 700
+              }}>
+                {language === 'mr' ? photo.titleMr : photo.titleEn}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <style>{`
+        .gallery-reveal-card {
+          opacity: 0;
+          transform: scale(0.95);
+          transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gallery-in-view .gallery-delay-1 {
+          opacity: 1;
+          transform: scale(1);
+          transition-delay: 0ms;
+        }
+
+        .gallery-in-view .gallery-delay-2 {
+          opacity: 1;
+          transform: scale(1);
+          transition-delay: 100ms;
+        }
+
+        .gallery-in-view .gallery-delay-3 {
+          opacity: 1;
+          transform: scale(1);
+          transition-delay: 200ms;
+        }
+
+        .gallery-reveal-card:hover .gallery-zoom-img {
+          transform: scale(1.06);
+        }
+      `}</style>
+    </section>
+  );
+};
 
 const Home = () => {
   const { language } = useLanguage();
@@ -111,7 +415,7 @@ const Home = () => {
             padding: '0 0.25rem'
           }}>
             <div style={{ fontSize: '0.86rem', color: '#4f6182', fontWeight: 600 }}>
-              {language === 'mr' ? '👈 डावीकडे / उजवीकडे स्वाइप करा' : '👈 Swipe / Slide horizontally 👉'}
+              {language === 'mr' ? '👈 स्वाइप करा / प्ले करा' : '👈 Swipe / Click to Play 👉'}
             </div>
 
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -176,7 +480,7 @@ const Home = () => {
               scrollbarWidth: 'none',
               WebkitOverflowScrolling: 'touch',
               paddingBottom: '1.5rem',
-              marginBottom: '1.5rem'
+              marginBottom: '1rem'
             }}
             className="reels-slider-track"
           >
@@ -193,7 +497,7 @@ const Home = () => {
             ))}
           </div>
 
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <Link to="/videos" className="btn btn-outline btn-lg" style={{ gap: '0.6rem' }}>
               <Play size={18} />
               <span>{language === 'mr' ? 'सर्व व्हिडिओ व रील्स पहा' : 'Explore All Videos & Reels'}</span>
@@ -275,102 +579,11 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials / Reviews Section */}
-      <section className="section" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
-        <div className="container">
-          <div className="section-header">
-            <div className="section-badge">
-              <Heart size={15} />
-              <span>{language === 'mr' ? 'रुग्णांचा विश्वास' : 'Patient Reviews'}</span>
-            </div>
-            <h2>
-              {language === 'mr' ? 'समाधानी रुग्णांचे अभिप्राय' : 'What Our Beneficiaries Say'}
-            </h2>
-            <p>
-              {language === 'mr'
-                ? 'कोल्हापूर, सांगली, सातारा, पुणे व महाराष्ट्रातील रुग्णांनी नोंदवलेले प्रामाणिक अनुभव.'
-                : 'Genuine feedback from individuals and families supported by Sahara Social Foundation.'}
-            </p>
-          </div>
+      {/* 9. Testimonials / Reviews Smooth Auto-Sliding Carousel Section */}
+      <TestimonialsCarousel />
 
-          <div className="grid-2" style={{ marginBottom: '2.5rem' }}>
-            {testimonialsData.map((testimonial) => (
-              <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Gallery Preview */}
-      <section className="section-sm" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
-        <div className="container">
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginBottom: '2rem',
-            flexWrap: 'wrap',
-            gap: '1rem'
-          }}>
-            <div>
-              <div className="section-badge">
-                <Sparkles size={14} />
-                <span>{language === 'mr' ? 'छायाचित्रे' : 'Photo Gallery'}</span>
-              </div>
-              <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.85rem)', color: '#12355B', margin: 0 }}>
-                {language === 'mr' ? 'संस्थेचे आरोग्य उपक्रम व शिबिरे' : 'Health Camps & Field Activities'}
-              </h2>
-            </div>
-
-            <Link to="/photos" className="btn btn-outline btn-sm">
-              <span>{language === 'mr' ? 'सर्व फोटो पहा' : 'View Full Gallery'}</span>
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="grid-3">
-            {galleryPhotos.slice(0, 3).map((photo) => (
-              <div
-                key={photo.id}
-                style={{
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  position: 'relative',
-                  height: '240px',
-                  boxShadow: '0 4px 15px rgba(18,53,91,0.08)',
-                  backgroundColor: '#0a1b2e'
-                }}
-              >
-                <img
-                  src={photo.image}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = photo.fallback;
-                  }}
-                  alt={photo.titleMr || photo.titleEn}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(to top, rgba(10,27,46,0.85) 0%, transparent 60%)'
-                }} />
-                <div style={{
-                  position: 'absolute',
-                  bottom: '1rem',
-                  left: '1rem',
-                  right: '1rem',
-                  color: '#ffffff',
-                  fontSize: '0.9rem',
-                  fontWeight: 700
-                }}>
-                  {language === 'mr' ? photo.titleMr : photo.titleEn}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 8. Gallery Staggered Reveal Preview */}
+      <GalleryStaggeredPreview />
 
       {/* Frequently Asked Questions */}
       <section className="section-sm" style={{ backgroundColor: '#F5F7FA', borderTop: '1px solid #e2eaf4' }}>

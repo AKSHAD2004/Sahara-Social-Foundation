@@ -31,7 +31,7 @@ const Hero = ({ onOpenConsultation }) => {
             </span>
           </div>
 
-          {/* Mobile Dedicated Photo Card (Shows full clear image on mobile devices) */}
+          {/* Dedicated Photo Card — Only on Mobile (Completely Hidden on Web/Desktop to prevent overlap) */}
           <div className="hero-mobile-image-card">
             <img 
               src="/hero-camp-bg.jpg" 
@@ -217,6 +217,7 @@ const Hero = ({ onOpenConsultation }) => {
       </div>
 
       <style>{`
+        /* Cinematic Entrance Animations for Hero */
         .hero-section {
           position: relative;
           background-color: #12355B;
@@ -226,7 +227,7 @@ const Hero = ({ onOpenConsultation }) => {
           font-family: var(--font-family);
         }
 
-        /* Desktop Background Image */
+        /* Desktop Background Image - Slow Cinematic Zoom (1.05 -> 1 over 1.4s) */
         .hero-bg-image-overlay {
           position: absolute;
           inset: 0;
@@ -246,6 +247,19 @@ const Hero = ({ onOpenConsultation }) => {
           opacity: 1;
           pointer-events: none;
           z-index: 1;
+          animation: cinematicZoomIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform;
+        }
+
+        @keyframes cinematicZoomIn {
+          0% {
+            transform: scale(1.06);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
         }
 
         .hero-content-wrapper {
@@ -255,11 +269,7 @@ const Hero = ({ onOpenConsultation }) => {
           align-items: flex-start;
         }
 
-        /* Mobile Photo Card: Hidden on desktop, shown on mobile */
-        .hero-mobile-image-card {
-          display: none;
-        }
-
+        /* 1. Badge Entrance (0ms) */
         .hero-animated-badge {
           display: inline-flex;
           align-items: center;
@@ -279,13 +289,10 @@ const Hero = ({ onOpenConsultation }) => {
           width: fit-content;
           max-width: 100%;
           box-shadow: 0 4px 18px rgba(10, 27, 46, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+          animation: heroFadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .hero-sparkle-icon {
-          animation: heroSparklePulse 2.4s ease-in-out infinite;
-          flex-shrink: 0;
-        }
-
+        /* 2. Heading: Fade + Slide Up */
         .hero-title {
           font-family: 'Baloo 2', 'Poppins', sans-serif;
           font-size: clamp(2rem, 4.5vw + 0.8rem, 3.4rem);
@@ -295,6 +302,7 @@ const Hero = ({ onOpenConsultation }) => {
           margin-bottom: 1rem;
           letter-spacing: -0.01em;
           text-shadow: 0 3px 16px rgba(10, 27, 46, 0.8);
+          animation: heroFadeSlideUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
         }
 
         .hero-title-highlight {
@@ -304,99 +312,22 @@ const Hero = ({ onOpenConsultation }) => {
         }
 
         .hero-campaign-highlight {
-          font-family: 'Baloo 2', 'Rozha One', sans-serif;
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
           font-weight: 800;
-          color: #F4A261;
-          background: linear-gradient(135deg, #ffffff 0%, #fff3ec 25%, #F4A261 65%, #f7b785 100%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: #ffffff;
           font-size: clamp(1.75rem, 3.6vw + 0.5rem, 2.7rem);
-          filter: drop-shadow(0 3px 12px rgba(10, 27, 46, 0.9));
+          text-shadow: 0 3px 16px rgba(10, 27, 46, 0.9);
           display: inline-block;
         }
 
+        /* 3. Description / More Details Toggle: Fade Up with 150ms delay */
         .hero-subtext-container {
           width: 100%;
           margin-bottom: 1.35rem;
+          animation: heroFadeSlideUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
         }
 
-        .hero-subtext {
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          font-size: clamp(1.05rem, 1.25vw + 0.5rem, 1.22rem);
-          font-weight: 500;
-          color: #e2eaf4;
-          line-height: 1.7;
-          margin-bottom: 0.55rem;
-          max-width: 760px;
-          text-shadow: 0 1px 8px rgba(10, 27, 46, 0.85);
-        }
-
-        .hero-read-more-btn {
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          background: rgba(255, 255, 255, 0.14);
-          border: 1px solid rgba(244, 162, 97, 0.45);
-          color: #fff3ec;
-          padding: 0.38rem 0.95rem;
-          border-radius: 9999px;
-          font-size: 0.88rem;
-          font-weight: 700;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4rem;
-          transition: all 0.25s ease;
-          touch-action: manipulation;
-          margin-bottom: 0.75rem;
-          box-shadow: 0 3px 10px rgba(10, 27, 46, 0.25);
-        }
-
-        .hero-read-more-btn:hover,
-        .hero-read-more-btn:active {
-          background: rgba(255, 255, 255, 0.25);
-          color: #ffffff;
-          border-color: #F4A261;
-          transform: translateY(-1px);
-        }
-
-        .hero-expanded-content {
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          background: rgba(18, 53, 91, 0.94);
-          border: 1px solid rgba(8, 126, 139, 0.4);
-          border-radius: 14px;
-          padding: 1.1rem;
-          margin-bottom: 0.85rem;
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          animation: heroFadeSlide 0.25s ease-out;
-          box-shadow: 0 8px 24px rgba(10, 27, 46, 0.4);
-        }
-
-        @keyframes heroFadeSlide {
-          from { opacity: 0; transform: translateY(-6px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero-expanded-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.85rem;
-        }
-
-        .hero-expanded-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.55rem;
-          font-size: 0.92rem;
-          color: #f1f5f9;
-          line-height: 1.5;
-        }
-
-        .hero-expanded-item strong {
-          color: #f7b785;
-          font-weight: 700;
-        }
-
+        /* 4. Notice / Trust Strip: Subtle Stagger */
         .hero-trust-strip {
           font-family: 'Baloo 2', 'Poppins', sans-serif;
           font-weight: 600;
@@ -417,8 +348,10 @@ const Hero = ({ onOpenConsultation }) => {
           gap: 0.65rem;
           max-width: 100%;
           box-shadow: 0 6px 20px rgba(10, 27, 46, 0.35);
+          animation: heroFadeSlideUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
         }
 
+        /* 5. CTA Buttons: Fade Up with 250ms+ delay */
         .hero-cta-group {
           display: flex;
           align-items: center;
@@ -427,6 +360,7 @@ const Hero = ({ onOpenConsultation }) => {
           margin-bottom: 0.5rem;
           width: 100%;
           font-family: 'Baloo 2', 'Poppins', sans-serif;
+          animation: heroFadeSlideUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
         }
 
         .hero-main-cta {
@@ -434,6 +368,12 @@ const Hero = ({ onOpenConsultation }) => {
           font-weight: 700;
           letter-spacing: 0.01em;
           box-shadow: 0 4px 16px rgba(220, 106, 27, 0.4);
+          transition: all 0.25s ease;
+        }
+
+        .hero-main-cta:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(220, 106, 27, 0.5);
         }
 
         .hero-secondary-cta-row {
@@ -444,6 +384,22 @@ const Hero = ({ onOpenConsultation }) => {
 
         .hero-sub-cta {
           font-weight: 700;
+          transition: all 0.25s ease;
+        }
+
+        .hero-sub-cta:hover {
+          transform: translateY(-2px);
+        }
+
+        @keyframes heroFadeSlideUp {
+          0% {
+            opacity: 0;
+            transform: translateY(22px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         @keyframes heroSparklePulse {
@@ -451,21 +407,26 @@ const Hero = ({ onOpenConsultation }) => {
           50% { transform: scale(1.2); }
         }
 
+        /* Web View: strictly hide mobile card to prevent double image overlap */
+        .hero-mobile-image-card {
+          display: none !important;
+        }
+
         /* Mobile Breakpoint (<= 640px) */
         @media (max-width: 640px) {
           .hero-section {
-            padding: 1.25rem 0 2rem 0 !important;
+            padding: 1.5rem 0 2.25rem 0 !important;
             background-color: #12355B !important;
           }
 
-          /* Hide desktop absolute background on mobile so mobile photo card is crisp */
+          /* Hide desktop background overlay on mobile to prevent any double image overlap */
           .hero-bg-image-overlay {
             display: none !important;
           }
 
-          /* Dedicated Crisp Photo Card on Mobile */
+          /* Show clean dedicated photo card on Mobile only */
           .hero-mobile-image-card {
-            display: block;
+            display: block !important;
             position: relative;
             width: 100%;
             border-radius: 16px;
@@ -474,6 +435,18 @@ const Hero = ({ onOpenConsultation }) => {
             border: 1.5px solid rgba(8, 126, 139, 0.35);
             margin-bottom: 1.15rem;
             background-color: #0a1b2e;
+            animation: heroMobileCardZoom 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+
+          @keyframes heroMobileCardZoom {
+            0% {
+              opacity: 0;
+              transform: scale(1.04);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1);
+            }
           }
 
           .hero-mobile-img {
@@ -524,28 +497,6 @@ const Hero = ({ onOpenConsultation }) => {
             margin-bottom: 0.9rem !important;
           }
 
-          .hero-subtext {
-            font-size: 0.92rem !important;
-            line-height: 1.58 !important;
-            margin-bottom: 0.4rem !important;
-            color: #e2eaf4 !important;
-          }
-
-          .hero-read-more-btn {
-            font-size: 0.8rem !important;
-            padding: 0.32rem 0.8rem !important;
-            margin-bottom: 0.6rem !important;
-          }
-
-          .hero-expanded-grid {
-            grid-template-columns: 1fr !important;
-            gap: 0.65rem !important;
-          }
-
-          .hero-expanded-item {
-            font-size: 0.82rem !important;
-          }
-
           .hero-trust-strip {
             font-size: 0.8rem !important;
             padding: 0.55rem 0.85rem !important;
@@ -577,7 +528,7 @@ const Hero = ({ onOpenConsultation }) => {
 
           .hero-sub-cta {
             flex: 1 !important;
-            justifyContent: center !important;
+            justify-content: center !important;
             font-size: 0.9rem !important;
             padding: 0.7rem !important;
             min-height: 46px;

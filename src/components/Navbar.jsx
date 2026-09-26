@@ -38,13 +38,14 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
+      if (window.scrollY > 10) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -131,13 +132,13 @@ const Navbar = () => {
             {/* Language Switcher (Pan-India) */}
             <button 
               onClick={openLanguageModal}
-              className="topbar-lang-btn"
+              className="topbar-lang-btn notranslate"
               title="Change Language / भाषा बदला"
               aria-label="Change language"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
             >
               <Globe size={13} style={{ color: '#F4A261' }} />
-              <span>{currentLanguageObj?.name || 'मराठी'}</span>
+              <span className="notranslate" style={{ fontWeight: 700 }}>{currentLanguageObj?.name || 'English'}</span>
               <ChevronDown size={11} style={{ opacity: 0.8 }} />
             </button>
           </div>
@@ -388,26 +389,27 @@ const Navbar = () => {
               {/* Pan-India Language Selector in Drawer */}
               <li style={{ borderTop: '1px solid #e2eaf4', paddingTop: '0.85rem', marginTop: '0.4rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', padding: '0 0.25rem' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#4f6182', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <span className="notranslate" style={{ fontSize: '0.78rem', color: '#4f6182', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                     <Globe size={14} style={{ color: '#087E8B' }} />
-                    <span>भाषा / Language ({currentLanguageObj?.name})</span>
+                    <span className="notranslate">Language ({currentLanguageObj?.name || 'English'})</span>
                   </span>
                   <button 
                     type="button"
                     onClick={() => { openLanguageModal(); setMobileMenuOpen(false); }}
                     style={{ background: 'none', border: 'none', color: '#087E8B', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
                   >
-                    सर्व भाषा (All)
+                    All Languages (सर्व भाषा)
                   </button>
                 </div>
 
                 {/* Quick Language Chips */}
-                <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.35rem', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                <div className="notranslate" style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.35rem', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                   {languagesList.map((lang) => (
                     <button
                       key={lang.code}
                       type="button"
                       onClick={() => selectLanguage(lang.code)}
+                      className="notranslate"
                       style={{
                         padding: '0.4rem 0.75rem',
                         borderRadius: '8px',
@@ -593,24 +595,28 @@ const Navbar = () => {
           border-color: #ffffff;
         }
 
-        /* Main Header */
+        /* Main Header - Locked on scroll */
         .main-header {
           position: sticky;
           top: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
           z-index: 1000;
           background-color: #ffffff;
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           border-bottom: 1px solid #e2eaf4;
           padding: 0.75rem 0;
-          transition: all 0.25s ease;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           box-shadow: 0 1px 3px rgba(18, 53, 91, 0.05);
         }
 
         .main-header-scrolled {
           background-color: rgba(255, 255, 255, 0.98);
-          padding: 0.5rem 0;
-          box-shadow: 0 4px 20px rgba(18, 53, 91, 0.08);
+          padding: 0.45rem 0;
+          box-shadow: 0 4px 20px rgba(18, 53, 91, 0.12);
+          border-bottom: 1px solid #cbd7e8;
         }
 
         .header-container {
@@ -857,6 +863,32 @@ const Navbar = () => {
           flex-direction: column;
           gap: 0.35rem;
           padding: 1.25rem 1rem;
+        }
+
+        .mobile-drawer-list > li {
+          animation: drawerItemFadeSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .mobile-drawer-list > li:nth-child(1) { animation-delay: 0.04s; }
+        .mobile-drawer-list > li:nth-child(2) { animation-delay: 0.08s; }
+        .mobile-drawer-list > li:nth-child(3) { animation-delay: 0.12s; }
+        .mobile-drawer-list > li:nth-child(4) { animation-delay: 0.16s; }
+        .mobile-drawer-list > li:nth-child(5) { animation-delay: 0.20s; }
+        .mobile-drawer-list > li:nth-child(6) { animation-delay: 0.24s; }
+        .mobile-drawer-list > li:nth-child(7) { animation-delay: 0.28s; }
+        .mobile-drawer-list > li:nth-child(8) { animation-delay: 0.32s; }
+        .mobile-drawer-list > li:nth-child(9) { animation-delay: 0.36s; }
+        .mobile-drawer-list > li:nth-child(10) { animation-delay: 0.40s; }
+
+        @keyframes drawerItemFadeSlide {
+          from {
+            opacity: 0;
+            transform: translateX(16px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
 
         .mobile-drawer-link {

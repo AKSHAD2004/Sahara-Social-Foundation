@@ -97,6 +97,35 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
           </Link>
         </div>
       )}
+
+      <style>{`
+        .service-card-animated {
+          transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+          cursor: pointer;
+        }
+
+        .service-card-animated:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 32px rgba(18, 53, 91, 0.12);
+          border-color: #087E8B;
+        }
+
+        .service-card-animated .trust-card-icon-wrap {
+          transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease;
+        }
+
+        .service-card-animated:hover .trust-card-icon-wrap {
+          transform: scale(1.08) rotate(3deg);
+          background-color: #087E8B;
+          color: #ffffff;
+        }
+
+        @media (max-width: 640px) {
+          .service-card-animated:hover {
+            transform: translateY(-2px);
+          }
+        }
+      `}</style>
     </div>
   );
 };

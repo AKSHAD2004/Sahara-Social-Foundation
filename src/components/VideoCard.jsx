@@ -266,6 +266,33 @@ const VideoCard = ({ video }) => {
           </a>
         </div>
       </div>
+
+      <style>{`
+        .play-pulse-btn {
+          animation: playPulseGlow 2s infinite ease-in-out;
+        }
+
+        @keyframes playPulseGlow {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(8, 126, 139, 0.6), 0 10px 25px rgba(0, 0, 0, 0.6);
+          }
+          50% {
+            transform: scale(1.08);
+            box-shadow: 0 0 0 12px rgba(8, 126, 139, 0), 0 14px 30px rgba(0, 0, 0, 0.8);
+          }
+        }
+
+        .reel-card-vertical {
+          transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+        }
+
+        .reel-card-vertical:hover {
+          transform: translateY(-6px) scale(1.02);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+          border-color: rgba(8, 126, 139, 0.8);
+        }
+      `}</style>
     </div>
   );
 };

@@ -130,6 +130,7 @@ const LanguageModal = () => {
                 key={lang.code}
                 type="button"
                 onClick={() => selectLanguage(lang.code)}
+                className="notranslate"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -156,8 +157,8 @@ const LanguageModal = () => {
                   }
                 }}
               >
-                <div>
-                  <div style={{
+                <div className="notranslate">
+                  <div className="notranslate" style={{
                     fontSize: '1.15rem',
                     fontWeight: 800,
                     color: isSelected ? '#087E8B' : '#12355B',
@@ -165,7 +166,7 @@ const LanguageModal = () => {
                   }}>
                     {lang.name}
                   </div>
-                  <div style={{
+                  <div className="notranslate" style={{
                     fontSize: '0.76rem',
                     color: '#4f6182',
                     marginTop: '0.2rem'
