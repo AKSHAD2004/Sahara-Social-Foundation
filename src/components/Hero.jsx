@@ -227,22 +227,23 @@ const Hero = ({ onOpenConsultation }) => {
           font-family: var(--font-family);
         }
 
-        /* Desktop Background Image - Slow Cinematic Zoom (1.05 -> 1 over 1.4s) */
+        /* Desktop Background Image - Properly Aligned Right-Center with Smooth Fade */
         .hero-bg-image-overlay {
           position: absolute;
           inset: 0;
           background-image: 
             linear-gradient(
               to right, 
-              rgba(18, 53, 91, 0.96) 0%, 
-              rgba(18, 53, 91, 0.85) 42%, 
-              rgba(8, 126, 139, 0.45) 75%, 
-              rgba(18, 53, 91, 0.12) 100%
+              #12355B 0%, 
+              rgba(18, 53, 91, 0.98) 35%, 
+              rgba(18, 53, 91, 0.82) 50%, 
+              rgba(18, 53, 91, 0.45) 70%, 
+              rgba(18, 53, 91, 0.1) 100%
             ),
             url('/hero-camp-bg.jpg'),
             url('/hero-bg.jpg');
           background-size: cover;
-          background-position: center right;
+          background-position: right 18%;
           background-repeat: no-repeat;
           opacity: 1;
           pointer-events: none;
@@ -454,7 +455,7 @@ const Hero = ({ onOpenConsultation }) => {
             height: auto;
             aspect-ratio: 16 / 9;
             object-fit: cover;
-            object-position: center 30%;
+            object-position: center 25%;
             display: block;
           }
 
