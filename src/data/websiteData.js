@@ -8,13 +8,13 @@ export const organizationInfo = {
   taglineMr: "मधुमेह मुक्त भारत अभियान आणि व्यसनमुक्त भारत अभियान",
   associatedCenter: "Aadhar Madhumeh-Mukti Margdarshan Kendra, Kolhapur",
   associatedCenterMr: "आधार मधुमेह-मुक्ती मार्गदर्शन केंद्र, कोल्हापूर",
-  logo: "/logo.png",
-  favicon: "/favicon.png",
+  logo: "/sahara-logo.jpg",
+  favicon: "/sahara-logo.jpg",
   
   contact: {
-    primaryPhone: "8421154090",
-    secondaryPhone: "9834066707",
-    whatsappNumber: "918421154090",
+    primaryPhone: "7745066707",
+    secondaryPhone: "7745066707",
+    whatsappNumber: "917745066707",
     email: "contact@samarthkolhapur.com",
     address: {
       shop: "Shop No. B-13, Royal Prestige Commercial Complex",
@@ -31,10 +31,10 @@ export const organizationInfo = {
       fullAddressEn: "Shop No. B-13, Royal Prestige, Near Vardhan Hospital, Near Parikh Pool, Railway Gate-Janata Bazar Road, E-Ward, Shahupuri, Kolhapur – 416001, Maharashtra, India",
       fullAddressMr: "शॉप नं. बी-१३, रॉयल प्रेस्टीज, वर्धन हॉस्पिटल जवळ, परिख पूला जवळ, रेल्वे फाटक - जनता बाजार रोड, ई-वॉर्ड, शाहूपुरी, कोल्हापूर – ४१६००१, महाराष्ट्र"
     },
-    visitingNote: "Note: It is recommended to call 8421154090 before visiting the office.",
-    visitingNoteMr: "महत्त्वाची टीप: कार्यालयात भेट देण्यापूर्वी कृपया ८४२११५४०९० या नंबरवर फोन करून यावे.",
-    orderGuidelineNote: "If you have ordered any formula from this website by clicking 'Order Now', please call 8421154090 upon receiving the package for personalized guidance on dosage and dietary regimen (Pathya).",
-    orderGuidelineNoteMr: "तुम्ही जर या वेबसाईट वरून फॉर्म्युला ऑर्डर केला असेल, वरील (Order Now) या बटन वर क्लिक करून, तर फॉर्म्युला मिळाल्यावर ८४२११५४०९० या नंबर वर कॉल करा (मार्गदर्शन आणि पथ्याबाबत सविस्तर माहितीसाठी)."
+    visitingNote: "Note: It is recommended to call 7745066707 before visiting the office.",
+    visitingNoteMr: "महत्त्वाची टीप: कार्यालयात भेट देण्यापूर्वी कृपया ७७४५०६६७०७ या नंबरवर फोन करून यावे.",
+    orderGuidelineNote: "If you have ordered any formula from this website by clicking 'Order Now', please call 7745066707 upon receiving the package for personalized guidance on dosage and dietary regimen (Pathya).",
+    orderGuidelineNoteMr: "तुम्ही जर या वेबसाईट वरून फॉर्म्युला ऑर्डर केला असेल, वरील (Order Now) या बटन वर क्लिक करून, तर फॉर्म्युला मिळाल्यावर ७७४५०६६७०७ या नंबर वर कॉल करा (मार्गदर्शन आणि पथ्याबाबत सविस्तर माहितीसाठी)."
   },
 
   about: {
@@ -200,28 +200,36 @@ export const healthCategories = [
 ];
 
 export const productsData = [
+  // 1. OFFICIAL COMBO PACKS (₹3200)
   {
-    id: "antox-d-t",
-    sku: "ANTOX-DT-01",
-    nameEn: "Antox D & Antox T (Diabetes Support Formula)",
-    nameMr: "Antox D आणि Antox T (मधुमेह नियंत्रण फॉर्म्युला)",
+    id: "prod_antox_d",
+    alias: "antox-d-t",
+    sku: "SK-DIA-01",
+    name: "Antox D & Antox T (Diabetes Support Kit)",
+    nameEn: "Antox D & Antox T (Diabetes Support Kit)",
+    nameMr: "Antox D आणि Antox T (मधुमेह नियंत्रण किट)",
     category: "diabetes",
     categoryNameEn: "Diabetes Care",
     categoryNameMr: "मधुमेह काळजी",
-    price: 1499,
-    originalPrice: 1899,
+    isCombo: true,
+    price: 3200,
+    originalPrice: 4000,
+    mrp: 4000,
     rating: 4.9,
     reviewsCount: 142,
+    stock: 100,
     image: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
     fallbackImage: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80",
     inStock: true,
-    badgeEn: "Bestseller",
-    badgeMr: "सर्वाधिक लोकप्रिय",
-    shortDescEn: "Comprehensive herbal blend designed to support pancreatic beta-cell health, glucose metabolism, and natural energy levels.",
-    shortDescMr: "स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नियंत्रणात ठेवण्यास मदत करणारा नैसर्गिक आयुर्वेदिक फॉर्म्युला.",
+    badgeEn: "Bestseller Combo",
+    badgeMr: "लोकप्रिय कॉम्बो पॅक",
+    shortDescEn: "Specialized Ayurvedic herbal supplement formulation for blood sugar support, glucose balance, and overall vitality as part of Madhumehmukta Bharat Abhiyan.",
+    shortDescMr: "स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नियंत्रणात ठेवण्यास मदत करणारा नैसर्गिक आयुर्वेदिक फॉर्म्युला किट.",
+    description: "Specialized Ayurvedic herbal supplement formulation for blood sugar support, glucose balance, and overall vitality as part of Madhumehmukta Bharat Abhiyan.",
     descriptionEn: "Antox D & Antox T kit is formulated under classical Ayurvedic guidelines to assist individuals managing fluctuating blood sugar levels. It helps improve cellular insulin uptake, purifies blood, reduces general fatigue, and supports vital organs from long-term diabetic stress. After receiving the kit, users are requested to call 8421154090 to receive personal dietary instructions (Pathya).",
     descriptionMr: "Antox D आणि Antox T हे किट आयुर्वेदातील निवडक औषधी वनस्पतींपासून तयार केले आहे. हे स्वादुपिंडातील इन्सुलिन निर्मितीस चालना देते, रक्तातील साखरेचे प्रमाण नियंत्रित करण्यास मदत करते आणि अशक्तपणा दूर करते. हे औषध मिळाल्यानंतर ८४२११५४०९० या नंबरवर कॉल करून पथ्याबाबत अवश्य मार्गदर्शन घ्यावे.",
     features: [
+      { en: "Complete dual-action combo: Antox D + Antox T", mr: "संपूर्ण २ औषधी कॉम्बो: Antox D + Antox T" },
       { en: "Helps regulate blood glucose naturally", mr: "साखर नैसर्गिकरीत्या नियंत्रणात ठेवण्यास मदत" },
       { en: "Enhances pancreatic vitality & insulin sensitivity", mr: "स्वादुपिंडाची ताकद व इन्सुलिन प्रतिसाद सुधारणा" },
       { en: "Reduces fatigue, frequent thirst and urination", mr: "थकवा, वारंवार तहान व लघवीची समस्या कमी होते" },
@@ -231,154 +239,289 @@ export const productsData = [
     dosageMr: "Antox D: जेवणापूर्वी कोमट पाण्यासोबत १ ते २ गोळ्या; Antox T: सकाळी व संध्याकाळी हर्बल काढा. (अधिक मार्गदर्शनासाठी ८४२११५४०९० वर संपर्क करा)"
   },
   {
-    id: "antox-hlk-t",
-    sku: "ANTOX-HLK-02",
-    nameEn: "Antox HLK & Antox T (Heart, Liver & Kidney Kit)",
+    id: "prod_antox_hlk",
+    alias: "antox-hlk-t",
+    sku: "SK-ORG-02",
+    name: "Antox HLK & Antox T (Heart, Liver, Kidney Kit)",
+    nameEn: "Antox HLK & Antox T (Heart, Liver, Kidney Kit)",
     nameMr: "Antox HLK आणि Antox T (हृदय, यकृत व मूत्रपिंड किट)",
     category: "heart",
-    categoryNameEn: "Vital Organs Care",
-    categoryNameMr: "महत्त्वाचे अवयव स्वास्थ्य",
-    price: 1699,
-    originalPrice: 2199,
+    categoryNameEn: "Heart Liver Kidney",
+    categoryNameMr: "हृदय, यकृत व मूत्रपिंड",
+    isCombo: true,
+    price: 3200,
+    originalPrice: 4000,
+    mrp: 4000,
     rating: 4.8,
     reviewsCount: 98,
+    stock: 100,
     image: "/antox-hlk-t.jpg",
     fallbackImage: "/antox-hlk-t.jpg",
     inStock: true,
-    badgeEn: "Triple Care",
-    badgeMr: "त्रिसूत्री स्वास्थ्य",
-    shortDescEn: "Synergistic herbal kit to maintain healthy cardiovascular circulation, optimize liver metabolism, and assist kidney filtration.",
-    shortDescMr: "हृदय, लिव्हर आणि किडनीचे कार्य सुरळीत ठेवणारे व शरीरातील टॉक्सिन्स बाहेर टाकणारे प्रभावी किट.",
-    descriptionEn: "Antox HLK combines powerful cardioprotective, hepatoprotective, and nephroprotective Ayurvedic herbs like Arjuna, Punarnava, Bhumi Amla, and Gokshura. It is ideal for individuals looking to maintain healthy blood pressure, manage cholesterol, assist fatty liver recovery, and promote natural renal cleansing.",
-    descriptionMr: "अर्जुन, पुनर्नवा, भुईआवळा आणि गोखरू यांसारख्या वनौषधींचा संगम असलेले हे किट रक्तदाब नियंत्रित ठेवण्यास, चरबीयुक्त यकृत (Fatty Liver) सुधारण्यास आणि मूत्रपिंडाची गाळण क्षमता उत्तम राखण्यास मदत करते.",
+    badgeEn: "Triple Care Combo",
+    badgeMr: "त्रिसूत्री कॉम्बो पॅक",
+    shortDescEn: "Comprehensive natural organ detoxifier and revitalizer supporting cardiac performance, liver enzyme balance, and kidney filtration wellness.",
+    shortDescMr: "हृदय, लिव्हर आणि किडनीचे कार्य सुरळीत ठेवणारे व शरीरातील टॉक्सिन्स बाहेर टाकणारे प्रभावी कॉम्बो किट.",
+    description: "Comprehensive natural organ detoxifier and revitalizer supporting cardiac performance, liver enzyme balance, and kidney filtration wellness.",
+    descriptionEn: "Antox HLK & Antox T combines powerful cardioprotective, hepatoprotective, and nephroprotective Ayurvedic herbs like Arjuna, Punarnava, Bhumi Amla, and Gokshura. It is ideal for individuals looking to maintain healthy blood pressure, manage cholesterol, assist fatty liver recovery, and promote natural renal cleansing.",
+    descriptionMr: "अर्जुन, पुनर्नवा, भुईआवळा आणि गोखरू यांसारख्या वनौषधींचा संगम असलेले हे कॉम्बो किट रक्तदाब नियंत्रित ठेवण्यास, चरबीयुक्त यकृत (Fatty Liver) सुधारण्यास आणि मूत्रपिंडाची गाळण क्षमता उत्तम राखण्यास मदत करते.",
     features: [
+      { en: "Full vital organ combo: Antox HLK bottle + Antox T detox tea", mr: "संपूर्ण किट: Antox HLK बाटली + Antox T डिटॉक्स टी" },
       { en: "Supports healthy heart muscle function & blood pressure", mr: "हृदयाची कार्यक्षमता व रक्तदाब समतोल" },
       { en: "Flushes toxic buildup from liver & kidneys", mr: "यकृत व किडनीतील घातक विषारी द्रव्ये बाहेर काढणे" },
-      { en: "Aids in cholesterol and lipid balance", mr: "कोलेस्ट्रॉल व ट्रायग्लिसराईड्स नियंत्रणात मदत" },
-      { en: "Includes Antox T detoxifying tea", mr: "डिटॉक्स टी समाविष्ट" }
+      { en: "Aids in cholesterol and lipid balance", mr: "कोलेस्ट्रॉल व ट्रायग्लिसराईड्स नियंत्रणात मदत" }
     ],
     dosageEn: "As prescribed during personal telephone consultation. Call 8421154090.",
     dosageMr: "फोनवरील समुपदेशनानुसार घ्यावे. संपर्क: ८४२११५४०९०."
   },
   {
-    id: "antox-b-al-nico",
-    sku: "ANTOX-BAL-03",
-    nameEn: "Antox B-AL-NICO Spray & Antox T (De-Addiction)",
-    nameMr: "Antox B-AL-NICO स्प्रे व Antox T (व्यसनमुक्ती फॉर्म्युला)",
+    id: "prod_antox_x",
+    alias: "antox-b-al-nico",
+    sku: "SK-ADD-03",
+    name: "Antox X & Antox T (Addiction Recovery Kit)",
+    nameEn: "Antox X & Antox T (Addiction Recovery Kit)",
+    nameMr: "Antox X आणि Antox T (व्यसनमुक्ती किट)",
     category: "addiction",
-    categoryNameEn: "Addiction Relief",
+    categoryNameEn: "Addiction",
     categoryNameMr: "व्यसनमुक्ती",
-    price: 1899,
-    originalPrice: 2499,
+    isCombo: true,
+    price: 3200,
+    originalPrice: 4000,
+    mrp: 4000,
     rating: 4.9,
     reviewsCount: 165,
-    image: "/antox-b-al-nico.jpg",
+    stock: 100,
+    image: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
     fallbackImage: "/antox-b-al-nico.jpg",
     inStock: true,
-    badgeEn: "High Impact",
-    badgeMr: "अतिशय प्रभावी",
-    shortDescEn: "Advanced sublingual oral spray designed to curb intense cravings for alcohol, gutkha, kharra, bidi, and cigarettes safely.",
-    shortDescMr: "दारू, तंबाखू, गुटखा, सिगारेटची तलफ शांत करून व्यसनातून मुक्ती मिळवून देणारा नैसर्गिक हर्बल स्प्रे.",
-    descriptionEn: "Under the 'Vyasanmukt Bharat Abhiyan', Sahara Social Foundation provides Antox B-AL-NICO oral spray. By targeting taste receptors and neuro-chemical craving pathways gently through Ayurvedic herbs, it decreases the urge to consume intoxicating substances without harsh withdrawal shocks. Full counselor support provided over phone.",
-    descriptionMr: "व्यसनमुक्त भारत अभियानांतर्गत तयार केलेला Antox B-AL-NICO स्प्रे व्यसनाची तीव्र इच्छा कमी करतो. हा पूर्णपणे आयुर्वेदिक असून त्याचे कोणतेही वाईट दुष्परिणाम होत नाहीत. हा स्प्रे रुग्णाला न सांगताही पाण्यामध्ये किंवा अन्नातून देता येतो. अधिक माहितीसाठी ८४२११५४०९० वर संपर्क साधा.",
+    badgeEn: "High Impact Combo",
+    badgeMr: "अतिशय प्रभावी किट",
+    shortDescEn: "Natural herbal formula designed to reduce cravings, cleanse toxins, calm nervous anxiety, and restore vitality during Vyasanmukta Bharat Abhiyan initiatives.",
+    shortDescMr: "दारू, तंबाखू, गुटखा, सिगारेटची तलफ शांत करून व्यसनातून मुक्ती मिळवून देणारा नैसर्गिक हर्बल कॉम्बो किट.",
+    description: "Natural herbal formula designed to reduce cravings, cleanse toxins, calm nervous anxiety, and restore vitality during Vyasanmukta Bharat Abhiyan initiatives.",
+    descriptionEn: "Under the 'Vyasanmukt Bharat Abhiyan', Sahara Social Foundation provides Antox X & Antox T formula kit. By targeting taste receptors and neuro-chemical craving pathways gently through Ayurvedic herbs, it decreases the urge to consume intoxicating substances without harsh withdrawal shocks. Full counselor support provided over phone.",
+    descriptionMr: "व्यसनमुक्त भारत अभियानांतर्गत तयार केलेले Antox X व Antox T किट व्यसनाची तीव्र इच्छा कमी करते. हे पूर्णपणे आयुर्वेदिक असून त्याचे कोणतेही वाईट दुष्परिणाम होत नाहीत. अधिक माहितीसाठी ८४२११५४०९० वर संपर्क साधा.",
     features: [
-      { en: "Reduces acute cravings for alcohol & nicotine", mr: "दारू व तंबाखू/गुटख्याची तलफ त्वरित कमी करतो" },
-      { en: "Can be administered easily without harsh side effects", mr: "वापरण्यास अत्यंत सोपा व दुष्परिणाम विरहित" },
-      { en: "Supports nervous system calming & emotional balance", mr: "मानसिक ताण व चिडचिड कमी करण्यास मदत" },
-      { en: "Dedicated counselor follow-up via 8421154090", mr: "संस्थेकडून मोफत समुपदेशन व पाठपुरावा" }
+      { en: "Powerful dual combo: Craving formula + Detox tea", mr: "दुहेरी कॉम्बो: तलफमुक्ती फॉर्म्युला + डिटॉक्स टी" },
+      { en: "Reduces acute cravings for alcohol & nicotine", mr: "दारू व तंबाखू/गुटख्याची तलफ कमी करतो" },
+      { en: "Safe and non-toxic herbal formulation", mr: "वापरण्यास सुरक्षित व दुष्परिणाम विरहित" },
+      { en: "Supports nervous system calming & emotional balance", mr: "मानसिक ताण व चिडचिड कमी करण्यास मदत" }
     ],
-    dosageEn: "Spray 2-3 puffs in mouth when cravings arise, or mix in water as advised by the counselor.",
-    dosageMr: "तलफ आल्यावर २-३ स्प्रे तोंडात मारावेत किंवा समुपदेशकाच्या सल्ल्यानुसार पाण्यातून द्यावे."
+    dosageEn: "As advised by personal health counselor. Call 8421154090.",
+    dosageMr: "समुपदेशकाच्या सल्ल्यानुसार घ्यावे. फोन: ८४२११५४०९०."
   },
   {
-    id: "antox-pn-kit",
-    sku: "ANTOX-PN-04",
-    nameEn: "Antox PN Powder & PN Oil (Joint & Bone Health)",
-    nameMr: "Antox PN पावडर आणि PN ऑईल (सांधेदुखी व हाडांचे आरोग्य)",
+    id: "prod_antox_pn",
+    alias: "antox-pn-kit",
+    sku: "SK-BON-04",
+    name: "Antox PN Powder & PN Oil (Joint & Bone Care Kit)",
+    nameEn: "Antox PN Powder & PN Oil (Joint & Bone Care Kit)",
+    nameMr: "Antox PN पावडर आणि PN ऑईल (सांधेदुखी व हाडे किट)",
     category: "bones",
-    categoryNameEn: "Joints & Bones",
+    categoryNameEn: "Bones",
     categoryNameMr: "सांधे व हाडे",
-    price: 1299,
-    originalPrice: 1699,
+    isCombo: true,
+    price: 3200,
+    originalPrice: 4000,
+    mrp: 4000,
     rating: 4.8,
     reviewsCount: 87,
+    stock: 100,
     image: "/antox-pn-kit.jpg",
     fallbackImage: "/antox-pn-kit.jpg",
     inStock: true,
-    badgeEn: "Herbal Pain Relief",
-    badgeMr: "नैसर्गिक वेदनाशामक",
-    shortDescEn: "Internal nutritional powder combined with external therapeutic herbal oil for severe arthritis, knee pain, and stiffness.",
+    badgeEn: "Joint Care Combo",
+    badgeMr: "सांधेदुखी कॉम्बो पॅक",
+    shortDescEn: "Therapeutic joint flexibility and pain soothing duo with anti-inflammatory herbs and traditional cold-pressed herbal oil for external massage.",
     shortDescMr: "गुडघेदुखी, कंबरदुखी, संधिवात आणि सांध्यांमधील कडकपणा कमी करण्यासाठी अंतर्गत व बाह्य उपचार किट.",
+    description: "Therapeutic joint flexibility and pain soothing duo with anti-inflammatory herbs and traditional cold-pressed herbal oil for external massage.",
     descriptionEn: "A dual action Ayurvedic relief kit. Antox PN Powder helps nourish cartilage, reduce systemic joint inflammation (Vata Dosha), while Antox PN Oil penetrates deep into muscular tissue to relieve stiffness, swelling, and improve mobility.",
     descriptionMr: "संधिवात, आम्लवात आणि वयोमानानुसार होणारी गुडघेदुखी यावर हे किट अतिशय गुणकारी आहे. पावडर शरीरातील वातदोष नियंत्रित करते आणि तेल सांध्यांना वंगण देऊन वेदना कमी करते.",
     features: [
+      { en: "Complete internal & external joint care combo", mr: "अंतर्गत पावडर + बाह्य मालिश तेल संपूर्ण किट" },
       { en: "Relieves chronic knee, hip and back pain", mr: "जुनाट गुडघेदुखी व कंबरदुखीपासून आराम" },
       { en: "Nourishes synovial fluid and cartilage", mr: "सांध्यांमधील सायनोव्हियल फ्लुईड टिकवून ठेवते" },
-      { en: "Reduces morning stiffness & swelling", mr: "सकाळचा सांध्यांचा कडकपणा व सूज कमी करते" },
-      { en: "Contains Shallaki, Guggulu, Ashwagandha & Mahanarayan Taila", mr: "शुद्ध गुग्गुळ, शल्लाकी, अश्वगंधा व महानारायण तेल" }
+      { en: "Reduces morning stiffness & swelling", mr: "सकाळचा सांध्यांचा कडकपणा व सूज कमी करते" }
     ],
     dosageEn: "Powder: 1 teaspoon with lukewarm water twice daily. Oil: Massage gently on affected joints twice daily.",
     dosageMr: "पावडर: १ चमचा कोमट पाण्यासोबत दिवसातून दोनदा. तेल: दुखणाऱ्या भागावर हलक्या हाताने मालिश करावी."
   },
+
+  // 2. OFFICIAL SINGLE PRODUCTS (₹1600)
   {
-    id: "antox-b-acid-c",
-    sku: "ANTOX-BAC-05",
-    nameEn: "Antox B-Acid & Antox C (Acidity & Gut Cleanse)",
-    nameMr: "Antox B-Acid आणि Antox C (पित्त व पोट साफ फॉर्म्युला)",
-    category: "acidity",
-    categoryNameEn: "Digestion & Acidity",
-    categoryNameMr: "पित्त व पचन",
-    price: 999,
-    originalPrice: 1299,
-    rating: 4.7,
+    id: "prod_antox_d_single",
+    alias: "antox-d-single",
+    sku: "SK-DIA-S01",
+    name: "Antox D (Diabetes Support Formula - 300ml)",
+    nameEn: "Antox D (Diabetes Support Formula - 300ml)",
+    nameMr: "Antox D (मधुमेह नियंत्रण फॉर्म्युला - ३०० मिली)",
+    category: "diabetes",
+    categoryNameEn: "Diabetes Care",
+    categoryNameMr: "मधुमेह काळजी",
+    isCombo: false,
+    price: 1600,
+    originalPrice: 2000,
+    mrp: 2000,
+    rating: 4.8,
     reviewsCount: 76,
-    image: "https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=800&auto=format&fit=crop&q=80",
-    fallbackImage: "https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=800&auto=format&fit=crop&q=80",
+    stock: 100,
+    image: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    fallbackImage: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80",
     inStock: true,
-    badgeEn: "Daily Care",
-    badgeMr: "दैनंदिन आरोग्य",
-    shortDescEn: "Instant and long-lasting herbal solution for acid reflux, gas, heartburn, indigestion, and chronic constipation.",
-    shortDescMr: "अॅसिडिटी, छातीत जळजळ, गॅसेस आणि पोट साफ न होण्याच्या त्रासावर खात्रीशीर आयुर्वेदिक फॉर्म्युला.",
-    descriptionEn: "Formulated with Pitta-balancing herbs like Avipattikar Churna, Yashtimadhu, Amla, and Triphala. It normalizes gastric secretion, heals the stomach mucosal lining, and establishes a healthy digestive microbiome.",
-    descriptionMr: "वारंवार पित्त खवळणे, उलट्या होणे, डोके दुखणे आणि बद्धकोष्ठतेवर हा अत्यंत गुणकारी फॉर्म्युला आहे. हे पचनसंस्थेला बळकटी देऊन शरीरातील अतिरिक्त उष्णता शांत करते.",
+    badgeEn: "Single Product",
+    badgeMr: "सिंगल उत्पादन",
+    shortDescEn: "Single bottle of pure Antox D Ayurvedic formulation for daily blood glucose balance.",
+    shortDescMr: "रक्तातील साखर नैसर्गिकरीत्या नियंत्रणात ठेवण्यासाठी Antox D ची १ बाटली (३०० मिली).",
+    description: "Single bottle of pure Antox D Ayurvedic formulation for daily blood glucose balance.",
+    descriptionEn: "Single unit of Antox D herbal formulation designed to boost pancreatic beta-cell health, enhance insulin sensitivity, and assist in daily diabetes management.",
+    descriptionMr: "Antox D ची एक बाटली. स्वादुपिंडातील इन्सुलिन निर्मितीस चालना देण्यासाठी आणि साखरेची पातळी नियंत्रणात ठेवण्यासाठी उपयुक्त.",
     features: [
-      { en: "Quick soothing relief from acidity and heartburn", mr: "छातीतील जळजळ व पित्तावर तत्काळ आराम" },
-      { en: "Improves gut motility and prevents constipation", mr: "पोट साफ राहण्यास मदत आणि गॅसेसचे प्रमाण कमी" },
-      { en: "Non-habit forming botanical formula", mr: "कोणतीही सवय न लावणारे १००% सुरक्षित औषध" },
-      { en: "Supports healthy liver digestive enzymes", mr: "लिव्हरचे पाचक रस सुधारते" }
+      { en: "1 Single Bottle (300 ml)", mr: "१ बाटली (३०० मिली)" },
+      { en: "Regulates blood glucose naturally", mr: "साखर नैसर्गिकरीत्या नियंत्रणात मदत" },
+      { en: "100% Herbal formulation", mr: "१००% शुद्ध आयुर्वेदिक घटक" }
     ],
-    dosageEn: "1 capsule twice a day after meals or as directed by counselor.",
-    dosageMr: "जेवणानंतर १ कॅप्सूल दिवसातून दोनदा किंवा समुपदेशकाच्या सल्ल्यानुसार."
+    dosageEn: "1-2 teaspoons twice daily before meals with lukewarm water.",
+    dosageMr: "जेवणापूर्वी १-२ चमचे कोमट पाण्यासोबत दिवसातून दोनदा."
   },
   {
-    id: "antox-x-tonic",
-    sku: "ANTOX-X-06",
-    nameEn: "Antox X (Vitality, Immunity & Stamina Tonic)",
-    nameMr: "Antox X (शारीरिक ताकद व रोगप्रतिकारक शक्ती टॉनिक)",
-    category: "vitality",
-    categoryNameEn: "Vitality & Strength",
-    categoryNameMr: "शक्ती व स्टॅमिना",
-    price: 1399,
-    originalPrice: 1799,
+    id: "prod_antox_hlk_single",
+    alias: "antox-hlk-single",
+    sku: "SK-ORG-S02",
+    name: "Antox HLK (Heart, Liver, Kidney Formula - 300ml)",
+    nameEn: "Antox HLK (Heart, Liver, Kidney Formula - 300ml)",
+    nameMr: "Antox HLK (हृदय, यकृत व मूत्रपिंड फॉर्म्युला - ३०० मिली)",
+    category: "heart",
+    categoryNameEn: "Heart Liver Kidney",
+    categoryNameMr: "हृदय, यकृत व मूत्रपिंड",
+    isCombo: false,
+    price: 1600,
+    originalPrice: 2000,
+    mrp: 2000,
     rating: 4.8,
-    reviewsCount: 64,
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
-    fallbackImage: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
+    reviewsCount: 54,
+    stock: 100,
+    image: "/antox-hlk-t.jpg",
+    fallbackImage: "/antox-hlk-t.jpg",
     inStock: true,
-    badgeEn: "Rejuvenator",
-    badgeMr: "रसायन टॉनिक",
-    shortDescEn: "Rasayana revitalizer with Shilajit, Safed Musli, Ashwagandha and Gokshura for endurance, strength, and overall vitality.",
-    shortDescMr: "शुद्ध शिलाजीत, अश्वगंधा व मूसळीयुक्त टॉनिक; थकवा दूर करून शारीरिक ताकद आणि रोगप्रतिकारशक्ती वाढवते.",
-    descriptionEn: "Antox X is designed as a daily herbal rejuvenating formula. It restores stamina, combats chronic mental/physical stress, enhances vigor, and strengthens the immune barrier against frequent infections.",
-    descriptionMr: "शरीरातील अशक्तपणा, उत्साह नसणे, ताणतणाव आणि कमी झालेली ताकद पूर्ववत करण्यासाठी हे रसायन टॉनिक उपयुक्त ठरते. स्त्री-पुरुष दोघांसाठी उपयुक्त.",
+    badgeEn: "Single Product",
+    badgeMr: "सिंगल उत्पादन",
+    shortDescEn: "Single bottle of Antox HLK vital organ tonic for cardiovascular, hepatic, and renal vitality.",
+    shortDescMr: "हृदय, यकृत आणि किडनीचे रक्षण करणारा Antox HLK चा १ बॉटल फॉर्म्युला.",
+    description: "Single bottle of Antox HLK vital organ tonic for cardiovascular, hepatic, and renal vitality.",
+    descriptionEn: "Antox HLK single bottle formulation provides targeted Ayurvedic botanical nutrition with Arjuna and Gokshura for vital internal organ wellness.",
+    descriptionMr: "अर्जुन, भुईआवळा आणि पुनर्नवा यांसारख्या वनौषधींनी युक्त १ बॉटल फॉर्म्युला. अवयवांचे आरोग्य सुधारण्यासाठी लाभदायी.",
     features: [
-      { en: "Natural energy & stamina booster", mr: "शारीरिक ऊर्जा आणि उत्साह वाढवते" },
-      { en: "Enhances mental clarity and stress tolerance", mr: "मानसिक ताण कमी करून स्मरणशक्ती व एकाग्रता वाढवते" },
-      { en: "Rich in authentic Himalayan Shilajit and Ashwagandha", mr: "शुद्ध शिलाजीत आणि अश्वगंधाचा समावेश" },
-      { en: "Safe for regular use", mr: "दैनंदिन वापरासाठी सुरक्षित" }
+      { en: "1 Single Bottle (300 ml)", mr: "१ बाटली (३०० मिली)" },
+      { en: "Promotes organ rejuvenation & detoxification", mr: "अवयवांची कार्यक्षमता व डिटॉक्सिफिकेशन" },
+      { en: "Pure natural herbal ingredients", mr: "शुद्ध नैसर्गिक आयुर्वेदिक अर्क" }
     ],
-    dosageEn: "1 capsule daily at bedtime with warm milk or water.",
-    dosageMr: "रात्री झोपताना १ कॅप्सूल कोमट दुधासोबत किंवा पाण्यासोबत."
+    dosageEn: "As advised by telephone counselor. Call 8421154090.",
+    dosageMr: "समुपदेशकाच्या सल्ल्यानुसार घ्यावे. फोन: ८४२११५४०९०."
+  },
+  {
+    id: "prod_antox_t_single",
+    alias: "antox-t-single",
+    sku: "SK-TEA-S03",
+    name: "Antox T (Nutrifeel Herbal Detox Tea - 60 Tea Bags)",
+    nameEn: "Antox T (Nutrifeel Herbal Detox Tea - 60 Tea Bags)",
+    nameMr: "Antox T (हर्बल डिटॉक्स टी - ६० टी बॅग्स)",
+    category: "diabetes",
+    categoryNameEn: "Detox & Metabolism",
+    categoryNameMr: "डिटॉक्स व पचन",
+    isCombo: false,
+    price: 1600,
+    originalPrice: 2000,
+    mrp: 2000,
+    rating: 4.9,
+    reviewsCount: 92,
+    stock: 100,
+    image: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    fallbackImage: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
+    inStock: true,
+    badgeEn: "Single Product",
+    badgeMr: "सिंगल उत्पादन",
+    shortDescEn: "Single pack of 60 premium herbal tea bags for systemic body purification and metabolic balance.",
+    shortDescMr: "शरीरशुद्धी, पचनसुधारणा आणि विषारी द्रव्ये बाहेर काढणारा Antox T चा ६० टी-बॅग्जचा पॅक.",
+    description: "Single pack of 60 premium herbal tea bags for systemic body purification and metabolic balance.",
+    descriptionEn: "Nutrifeel Antox T is a classical botanical brew that works on metabolism, helps clear arterial toxin blocks, aids digestion, and boosts daily immunity.",
+    descriptionMr: "शरीरातील दूषित घटक काढून पचनशक्ती वाढवणारा आणि ताजेतवाने ठेवणारा हर्बल चहा. ६० टी बॅग्स पॅक.",
+    features: [
+      { en: "1 Box containing 60 Herbal Tea Bags", mr: "१ बॉक्स (६० हर्बल टी बॅग्स)" },
+      { en: "Flushes deep metabolic toxins", mr: "शरीरातील विषारी घटक बाहेर काढण्यास मदत" },
+      { en: "Refreshing daily caffeine-free Ayurvedic tea", mr: "कॅफिन-मुक्त पौष्टिक आयुर्वेदिक चहा" }
+    ],
+    dosageEn: "Dip 1 tea bag in 1 cup boiling water, infuse for 3-5 minutes. Drink morning & evening.",
+    dosageMr: "१ कप गरम पाण्यात १ टी-बॅग ३-५ मिनिटे ठेवून सकाळी व संध्याकाळी प्यावे."
+  },
+  {
+    id: "prod_antox_x_single",
+    alias: "antox-x-single",
+    sku: "SK-ADD-S04",
+    name: "Antox X (Addiction Recovery Formula - 300ml)",
+    nameEn: "Antox X (Addiction Recovery Formula - 300ml)",
+    nameMr: "Antox X (व्यसनमुक्ती फॉर्म्युला - ३०० मिली)",
+    category: "addiction",
+    categoryNameEn: "Addiction",
+    categoryNameMr: "व्यसनमुक्ती",
+    isCombo: false,
+    price: 1600,
+    originalPrice: 2000,
+    mrp: 2000,
+    rating: 4.8,
+    reviewsCount: 68,
+    stock: 100,
+    image: "/antox-b-al-nico.jpg",
+    fallbackImage: "/antox-b-al-nico.jpg",
+    inStock: true,
+    badgeEn: "Single Product",
+    badgeMr: "सिंगल उत्पादन",
+    shortDescEn: "Single bottle of Antox X herbal formula to reduce cravings for alcohol, tobacco, and gutkha.",
+    shortDescMr: "व्यसनाची तीव्र इच्छा व तलफ कमी करणारा Antox X चा १ बाटली फॉर्म्युला.",
+    description: "Single bottle of Antox X herbal formula to reduce cravings for alcohol, tobacco, and gutkha.",
+    descriptionEn: "Antox X single bottle works gently on taste buds and nerve centers to reduce impulsive urges for tobacco and alcohol, supporting smooth withdrawal.",
+    descriptionMr: "तंबाखू, गुटखा व दारूची तीव्र तलफ कमी करण्यासाठी Antox X ची १ बाटली. दुष्परिणामांशिवाय सुरक्षित.",
+    features: [
+      { en: "1 Single Bottle (300 ml)", mr: "१ बाटली (३०० मिली)" },
+      { en: "Reduces acute addictive cravings", mr: "व्यसनाची तीव्र तलफ शांत करण्यास मदत" },
+      { en: "Calms stress and restlessness", mr: "मानसिक अस्वस्थता कमी करते" }
+    ],
+    dosageEn: "As advised by personal counselor. Call 8421154090.",
+    dosageMr: "फोनवरील समुपदेशकाच्या मार्गदर्शनानुसार घ्यावे. फोन: ८४२११५४०९०."
+  },
+  {
+    id: "prod_antox_pn_single",
+    alias: "antox-pn-single",
+    sku: "SK-BON-S05",
+    name: "Antox PN (Joint & Bone Pain Relief Oil - 100ml)",
+    nameEn: "Antox PN (Joint & Bone Pain Relief Oil - 100ml)",
+    nameMr: "Antox PN (सांधेदुखी ऑईल - १०० मिली)",
+    category: "bones",
+    categoryNameEn: "Bones",
+    categoryNameMr: "सांधे व हाडे",
+    isCombo: false,
+    price: 1600,
+    originalPrice: 2000,
+    mrp: 2000,
+    rating: 4.8,
+    reviewsCount: 52,
+    stock: 100,
+    image: "/antox-pn-kit.jpg",
+    fallbackImage: "/antox-pn-kit.jpg",
+    inStock: true,
+    badgeEn: "Single Product",
+    badgeMr: "सिंगल उत्पादन",
+    shortDescEn: "Single bottle of traditional cold-pressed herbal joint massage oil for knees, back, and spine.",
+    shortDescMr: "सांधे, गुडघे, मान व कंबरदुखीवर मालिश करण्यासाठी Antox PN चे १ बाटली आयुर्वेदिक तेल.",
+    description: "Single bottle of traditional cold-pressed herbal joint massage oil for knees, back, and spine.",
+    descriptionEn: "Antox PN Oil is enriched with classical Mahanarayan and Shallaki extracts to soothe swollen joint tissue, ease friction, and restore natural mobility.",
+    descriptionMr: "गुडघेदुखी, संधिवात आणि मणक्याच्या दुखण्यावर प्रभावी १ बाटली तेल. सांध्यांना वंगण देऊन लवचिकता वाढवते.",
+    features: [
+      { en: "1 Single Bottle (100 ml Oil)", mr: "१ बाटली (१०० मिली तेल)" },
+      { en: "Quick absorption & soothing relief", mr: "त्वचेमध्ये जलद शोषले जाऊन तात्काळ आराम" },
+      { en: "Natural Mahanarayan & Shallaki herbal blend", mr: "महानारायण व शल्लाकी तेल घटक" }
+    ],
+    dosageEn: "Gently massage on painful joint area twice daily.",
+    dosageMr: "दुखणाऱ्या सांध्यावर दिवसातून दोनदा हलक्या हाताने मालिश करावी."
   }
 ];
 
@@ -823,7 +966,7 @@ When you order formulas, request counseling, or submit contact forms, we collect
 2. Use of Information:
 We use your information exclusively to:
 - Process and ship your formula orders.
-- Provide personalized telephone consultation regarding dosage and dietary regimen (Pathya) via 8421154090.
+- Provide personalized telephone consultation regarding dosage and dietary regimen (Pathya) via 7745066707.
 - Communicate campaign updates, health camp announcements, and de-addiction drives.
 
 3. Protection of Medical & Personal Data:
@@ -831,7 +974,7 @@ We never sell, rent, or trade your personal or health information to third-party
 
 4. Contact for Privacy Inquiries:
 For questions regarding your data, contact us at:
-Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur – 416001. Phone: 8421154090.`,
+Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur – 416001. Phone: 7745066707.`,
     contentMr: `सहारा सोशल फाऊंडेशन (samarthkolhapur.com) आपल्या सर्व रुग्ण, हितचिंतक आणि ग्राहकांच्या वैयक्तिक माहितीच्या सुरक्षिततेचा आदर करते.
 
 १. गोळा केली जाणारी माहिती:
@@ -839,14 +982,14 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
 
 २. माहितीचा वापर:
 - ऑर्डर केलेले पार्सल सुरक्षित पाठवण्यासाठी.
-- ८४२११५४०९० द्वारे औषधाचे प्रमाण व पथ्याबाबत फोनवर मार्गदर्शन करण्यासाठी.
+- ७७४५०६६७०७ द्वारे औषधाचे प्रमाण व पथ्याबाबत फोनवर मार्गदर्शन करण्यासाठी.
 - आरोग्य शिबिरे व जनजागृती मोहिमांची माहिती देण्यासाठी.
 
 ३. माहितीची गोपनीयता:
 आपली कोणतीही वैयक्तिक किंवा वैद्यकीय माहिती कोणत्याही तिसऱ्या पक्षाला विकली जात नाही. ती पूर्णपणे सुरक्षित व गोपनीय ठेवली जाते.
 
 ४. संपर्क:
-गोपनीयतेबाबत काही शंका असल्यास संपर्क: सहारा सोशल फाऊंडेशन, रॉयल प्रेस्टीज, शाहूपुरी, कोल्हापूर - ४१६००१. फोन: ८४२११५४०९०.`
+गोपनीयतेबाबत काही शंका असल्यास संपर्क: सहारा सोशल फाऊंडेशन, रॉयल प्रेस्टीज, शाहूपुरी, कोल्हापूर - ४१६००१. फोन: ७७४५०६६७०७.`
   },
 
   refundPolicy: {
@@ -857,7 +1000,7 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
 
 1. Returns Eligibility:
 - Returns are accepted if you receive a damaged, leaked, or wrong product package during transit.
-- Please report any damage within 48 hours of delivery by calling 8421154090 or sending parcel opening photos on WhatsApp (8421154090).
+- Please report any damage within 48 hours of delivery by calling 7745066707 or sending parcel opening photos on WhatsApp (7745066707).
 - Products must be unopened with the original security seal intact.
 
 2. Refund Process:
@@ -865,14 +1008,14 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
 - In case of replacement, a fresh package is dispatched immediately free of extra shipping charges.
 
 3. Cancellations:
-- You may cancel an order before dispatch by calling our helpline 8421154090.
+- You may cancel an order before dispatch by calling our helpline 7745066707.
 
-For assistance with orders, returns, or guidance, contact our customer support at 8421154090.`,
+For assistance with orders, returns, or guidance, contact our customer support at 7745066707.`,
     contentMr: `सहारा सोशल फाऊंडेशनच्या वतीने आम्ही आपणास शुद्ध व सीलबंद आयुर्वेदिक उत्पादने पोहोचवण्यासाठी कटिबद्ध आहोत.
 
 १. पार्सल परत करण्याचे नियम:
 - कुरिअर प्रवासात बाटली फुटल्यास किंवा चुकीचे पार्सल आल्यास बदलून दिले जाईल.
-- पार्सल मिळाल्यापासून ४८ तासांच्या आत ८४२११५४०९० या नंबरवर संपर्क करून किंवा व्हॉट्सअ‍ॅपवर फोटो पाठवून कळवावे.
+- पार्सल मिळाल्यापासून ४८ तासांच्या आत ७७४५०६६७०७ या नंबरवर संपर्क करून किंवा व्हॉट्सअ‍ॅपवर फोटो पाठवून कळवावे.
 - उत्पादनाचे मूळ सील सुरक्षित असावे.
 
 २. परतावा (Refund):
@@ -880,9 +1023,9 @@ For assistance with orders, returns, or guidance, contact our customer support a
 - बदली पार्सल हवे असल्यास कोणतेही अतिरिक्त शुल्क न घेता नवीन पार्सल पाठवले जाते.
 
 ३. ऑर्डर रद्द करणे:
-- पार्सल रवाना होण्यापूर्वी आपण ८४२११५४०९० वर फोन करून ऑर्डर रद्द करू शकता.
+- पार्सल रवाना होण्यापूर्वी आपण ७७४५०६६७०७ वर फोन करून ऑर्डर रद्द करू शकता.
 
-कोणत्याही मदतीसाठी संपर्क साधा: ८४२११५४०९०.`
+कोणत्याही मदतीसाठी संपर्क साधा: ७७४५०६६७०७.`
   }
 };
 

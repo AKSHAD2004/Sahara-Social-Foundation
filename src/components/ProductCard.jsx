@@ -20,9 +20,7 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const discountPercent = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) 
-    : null;
+  const effectivePrice = product.price || product.sellingPrice;
 
   const handleOrderNow = () => {
     if (!customerUser) {
@@ -46,30 +44,30 @@ const ProductCard = ({ product }) => {
     <div
       style={{
         backgroundColor: '#ffffff',
-        borderRadius: '16px',
-        border: '1px solid #e2eaf4',
+        borderRadius: '12px',
+        border: '1px solid #E2E8F0',
         overflow: 'hidden',
-        boxShadow: '0 3px 12px rgba(18, 53, 91, 0.05)',
+        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        transition: 'all 0.25s ease'
+        transition: 'all 0.2s ease'
       }}
-      className="card product-card-modern"
+      className="card product-card-simple"
     >
-      {/* Product Image Container */}
+      {/* Product Image Container (Clean, no floating badge clutter) */}
       <div 
         style={{ 
           position: 'relative', 
           width: '100%',
           aspectRatio: '1 / 1',
-          maxHeight: '220px',
-          backgroundColor: '#f8fafc', 
+          maxHeight: '200px',
+          backgroundColor: '#fafafa', 
           overflow: 'hidden', 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center', 
-          padding: '0.65rem'
+          padding: '0.75rem'
         }}
       >
         <Link 
@@ -78,213 +76,101 @@ const ProductCard = ({ product }) => {
         >
           <img
             src={product.image}
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = product.fallbackImage;
             }}
             alt={product.nameMr || product.nameEn}
-            style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.3s ease' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
             className="product-card-img"
           />
         </Link>
-
-        {/* Top-Left Badge (Bestseller / Category) */}
-        {product.badgeEn && (
-          <div 
-            style={{
-              position: 'absolute',
-              top: '0.5rem',
-              left: '0.5rem',
-              backgroundColor: '#087E8B',
-              color: '#ffffff',
-              padding: '0.2rem 0.5rem',
-              borderRadius: '6px',
-              fontSize: '0.65rem',
-              fontWeight: 800,
-              textTransform: 'uppercase',
-              letterSpacing: '0.03em',
-              boxShadow: '0 2px 6px rgba(8,126,139,0.3)',
-              zIndex: 2
-            }}
-          >
-            {language === 'mr' ? product.badgeMr : product.badgeEn}
-          </div>
-        )}
-
-        {/* Top-Right Heart / Wishlist Button */}
-        <button
-          type="button"
-          onClick={handleToggleWishlist}
-          style={{
-            position: 'absolute',
-            top: '0.5rem',
-            right: '0.5rem',
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.92)',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(226, 234, 244, 0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
-            zIndex: 2,
-            transition: 'all 0.2s ease',
-            color: isWishlisted ? '#e11d48' : '#64748b'
-          }}
-          title={isWishlisted ? 'Saved' : 'Add to wishlist'}
-          aria-label="Wishlist"
-        >
-          <Heart 
-            size={16} 
-            fill={isWishlisted ? '#e11d48' : 'none'} 
-            color={isWishlisted ? '#e11d48' : '#64748b'} 
-          />
-        </button>
-
-        {/* Bottom-Left Floating Rating Badge (Ref: Image 2) */}
-        <div style={{
-          position: 'absolute',
-          bottom: '0.5rem',
-          left: '0.5rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.94)',
-          backdropFilter: 'blur(4px)',
-          padding: '0.15rem 0.45rem',
-          borderRadius: '6px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.2rem',
-          fontSize: '0.72rem',
-          fontWeight: 700,
-          color: '#172033',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-          border: '1px solid rgba(226, 234, 244, 0.6)',
-          zIndex: 2
-        }}>
-          <span style={{ fontWeight: 800 }}>{product.rating}</span>
-          <Star size={11} fill="#F4A261" color="#F4A261" />
-          <span style={{ color: '#94a3b8', fontSize: '0.68rem', fontWeight: 500 }}>| {product.reviewsCount}</span>
-        </div>
       </div>
 
-      {/* Product Details Section */}
+      {/* Product Details Section (Clean, unified hierarchy) */}
       <div style={{ 
         padding: '0.75rem', 
         display: 'flex', 
         flexDirection: 'column', 
         flex: 1 
       }}>
-        {/* Category / Brand Subheading */}
-        <div style={{ 
-          fontSize: '0.68rem', 
-          color: '#087E8B', 
-          fontWeight: 800, 
-          textTransform: 'uppercase', 
-          letterSpacing: '0.04em',
-          marginBottom: '0.2rem' 
-        }}>
-          {language === 'mr' ? product.categoryNameMr : product.categoryNameEn}
-        </div>
-
         {/* Product Title */}
         <Link to={`/shop/${product.id}`} style={{ textDecoration: 'none' }}>
           <h3 style={{
-            fontSize: '0.92rem',
+            fontSize: '0.88rem',
             fontWeight: 700,
-            color: '#12355B',
-            marginBottom: '0.35rem',
-            lineHeight: 1.3,
+            color: '#17251B',
+            marginBottom: '0.25rem',
+            lineHeight: 1.35,
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             minHeight: '2.4rem'
           }}>
-            {language === 'mr' ? product.nameMr : product.nameEn}
+            {language === 'mr' ? (product.nameMr || product.name || product.nameEn) : (product.nameEn || product.name || product.nameMr)}
           </h3>
         </Link>
 
-        {/* Pricing Row with Down-Arrow Discount (Ref: Image 2) */}
+        {/* Subtle Pack Info & Delivery Note */}
+        <div style={{ 
+          fontSize: '0.72rem', 
+          color: '#5F6B61', 
+          fontWeight: 600,
+          marginBottom: '0.5rem'
+        }}>
+          {(product.isCombo !== false && (product.isCombo || effectivePrice >= 3000))
+            ? (language === 'mr' ? 'कॉम्बो पॅक • मोफत डिलिव्हरी' : 'Combo Pack • Free Delivery')
+            : (language === 'mr' ? 'सिंगल पॅक • मोफत डिलिव्हरी' : 'Single Product • Free Delivery')}
+        </div>
+
+        {/* Price Row */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'baseline', 
-          gap: '0.35rem', 
-          flexWrap: 'wrap',
-          marginBottom: '0.35rem', 
+          justifyContent: 'space-between',
+          marginBottom: '0.65rem', 
           marginTop: 'auto' 
         }}>
-          {discountPercent && (
-            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#087E8B' }}>
-              ↓{discountPercent}%
-            </span>
-          )}
-          {product.originalPrice && (
-            <span style={{ fontSize: '0.78rem', color: '#9cb0ce', textDecoration: 'line-through' }}>
+          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#006B2D' }}>
+            ₹{effectivePrice}
+          </span>
+          {product.originalPrice && product.originalPrice > effectivePrice && (
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8', textDecoration: 'line-through' }}>
               ₹{product.originalPrice}
             </span>
           )}
-          <span style={{ fontSize: '1.08rem', fontWeight: 800, color: '#12355B' }}>
-            ₹{product.price}
-          </span>
         </div>
 
-        {/* Delivery Tag */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.25rem', 
-          fontSize: '0.7rem', 
-          color: '#087E8B', 
-          fontWeight: 700,
-          marginBottom: '0.55rem'
-        }}>
-          <Truck size={12} />
-          <span>{language === 'mr' ? 'मोफत डिलिव्हरी' : 'Free Delivery'}</span>
-        </div>
-
-        {/* CTA Buttons Row */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 1fr', 
-          gap: '0.35rem',
-          marginTop: '0.2rem'
-        }}>
-          <button
-            type="button"
-            onClick={() => addToCart(product, 1)}
-            className="btn btn-secondary btn-sm"
-            style={{ 
-              width: '100%', 
-              padding: '0.4rem 0.3rem',
-              fontSize: '0.75rem',
-              minHeight: '36px',
-              gap: '0.25rem'
-            }}
-            title={language === 'mr' ? 'कार्टमध्ये टाका' : 'Add to Cart'}
-          >
-            <ShoppingCart size={13} />
-            <span>{language === 'mr' ? 'कार्ट' : 'Cart'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleOrderNow}
-            className="btn btn-primary btn-sm"
-            style={{ 
-              width: '100%', 
-              padding: '0.4rem 0.3rem',
-              fontSize: '0.75rem',
-              minHeight: '36px',
-              gap: '0.25rem'
-            }}
-            title={language === 'mr' ? 'थेट ऑर्डर करा' : 'Buy Now'}
-          >
-            <span>{language === 'mr' ? 'ऑर्डर' : 'Buy Now'}</span>
-            <ArrowRight size={13} />
-          </button>
-        </div>
+        {/* Single Clean Full-Width Order Button */}
+        <button
+          type="button"
+          onClick={handleOrderNow}
+          style={{
+            width: '100%',
+            padding: '0.5rem 0.75rem',
+            borderRadius: '8px',
+            backgroundColor: '#006B2D',
+            color: '#ffffff',
+            fontWeight: 700,
+            fontSize: '0.82rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.35rem',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#08481c'; }}
+          onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; }}
+          title={language === 'mr' ? 'थेट ऑर्डर करा' : 'Order Now'}
+        >
+          <ShoppingCart size={14} />
+          <span>{language === 'mr' ? 'ऑर्डर करा' : 'Order Now'}</span>
+        </button>
       </div>
     </div>
   );

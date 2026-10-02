@@ -93,12 +93,12 @@ const ConsultationModal = ({ isOpen, onClose }) => {
         {!isSubmitted ? (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-              <Calendar size={22} style={{ color: '#087E8B', flexShrink: 0 }} />
-              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#12355B', margin: 0, fontFamily: 'var(--font-heading)' }}>
+              <Calendar size={22} style={{ color: '#006B2D', flexShrink: 0 }} />
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#006B2D', margin: 0, fontFamily: 'var(--font-heading)' }}>
                 {language === 'mr' ? 'मोफत आरोग्य समुपदेशन नोंदणी' : 'Free Health Counseling Booking'}
               </h3>
             </div>
-            <p style={{ fontSize: '0.86rem', color: '#4f6182', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '0.86rem', color: '#5F6B61', marginBottom: '1.25rem', lineHeight: 1.5 }}>
               {language === 'mr'
                 ? 'खालील फॉर्म भरा. सहारा सोशल फाऊंडेशनचे तज्ज्ञ समुपदेशक तुम्हाला आहार व आयुर्वेदिक उपचारांसाठी फोनवर मार्गदर्शन करतील.'
                 : 'Fill the form below. Our health counselor will contact you for dietary advice and natural Ayurvedic support.'}
@@ -194,8 +194,8 @@ const ConsultationModal = ({ isOpen, onClose }) => {
               width: '60px',
               height: '60px',
               borderRadius: '50%',
-              backgroundColor: '#dbf7fa',
-              color: '#087E8B',
+              backgroundColor: '#e2faea',
+              color: '#006B2D',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -204,29 +204,29 @@ const ConsultationModal = ({ isOpen, onClose }) => {
               <CheckCircle size={34} />
             </div>
 
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#12355B', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#006B2D', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'आपली नोंदणी यशस्वी झाली आहे!' : 'Request Received Successfully!'}
             </h3>
 
-            <p style={{ fontSize: '0.88rem', color: '#4f6182', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.88rem', color: '#5F6B61', lineHeight: 1.6, marginBottom: '1.25rem' }}>
               {language === 'mr'
                 ? `धन्यवाद ${formData.name}. आमचे समुपदेशक लवकरच ${formData.phone} वर संपर्क करतील.`
                 : `Thank you ${formData.name}. Our health counseling team will call you shortly on ${formData.phone}.`}
             </p>
 
             <div style={{
-              backgroundColor: '#F5F7FA',
+              backgroundColor: '#F3F8F1',
               padding: '0.85rem',
               borderRadius: '12px',
-              border: '1px solid #e2eaf4',
+              border: '1px solid #E1E9DF',
               marginBottom: '1.25rem'
             }}>
-              <div style={{ fontSize: '0.82rem', color: '#4f6182', marginBottom: '0.3rem' }}>
+              <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginBottom: '0.3rem' }}>
                 {language === 'mr' ? 'तातडीच्या मार्गदर्शनासाठी थेट कॉल करा:' : 'For immediate guidance, call directly:'}
               </div>
               <a
                 href={`tel:${organizationInfo.contact.primaryPhone}`}
-                style={{ fontSize: '1.15rem', fontWeight: 800, color: '#087E8B' }}
+                style={{ fontSize: '1.15rem', fontWeight: 800, color: '#006B2D' }}
               >
                 <Phone size={15} style={{ display: 'inline', marginRight: '6px' }} />
                 {organizationInfo.contact.primaryPhone}

@@ -11,14 +11,17 @@ import {
   Clock, 
   ShieldCheck,
   Edit2,
+  Edit,
   Save,
   AlertCircle,
   LogIn,
-  UserPlus
+  UserPlus,
+  Package,
+  X
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { organizationInfo } from '../data/websiteData';
+import { organizationInfo, productsData } from '../data/websiteData';
 import { dbService } from '../services/db';
 
 const Account = () => {
@@ -50,6 +53,72 @@ const Account = () => {
 
   // Orders list
   const [orders, setOrders] = useState([]);
+
+  // Products catalog & edit management
+  const [products, setProducts] = useState(() => {
+    const fromDb = dbService.getAll('products');
+    return (Array.isArray(fromDb) && fromDb.length > 0) ? fromDb : productsData;
+  });
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [showEditProductModal, setShowEditProductModal] = useState(false);
+  const [productFormData, setProductFormData] = useState({
+    name: '',
+    sku: '',
+    category: 'Diabetes',
+    price: 2800,
+    mrp: 3500,
+    stock: 100,
+    description: '',
+    image: ''
+  });
+  const [productUpdateMsg, setProductUpdateMsg] = useState('');
+
+  useEffect(() => {
+    const unsub = dbService.subscribe('products', (prods) => {
+      if (Array.isArray(prods) && prods.length > 0) {
+        setProducts(prods);
+      }
+    });
+    return unsub;
+  }, []);
+
+  const handleOpenEditProduct = (prod) => {
+    setEditingProduct(prod);
+    setProductFormData({
+      name: prod.name || prod.nameEn || '',
+      sku: prod.sku || '',
+      category: prod.category || 'Diabetes',
+      price: prod.price || prod.sellingPrice || 0,
+      mrp: prod.mrp || prod.originalPrice || 0,
+      stock: prod.stock !== undefined ? prod.stock : 100,
+      description: prod.description || prod.shortDescEn || '',
+      image: prod.image || ''
+    });
+    setShowEditProductModal(true);
+  };
+
+  const handleSaveProductEdit = async (e) => {
+    e.preventDefault();
+    if (!editingProduct || !productFormData.name) return;
+
+    await dbService.update('products', editingProduct.id, {
+      ...editingProduct,
+      name: productFormData.name,
+      nameEn: productFormData.name,
+      sku: productFormData.sku,
+      category: productFormData.category,
+      price: Number(productFormData.price),
+      sellingPrice: Number(productFormData.price),
+      mrp: Number(productFormData.mrp),
+      stock: Number(productFormData.stock),
+      description: productFormData.description,
+      image: productFormData.image
+    });
+
+    setProductUpdateMsg(language === 'mr' ? 'उत्पादन माहिती यशस्वीरीत्या जतन केली!' : 'Product updated successfully!');
+    setShowEditProductModal(false);
+    setTimeout(() => setProductUpdateMsg(''), 4000);
+  };
 
   useEffect(() => {
     if (customerUser) {
@@ -245,14 +314,14 @@ const Account = () => {
   };
 
   return (
-    <div className="account-page" style={{ backgroundColor: '#F5F7FA', padding: '3.5rem 0 5.5rem 0', minHeight: '80vh' }}>
+    <div className="account-page" style={{ backgroundColor: '#F3F8F1', padding: '3.5rem 0 5.5rem 0', minHeight: '80vh' }}>
       <div className="container" style={{ maxWidth: '960px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.2rem', color: '#12355B', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
+            <h1 style={{ fontSize: '2.2rem', color: '#006B2D', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'माझे खाते (Customer Account)' : 'Customer Account'}
             </h1>
-            <p style={{ color: '#4f6182', fontSize: '0.95rem', margin: '0.25rem 0 0 0' }}>
+            <p style={{ color: '#5F6B61', fontSize: '0.95rem', margin: '0.25rem 0 0 0' }}>
               {language === 'mr' 
                 ? 'आपल्या ऑर्डर्स, पत्ता व ग्राहक प्रोफाइल व्यवस्थापित करा' 
                 : 'Manage your orders, delivery address, and beneficiary profile'}
@@ -291,8 +360,8 @@ const Account = () => {
             backgroundColor: '#ffffff',
             borderRadius: '24px',
             padding: '2.5rem',
-            border: '1px solid #e2eaf4',
-            boxShadow: '0 10px 25px -5px rgba(18, 53, 91, 0.06), 0 8px 10px -6px rgba(18, 53, 91, 0.02)',
+            border: '1px solid #E1E9DF',
+            boxShadow: '0 10px 25px -5px rgba(0, 107, 45, 0.06), 0 8px 10px -6px rgba(0, 107, 45, 0.02)',
             maxWidth: '520px',
             margin: '0 auto'
           }}>
@@ -302,22 +371,22 @@ const Account = () => {
                 width: '64px',
                 height: '64px',
                 borderRadius: '50%',
-                backgroundColor: '#dbf7fa',
-                color: '#087E8B',
+                backgroundColor: '#e2faea',
+                color: '#006B2D',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '1rem',
-                border: '2px solid #abedf5'
+                border: '2px solid #b8eec8'
               }}>
                 <User size={32} />
               </div>
-              <h2 style={{ fontSize: '1.45rem', color: '#12355B', fontWeight: 800, marginBottom: '0.35rem', fontFamily: 'var(--font-heading)' }}>
+              <h2 style={{ fontSize: '1.45rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.35rem', fontFamily: 'var(--font-heading)' }}>
                 {authMode === 'existing' 
                   ? (language === 'mr' ? 'आधीच्या खात्यात लॉगिन करा' : 'Login to Existing Account')
                   : (language === 'mr' ? 'नवीन ग्राहक नोंदणी' : 'Create Customer Account')}
               </h2>
-              <p style={{ color: '#4f6182', fontSize: '0.88rem', margin: 0 }}>
+              <p style={{ color: '#5F6B61', fontSize: '0.88rem', margin: 0 }}>
                 {authMode === 'existing'
                   ? (language === 'mr' ? 'आपला नोंदणीकृत १० अंकी मोबाईल नंबर टाकून लॉगिन करा' : 'Enter your registered 10-digit mobile number to access your account')
                   : (language === 'mr' ? 'आपल्या पहिल्या खरेदीसाठी व ऑर्डर ट्रॅकिंगसाठी नाव व मोबाईल नोंदवा' : 'Register your details for instant order tracking & delivery')}
@@ -327,11 +396,11 @@ const Account = () => {
             {/* Switch Tabs: Existing Account vs New Registration */}
             <div style={{
               display: 'flex',
-              backgroundColor: '#F5F7FA',
+              backgroundColor: '#F3F8F1',
               borderRadius: '12px',
               padding: '0.35rem',
               marginBottom: '1.75rem',
-              border: '1px solid #e2eaf4'
+              border: '1px solid #E1E9DF'
             }}>
               <button
                 type="button"
@@ -342,7 +411,7 @@ const Account = () => {
                   borderRadius: '9px',
                   border: 'none',
                   backgroundColor: authMode === 'existing' ? '#ffffff' : 'transparent',
-                  color: authMode === 'existing' ? '#087E8B' : '#4f6182',
+                  color: authMode === 'existing' ? '#006B2D' : '#5F6B61',
                   fontWeight: authMode === 'existing' ? 700 : 600,
                   fontSize: '0.88rem',
                   display: 'flex',
@@ -350,7 +419,7 @@ const Account = () => {
                   justifyContent: 'center',
                   gap: '0.4rem',
                   cursor: 'pointer',
-                  boxShadow: authMode === 'existing' ? '0 2px 6px rgba(18,53,91,0.08)' : 'none',
+                  boxShadow: authMode === 'existing' ? '0 2px 6px rgba(0,107,45,0.08)' : 'none',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -367,7 +436,7 @@ const Account = () => {
                   borderRadius: '9px',
                   border: 'none',
                   backgroundColor: authMode === 'new' ? '#ffffff' : 'transparent',
-                  color: authMode === 'new' ? '#087E8B' : '#4f6182',
+                  color: authMode === 'new' ? '#006B2D' : '#5F6B61',
                   fontWeight: authMode === 'new' ? 700 : 600,
                   fontSize: '0.88rem',
                   display: 'flex',
@@ -375,7 +444,7 @@ const Account = () => {
                   justifyContent: 'center',
                   gap: '0.4rem',
                   cursor: 'pointer',
-                  boxShadow: authMode === 'new' ? '0 2px 6px rgba(18,53,91,0.08)' : 'none',
+                  boxShadow: authMode === 'new' ? '0 2px 6px rgba(0,107,45,0.08)' : 'none',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -407,7 +476,7 @@ const Account = () => {
             {authMode === 'existing' ? (
               <form onSubmit={handleExistingCustomerLogin}>
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#172033', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
                     {language === 'mr' ? 'नोंदणीकृत १० अंकी मोबाईल नंबर (Mobile Number) *' : 'Registered 10-Digit Mobile Number *'}
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -416,7 +485,7 @@ const Account = () => {
                       left: '12px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      color: '#087E8B',
+                      color: '#006B2D',
                       fontWeight: 700,
                       fontSize: '0.9rem'
                     }}>
@@ -433,7 +502,7 @@ const Account = () => {
                         width: '100%',
                         padding: '0.75rem 1rem 0.75rem 3.2rem',
                         borderRadius: '10px',
-                        border: '1.5px solid #e2eaf4',
+                        border: '1.5px solid #E1E9DF',
                         fontSize: '1rem',
                         outline: 'none',
                         letterSpacing: '1px',
@@ -443,7 +512,7 @@ const Account = () => {
                       required
                     />
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#4f6182', marginTop: '0.35rem' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#5F6B61', marginTop: '0.35rem' }}>
                     {language === 'mr' 
                       ? 'आपल्या पूर्वीच्या ऑर्डरमध्ये दिलेला मोबाईल नंबर येथे प्रविष्ट करा.' 
                       : 'Enter the mobile number used during your previous purchase or consultation.'}
@@ -460,8 +529,7 @@ const Account = () => {
                     fontWeight: 700,
                     borderRadius: '12px',
                     justifyContent: 'center',
-                    backgroundColor: '#065f46',
-                    boxShadow: '0 4px 14px rgba(6, 95, 70, 0.25)'
+                    boxShadow: '0 4px 14px rgba(0, 107, 45, 0.25)'
                   }}
                 >
                   <LogIn size={18} />
@@ -469,8 +537,8 @@ const Account = () => {
                 </button>
 
                 {/* Switch helper link */}
-                <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
-                  <span style={{ fontSize: '0.86rem', color: '#64748b' }}>
+                <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E1E9DF' }}>
+                  <span style={{ fontSize: '0.86rem', color: '#5F6B61' }}>
                     {language === 'mr' ? 'नवीन ग्राहक आहात का? ' : 'New to Sahara Social Foundation? '}
                   </span>
                   <button
@@ -479,7 +547,7 @@ const Account = () => {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: '#059669',
+                      color: '#006B2D',
                       fontWeight: 700,
                       fontSize: '0.86rem',
                       cursor: 'pointer',
@@ -495,7 +563,7 @@ const Account = () => {
               /* Form 2: New Customer Registration */
               <form onSubmit={handleNewCustomerRegister}>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
                     {language === 'mr' ? 'पूर्ण नाव (Full Name) *' : 'Full Name *'}
                   </label>
                   <input
@@ -508,7 +576,7 @@ const Account = () => {
                       width: '100%',
                       padding: '0.75rem 1rem',
                       borderRadius: '10px',
-                      border: '1.5px solid #cbd5e1',
+                      border: '1.5px solid #E1E9DF',
                       fontSize: '0.95rem',
                       outline: 'none',
                       boxSizing: 'border-box'
@@ -517,7 +585,7 @@ const Account = () => {
                 </div>
 
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
                     {language === 'mr' ? '१० अंकी मोबाईल नंबर (Mobile Number) *' : '10-Digit Mobile Number *'}
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -526,7 +594,7 @@ const Account = () => {
                       left: '12px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      color: '#475569',
+                      color: '#006B2D',
                       fontWeight: 700,
                       fontSize: '0.9rem'
                     }}>
@@ -543,7 +611,7 @@ const Account = () => {
                         width: '100%',
                         padding: '0.75rem 1rem 0.75rem 3.2rem',
                         borderRadius: '10px',
-                        border: '1.5px solid #cbd5e1',
+                        border: '1.5px solid #E1E9DF',
                         fontSize: '0.95rem',
                         outline: 'none',
                         letterSpacing: '1px',
@@ -555,7 +623,7 @@ const Account = () => {
                 </div>
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
                     {language === 'mr' ? 'शहर / गाव (City / Village)' : 'City / Town'}
                   </label>
                   <input
@@ -567,7 +635,7 @@ const Account = () => {
                       width: '100%',
                       padding: '0.75rem 1rem',
                       borderRadius: '10px',
-                      border: '1.5px solid #cbd5e1',
+                      border: '1.5px solid #E1E9DF',
                       fontSize: '0.95rem',
                       outline: 'none',
                       boxSizing: 'border-box'
@@ -592,8 +660,8 @@ const Account = () => {
                 </button>
 
                 {/* Switch helper link */}
-                <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #f1f5f9' }}>
-                  <span style={{ fontSize: '0.86rem', color: '#4f6182' }}>
+                <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E1E9DF' }}>
+                  <span style={{ fontSize: '0.86rem', color: '#5F6B61' }}>
                     {language === 'mr' ? 'आधीपासून खाते आहे का? ' : 'Already have an existing account? '}
                   </span>
                   <button
@@ -602,7 +670,7 @@ const Account = () => {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: '#087E8B',
+                      color: '#006B2D',
                       fontWeight: 700,
                       fontSize: '0.86rem',
                       cursor: 'pointer',
@@ -623,10 +691,10 @@ const Account = () => {
               justifyContent: 'center',
               gap: '0.4rem',
               marginTop: '1.5rem',
-              color: '#4f6182',
+              color: '#5F6B61',
               fontSize: '0.78rem'
             }}>
-              <ShieldCheck size={15} style={{ color: '#087E8B' }} />
+              <ShieldCheck size={15} style={{ color: '#006B2D' }} />
               <span>{language === 'mr' ? 'सहारा सोशल फाऊंडेशन • १००% सुरक्षित ग्राहक खाते' : 'Sahara Social Foundation • 100% Secure Account'}</span>
             </div>
           </div>
@@ -643,17 +711,17 @@ const Account = () => {
               backgroundColor: '#ffffff',
               borderRadius: '18px',
               padding: '1.25rem',
-              border: '1px solid #e2eaf4',
-              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
+              border: '1px solid #E1E9DF',
+              boxShadow: '0 4px 15px rgba(0,107,45,0.04)'
             }}>
               {/* Profile Card Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.5rem 1.25rem 0.5rem', borderBottom: '1px solid #f1f5f9', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0.5rem 1.25rem 0.5rem', borderBottom: '1px solid #E1E9DF', marginBottom: '0.75rem' }}>
                 <div style={{
                   width: '48px',
                   height: '48px',
                   borderRadius: '50%',
-                  backgroundColor: '#dbf7fa',
-                  color: '#087E8B',
+                  backgroundColor: '#e2faea',
+                  color: '#006B2D',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -664,10 +732,10 @@ const Account = () => {
                   {customerUser.fullName ? customerUser.fullName.charAt(0).toUpperCase() : <User size={22} />}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, color: '#12355B', fontSize: '0.98rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: 'var(--font-heading)' }}>
+                  <div style={{ fontWeight: 700, color: '#006B2D', fontSize: '0.98rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontFamily: 'var(--font-heading)' }}>
                     {customerUser.fullName || (language === 'mr' ? 'आरोग्य लाभार्थी' : 'Health Beneficiary')}
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#4f6182' }}>
+                  <div style={{ fontSize: '0.78rem', color: '#5F6B61' }}>
                     {customerUser.phone || 'Sahara Member'}
                   </div>
                 </div>
@@ -684,8 +752,8 @@ const Account = () => {
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
                     border: 'none',
-                    backgroundColor: activeTab === 'orders' ? '#dbf7fa' : 'transparent',
-                    color: activeTab === 'orders' ? '#087E8B' : '#172033',
+                    backgroundColor: activeTab === 'orders' ? '#e2faea' : 'transparent',
+                    color: activeTab === 'orders' ? '#006B2D' : '#17251B',
                     fontWeight: activeTab === 'orders' ? 700 : 600,
                     fontSize: '0.92rem',
                     cursor: 'pointer',
@@ -706,8 +774,8 @@ const Account = () => {
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
                     border: 'none',
-                    backgroundColor: activeTab === 'profile' ? '#dbf7fa' : 'transparent',
-                    color: activeTab === 'profile' ? '#087E8B' : '#172033',
+                    backgroundColor: activeTab === 'profile' ? '#e2faea' : 'transparent',
+                    color: activeTab === 'profile' ? '#006B2D' : '#17251B',
                     fontWeight: activeTab === 'profile' ? 700 : 600,
                     fontSize: '0.92rem',
                     cursor: 'pointer',
@@ -719,8 +787,30 @@ const Account = () => {
                   <span>{language === 'mr' ? 'माझी प्रोफाइल व पत्ता' : 'Profile & Address'}</span>
                 </button>
 
+                <button
+                  onClick={() => setActiveTab('products')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    padding: '0.75rem 0.9rem',
+                    borderRadius: '10px',
+                    border: 'none',
+                    backgroundColor: activeTab === 'products' ? '#e2faea' : 'transparent',
+                    color: activeTab === 'products' ? '#006B2D' : '#17251B',
+                    fontWeight: activeTab === 'products' ? 700 : 600,
+                    fontSize: '0.92rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Package size={18} />
+                  <span>{language === 'mr' ? 'उत्पादने (Products)' : 'Products Catalog'}</span>
+                </button>
+
                 {/* Divider */}
-                <div style={{ height: '1px', backgroundColor: '#e2eaf4', margin: '0.6rem 0' }} />
+                <div style={{ height: '1px', backgroundColor: '#E1E9DF', margin: '0.6rem 0' }} />
 
                 {/* Logout Option Below Navigation */}
                 <button
@@ -758,17 +848,17 @@ const Account = () => {
               backgroundColor: '#ffffff',
               borderRadius: '20px',
               padding: '2rem',
-              border: '1px solid #e2eaf4',
-              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
+              border: '1px solid #E1E9DF',
+              boxShadow: '0 4px 15px rgba(0,107,45,0.04)'
             }}>
               {/* Tab 1: Orders */}
               {activeTab === 'orders' && (
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <h3 style={{ fontSize: '1.3rem', color: '#12355B', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
+                    <h3 style={{ fontSize: '1.3rem', color: '#006B2D', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
                       {language === 'mr' ? 'मागील ऑर्डर्स व ट्रॅकिंग' : 'Order History & Status'}
                     </h3>
-                    <span style={{ fontSize: '0.85rem', color: '#4f6182', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.85rem', color: '#5F6B61', fontWeight: 600 }}>
                       {orders.length} {language === 'mr' ? 'ऑर्डर्स' : 'Orders'}
                     </span>
                   </div>
@@ -786,23 +876,23 @@ const Account = () => {
                       <div
                         key={orderId}
                         style={{
-                          border: '1px solid #e2eaf4',
+                          border: '1px solid #E1E9DF',
                           borderRadius: '14px',
                           padding: '1.25rem',
                           marginBottom: '1rem',
-                          backgroundColor: '#F5F7FA'
+                          backgroundColor: '#F3F8F1'
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                           <div>
-                            <span style={{ fontWeight: 700, color: '#12355B', fontSize: '1rem' }}>{orderId}</span>
-                            <span style={{ color: '#4f6182', fontSize: '0.82rem', marginLeft: '0.75rem' }}>{orderDate}</span>
+                            <span style={{ fontWeight: 700, color: '#006B2D', fontSize: '1rem' }}>{orderId}</span>
+                            <span style={{ color: '#5F6B61', fontSize: '0.82rem', marginLeft: '0.75rem' }}>{orderDate}</span>
                           </div>
                           <span style={{
-                            backgroundColor: orderStatus.toLowerCase().includes('deliver') ? '#fff3ec' : '#dbf7fa',
-                            color: orderStatus.toLowerCase().includes('deliver') ? '#7c2d12' : '#087E8B',
+                            backgroundColor: orderStatus.toLowerCase().includes('deliver') ? '#e2faea' : '#fff9e6',
+                            color: orderStatus.toLowerCase().includes('deliver') ? '#006B2D' : '#785300',
                             border: '1px solid',
-                            borderColor: orderStatus.toLowerCase().includes('deliver') ? '#ffd4b8' : '#abedf5',
+                            borderColor: orderStatus.toLowerCase().includes('deliver') ? '#b8eec8' : '#ffe899',
                             fontSize: '0.78rem',
                             fontWeight: 700,
                             padding: '0.25rem 0.65rem',
@@ -812,15 +902,15 @@ const Account = () => {
                           </span>
                         </div>
 
-                        <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#172033', marginBottom: '0.35rem' }}>
+                        <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#17251B', marginBottom: '0.35rem' }}>
                           {itemsName}
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed #cbd5e1' }}>
-                          <span style={{ fontSize: '0.85rem', color: '#087E8B', fontWeight: 600 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed #E1E9DF' }}>
+                          <span style={{ fontSize: '0.85rem', color: '#159B32', fontWeight: 600 }}>
                             {ord.counselingStatus || (language === 'mr' ? 'तज्ज्ञ मार्गदर्शन सक्रिय (८४२११५४०९०)' : 'Free Expert Guidance (8421154090)')}
                           </span>
-                          <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#12355B' }}>
+                          <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#006B2D' }}>
                             ₹{amount}
                           </span>
                         </div>
@@ -829,16 +919,16 @@ const Account = () => {
                   })}
 
                   <div style={{
-                    backgroundColor: '#fff3ec',
+                    backgroundColor: '#fff9e6',
                     borderRadius: '12px',
                     padding: '1rem',
-                    border: '1px solid #ffd4b8',
+                    border: '1px solid #FFC928',
                     marginTop: '1.5rem',
                     fontSize: '0.88rem',
-                    color: '#7c2d12'
+                    color: '#785300'
                   }}>
-                    <strong style={{ color: '#12355B' }}>{language === 'mr' ? 'टीप:' : 'Note:'}</strong>{' '}
-                    <span style={{ color: '#172033' }}>
+                    <strong style={{ color: '#006B2D' }}>{language === 'mr' ? 'टीप:' : 'Note:'}</strong>{' '}
+                    <span style={{ color: '#17251B' }}>
                       {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
                     </span>
                   </div>
@@ -848,17 +938,17 @@ const Account = () => {
               {/* Tab 2: Profile & Details */}
               {activeTab === 'profile' && (
                 <div>
-                  <h3 style={{ fontSize: '1.3rem', color: '#12355B', fontWeight: 800, marginBottom: '1.25rem', fontFamily: 'var(--font-heading)' }}>
+                  <h3 style={{ fontSize: '1.3rem', color: '#006B2D', fontWeight: 800, marginBottom: '1.25rem', fontFamily: 'var(--font-heading)' }}>
                     {language === 'mr' ? 'वैयक्तिक माहिती व पत्ता' : 'Personal Profile & Address'}
                   </h3>
 
                   {saveSuccess && (
                     <div style={{
-                      backgroundColor: '#dbf7fa',
-                      color: '#087E8B',
+                      backgroundColor: '#e2faea',
+                      color: '#006B2D',
                       padding: '0.75rem 1rem',
                       borderRadius: '10px',
-                      border: '1px solid #abedf5',
+                      border: '1px solid #b8eec8',
                       marginBottom: '1.25rem',
                       fontSize: '0.9rem',
                       fontWeight: 600,
@@ -874,7 +964,7 @@ const Account = () => {
                   <form onSubmit={handleSaveProfile}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                           {language === 'mr' ? 'पूर्ण नाव' : 'Full Name'}
                         </label>
                         <input 
@@ -886,14 +976,14 @@ const Account = () => {
                             width: '100%',
                             padding: '0.7rem 0.9rem',
                             borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid #E1E9DF',
                             fontSize: '0.95rem'
                           }}
                           required 
                         />
                       </div>
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                           {language === 'mr' ? 'मोबाईल नंबर' : 'Mobile Number'}
                         </label>
                         <input 
@@ -905,7 +995,7 @@ const Account = () => {
                             width: '100%',
                             padding: '0.7rem 0.9rem',
                             borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid #E1E9DF',
                             fontSize: '0.95rem'
                           }}
                           required 
@@ -915,7 +1005,7 @@ const Account = () => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                           {language === 'mr' ? 'ईमेल (पर्यायी)' : 'Email (Optional)'}
                         </label>
                         <input 
@@ -927,13 +1017,13 @@ const Account = () => {
                             width: '100%',
                             padding: '0.7rem 0.9rem',
                             borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid #E1E9DF',
                             fontSize: '0.95rem'
                           }}
                         />
                       </div>
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                           {language === 'mr' ? 'शहर / गाव' : 'City / Village'}
                         </label>
                         <input 
@@ -945,7 +1035,7 @@ const Account = () => {
                             width: '100%',
                             padding: '0.7rem 0.9rem',
                             borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid #E1E9DF',
                             fontSize: '0.95rem'
                           }}
                         />
@@ -953,7 +1043,7 @@ const Account = () => {
                     </div>
 
                     <div style={{ marginBottom: '1rem' }}>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                         {language === 'mr' ? 'डिलिव्हरी पत्ता' : 'Delivery Address'}
                       </label>
                       <textarea 
@@ -966,7 +1056,7 @@ const Account = () => {
                           width: '100%',
                           padding: '0.7rem 0.9rem',
                           borderRadius: '10px',
-                          border: '1px solid #cbd5e1',
+                          border: '1px solid #E1E9DF',
                           fontSize: '0.95rem',
                           fontFamily: 'inherit'
                         }}
@@ -975,7 +1065,7 @@ const Account = () => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                           {language === 'mr' ? 'पिनकोड' : 'Pincode'}
                         </label>
                         <input 
@@ -988,13 +1078,13 @@ const Account = () => {
                             width: '100%',
                             padding: '0.7rem 0.9rem',
                             borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid #E1E9DF',
                             fontSize: '0.95rem'
                           }}
                         />
                       </div>
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                           {language === 'mr' ? 'राज्य' : 'State'}
                         </label>
                         <input 
@@ -1006,7 +1096,7 @@ const Account = () => {
                             width: '100%',
                             padding: '0.7rem 0.9rem',
                             borderRadius: '10px',
-                            border: '1px solid #cbd5e1',
+                            border: '1px solid #E1E9DF',
                             fontSize: '0.95rem'
                           }}
                         />
@@ -1025,7 +1115,7 @@ const Account = () => {
                   <div style={{
                     marginTop: '2.5rem',
                     paddingTop: '1.5rem',
-                    borderTop: '1px solid #f1f5f9',
+                    borderTop: '1px solid #E1E9DF',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
@@ -1070,6 +1160,377 @@ const Account = () => {
                   </div>
                 </div>
               )}
+
+              {/* Tab 3: Products Management */}
+              {activeTab === 'products' && (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.3rem', color: '#006B2D', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
+                        {language === 'mr' ? 'उपलब्ध उत्पादने व संपादन' : 'Products & Catalog Management'}
+                      </h3>
+                      <p style={{ color: '#5F6B61', fontSize: '0.85rem', margin: '0.2rem 0 0 0' }}>
+                        {language === 'mr' 
+                          ? 'येथून उत्पादनांचे नाव, विक्री किंमत (Price), MRP, स्टॉक व माहिती थेट संपादित करा.'
+                          : 'Edit product name, selling price, MRP, stock count and details in realtime.'}
+                      </p>
+                    </div>
+                    <span style={{ fontSize: '0.85rem', color: '#006B2D', fontWeight: 700, backgroundColor: '#e2faea', padding: '0.3rem 0.75rem', borderRadius: '8px' }}>
+                      {products.length} {language === 'mr' ? 'सक्रिय उत्पादने' : 'Active Products'}
+                    </span>
+                  </div>
+
+                  {productUpdateMsg && (
+                    <div style={{
+                      backgroundColor: '#e2faea',
+                      color: '#006B2D',
+                      padding: '0.75rem 1rem',
+                      borderRadius: '10px',
+                      border: '1px solid #b8eec8',
+                      marginBottom: '1.25rem',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      <CheckCircle2 size={18} />
+                      <span>{productUpdateMsg}</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {products.map((prod) => {
+                      const effectivePrice = prod.price || prod.sellingPrice || 0;
+                      const effectiveMrp = prod.mrp || prod.originalPrice || 0;
+                      return (
+                        <div
+                          key={prod.id}
+                          style={{
+                            border: '1.5px solid #E1E9DF',
+                            borderRadius: '16px',
+                            padding: '1.25rem',
+                            backgroundColor: '#ffffff',
+                            boxShadow: '0 2px 8px rgba(0,107,45,0.04)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: '1rem'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '260px', flex: '1 1 auto' }}>
+                            <img
+                              src={prod.image || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100'}
+                              alt={prod.name}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100';
+                              }}
+                              style={{
+                                width: '56px',
+                                height: '56px',
+                                borderRadius: '12px',
+                                objectFit: 'contain',
+                                border: '1px solid #E1E9DF',
+                                backgroundColor: '#F3F8F1',
+                                padding: '4px',
+                                flexShrink: 0
+                              }}
+                            />
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                <strong style={{ color: '#006B2D', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>
+                                  {prod.name}
+                                </strong>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.78rem', color: '#5F6B61' }}>
+                                <span style={{ fontWeight: 700, color: '#159B32' }}>{prod.sku}</span>
+                                <span>•</span>
+                                <span style={{ backgroundColor: '#F3F8F1', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 600, color: '#17251B' }}>
+                                  {prod.category}
+                                </span>
+                                <span>•</span>
+                                <span style={{ color: prod.stock <= 0 ? '#ef4444' : '#159B32', fontWeight: 700 }}>
+                                  {prod.stock !== undefined ? prod.stock : 100} {language === 'mr' ? 'नग शिल्लक' : 'units in stock'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#006B2D' }}>
+                                ₹{effectivePrice}
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditProduct(prod)}
+                              className="btn btn-primary btn-sm"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.4rem',
+                                padding: '0.55rem 1rem',
+                                borderRadius: '10px',
+                                fontWeight: 700,
+                                fontSize: '0.88rem',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Edit size={15} />
+                              <span>{language === 'mr' ? 'बदल करा (Edit)' : 'Edit Product'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Product Edit Modal for Customer Dashboard */}
+        {showEditProductModal && editingProduct && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(4, 32, 14, 0.75)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 99999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem',
+              animation: 'fadeIn 0.2s ease-out'
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowEditProductModal(false);
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#ffffff',
+                borderRadius: '20px',
+                maxWidth: '560px',
+                width: '100%',
+                boxShadow: '0 25px 50px -12px rgba(0, 107, 45, 0.35)',
+                overflow: 'hidden',
+                position: 'relative',
+                border: '1px solid #E1E9DF',
+                maxHeight: '90vh',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              {/* Modal Header */}
+              <div style={{
+                background: 'linear-gradient(135deg, #006B2D 0%, #04200e 100%)',
+                color: '#ffffff',
+                padding: '1.25rem 1.5rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#ffffff' }}>
+                    {language === 'mr' ? 'उत्पादन संपादन करा (Edit Product)' : 'Edit Product Details'}
+                  </h3>
+                  <div style={{ fontSize: '0.8rem', color: '#d6fae0', marginTop: '0.2rem' }}>
+                    SKU: {productFormData.sku} • {productFormData.category}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEditProductModal(false)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.18)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Modal Body Form */}
+              <form onSubmit={handleSaveProductEdit} style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
+                    {language === 'mr' ? 'उत्पादनाचे नाव (Product Name) *' : 'Product Name *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={productFormData.name}
+                    onChange={(e) => setProductFormData({ ...productFormData, name: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.7rem 0.9rem',
+                      borderRadius: '10px',
+                      border: '1.5px solid #E1E9DF',
+                      fontSize: '0.95rem',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
+                      {language === 'mr' ? 'विक्री किंमत (Selling Price ₹) *' : 'Selling Price (₹) *'}
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={productFormData.price}
+                      onChange={(e) => setProductFormData({ ...productFormData, price: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '0.7rem 0.9rem',
+                        borderRadius: '10px',
+                        border: '1.5px solid #E1E9DF',
+                        fontSize: '0.95rem',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
+                      {language === 'mr' ? 'छापील किंमत (MRP ₹)' : 'MRP (₹)'}
+                    </label>
+                    <input
+                      type="number"
+                      value={productFormData.mrp}
+                      onChange={(e) => setProductFormData({ ...productFormData, mrp: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '0.7rem 0.9rem',
+                        borderRadius: '10px',
+                        border: '1.5px solid #E1E9DF',
+                        fontSize: '0.95rem',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
+                      {language === 'mr' ? 'शिल्लक नग (Stock Count)' : 'Stock Units'}
+                    </label>
+                    <input
+                      type="number"
+                      value={productFormData.stock}
+                      onChange={(e) => setProductFormData({ ...productFormData, stock: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '0.7rem 0.9rem',
+                        borderRadius: '10px',
+                        border: '1.5px solid #E1E9DF',
+                        fontSize: '0.95rem',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
+                      {language === 'mr' ? 'कॅटेगरी (Category)' : 'Category'}
+                    </label>
+                    <select
+                      value={productFormData.category}
+                      onChange={(e) => setProductFormData({ ...productFormData, category: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '0.7rem 0.9rem',
+                        borderRadius: '10px',
+                        border: '1.5px solid #E1E9DF',
+                        fontSize: '0.95rem',
+                        boxSizing: 'border-box',
+                        backgroundColor: '#ffffff'
+                      }}
+                    >
+                      <option value="Diabetes">Diabetes</option>
+                      <option value="Heart Liver Kidney">Heart Liver Kidney</option>
+                      <option value="Addiction">Addiction</option>
+                      <option value="Bones">Bones</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
+                    {language === 'mr' ? 'फोटो लिंक (Image URL)' : 'Product Image URL'}
+                  </label>
+                  <input
+                    type="text"
+                    value={productFormData.image}
+                    onChange={(e) => setProductFormData({ ...productFormData, image: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.7rem 0.9rem',
+                      borderRadius: '10px',
+                      border: '1.5px solid #E1E9DF',
+                      fontSize: '0.9rem',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
+                    {language === 'mr' ? 'वर्णन व माहिती (Description)' : 'Description & Details'}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={productFormData.description}
+                    onChange={(e) => setProductFormData({ ...productFormData, description: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '0.7rem 0.9rem',
+                      borderRadius: '10px',
+                      border: '1.5px solid #E1E9DF',
+                      fontSize: '0.9rem',
+                      boxSizing: 'border-box',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid #E1E9DF' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowEditProductModal(false)}
+                    className="btn btn-secondary btn-sm"
+                    style={{ padding: '0.65rem 1.25rem', borderRadius: '10px' }}
+                  >
+                    {language === 'mr' ? 'रद्द करा' : 'Cancel'}
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-sm"
+                    style={{ padding: '0.65rem 1.5rem', borderRadius: '10px', fontWeight: 700 }}
+                  >
+                    <Save size={15} />
+                    <span>{language === 'mr' ? 'जतन करा (Save Changes)' : 'Save Changes'}</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

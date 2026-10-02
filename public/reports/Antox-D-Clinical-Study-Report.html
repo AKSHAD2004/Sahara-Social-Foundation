@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical Study Report - Antox-D Liquid | CTRI/2025/10/095664</title>
+  <style>
+    :root {
+      --primary: #006B2D;
+      --primary-dark: #04200e;
+      --accent: #FFC928;
+      --text: #17251B;
+      --text-muted: #5F6B61;
+      --bg-light: #F4F8F3;
+      --border: #D1DFCF;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background-color: #f7f9f7;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    .report-container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
+    }
+    .header-banner {
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 25px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .badge-confidential {
+      display: inline-block;
+      background: #ffebeb;
+      color: #c92a2a;
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 4px 14px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      margin-bottom: 15px;
+      border: 1px solid #ffc9c9;
+    }
+    .badge-ctri {
+      display: inline-block;
+      background: #e2faea;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 5px 16px;
+      border-radius: 999px;
+      margin-bottom: 15px;
+      border: 1px solid #b7ebc5;
+    }
+    h1 {
+      color: var(--primary-dark);
+      font-size: 1.85rem;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .sub-title {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+    }
+    .protocol-meta {
+      background: var(--bg-light);
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      background: #ffffff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-print {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .btn-print:hover {
+      background: var(--primary-dark);
+    }
+    .btn-outline {
+      background: #ffffff;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+    .section-title {
+      color: var(--primary);
+      font-size: 1.35rem;
+      font-weight: 800;
+      border-left: 4px solid var(--primary);
+      padding-left: 12px;
+      margin: 35px 0 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 25px;
+      font-size: 0.88rem;
+    }
+    th, td {
+      border: 1px solid #d9e4d6;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th {
+      background-color: #006B2D;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    tr:nth-child(even) {
+      background-color: #f9fcf8;
+    }
+    .highlight-pill {
+      background-color: #e2faea;
+      color: #006B2D;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .p-sig {
+      color: #006B2D;
+      font-weight: 800;
+    }
+    .synopsis-grid {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px;
+      background: var(--bg-light);
+      padding: 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 25px;
+    }
+    .synopsis-label {
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+    .card-stat {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    .stat-number {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0 30px;
+    }
+    .signatory-box {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 25px;
+      background: #ffffff;
+    }
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .report-container {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .actions-bar {
+        display: none !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="report-container">
+  <!-- Actions Bar -->
+  <div class="actions-bar">
+    <div>
+      <span style="font-weight: 800; color: #006B2D;">Antox - D Total Clinical Study Report</span>
+      <span style="font-size: 0.82rem; color: #5F6B61; margin-left: 8px;">(78 Pages Official Dossier)</span>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button onclick="window.print()" class="btn btn-print">🖨️ Print / Save as PDF</button>
+      <button onclick="window.close()" class="btn btn-outline">Close Window</button>
+    </div>
+  </div>
+
+  <!-- Header Banner -->
+  <div class="header-banner">
+    <div class="badge-confidential">CONFIDENTIAL • CLINICAL RESEARCH REPORT</div><br/>
+    <div class="badge-ctri">CTRI Registration: CTRI/2025/10/095664 (Registered on: 06/10/2025)</div>
+    <h1>CLINICAL STUDY REPORT</h1>
+    <div class="sub-title">
+      A randomized, double-blind, parallel-arm clinical trial to assess the efficacy and safety of a Health supplement (Antox-D liquid) in participants with type 2 diabetes mellitus.
+    </div>
+    <div style="font-size: 0.95rem; font-weight: 700; color: #006B2D;">
+      Sponsor: Nutrifeel Health Products Pvt. Ltd. | CRO: Mprex Healthcare Pvt. Ltd.
+    </div>
+    <div class="protocol-meta">
+      <div><strong>Protocol:</strong> MHC/CT/25-26/007</div>
+      <div><strong>Version:</strong> 2.00 (Dated: 31st July 2025)</div>
+      <div><strong>Trial Phase:</strong> Phase II Interventional</div>
+      <div><strong>Total Completers:</strong> 102 Participants</div>
+    </div>
+  </div>
+
+  <!-- Executive Key Highlights -->
+  <div class="stats-grid">
+    <div class="card-stat">
+      <div class="stat-number">-8.34%</div>
+      <div class="stat-label">HbA1c Reduction (p = 0.0002)</div>
+    </div>
+    <div class="card-stat">
+      <div class="stat-number">-16.49%</div>
+      <div class="stat-label">HOMA-IR Insulin Resistance (p = 0.0004)</div>
+    </div>
+    <div class="card-stat">
+      <div class="stat-number">-15.09%</div>
+      <div class="stat-label">Postprandial Blood Glucose</div>
+    </div>
+    <div class="card-stat">
+      <div class="stat-number">-35.47%</div>
+      <div class="stat-label">Metabolic Syndrome Z-Score (p = 0.027)</div>
+    </div>
+    <div class="card-stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Safety & Tolerability (Zero ADRs)</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Study Synopsis -->
+  <h2 class="section-title">1. Study Synopsis & Design</h2>
+  <div class="synopsis-grid">
+    <div class="synopsis-label">Study Title</div>
+    <div>A randomised, double-blind, parallel-arm clinical trial to assess the efficacy and safety of a Health supplement (Antox-D liquid) in participants with type 2 diabetes mellitus.</div>
+
+    <div class="synopsis-label">Trial Registry</div>
+    <div>Clinical Trials Registry - India (CTRI) No.: <strong>CTRI/2025/10/095664</strong> [Registered on: 06/10/2025]</div>
+
+    <div class="synopsis-label">Study Design</div>
+    <div>Randomized, double-blind, parallel-arm, interventional, prospective, Phase II clinical trial.</div>
+
+    <div class="synopsis-label">Treatment Groups</div>
+    <div>
+      <strong>Group A (Test Arm):</strong> Antox-D liquid (10 ml twice daily, 1 hr before lunch and dinner with water) + Standard OHAs (n=50 completers).<br/>
+      <strong>Group B (Placebo Arm):</strong> Placebo liquid (10 ml twice daily, 1 hr before lunch and dinner with water) + Standard OHAs (n=52 completers).
+    </div>
+
+    <div class="synopsis-label">Duration</div>
+    <div>90 Days primary intervention period, followed by 90-Day extension phase (Day 91 to Day 180).</div>
+
+    <div class="synopsis-label">Investigators & Sites</div>
+    <div>
+      1. <strong>Dr. Anuja Mukesh Phatak</strong>, Omkar Multispeciality Hospital, Ravet, Pune, MH - 412101.<br/>
+      2. <strong>Dr. Dhyaneshwar Manwatkar</strong>, Care Multispeciality Hospital, Wagholi, Pune, MH - 412207.
+    </div>
+
+    <div class="synopsis-label">Inclusion Criteria</div>
+    <div>Age 30 to 65 years, T2DM on oral hypoglycemic agents (biguanides + sulfonylureas), HbA1c between 7.0% and 9.0%, BMI < 30 kg/m².</div>
+  </div>
+
+  <!-- Section 2: Active Formulation Ingredients -->
+  <h2 class="section-title">2. Active Herbal Formulation (Table 3)</h2>
+  <p style="margin-bottom: 10px; font-size: 0.92rem; color: var(--text-muted);">
+    Each 10 ml dose of Antox-D liquid contains FSSAI-approved standardized botanical extracts:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Sr.</th>
+        <th>Herb (Common Name)</th>
+        <th>Botanical Scientific Name</th>
+        <th>Part Used</th>
+        <th>Quantity (per 10 ml)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Karela</strong></td><td>Momordica charantia</td><td>Fruit Extract</td><td>250 mg</td></tr>
+      <tr><td>2</td><td><strong>Gudmar</strong></td><td>Gymnema sylvestre</td><td>Plant Extract</td><td>250 mg</td></tr>
+      <tr><td>3</td><td><strong>Jamun</strong></td><td>Syzygium cuminii</td><td>Seed Extract</td><td>150 mg</td></tr>
+      <tr><td>4</td><td><strong>Ashwagandha</strong></td><td>Withania somnifera</td><td>Root Extract</td><td>150 mg</td></tr>
+      <tr><td>5</td><td><strong>Shatawar</strong></td><td>Asparagus racemosus</td><td>Tuberous Root Extract</td><td>150 mg</td></tr>
+      <tr><td>6</td><td><strong>Methi</strong></td><td>Trigonella foenum-graecum</td><td>Seeds</td><td>150 mg</td></tr>
+      <tr><td>7</td><td><strong>Amla</strong></td><td>Emblica officinalis</td><td>Fruit Juice</td><td>2.5 ml</td></tr>
+      <tr><td>8</td><td><strong>Harad</strong></td><td>Terminalia chebula</td><td>Fruit Pericarp Extract</td><td>150 mg</td></tr>
+      <tr><td>9</td><td><strong>Bahera</strong></td><td>Terminalia belerica</td><td>Fruit Pericarp Extract</td><td>150 mg</td></tr>
+      <tr><td>10</td><td><strong>Bael Pather</strong></td><td>Aegle marmelos</td><td>Leaf Extract</td><td>150 mg</td></tr>
+      <tr><td>11</td><td><strong>Kutaki</strong></td><td>Picrorhiza kurroa</td><td>Root Extract</td><td>62.5 mg</td></tr>
+      <tr><td>12</td><td><strong>Neem</strong></td><td>Azadirachta indica</td><td>Leaves Extract</td><td>50 mg</td></tr>
+      <tr><td>13</td><td><strong>Sonth</strong></td><td>Zingiber officinale</td><td>Rhizome Extract</td><td>25 mg</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Section 3: Clinical Efficacy Results -->
+  <h2 class="section-title">3. Primary & Secondary Efficacy Outcomes (90 Days)</h2>
+
+  <!-- Table 5: HbA1c -->
+  <h3 style="color: var(--primary-dark); font-size: 1.1rem; margin-top: 20px;">Table 5: Assessment of Change in Glycated Hemoglobin (HbA1c)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Visit</th>
+        <th>Group A: Antox-D (n=50)</th>
+        <th>Group B: Placebo (n=52)</th>
+        <th>Between-Group P-Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Screening Baseline</td>
+        <td>7.48 ± 0.32%</td>
+        <td>7.50 ± 0.33%</td>
+        <td>p = 0.696</td>
+      </tr>
+      <tr>
+        <td><strong>Day 90 (End of Trial)</strong></td>
+        <td><strong>6.85 ± 0.36% (<span class="highlight-pill">-8.34%</span>)</strong></td>
+        <td>7.30 ± 0.63% (-2.72%)</td>
+        <td><strong class="p-sig">p = 0.0002*</strong></td>
+      </tr>
+      <tr>
+        <td>Within-Group P-Value</td>
+        <td><strong class="p-sig">p < 0.0001*</strong></td>
+        <td>p < 0.0001*</td>
+        <td>-</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Table 6: Glucose -->
+  <h3 style="color: var(--primary-dark); font-size: 1.1rem; margin-top: 25px;">Table 6: Fasting & Postprandial (PPG) Plasma Glucose (mg/dL)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter & Visit</th>
+        <th>Group A: Antox-D (n=50)</th>
+        <th>Group B: Placebo (n=52)</th>
+        <th>P-Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Fasting Glucose (Baseline)</strong></td>
+        <td>130.67 ± 27.33 mg/dL</td>
+        <td>133.02 ± 30.47 mg/dL</td>
+        <td>p = 0.799</td>
+      </tr>
+      <tr>
+        <td>Fasting Glucose (Day 60)</td>
+        <td>120.04 ± 20.52 mg/dL (-8.13%)</td>
+        <td>130.50 ± 16.71 mg/dL (-1.89%)</td>
+        <td><strong class="p-sig">p = 0.028*</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Fasting Glucose (Day 90)</strong></td>
+        <td><strong>119.32 ± 19.37 mg/dL (<span class="highlight-pill">-8.68%</span>)</strong></td>
+        <td>139.15 ± 22.92 mg/dL (+4.61%)</td>
+        <td><strong class="p-sig">p = 0.002*</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Post-Meal Glucose (Baseline)</strong></td>
+        <td>196.43 ± 41.15 mg/dL</td>
+        <td>200.63 ± 35.08 mg/dL</td>
+        <td>p = 0.346</td>
+      </tr>
+      <tr>
+        <td><strong>Post-Meal Glucose (Day 90)</strong></td>
+        <td><strong>166.80 ± 24.08 mg/dL (<span class="highlight-pill">-15.09%</span>)</strong></td>
+        <td>184.58 ± 27.24 mg/dL (-8.00%)</td>
+        <td>p = 0.097 (Trend)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Table 7: HOMA-IR -->
+  <h3 style="color: var(--primary-dark); font-size: 1.1rem; margin-top: 25px;">Table 7: Insulin Resistance (HOMA-IR) & Fasting Insulin</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter & Visit</th>
+        <th>Group A: Antox-D (n=50)</th>
+        <th>Group B: Placebo (n=52)</th>
+        <th>Between-Group P-Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Fasting Insulin (Baseline)</td>
+        <td>43.51 ± 7.66 mIU/L</td>
+        <td>44.00 ± 7.57 mIU/L</td>
+        <td>p = 0.746</td>
+      </tr>
+      <tr>
+        <td>Fasting Insulin (Day 90)</td>
+        <td><strong>39.36 ± 7.17 mIU/L (<span class="highlight-pill">-9.53%</span>)</strong></td>
+        <td>42.81 ± 7.32 mIU/L (-2.70%)</td>
+        <td><strong class="p-sig">p = 0.009*</strong></td>
+      </tr>
+      <tr>
+        <td>HOMA-IR Score (Baseline)</td>
+        <td>13.98 ± 4.00</td>
+        <td>14.35 ± 3.84</td>
+        <td>p = 0.489</td>
+      </tr>
+      <tr>
+        <td><strong>HOMA-IR Score (Day 90)</strong></td>
+        <td><strong>11.67 ± 3.16 (<span class="highlight-pill">-16.49%</span>)</strong></td>
+        <td>14.75 ± 3.60 (+2.77% increase)</td>
+        <td><strong class="p-sig">p = 0.0004*</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Table 8: Lipid Profile & MetS -->
+  <h3 style="color: var(--primary-dark); font-size: 1.1rem; margin-top: 25px;">Table 8 & 9: Lipid Profile & Metabolic Syndrome Severity</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Biomarker</th>
+        <th>Baseline</th>
+        <th>Day 90 (Antox-D)</th>
+        <th>Day 90 (Placebo)</th>
+        <th>Significance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>LDL Cholesterol</strong></td>
+        <td>116.34 ± 13.24 mg/dL</td>
+        <td><strong>107.58 ± 12.06 mg/dL (-7.53%)</strong></td>
+        <td>110.23 ± 12.16 mg/dL (-1.92%)</td>
+        <td><strong class="p-sig">p = 0.0006*</strong></td>
+      </tr>
+      <tr>
+        <td>Total Cholesterol</td>
+        <td>184.31 ± 19.88 mg/dL</td>
+        <td>173.73 ± 17.69 mg/dL (-5.74%)</td>
+        <td>175.55 ± 17.02 mg/dL (-3.58%)</td>
+        <td>p < 0.0001 within group</td>
+      </tr>
+      <tr>
+        <td>Triglycerides</td>
+        <td>131.27 ± 23.89 mg/dL</td>
+        <td>121.22 ± 34.85 mg/dL (-7.65%)</td>
+        <td>119.03 ± 29.96 mg/dL (-11.51%)</td>
+        <td>p = 0.002 within group</td>
+      </tr>
+      <tr>
+        <td><strong>MetS Z-Score</strong></td>
+        <td>0.69 ± 0.64</td>
+        <td><strong>0.44 ± 0.40 (<span class="highlight-pill">-35.47%</span>)</strong></td>
+        <td>0.79 ± 0.52 (+2.43%)</td>
+        <td><strong class="p-sig">p = 0.027*</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Body Weight (kg)</strong></td>
+        <td>69.67 ± 7.63 kg</td>
+        <td><strong>68.42 ± 7.70 kg (-1.25 kg)</strong></td>
+        <td>69.69 ± 5.67 kg (-0.10 kg)</td>
+        <td><strong class="p-sig">p = 0.005*</strong></td>
+      </tr>
+      <tr>
+        <td><strong>BMI (kg/m²)</strong></td>
+        <td>26.31 ± 2.14 kg/m²</td>
+        <td><strong>25.85 ± 2.27 kg/m² (-1.77%)</strong></td>
+        <td>26.59 ± 2.00 kg/m² (-0.21%)</td>
+        <td><strong class="p-sig">p = 0.013*</strong></td>
+      </tr>
+      <tr>
+        <td>Fatigue Scale (FSS)</td>
+        <td>33.34 ± 11.11</td>
+        <td><strong>29.30 ± 8.71 (-12.12%)</strong></td>
+        <td>31.98 ± 7.73 (-4.64%)</td>
+        <td><strong class="p-sig">p = 0.012*</strong></td>
+      </tr>
+      <tr>
+        <td>Treatment Satisfaction</td>
+        <td>38% Satisfied</td>
+        <td><strong>80% Satisfied</strong></td>
+        <td>50% Satisfied</td>
+        <td><strong class="p-sig">p = 0.0001*</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 4: Safety & Tolerability -->
+  <h2 class="section-title">4. Safety, Organ Function & Tolerability (Tables 14-17)</h2>
+  <div style="background: var(--bg-light); padding: 18px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.92rem;">
+    <ul style="padding-left: 20px; line-height: 1.8;">
+      <li><strong>Complete Blood Count (CBC):</strong> Total leukocyte counts, neutrophils, lymphocytes, RBC, platelets, and hemoglobin remained strictly within healthy normal physiological ranges.</li>
+      <li><strong>Liver Function Test (LFT):</strong> Bilirubin, SGOT (28.30 U/L), SGPT (33.00 U/L), Alkaline Phosphatase, and Total Proteins demonstrated zero hepatotoxicity.</li>
+      <li><strong>Renal Function Test (RFT):</strong> Blood Urea Nitrogen, Serum Creatinine (0.85 mg/dL), and Glomerular Filtration Rate (GFR: 149.60 ml/min) showed healthy renal filtration and no nephrotoxicity.</li>
+      <li><strong>Vital Signs:</strong> Blood pressure (Systolic: ~122 mmHg, Diastolic: ~78 mmHg), Pulse rate (~78 bpm), and Body Temperature showed zero systemic instability.</li>
+      <li><strong>Adverse Events:</strong> <strong>ZERO (0) Adverse Drug Reactions (ADRs)</strong> or Serious Adverse Events were observed or reported.</li>
+      <li><strong>Compliance & Tolerability:</strong> <strong>100% compliance rate</strong> and a score of <strong>03/03 (Excellent Tolerability)</strong> across all participants.</li>
+    </ul>
+  </div>
+
+  <!-- Section 5: Annexure 180-Day Extension Phase -->
+  <h2 class="section-title">5. Annexure: 180-Day Long-Term Extension Phase</h2>
+  <p style="margin-bottom: 12px; font-size: 0.92rem; color: var(--text-muted);">
+    Following the initial 90-day double-blind trial, 18 responders continued Antox-D liquid therapy up to Day 180 to evaluate sustained long-term efficacy:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Biomarker</th>
+        <th>Baseline (Day 1)</th>
+        <th>Day 90</th>
+        <th>Day 180 (End of Extension)</th>
+        <th>Total Improvement</th>
+        <th>P-Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Fasting Glucose (FPG)</strong></td>
+        <td>126.44 ± 16.92 mg/dL</td>
+        <td>121.44 ± 16.30 mg/dL</td>
+        <td><strong>110.61 ± 7.75 mg/dL</strong></td>
+        <td><span class="highlight-pill">-12.52%</span></td>
+        <td><strong class="p-sig">p = 0.001*</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Postprandial Glucose (PPG)</strong></td>
+        <td>187.87 ± 37.86 mg/dL</td>
+        <td>157.44 ± 26.25 mg/dL</td>
+        <td><strong>136.17 ± 13.61 mg/dL</strong></td>
+        <td><span class="highlight-pill">-27.52%</span></td>
+        <td><strong class="p-sig">p < 0.0001*</strong></td>
+      </tr>
+      <tr>
+        <td><strong>HbA1c Levels</strong></td>
+        <td>7.39 ± 0.24%</td>
+        <td>6.63 ± 0.23%</td>
+        <td><strong>6.27 ± 0.53%</strong></td>
+        <td><span class="highlight-pill">-15.11%</span></td>
+        <td><strong class="p-sig">p < 0.0001*</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Fasting Insulin</strong></td>
+        <td>38.73 ± 11.29 mIU/L</td>
+        <td>35.48 ± 9.95 mIU/L</td>
+        <td><strong>18.93 ± 3.05 mIU/L</strong></td>
+        <td><span class="highlight-pill">-51.13%</span></td>
+        <td>Sustained Control</td>
+      </tr>
+      <tr>
+        <td><strong>HOMA-IR (Resistance)</strong></td>
+        <td>13.63 ± 3.57</td>
+        <td>10.48 ± 2.84</td>
+        <td><strong>5.02 ± 1.03</strong></td>
+        <td><span class="highlight-pill">-63.18%</span></td>
+        <td>Remarkable Recovery</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Official Conclusion Statement -->
+  <h2 class="section-title">6. Official Study Conclusion</h2>
+  <div style="background: #e2faea; border-left: 4px solid var(--primary); padding: 18px 22px; border-radius: 0 8px 8px 0; margin-bottom: 30px;">
+    <p style="font-size: 0.96rem; font-weight: 600; color: var(--primary-dark);">
+      "The findings of this Phase II randomized, double-blind, placebo-controlled clinical trial demonstrate that Antox-D liquid serves as a safe, potent, and highly effective adjunctive nutraceutical intervention in patients with Type 2 Diabetes Mellitus. Significant improvements were achieved in HbA1c reduction (p = 0.0002), fasting and postprandial glucose regulation, profound reversal of insulin resistance (HOMA-IR reduction of 16.49% at Day 90 and 63.18% at Day 180), significant lowering of LDL cholesterol (p = 0.0006), reduction in metabolic syndrome severity (p = 0.027), weight management, and enhancement of overall diabetes-related quality of life — with 100% tolerability and zero adverse events."
+    </p>
+  </div>
+
+  <!-- Signatories & Contacts -->
+  <div class="signatory-box">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+      <div>
+        <div style="font-weight: 800; color: var(--primary);">SPONSOR SIGNATORY</div>
+        <div style="margin-top: 8px; font-weight: 700;">Nutrifeel Health Products Pvt. Ltd.</div>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">
+          Mr. Sadik Gous Shaikh, Director<br/>
+          456-57 Vasant Park Sugar Mill Road, Kasaba Bavada, Kolhapur - 416006
+        </div>
+      </div>
+      <div>
+        <div style="font-weight: 800; color: var(--primary);">CONTRACT RESEARCH ORGANIZATION</div>
+        <div style="margin-top: 8px; font-weight: 700;">Mprex Healthcare Pvt. Ltd.</div>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">
+          Dr. Gayatri Ganu, Managing Director<br/>
+          Office 813-816, Sai Millenium, Punawale, Pune - 411033
+        </div>
+      </div>
+      <div>
+        <div style="font-weight: 800; color: var(--primary);">COMMUNITY & PRO DESK</div>
+        <div style="margin-top: 8px; font-weight: 700;">Sahara Social Foundation</div>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">
+          Kolhapur, Maharashtra (Reg. MAH/582/2014/KOP)<br/>
+          Counseling & PRO Helpline: <strong>+91 7745066707</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 30px; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 20px;">
+    Document Ref: MHC/CT/25-26/007 (Version 2.00) • CTRI/2025/10/095664 • Published & Archived for Clinical Verification
+  </div>
+</div>
+
+</body>
+</html>

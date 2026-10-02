@@ -36,7 +36,7 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
         backgroundColor: '#ffffff',
         borderRadius: '16px',
         padding: '1.5rem',
-        border: '1px solid #e2e8f0',
+        border: '1px solid #E1E9DF',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative'
@@ -49,23 +49,23 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
           width: '54px',
           height: '54px',
           borderRadius: '14px',
-          backgroundColor: '#dbf7fa',
-          color: '#087E8B',
+          backgroundColor: '#e2faea',
+          color: '#006B2D',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: '1.25rem',
-          border: '1px solid #abedf5'
+          border: '1px solid #c2f5d2'
         }}
       >
         <IconComponent size={26} />
       </div>
 
-      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#12355B', marginBottom: '0.5rem' }}>
+      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#17251B', marginBottom: '0.5rem' }}>
         {language === 'mr' ? service.nameMr : service.nameEn}
       </h3>
 
-      <p style={{ fontSize: '0.88rem', color: '#4f6182', lineHeight: 1.55, marginBottom: '1.25rem' }}>
+      <p style={{ fontSize: '0.88rem', color: '#5F6B61', lineHeight: 1.55, marginBottom: '1.25rem' }}>
         {language === 'mr' ? service.descMr : service.descEn}
       </p>
 
@@ -73,12 +73,12 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
         <div style={{
           marginTop: 'auto',
           paddingTop: '0.85rem',
-          borderTop: '1px dashed #e2eaf4',
+          borderTop: '1px dashed #E1E9DF',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span style={{ fontSize: '0.78rem', color: '#087E8B', fontWeight: 600 }}>
+          <span style={{ fontSize: '0.78rem', color: '#006B2D', fontWeight: 600 }}>
             {service.popularProduct}
           </span>
           <Link
@@ -86,7 +86,7 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
             style={{
               fontSize: '0.82rem',
               fontWeight: 700,
-              color: '#087E8B',
+              color: '#006B2D',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.25rem'
@@ -106,8 +106,8 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
 
         .service-card-animated:hover {
           transform: translateY(-6px);
-          box-shadow: 0 16px 32px rgba(18, 53, 91, 0.12);
-          border-color: #087E8B;
+          box-shadow: 0 16px 32px rgba(0, 107, 45, 0.12);
+          border-color: #006B2D;
         }
 
         .service-card-animated .trust-card-icon-wrap {
@@ -116,7 +116,7 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
 
         .service-card-animated:hover .trust-card-icon-wrap {
           transform: scale(1.08) rotate(3deg);
-          background-color: #087E8B;
+          background-color: #006B2D;
           color: #ffffff;
         }
 

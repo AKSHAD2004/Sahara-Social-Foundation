@@ -26,6 +26,7 @@ import Account from './pages/Account';
 import Affiliate from './pages/Affiliate';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
+import StudyReport from './pages/StudyReport';
 import NotFound from './pages/NotFound';
 
 // Context Providers
@@ -108,6 +109,10 @@ function PublicLayout() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/refund_returns" element={<RefundPolicy />} />
+          <Route path="/study-report" element={<StudyReport />} />
+          <Route path="/clinical-report" element={<StudyReport />} />
+          <Route path="/clinical-reports" element={<StudyReport />} />
+          <Route path="/report" element={<StudyReport />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

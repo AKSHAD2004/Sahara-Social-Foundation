@@ -34,12 +34,20 @@ export default function ProductList() {
 
   useEffect(() => {
     const unsub = dbService.subscribe('products', (prods) => {
+      const validIds = new Set(initialProducts.map((p) => p.id));
       if (!prods || prods.length === 0) {
         // Automatically populate with initial official products if empty
         dbService.setCollection('products', initialProducts);
         setProducts(initialProducts);
       } else {
-        setProducts(prods);
+        const filtered = prods.filter((p) => validIds.has(p.id));
+        if (filtered.length !== prods.length || filtered.length === 0) {
+          const toSave = filtered.length > 0 ? filtered : initialProducts;
+          dbService.setCollection('products', toSave);
+          setProducts(toSave);
+        } else {
+          setProducts(filtered);
+        }
       }
     });
     return unsub;
@@ -199,9 +207,9 @@ export default function ProductList() {
                 <th>SKU & Category</th>
                 <th>MRP / Price</th>
                 <th>Stock</th>
-                <th>Commission Eligible</th>
+                <th style={{ textAlign: 'center' }}>Edit Product</th>
+                <th>Commission</th>
                 <th>Status</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -217,7 +225,7 @@ export default function ProductList() {
                             e.target.onerror = null;
                             e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100';
                           }}
-                          style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #e2e8f0' }}
+                          style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }}
                         />
                         <div>
                           <strong style={{ color: '#1e293b' }}>{prod.name}</strong>
@@ -242,6 +250,16 @@ export default function ProductList() {
                         {prod.stock} units
                       </strong>
                     </td>
+                    <td style={{ textAlign: 'center' }}>
+                      <button
+                        className="crm-btn crm-btn-primary crm-btn-sm"
+                        onClick={() => handleOpenEdit(prod)}
+                        title="Edit Product"
+                        style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.75rem' }}
+                      >
+                        <Edit size={14} /> Edit
+                      </button>
+                    </td>
                     <td>
                       <button
                         className={`crm-btn crm-btn-sm ${prod.commissionEligible !== false ? 'crm-btn-primary' : 'crm-btn-secondary'}`}
@@ -255,25 +273,6 @@ export default function ProductList() {
                       <span className={`badge ${prod.status === 'active' ? 'badge-success' : 'badge-danger'}`}>
                         {prod.status}
                       </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '0.4rem' }}>
-                        <button
-                          className="crm-btn crm-btn-secondary crm-btn-sm"
-                          onClick={() => handleOpenEdit(prod)}
-                          title="Edit Product"
-                        >
-                          <Edit size={13} /> Edit
-                        </button>
-                        <button
-                          className="crm-icon-btn"
-                          style={{ width: '28px', height: '28px', color: '#ef4444' }}
-                          onClick={() => handleDeleteProduct(prod.id)}
-                          title="Delete"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
                     </td>
                   </tr>
                 ))
@@ -346,12 +345,9 @@ export default function ProductList() {
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               >
                 <option value="Diabetes">Diabetes</option>
-                <option value="Panchakarm">Panchakarm</option>
                 <option value="Heart Liver Kidney">Heart Liver Kidney</option>
-                <option value="Bones">Bones / Joints</option>
-                <option value="Addiction">Addiction Recovery</option>
-                <option value="Acidity">Acidity & Gut</option>
-                <option value="Sexual Health">Vitality & Wellness</option>
+                <option value="Addiction">Addiction</option>
+                <option value="Bones">Bones</option>
               </select>
             </div>
 

@@ -5,19 +5,22 @@ import { dbService } from '../services/db';
 import { firebaseAuthService } from '../services/firebaseAuth';
 import { isFirebaseConfigured, auth as fbAuth } from '../services/firebase';
 
-const AuthContext = createContext(null);
+// Stable context singleton to prevent HMR and duplicate bundle invalidation
+const AuthContext = (typeof window !== 'undefined' && window.__SAHARA_AUTH_CTX__)
+  ? window.__SAHARA_AUTH_CTX__
+  : (typeof window !== 'undefined' ? (window.__SAHARA_AUTH_CTX__ = createContext(null)) : createContext(null));
 
 const STORAGE_AUTH_KEY = 'sahara_crm_current_user';
 const CUSTOMER_STORAGE_KEY = 'sahara_customer_user';
 
 export function AuthProvider({ children }) {
-  // Default to Super Admin so the CRM is immediately interactive
+  // Require authentication to access CRM (defaults to null so login page is displayed first)
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_AUTH_KEY);
       if (saved) return JSON.parse(saved);
     } catch (e) {}
-    return initialUsers[0]; // Dr. Sharad Patil (Super Admin)
+    return null;
   });
 
   // Customer Authentication for eCommerce Buyers
@@ -66,10 +69,14 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       if (isFirebaseConfigured && fbAuth) {
-        const userProfile = await firebaseAuthService.login(email, password);
-        setCurrentUser(userProfile);
-        localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify(userProfile));
-        return userProfile;
+        try {
+          const userProfile = await firebaseAuthService.login(email, password);
+          setCurrentUser(userProfile);
+          localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify(userProfile));
+          return userProfile;
+        } catch (fbErr) {
+          console.warn('Firebase Auth sign-in failed, checking system users:', fbErr.message);
+        }
       }
 
       // Local fallback auth
@@ -231,7 +238,30 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    return {
+      currentUser: null,
+      customerUser: null,
+      isCustomerLoggedIn: false,
+      isCustomerAuthModalOpen: false,
+      openCustomerAuthModal: () => {},
+      closeCustomerAuthModal: () => {},
+      loginCustomer: () => null,
+      logoutCustomer: () => {},
+      loading: false,
+      availableUsers: initialUsers,
+      isFirebaseConfigured,
+      login: async () => null,
+      logout: async () => {},
+      switchUser: () => {},
+      hasRole: () => false,
+      hasAnyRole: () => false,
+      isSuperAdmin: false,
+      isAdmin: false,
+      isManager: false,
+      isSales: false,
+      isAffiliate: false,
+      isSupport: false
+    };
   }
   return context;
 }

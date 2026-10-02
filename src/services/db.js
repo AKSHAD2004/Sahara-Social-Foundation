@@ -60,8 +60,32 @@ function initCollection(collectionName, defaultData) {
     const stored = localStorage.getItem(key);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // For core catalogs (products, commissionSlabs, users), ensure they don't remain empty
-      if (Array.isArray(parsed) && parsed.length === 0 && Array.isArray(defaultData) && defaultData.length > 0) {
+      // For products collection, ensure all official products exist with updated official pricing (3200 for combos, 1600 for singles)
+      if (collectionName === 'products' && Array.isArray(defaultData)) {
+        const defaultMap = new Map(defaultData.map((p) => [p.id, p]));
+        const existingList = Array.isArray(parsed) ? parsed : [];
+        const merged = defaultData.map((defProd) => {
+          const found = existingList.find((p) => p.id === defProd.id);
+          if (found) {
+            // Keep stock or custom description if present, but always enforce updated official pricing and names
+            return {
+              ...found,
+              name: defProd.name,
+              price: defProd.price,
+              sellingPrice: defProd.sellingPrice,
+              mrp: defProd.mrp,
+              isCombo: defProd.isCombo,
+              image: defProd.image || found.image
+            };
+          }
+          return defProd;
+        });
+        state[collectionName] = merged;
+      } else if (collectionName === 'settings' && parsed && defaultData) {
+        const mergedSettings = { ...parsed, phone: defaultData.phone, whatsappNumber: defaultData.whatsappNumber };
+        state[collectionName] = mergedSettings;
+        localStorage.setItem(key, JSON.stringify(mergedSettings));
+      } else if (Array.isArray(parsed) && parsed.length === 0 && Array.isArray(defaultData) && defaultData.length > 0) {
         state[collectionName] = defaultData;
         localStorage.setItem(key, JSON.stringify(defaultData));
       } else {
@@ -646,7 +670,7 @@ export const dbService = {
   },
 
   /**
-   * Seed all CRM collections directly into Cloud Firestore with 1 click
+   * Seed and update all CRM collections directly into Cloud Firestore
    */
   async seedFirestore() {
     if (!isFirebaseConfigured || !firestoreDb) {
@@ -654,30 +678,38 @@ export const dbService = {
     }
 
     const dataMap = {
-      users: initialUsers,
-      customers: initialCustomers,
-      leads: initialLeads,
-      followups: initialFollowups,
-      orders: initialOrders,
-      products: initialProducts,
-      commissionSlabs: initialCommissionSlabs,
-      commissionTransactions: initialCommissionTransactions,
-      commissionPayouts: initialPayouts,
-      supportTickets: initialSupportTickets,
-      auditLogs: initialAuditLogs
+      users: (state.users && state.users.length > 0) ? state.users : initialUsers,
+      customers: state.customers || [],
+      leads: state.leads || [],
+      followups: state.followups || [],
+      orders: state.orders || [],
+      products: (state.products && state.products.length > 0) ? state.products : initialProducts,
+      commissionSlabs: (state.commissionSlabs && state.commissionSlabs.length > 0) ? state.commissionSlabs : initialCommissionSlabs,
+      commissionTransactions: state.commissionTransactions || [],
+      commissionPayouts: state.commissionPayouts || [],
+      supportTickets: state.supportTickets || [],
+      auditLogs: state.auditLogs || []
     };
 
     let count = 0;
     for (const [colName, items] of Object.entries(dataMap)) {
-      for (const item of items) {
-        const docRef = doc(firestoreDb, colName, item.id);
-        await setDoc(docRef, { ...item, syncedAt: new Date().toISOString() }, { merge: true });
-        count++;
+      if (Array.isArray(items)) {
+        for (const item of items) {
+          const docId = item.id || `${colName}_${Date.now()}_${Math.random()}`;
+          const docRef = doc(firestoreDb, colName, docId);
+          await setDoc(docRef, { ...item, id: docId, syncedAt: new Date().toISOString() }, { merge: true });
+          count++;
+        }
       }
     }
 
     // Save settings document
-    await setDoc(doc(firestoreDb, 'settings', 'company_settings'), initialSettings, { merge: true });
+    const currentSettings = state.settings || initialSettings;
+    await setDoc(doc(firestoreDb, 'settings', 'company_settings'), {
+      ...currentSettings,
+      syncedAt: new Date().toISOString()
+    }, { merge: true });
+    count++;
 
     return { success: true, seededCount: count };
   }

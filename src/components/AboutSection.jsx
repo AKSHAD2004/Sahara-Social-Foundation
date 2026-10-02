@@ -72,28 +72,28 @@ const AboutSection = () => {
   }, []);
 
   const stats = [
-    { target: 18, suffix: '+', labelEn: 'Years Experience', labelMr: 'वर्षांचा अखंड अनुभव', icon: <Calendar size={18} style={{ color: '#087E8B' }} /> },
-    { target: 500, suffix: '+', labelEn: 'Social Programs', labelMr: 'आरोग्य शिबिरे व कार्यक्रम', icon: <Award size={18} style={{ color: '#F4A261' }} /> },
-    { target: 10000, suffix: '+', labelEn: 'Lives Impacted', labelMr: 'लाभार्थी व नागरिक', icon: <Users size={18} style={{ color: '#0da3b3' }} /> }
+    { target: 18, suffix: '+', labelEn: 'Years Experience', labelMr: 'वर्षांचा अखंड अनुभव', icon: <Calendar size={18} style={{ color: '#006B2D' }} /> },
+    { target: 500, suffix: '+', labelEn: 'Social Programs', labelMr: 'आरोग्य शिबिरे व कार्यक्रम', icon: <Award size={18} style={{ color: '#FFC928' }} /> },
+    { target: 10000, suffix: '+', labelEn: 'Lives Impacted', labelMr: 'लाभार्थी व नागरिक', icon: <Users size={18} style={{ color: '#159B32' }} /> }
   ];
 
   return (
-    <section ref={sectionRef} className={`section about-section ${inView ? 'about-in-view' : ''}`} style={{ backgroundColor: '#F5F7FA', overflow: 'hidden' }}>
+    <section ref={sectionRef} className={`section about-section ${inView ? 'about-in-view' : ''}`} style={{ backgroundColor: '#ffffff', overflow: 'hidden' }}>
       <div className="container">
         <div className="about-grid">
           {/* Left Column: Visual & Badges (Slides from Left with Mask Reveal) */}
           <div className="about-visual-wrapper">
             <div className="about-visual-card">
               <div className="about-mask-reveal-box">
-                <div className="about-logo-box">
+                <div className="about-logo-box" style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'center' }}>
                   <MissionLogoBadge size={190} />
                 </div>
               </div>
-              <div style={{ textAlign: 'center', color: '#12355B' }}>
+              <div style={{ textAlign: 'center', color: '#006B2D' }}>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.25rem' }}>
                   {language === 'mr' ? 'सहारा सोशल फाऊंडेशन' : 'Sahara Social Foundation'}
                 </div>
-                <div style={{ fontSize: '0.84rem', color: '#087E8B', fontWeight: 600 }}>
+                <div style={{ fontSize: '0.84rem', color: '#159B32', fontWeight: 600 }}>
                   {language === 'mr' ? 'मधुमेहमुक्त व व्यसनमुक्त भारत अभियान • कोल्हापूर' : 'Diabetes Free & Addiction Free Mission • Kolhapur'}
                 </div>
               </div>
@@ -101,12 +101,12 @@ const AboutSection = () => {
 
             {/* Floating Experience Badge */}
             <div className="about-float-badge">
-              <Building2 size={24} style={{ color: '#087E8B', flexShrink: 0 }} />
+              <Building2 size={24} style={{ color: '#006B2D', flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#12355B' }}>
+                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#006B2D' }}>
                   {language === 'mr' ? 'शाहूपुरी, कोल्हापूर' : 'Shahupuri, Kolhapur'}
                 </div>
-                <div style={{ fontSize: '0.74rem', color: '#4f6182' }}>
+                <div style={{ fontSize: '0.74rem', color: '#5F6B61' }}>
                   {language === 'mr' ? 'रॉयल प्रेस्टीज संकुल' : 'Royal Prestige Complex'}
                 </div>
               </div>
@@ -150,12 +150,12 @@ const AboutSection = () => {
               {/* Mission Card */}
               <div className="about-card-mission">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                  <Target size={18} style={{ color: '#087E8B' }} />
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#12355B', margin: 0 }}>
+                  <Target size={18} style={{ color: '#006B2D' }} />
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#006B2D', margin: 0 }}>
                     {language === 'mr' ? 'आमचे ध्येय (Our Mission)' : 'Our Mission'}
                   </h3>
                 </div>
-                <p style={{ fontSize: '0.88rem', color: '#4f6182', lineHeight: 1.5, margin: 0 }}>
+                <p style={{ fontSize: '0.88rem', color: '#5F6B61', lineHeight: 1.5, margin: 0 }}>
                   {language === 'mr' ? organizationInfo.about.missionMr : organizationInfo.about.missionEn}
                 </p>
               </div>
@@ -163,12 +163,12 @@ const AboutSection = () => {
               {/* Vision Card */}
               <div className="about-card-vision">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                  <Eye size={18} style={{ color: '#F4A261' }} />
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#c2530c', margin: 0 }}>
+                  <Eye size={18} style={{ color: '#D4AF37' }} />
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#785300', margin: 0 }}>
                     {language === 'mr' ? 'आमची दूरदृष्टी (Our Vision)' : 'Our Vision'}
                   </h3>
                 </div>
-                <p style={{ fontSize: '0.88rem', color: '#4f6182', lineHeight: 1.5, margin: 0 }}>
+                <p style={{ fontSize: '0.88rem', color: '#5F6B61', lineHeight: 1.5, margin: 0 }}>
                   {language === 'mr' ? organizationInfo.about.visionMr : organizationInfo.about.visionEn}
                 </p>
               </div>
@@ -222,10 +222,10 @@ const AboutSection = () => {
         .about-visual-card {
           border-radius: 24px;
           overflow: hidden;
-          box-shadow: 0 16px 35px rgba(18,53,91,0.08);
+          box-shadow: 0 16px 36px rgba(0, 107, 45, 0.09), 0 0 20px rgba(212, 175, 55, 0.12);
           position: relative;
-          background: linear-gradient(135deg, #ffffff 0%, #e2effc 100%);
-          border: 1px solid #e2eaf4;
+          background: linear-gradient(145deg, #ffffff 0%, #F3F8F1 65%, #eaf5e7 100%);
+          border: 1.5px solid #E1E9DF;
           min-height: 380px;
           display: flex;
           flex-direction: column;
@@ -248,8 +248,8 @@ const AboutSection = () => {
           background-color: #ffffff;
           border-radius: 14px;
           padding: 0.75rem 1rem;
-          box-shadow: 0 10px 25px rgba(18,53,91,0.12);
-          border: 1px solid #e2eaf4;
+          box-shadow: 0 10px 25px rgba(0, 107, 45, 0.10);
+          border: 1.5px solid #E1E9DF;
           display: flex;
           align-items: center;
           gap: 0.65rem;
@@ -272,12 +272,12 @@ const AboutSection = () => {
         .about-heading {
           font-size: clamp(1.45rem, 3vw + 0.4rem, 2.1rem);
           margin-bottom: 0.85rem;
-          color: #12355B;
+          color: #006B2D;
         }
 
         .about-description {
           font-size: clamp(0.92rem, 1vw + 0.4rem, 1.05rem);
-          color: #374765;
+          color: #5F6B61;
           line-height: 1.65;
           margin-bottom: 1.2rem;
         }
@@ -294,8 +294,8 @@ const AboutSection = () => {
           background-color: #ffffff;
           border-radius: 14px;
           padding: 0.85rem 1rem;
-          border: 1px solid #e2eaf4;
-          box-shadow: 0 4px 12px rgba(18, 53, 91, 0.04);
+          border: 1px solid #E1E9DF;
+          box-shadow: 0 4px 12px rgba(0, 107, 45, 0.05);
           opacity: 0;
           transform: translateY(18px);
           transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -320,13 +320,13 @@ const AboutSection = () => {
         .about-stat-number {
           font-size: 1.25rem;
           font-weight: 800;
-          color: #12355B;
+          color: #006B2D;
           font-family: 'Baloo 2', sans-serif;
         }
 
         .about-stat-label {
           font-size: 0.74rem;
-          color: #4f6182;
+          color: #5F6B61;
           font-weight: 600;
           line-height: 1.3;
         }
@@ -342,18 +342,18 @@ const AboutSection = () => {
           background-color: #ffffff;
           border-radius: 12px;
           padding: 1rem 1.15rem;
-          border: 1px solid #e2eaf4;
-          border-left: 4px solid #087E8B;
-          box-shadow: 0 2px 6px rgba(18,53,91,0.04);
+          border: 1px solid #E1E9DF;
+          border-left: 4px solid #006B2D;
+          box-shadow: 0 2px 6px rgba(0, 107, 45, 0.04);
         }
 
         .about-card-vision {
           background-color: #ffffff;
           border-radius: 12px;
           padding: 1rem 1.15rem;
-          border: 1px solid #e2eaf4;
-          border-left: 4px solid #F4A261;
-          box-shadow: 0 2px 6px rgba(18,53,91,0.04);
+          border: 1px solid #E1E9DF;
+          border-left: 4px solid #FFC928;
+          box-shadow: 0 2px 6px rgba(0, 107, 45, 0.04);
         }
 
         .about-btn-group {

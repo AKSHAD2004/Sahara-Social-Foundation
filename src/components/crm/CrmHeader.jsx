@@ -249,7 +249,10 @@ export default function CrmHeader({ onToggleMobile }) {
         {/* Logout */}
         <button 
           className="crm-icon-btn" 
-          onClick={logout} 
+          onClick={async () => {
+            await logout();
+            navigate('/crm/login', { replace: true });
+          }} 
           title="Sign out of CRM"
         >
           <LogOut size={18} />

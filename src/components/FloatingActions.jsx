@@ -24,12 +24,12 @@ const FloatingActions = () => {
           width: '52px',
           height: '52px',
           borderRadius: '50%',
-          backgroundColor: '#0284c7',
+          backgroundColor: '#006B2D',
           color: '#ffffff',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 8px 25px rgba(2, 132, 199, 0.4)',
+          boxShadow: '0 8px 25px rgba(0, 107, 45, 0.4)',
           transition: 'all 0.25s ease'
         }}
         title={`Call Helpline: ${organizationInfo.contact.primaryPhone}`}

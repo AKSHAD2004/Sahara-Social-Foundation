@@ -9,7 +9,7 @@ const RefundPolicy = () => {
   const policy = policiesData.refundPolicy;
 
   return (
-    <div className="policy-page" style={{ backgroundColor: '#f8fafc', padding: '3.5rem 0 5.5rem 0' }}>
+    <div className="policy-page" style={{ backgroundColor: '#F3F8F1', padding: '3.5rem 0 5.5rem 0' }}>
       <div className="container" style={{ maxWidth: '860px' }}>
         <div style={{ marginBottom: '1.5rem' }}>
           <Link
@@ -18,9 +18,9 @@ const RefundPolicy = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              color: '#059669',
+              color: '#006B2D',
               fontSize: '0.9rem',
-              fontWeight: 600
+              fontWeight: 700
             }}
           >
             <ArrowLeft size={16} />
@@ -32,25 +32,25 @@ const RefundPolicy = () => {
           backgroundColor: '#ffffff',
           borderRadius: '24px',
           padding: '3rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.03)'
+          border: '1px solid #E1E9DF',
+          boxShadow: '0 8px 30px rgba(0,107,45,0.04)'
         }}>
           <div className="section-badge" style={{ marginBottom: '1rem' }}>
             <RotateCcw size={16} />
             <span>{language === 'mr' ? 'परतावा व बदली' : 'Refund & Returns'}</span>
           </div>
 
-          <h1 style={{ fontSize: '2.2rem', color: '#064e3b', fontWeight: 800, marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2.2rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? policy.titleMr : policy.titleEn}
           </h1>
 
-          <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '2rem' }}>
+          <div style={{ fontSize: '0.85rem', color: '#5F6B61', marginBottom: '2rem' }}>
             Last updated: {policy.lastUpdated}
           </div>
 
           <div style={{
             fontSize: '1rem',
-            color: '#334155',
+            color: '#17251B',
             lineHeight: 1.8,
             whiteSpace: 'pre-line'
           }}>

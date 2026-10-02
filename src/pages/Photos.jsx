@@ -25,21 +25,16 @@ const Photos = () => {
   return (
     <div className="photos-page">
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
-        color: '#ffffff',
-        padding: '3.5rem 0',
-        textAlign: 'center'
-      }}>
+      <div className="page-hero-header">
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(244,162,97,0.2)', color: '#F4A261', border: '1px solid rgba(244,162,97,0.4)' }}>
-            <ImageIcon size={16} />
+          <div className="section-badge">
+            <ImageIcon size={14} />
             <span>{language === 'mr' ? 'छायाचित्रे संग्रह' : 'Official Photo Gallery'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
+          <h1>
             {language === 'mr' ? 'सहारा सोशल फाऊंडेशनचे आरोग्य उपक्रम व शिबिरे' : 'Field Activities & Health Camps'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#e2effc', maxWidth: '750px', margin: '0 auto' }}>
+          <p>
             {language === 'mr'
               ? 'मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियानाची महाराष्ट्रभरातील शिबिरे, रुग्ण संवाद आणि अधिकृत उपक्रमांचे फोटो.'
               : 'Official photo documentation of nationwide health checkup drives, patient counseling sessions, and social outreach.'}
@@ -47,10 +42,10 @@ const Photos = () => {
         </div>
       </div>
 
-      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
+      <section className="section" style={{ backgroundColor: '#F3F8F1' }}>
         <div className="container">
           {/* Category Filter Chips */}
-          <div style={{
+          <div className="photos-filter-chips" style={{
             display: 'flex',
             justifyContent: 'center',
             gap: '0.6rem',
@@ -69,11 +64,11 @@ const Photos = () => {
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     border: '1.5px solid',
-                    borderColor: isActive ? '#087E8B' : '#e2eaf4',
-                    backgroundColor: isActive ? '#087E8B' : '#ffffff',
-                    color: isActive ? '#ffffff' : '#172033',
+                    borderColor: isActive ? '#006B2D' : '#E1E9DF',
+                    backgroundColor: isActive ? '#006B2D' : '#ffffff',
+                    color: isActive ? '#ffffff' : '#17251B',
                     cursor: 'pointer',
-                    boxShadow: isActive ? '0 4px 12px rgba(8, 126, 139, 0.25)' : '0 2px 6px rgba(18,53,91,0.04)',
+                    boxShadow: isActive ? '0 4px 12px rgba(0, 107, 45, 0.25)' : '0 2px 6px rgba(0, 107, 45, 0.04)',
                     transition: 'all 0.2s ease'
                   }}
                 >
@@ -94,10 +89,10 @@ const Photos = () => {
                   overflow: 'hidden',
                   position: 'relative',
                   height: '300px',
-                  boxShadow: '0 6px 20px rgba(18,53,91,0.06)',
+                  boxShadow: '0 6px 20px rgba(0, 107, 45, 0.06)',
                   cursor: 'pointer',
-                  backgroundColor: '#0a1b2e',
-                  border: '1px solid #e2eaf4'
+                  backgroundColor: '#04200e',
+                  border: '1px solid #E1E9DF'
                 }}
                 className="card"
               >
@@ -119,7 +114,7 @@ const Photos = () => {
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(to top, rgba(18, 53, 91, 0.95) 0%, rgba(18, 53, 91, 0.3) 50%, transparent 80%)',
+                  background: 'linear-gradient(to top, rgba(4, 32, 14, 0.95) 0%, rgba(4, 32, 14, 0.3) 50%, transparent 80%)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'flex-end',
@@ -132,7 +127,7 @@ const Photos = () => {
                     marginBottom: '0.4rem'
                   }}>
                     <span style={{
-                      backgroundColor: '#087E8B',
+                      backgroundColor: '#006B2D',
                       color: '#ffffff',
                       fontSize: '0.72rem',
                       fontWeight: 700,
@@ -167,21 +162,21 @@ const Photos = () => {
           </div>
 
           {/* Social Contact Strip */}
-          <div style={{
+          <div className="photos-camp-callout" style={{
             marginTop: '4rem',
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '2.5rem',
-            border: '1px solid #e2eaf4',
-            boxShadow: '0 10px 30px rgba(18,53,91,0.05)',
+            border: '1px solid #E1E9DF',
+            boxShadow: '0 10px 30px rgba(0, 107, 45, 0.05)',
             textAlign: 'center',
             maxWidth: '840px',
             margin: '4rem auto 0 auto'
           }}>
-            <h3 style={{ fontSize: '1.5rem', color: '#12355B', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
+            <h3 style={{ fontSize: '1.5rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'आमच्या पुढील आरोग्य शिबिरात सहभागी व्हा' : 'Join Our Next Health Checkup Camp'}
             </h3>
-            <p style={{ color: '#4f6182', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+            <p style={{ color: '#5F6B61', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
               {language === 'mr'
                 ? 'अधिक माहितीसाठी किंवा आपल्या गावात/संस्थेत शिबीर आयोजित करण्यासाठी संपर्क साधा.'
                 : 'Call our Kolhapur helpline to organize or participate in upcoming awareness camps.'}
@@ -210,6 +205,28 @@ const Photos = () => {
         </div>
       </section>
 
+      <style>{`
+        @media (max-width: 640px) {
+          .photos-filter-chips {
+            margin-bottom: 1.25rem !important;
+            gap: 0.4rem !important;
+          }
+          .photos-camp-callout {
+            margin-top: 1.5rem !important;
+            padding: 1.25rem 1rem !important;
+            border-radius: 14px !important;
+          }
+          .photos-camp-callout h3 {
+            font-size: 1.2rem !important;
+            margin-bottom: 0.35rem !important;
+          }
+          .photos-camp-callout p {
+            font-size: 0.82rem !important;
+            margin-bottom: 1rem !important;
+          }
+        }
+      `}</style>
+
       {/* Lightbox Modal */}
       {activePhoto && (
         <div className="modal-overlay" onClick={() => setActivePhoto(null)}>
@@ -232,7 +249,7 @@ const Photos = () => {
 
             <div style={{
               padding: '1.25rem 1.5rem',
-              backgroundColor: '#12355B',
+              backgroundColor: '#04200e',
               color: '#ffffff',
               display: 'flex',
               justifyContent: 'space-between',

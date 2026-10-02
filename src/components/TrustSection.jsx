@@ -13,28 +13,28 @@ const TrustSection = () => {
 
   const trustPoints = [
     {
-      icon: <Leaf size={26} style={{ color: '#087E8B' }} />,
+      icon: <Leaf size={26} style={{ color: '#006B2D' }} />,
       titleEn: "Pure Ayurvedic Formulations",
       titleMr: "१००% शुद्ध आयुर्वेदिक औषधी",
       descEn: "Natural herbal ingredients prepared under Ayurvedic safety standards with zero harmful chemicals.",
       descMr: "कोणत्याही घातक रसायनांशिवाय, प्राचीन आयुर्वेदिक ग्रंथांच्या आधारे तयार केलेले शुद्ध व सुरक्षित फॉर्म्युला."
     },
     {
-      icon: <PhoneCall size={26} style={{ color: '#12355B' }} />,
+      icon: <PhoneCall size={26} style={{ color: '#159B32' }} />,
       titleEn: "Dedicated Regimen Helpline",
       titleMr: "थेट फोनवर आहार व पथ्य मार्गदर्शन",
-      descEn: "Call 8421154090 upon receiving your formula for detailed dosage and dietary advice tailored for you.",
-      descMr: "फॉर्म्युला मिळाल्यानंतर ८४२११५४०९० वर कॉल करून आपल्या प्रकृतीनुसार औषध घेण्याची पद्धत व पथ्य समजून घ्या."
+      descEn: "Call 7745066707 upon receiving your formula for detailed dosage and dietary advice tailored for you.",
+      descMr: "फॉर्म्युला मिळाल्यानंतर ७७४५०६६७०७ वर कॉल करून आपल्या प्रकृतीनुसार औषध घेण्याची पद्धत व पथ्य समजून घ्या."
     },
     {
-      icon: <Users size={26} style={{ color: '#F4A261' }} />,
+      icon: <Users size={26} style={{ color: '#785300' }} />,
       titleEn: "Statewide Health Awareness",
       titleMr: "राज्यव्यापी आरोग्य व व्यसनमुक्ती मोहीम",
       descEn: "Regular social camps, public seminars, and counseling initiatives in Maharashtra.",
       descMr: "कोल्हापूर, सांगली, सातारा, पुणे व सोलापूरसह संपूर्ण महाराष्ट्रात नियमित जनजागृती शिबिरे."
     },
     {
-      icon: <HeartHandshake size={26} style={{ color: '#0da3b3' }} />,
+      icon: <HeartHandshake size={26} style={{ color: '#006B2D' }} />,
       titleEn: "Aadhar Guidance Association",
       titleMr: "आधार मार्गदर्शन केंद्र सहकार्य",
       descEn: "Working closely with Aadhar Madhumeh-Mukti Margdarshan Kendra in Shahupuri, Kolhapur.",
@@ -43,7 +43,7 @@ const TrustSection = () => {
   ];
 
   return (
-    <section className="section-sm trust-section-wrapper" style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2eaf4', position: 'relative', overflow: 'hidden' }}>
+    <section className="section-sm trust-section-wrapper" style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #E1E9DF', position: 'relative', overflow: 'hidden' }}>
       <div className="container">
         <div className="section-header">
           <div className="section-badge">
@@ -69,10 +69,10 @@ const TrustSection = () => {
                 backgroundColor: '#ffffff',
                 borderRadius: '18px',
                 padding: '1.5rem 1.3rem',
-                border: '1.5px solid #e2eaf4',
+                border: '1.5px solid #E1E9DF',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 4px 16px rgba(18, 53, 91, 0.07)'
+                boxShadow: '0 4px 16px rgba(0, 107, 45, 0.05)'
               }}
             >
               {/* Top vibrant accent glow line */}
@@ -85,8 +85,8 @@ const TrustSection = () => {
                   right: 0,
                   height: '4px',
                   background: index % 2 === 0 
-                    ? 'linear-gradient(90deg, #087E8B, #3cd0e2)' 
-                    : 'linear-gradient(90deg, #F4A261, #f7b785)'
+                    ? 'linear-gradient(90deg, #006B2D, #159B32)' 
+                    : 'linear-gradient(90deg, #159B32, #FFC928)'
                 }}
               />
 
@@ -99,21 +99,21 @@ const TrustSection = () => {
                   width: '54px',
                   height: '54px',
                   borderRadius: '14px',
-                  backgroundColor: index % 2 === 0 ? '#eefcfd' : '#fff7ed',
+                  backgroundColor: index % 2 === 0 ? '#e2faea' : '#fff9e6',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: '1.1rem',
-                  boxShadow: '0 4px 14px rgba(18,53,91,0.09)',
-                  border: index % 2 === 0 ? '1.5px solid #dbf7fa' : '1.5px solid #ffedd5'
+                  boxShadow: '0 4px 14px rgba(0, 107, 45, 0.06)',
+                  border: index % 2 === 0 ? '1.5px solid #c2f5d2' : '1.5px solid #ffe594'
                 }}
               >
                 {item.icon}
               </div>
-              <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#12355B', marginBottom: '0.45rem', lineHeight: 1.35 }}>
+              <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#17251B', marginBottom: '0.45rem', lineHeight: 1.35 }}>
                 {language === 'mr' ? item.titleMr : item.titleEn}
               </h3>
-              <p style={{ fontSize: '0.9rem', color: '#4f6182', lineHeight: 1.6, margin: 0 }}>
+              <p style={{ fontSize: '0.9rem', color: '#5F6B61', lineHeight: 1.6, margin: 0 }}>
                 {language === 'mr' ? item.descMr : item.descEn}
               </p>
             </div>
@@ -145,8 +145,8 @@ const TrustSection = () => {
         .trust-card-animated:hover,
         .trust-card-animated:active {
           transform: translateY(-8px) scale(1.02) !important;
-          box-shadow: 0 16px 36px rgba(18, 53, 91, 0.16) !important;
-          border-color: #087E8B !important;
+          box-shadow: 0 16px 36px rgba(0, 107, 45, 0.14) !important;
+          border-color: #006B2D !important;
         }
 
         /* Gentle Icon Pulse & Bounce */
@@ -162,7 +162,7 @@ const TrustSection = () => {
 
         .trust-card-animated:hover .trust-icon-box {
           transform: scale(1.15) rotate(6deg) !important;
-          box-shadow: 0 8px 22px rgba(8, 126, 139, 0.28) !important;
+          box-shadow: 0 8px 22px rgba(0, 107, 45, 0.22) !important;
         }
 
         /* Shimmer light sweep across card */
@@ -191,11 +191,11 @@ const TrustSection = () => {
         @keyframes trustFloatMobile {
           0%, 100% {
             transform: translateY(0px);
-            box-shadow: 0 4px 16px rgba(18, 53, 91, 0.07);
+            box-shadow: 0 4px 16px rgba(0, 107, 45, 0.06);
           }
           50% {
             transform: translateY(-8px);
-            box-shadow: 0 12px 28px rgba(18, 53, 91, 0.14);
+            box-shadow: 0 12px 28px rgba(0, 107, 45, 0.12);
           }
         }
 
@@ -217,20 +217,23 @@ const TrustSection = () => {
           }
         }
 
-        /* Mobile specific enhancements */
+        /* Mobile Performance Optimization - Disable heavy continuous repaint loops */
         @media (max-width: 640px) {
-          .trust-card-animated {
+          .trust-card-animated,
+          .trust-card-stagger-1,
+          .trust-card-stagger-2,
+          .trust-card-stagger-3,
+          .trust-card-stagger-4 {
+            animation: none !important;
+            transform: none !important;
             margin-bottom: 0.25rem;
+            will-change: auto !important;
           }
-          @keyframes trustFloatMobile {
-            0%, 100% {
-              transform: translateY(0px);
-              box-shadow: 0 4px 14px rgba(18, 53, 91, 0.06);
-            }
-            50% {
-              transform: translateY(-6px);
-              box-shadow: 0 10px 24px rgba(18, 53, 91, 0.12);
-            }
+          .trust-icon-box {
+            animation: none !important;
+          }
+          .trust-card-shimmer {
+            display: none !important;
           }
         }
       `}</style>

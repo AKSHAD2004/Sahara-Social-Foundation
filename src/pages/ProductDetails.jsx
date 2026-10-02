@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, 
@@ -8,10 +8,14 @@ import {
   Phone, 
   ShieldCheck, 
   Truck, 
-  RotateCcw
+  RotateCcw,
+  Edit,
+  Save,
+  X
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import { productsData, organizationInfo } from '../data/websiteData';
+import { dbService } from '../services/db';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -20,14 +24,110 @@ const ProductDetails = () => {
   const { id } = useParams();
   const { language } = useLanguage();
   const { addToCart } = useCart();
-  const { customerUser, openCustomerAuthModal } = useAuth();
+  const { customerUser, currentUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    price: '',
+    mrp: '',
+    stock: '',
+    description: '',
+    image: ''
+  });
+  const [editSuccessMsg, setEditSuccessMsg] = useState('');
+  const [productsList, setProductsList] = useState(() => {
+    const fromDb = dbService.getAll('products');
+    return (Array.isArray(fromDb) && fromDb.length > 0) ? fromDb : productsData;
+  });
 
-  const product = productsData.find((p) => p.id === id) || productsData[0];
+  useEffect(() => {
+    const unsub = dbService.subscribe('products', (dbProducts) => {
+      if (Array.isArray(dbProducts) && dbProducts.length > 0) {
+        setProductsList(dbProducts);
+      }
+    });
+    return unsub;
+  }, []);
+
+  const rawProduct = productsList.find((p) => p.id === id || p.sku === id || p.alias === id) 
+    || productsData.find((p) => p.id === id || p.sku === id || p.alias === id) 
+    || productsList[0] 
+    || productsData[0];
+
+  const staticMeta = productsData.find(
+    (sd) => sd.id === rawProduct?.id || sd.sku === rawProduct?.sku || sd.alias === rawProduct?.id
+  ) || {};
+
+  const product = {
+    ...staticMeta,
+    ...rawProduct,
+    id: rawProduct.id || staticMeta.id,
+    name: rawProduct.name || staticMeta.name,
+    nameEn: rawProduct.name || staticMeta.nameEn || rawProduct.nameEn,
+    nameMr: staticMeta.nameMr || rawProduct.name,
+    sku: rawProduct.sku || staticMeta.sku,
+    categoryNameEn: rawProduct.category || staticMeta.categoryNameEn || 'Ayurvedic Formula',
+    categoryNameMr: staticMeta.categoryNameMr || rawProduct.category,
+    isCombo: rawProduct.isCombo !== undefined ? rawProduct.isCombo : (staticMeta.isCombo !== undefined ? staticMeta.isCombo : (Number(rawProduct.price || staticMeta.price) >= 3000)),
+    price: Number(rawProduct.price || rawProduct.sellingPrice || staticMeta.price || 0),
+    originalPrice: Number(rawProduct.mrp || staticMeta.originalPrice || staticMeta.mrp || rawProduct.price),
+    mrp: Number(rawProduct.mrp || staticMeta.mrp || rawProduct.price),
+    stock: rawProduct.stock !== undefined ? Number(rawProduct.stock) : (staticMeta.stock || 100),
+    image: rawProduct.image || staticMeta.image,
+    fallbackImage: staticMeta.fallbackImage || rawProduct.image,
+    description: rawProduct.description || staticMeta.description || '',
+    descriptionEn: rawProduct.description || staticMeta.descriptionEn || staticMeta.description || '',
+    descriptionMr: staticMeta.descriptionMr || rawProduct.description || '',
+    features: staticMeta.features || [
+      { en: "100% Herbal with no chemical additives", mr: "कोणत्याही केमिकल विरहित १००% शुद्ध आयुर्वेदिक" },
+      { en: "Formulated under classical Ayurvedic guidelines", mr: "शास्त्रीय आयुर्वेदिक पद्धतीनुसार तयार" }
+    ],
+    rating: rawProduct.rating || staticMeta.rating || 4.8,
+    reviewsCount: rawProduct.reviewsCount || staticMeta.reviewsCount || 100,
+    badgeEn: rawProduct.badgeEn || staticMeta.badgeEn || 'Official',
+    badgeMr: rawProduct.badgeMr || staticMeta.badgeMr || 'अधिकृत'
+  };
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
+  };
+
+  const handleOpenEdit = () => {
+    setEditFormData({
+      name: product.nameEn || product.name || '',
+      price: product.price || '',
+      mrp: product.mrp || product.originalPrice || '',
+      stock: product.stock !== undefined ? product.stock : 100,
+      description: product.descriptionEn || product.description || '',
+      image: product.image || ''
+    });
+    setEditSuccessMsg('');
+    setShowEditModal(true);
+  };
+
+  const handleSaveProductEdit = (e) => {
+    e.preventDefault();
+    if (!product.id) return;
+    const updated = dbService.update('products', product.id, {
+      name: editFormData.name,
+      price: Number(editFormData.price),
+      sellingPrice: Number(editFormData.price),
+      mrp: Number(editFormData.mrp),
+      stock: Number(editFormData.stock),
+      description: editFormData.description,
+      image: editFormData.image
+    });
+
+    if (updated) {
+      setProductsList(dbService.getAll('products'));
+      setEditSuccessMsg('Product updated successfully! / उत्पादन यशस्वीरित्या अद्यतनित केले.');
+      setTimeout(() => {
+        setShowEditModal(false);
+        setEditSuccessMsg('');
+      }, 1200);
+    }
   };
 
   const handleOrderNow = () => {
@@ -43,7 +143,7 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="product-details-page" style={{ backgroundColor: '#F5F7FA', padding: '2rem 0 4rem 0' }}>
+    <div className="product-details-page" style={{ backgroundColor: '#F3F8F1', padding: '2rem 0 4rem 0' }}>
       <div className="container">
         {/* Breadcrumbs */}
         <div style={{ marginBottom: '1.25rem' }}>
@@ -53,7 +153,7 @@ const ProductDetails = () => {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              color: '#087E8B',
+              color: '#006B2D',
               fontSize: '0.88rem',
               fontWeight: 700
             }}
@@ -67,9 +167,9 @@ const ProductDetails = () => {
         <div className="product-layout-grid" style={{
           backgroundColor: '#ffffff',
           borderRadius: '24px',
-          border: '1px solid #e2eaf4',
+          border: '1px solid #E1E9DF',
           padding: '2.5rem',
-          boxShadow: '0 10px 35px rgba(18,53,91,0.06)',
+          boxShadow: '0 10px 35px rgba(0, 107, 45, 0.06)',
           display: 'grid',
           gridTemplateColumns: '1fr 1.2fr',
           gap: '3rem',
@@ -81,7 +181,7 @@ const ProductDetails = () => {
               borderRadius: '18px',
               overflow: 'hidden',
               backgroundColor: '#ffffff',
-              border: '1px solid #e2eaf4',
+              border: '1px solid #E1E9DF',
               aspectRatio: '1 / 1',
               position: 'relative',
               marginBottom: '1rem',
@@ -104,13 +204,13 @@ const ProductDetails = () => {
                   position: 'absolute',
                   top: '0.85rem',
                   left: '0.85rem',
-                  backgroundColor: '#087E8B',
+                  backgroundColor: '#006B2D',
                   color: '#ffffff',
                   padding: '0.3rem 0.75rem',
                   borderRadius: '6px',
                   fontSize: '0.74rem',
                   fontWeight: 700,
-                  boxShadow: '0 2px 6px rgba(8,126,139,0.25)'
+                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.25)'
                 }}>
                   {language === 'mr' ? product.badgeMr : product.badgeEn}
                 </div>
@@ -124,23 +224,23 @@ const ProductDetails = () => {
               gap: '0.5rem',
               textAlign: 'center'
             }}>
-              <div style={{ backgroundColor: '#dbf7fa', padding: '0.65rem 0.4rem', borderRadius: '10px', border: '1px solid #abedf5' }}>
-                <ShieldCheck size={18} style={{ color: '#087E8B', margin: '0 auto 0.2rem auto' }} />
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#087E8B' }}>
+              <div style={{ backgroundColor: '#e2faea', padding: '0.65rem 0.4rem', borderRadius: '10px', border: '1px solid #c3edd2' }}>
+                <ShieldCheck size={18} style={{ color: '#006B2D', margin: '0 auto 0.2rem auto' }} />
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#006B2D' }}>
                   {language === 'mr' ? '१००% आयुर्वेदिक' : '100% Ayurvedic'}
                 </div>
               </div>
 
-              <div style={{ backgroundColor: '#e2effc', padding: '0.65rem 0.4rem', borderRadius: '10px', border: '1px solid #b8d4f6' }}>
-                <Truck size={18} style={{ color: '#12355B', margin: '0 auto 0.2rem auto' }} />
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#12355B' }}>
+              <div style={{ backgroundColor: '#F3F8F1', padding: '0.65rem 0.4rem', borderRadius: '10px', border: '1px solid #E1E9DF' }}>
+                <Truck size={18} style={{ color: '#006B2D', margin: '0 auto 0.2rem auto' }} />
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#006B2D' }}>
                   {language === 'mr' ? 'मोफत डिलिव्हरी' : 'Free Delivery'}
                 </div>
               </div>
 
-              <div style={{ backgroundColor: '#fff3ec', padding: '0.65rem 0.4rem', borderRadius: '10px', border: '1px solid #ffd4b8' }}>
-                <RotateCcw size={18} style={{ color: '#F4A261', margin: '0 auto 0.2rem auto' }} />
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#7c2d12' }}>
+              <div style={{ backgroundColor: '#fff9e6', padding: '0.65rem 0.4rem', borderRadius: '10px', border: '1px solid #ffeaad' }}>
+                <RotateCcw size={18} style={{ color: '#b38600', margin: '0 auto 0.2rem auto' }} />
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#785300' }}>
                   {language === 'mr' ? 'सुरक्षित सील' : 'Tamper-Proof'}
                 </div>
               </div>
@@ -149,11 +249,33 @@ const ProductDetails = () => {
 
           {/* Right Column: Information & Actions */}
           <div>
-            <div style={{ fontSize: '0.78rem', color: '#087E8B', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-              {language === 'mr' ? product.categoryNameMr : product.categoryNameEn} • SKU: {product.sku}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ fontSize: '0.78rem', color: '#159B32', fontWeight: 700, textTransform: 'uppercase' }}>
+                {language === 'mr' ? product.categoryNameMr : product.categoryNameEn} • SKU: {product.sku}
+              </div>
+              <button
+                type="button"
+                onClick={handleOpenEdit}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  backgroundColor: '#e2faea',
+                  color: '#006B2D',
+                  border: '1px solid #c3edd2',
+                  borderRadius: '6px',
+                  padding: '0.25rem 0.65rem',
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                <Edit size={13} />
+                <span>{language === 'mr' ? 'उत्पादन संपादित करा' : 'Edit Product'}</span>
+              </button>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', color: '#12355B', fontWeight: 800, lineHeight: 1.25, marginBottom: '0.65rem', fontFamily: 'var(--font-heading)' }}>
+            <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', color: '#006B2D', fontWeight: 800, lineHeight: 1.25, marginBottom: '0.65rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? product.nameMr : product.nameEn}
             </h1>
 
@@ -161,60 +283,63 @@ const ProductDetails = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', gap: '0.15rem' }}>
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} fill="#F4A261" color="#F4A261" />
+                  <Star key={i} size={16} fill="#FFC928" color="#FFC928" />
                 ))}
               </div>
-              <span style={{ fontWeight: 700, color: '#172033', fontSize: '0.9rem' }}>{product.rating}</span>
-              <span style={{ color: '#4f6182', fontSize: '0.8rem' }}>({product.reviewsCount} {language === 'mr' ? 'अभिप्राय' : 'reviews'})</span>
+              <span style={{ fontWeight: 700, color: '#17251B', fontSize: '0.9rem' }}>{product.rating}</span>
+              <span style={{ color: '#5F6B61', fontSize: '0.8rem' }}>({product.reviewsCount} {language === 'mr' ? 'अभिप्राय' : 'reviews'})</span>
             </div>
 
             {/* Price Box */}
             <div style={{
-              backgroundColor: '#F5F7FA',
-              padding: '1rem 1.25rem',
+              backgroundColor: '#F3F8F1',
+              padding: '0.85rem 1.25rem',
               borderRadius: '14px',
-              border: '1px solid #e2eaf4',
+              border: '1px solid #E1E9DF',
               marginBottom: '1.25rem',
               display: 'flex',
-              alignItems: 'baseline',
-              gap: '0.75rem',
-              flexWrap: 'wrap'
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem'
             }}>
-              <span style={{ fontSize: '1.85rem', fontWeight: 800, color: '#12355B' }}>
-                ₹{product.price}
-              </span>
-              {product.originalPrice && (
-                <span style={{ fontSize: '1.05rem', color: '#94a3b8', textDecoration: 'line-through' }}>
-                  ₹{product.originalPrice}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.65rem' }}>
+                <span style={{ fontSize: '2.1rem', fontWeight: 800, color: '#006B2D' }}>
+                  ₹{product.price}
                 </span>
-              )}
-              <span style={{
-                backgroundColor: '#fff3ec',
-                color: '#7c2d12',
-                border: '1px solid #ffd4b8',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                padding: '0.2rem 0.55rem',
+                <span style={{ fontSize: '1rem', color: '#5F6B61', textDecoration: 'line-through' }}>
+                  ₹{product.originalPrice || (product.price >= 3000 ? 4000 : 2000)}
+                </span>
+              </div>
+
+              <span style={{ 
+                fontSize: '0.82rem', 
+                fontWeight: 800, 
+                color: (product.isCombo !== false && (product.isCombo || product.price >= 3000)) ? '#006B2D' : '#785300', 
+                backgroundColor: (product.isCombo !== false && (product.isCombo || product.price >= 3000)) ? '#e2faea' : '#fff9e6', 
+                padding: '0.35rem 0.75rem', 
                 borderRadius: '6px',
-                marginLeft: 'auto'
+                border: `1px solid ${(product.isCombo !== false && (product.isCombo || product.price >= 3000)) ? '#c2f5d2' : '#ffe594'}`
               }}>
-                {language === 'mr' ? 'सवलत समाविष्ट' : 'Special Price'}
+                {(product.isCombo !== false && (product.isCombo || product.price >= 3000)) 
+                  ? (language === 'mr' ? 'कॉम्बो पॅक (२ औषधी किट)' : 'Combo Pack (Full Kit)') 
+                  : (language === 'mr' ? 'सिंगल प्रॉडक्ट (१ उत्पादन)' : 'Single Product')}
               </span>
             </div>
 
             {/* Mandatory Post-Order Helpline Guideline Alert */}
             <div style={{
-              backgroundColor: '#fff3ec',
-              borderLeft: '4px solid #F4A261',
+              backgroundColor: '#fff9e6',
+              borderLeft: '4px solid #FFC928',
               padding: '0.85rem 1rem',
               borderRadius: '8px',
               marginBottom: '1.35rem',
               fontSize: '0.88rem',
-              color: '#7c2d12',
+              color: '#785300',
               lineHeight: 1.5
             }}>
               <strong>{language === 'mr' ? 'महत्त्वाची सूचना (Important):' : 'Regimen Guidance:'}</strong><br />
-              <span style={{ color: '#172033' }}>
+              <span style={{ color: '#17251B' }}>
                 {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
               </span>
             </div>
@@ -229,7 +354,7 @@ const ProductDetails = () => {
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                border: '1.5px solid #cbd5e1',
+                border: '1.5px solid #E1E9DF',
                 borderRadius: '10px',
                 overflow: 'hidden'
               }}>
@@ -238,17 +363,17 @@ const ProductDetails = () => {
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   style={{
                     padding: '0.65rem 0.9rem',
-                    background: '#f1f5f9',
+                    background: '#F3F8F1',
                     border: 'none',
                     fontSize: '1.1rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    color: '#12355B'
+                    color: '#006B2D'
                   }}
                 >
                   -
                 </button>
-                <span style={{ padding: '0.65rem 1rem', fontWeight: 700, fontSize: '1rem', color: '#172033' }}>
+                <span style={{ padding: '0.65rem 1rem', fontWeight: 700, fontSize: '1rem', color: '#17251B' }}>
                   {quantity}
                 </span>
                 <button
@@ -256,12 +381,12 @@ const ProductDetails = () => {
                   onClick={() => setQuantity((q) => q + 1)}
                   style={{
                     padding: '0.65rem 0.9rem',
-                    background: '#f1f5f9',
+                    background: '#F3F8F1',
                     border: 'none',
                     fontSize: '1.1rem',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    color: '#12355B'
+                    color: '#006B2D'
                   }}
                 >
                   +
@@ -295,7 +420,7 @@ const ProductDetails = () => {
               gap: '1rem',
               flexWrap: 'wrap',
               paddingTop: '0.75rem',
-              borderTop: '1px solid #e2eaf4'
+              borderTop: '1px solid #E1E9DF'
             }}>
               <a
                 href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
@@ -316,12 +441,12 @@ const ProductDetails = () => {
                 alignItems: 'center',
                 gap: '0.4rem',
                 fontSize: '0.86rem',
-                color: '#4f6182'
+                color: '#5F6B61'
               }}>
-                <Phone size={15} style={{ color: '#087E8B' }} />
+                <Phone size={15} style={{ color: '#006B2D' }} />
                 <span>
                   {language === 'mr' ? 'हेल्पलाईन:' : 'Helpline:'}{' '}
-                  <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#087E8B', fontWeight: 700 }}>
+                  <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#006B2D', fontWeight: 700 }}>
                     {organizationInfo.contact.primaryPhone}
                   </a>
                 </span>
@@ -337,16 +462,16 @@ const ProductDetails = () => {
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '1.75rem',
-            border: '1px solid #e2eaf4',
-            boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
+            border: '1px solid #E1E9DF',
+            boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)'
           }}>
-            <h3 style={{ fontSize: '1.2rem', color: '#12355B', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
+            <h3 style={{ fontSize: '1.2rem', color: '#006B2D', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'प्रमुख फायदे व वैशिष्ट्ये' : 'Key Health Benefits'}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
               {product.features?.map((feat, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.9rem', color: '#172033' }}>
-                  <CheckCircle2 size={16} style={{ color: '#087E8B', flexShrink: 0, marginTop: '3px' }} />
+                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.9rem', color: '#17251B' }}>
+                  <CheckCircle2 size={16} style={{ color: '#159B32', flexShrink: 0, marginTop: '3px' }} />
                   <span>{language === 'mr' ? feat.mr : feat.en}</span>
                 </div>
               ))}
@@ -358,26 +483,26 @@ const ProductDetails = () => {
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '1.75rem',
-            border: '1px solid #e2eaf4',
-            boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
+            border: '1px solid #E1E9DF',
+            boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)'
           }}>
-            <h3 style={{ fontSize: '1.2rem', color: '#12355B', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
+            <h3 style={{ fontSize: '1.2rem', color: '#006B2D', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'सेवन पद्धती व मार्गदर्शिका' : 'Recommended Usage & Regimen'}
             </h3>
-            <p style={{ fontSize: '0.92rem', color: '#4f6182', lineHeight: 1.65, marginBottom: '1rem' }}>
+            <p style={{ fontSize: '0.92rem', color: '#5F6B61', lineHeight: 1.65, marginBottom: '1rem' }}>
               {language === 'mr' ? product.dosageMr : product.dosageEn}
             </p>
 
             <div style={{
-              backgroundColor: '#dbf7fa',
+              backgroundColor: '#e2faea',
               padding: '0.85rem 1rem',
               borderRadius: '10px',
-              border: '1px solid #abedf5',
+              border: '1px solid #c3edd2',
               fontSize: '0.84rem',
-              color: '#087E8B'
+              color: '#006B2D'
             }}>
               <strong>{language === 'mr' ? 'समुपदेशन सूचना:' : 'Counselor Tip:'}</strong>{' '}
-              <span style={{ color: '#172033' }}>
+              <span style={{ color: '#17251B' }}>
                 {language === 'mr'
                   ? 'प्रत्येक व्यक्तीची प्रकृती व आजाराचे स्वरूप वेगळे असते. अचूक प्रमाणासाठी ८४२११५४०९० वर बोलून घ्यावे.'
                   : 'Individual requirements may vary. Call 8421154090 to consult with our healthcare staff.'}
@@ -387,16 +512,166 @@ const ProductDetails = () => {
         </div>
       </div>
 
+      {/* Product Edit Modal */}
+      {showEditModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(4, 32, 14, 0.7)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '20px',
+            padding: '2rem',
+            maxWidth: '560px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.25)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid #E1E9DF', paddingBottom: '0.75rem' }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#006B2D', margin: 0 }}>
+                {language === 'mr' ? 'उत्पादन संपादित करा' : 'Edit Product'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5F6B61' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {editSuccessMsg && (
+              <div style={{ backgroundColor: '#e2faea', color: '#006B2D', padding: '0.75rem 1rem', borderRadius: '10px', marginBottom: '1rem', fontWeight: 700, fontSize: '0.9rem' }}>
+                ✓ {editSuccessMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveProductEdit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
+                  {language === 'mr' ? 'उत्पादनाचे नाव' : 'Product Name'}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #E1E9DF', fontSize: '0.92rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
+                    {language === 'mr' ? 'किंमत (₹)' : 'Price (₹)'}
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={editFormData.price}
+                    onChange={(e) => setEditFormData({ ...editFormData, price: e.target.value })}
+                    style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #E1E9DF', fontSize: '0.92rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
+                    MRP (₹)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={editFormData.mrp}
+                    onChange={(e) => setEditFormData({ ...editFormData, mrp: e.target.value })}
+                    style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #E1E9DF', fontSize: '0.92rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
+                    {language === 'mr' ? 'शिल्लक स्टॉक' : 'Stock (Units)'}
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={editFormData.stock}
+                    onChange={(e) => setEditFormData({ ...editFormData, stock: e.target.value })}
+                    style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #E1E9DF', fontSize: '0.92rem' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
+                  {language === 'mr' ? 'फोटो URL / इमेज' : 'Image URL'}
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.image}
+                  onChange={(e) => setEditFormData({ ...editFormData, image: e.target.value })}
+                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #E1E9DF', fontSize: '0.92rem' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
+                  {language === 'mr' ? 'तपशील / वर्णन' : 'Description'}
+                </label>
+                <textarea
+                  rows="3"
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #E1E9DF', fontSize: '0.92rem', resize: 'vertical' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  style={{ padding: '0.65rem 1.25rem', borderRadius: '8px', border: '1px solid #E1E9DF', background: '#F3F8F1', fontWeight: 600, cursor: 'pointer', color: '#17251B' }}
+                >
+                  {language === 'mr' ? 'रद्द करा' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.5rem', borderRadius: '8px', border: 'none', background: '#006B2D', color: '#ffffff', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  <Save size={16} />
+                  <span>{language === 'mr' ? 'बदल जतन करा' : 'Save Changes'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @media (max-width: 960px) {
           .product-layout-grid {
             grid-template-columns: 1fr !important;
-            gap: 2rem !important;
-            padding: 1.5rem 1rem !important;
+            gap: 1.25rem !important;
+            padding: 1.15rem 0.85rem !important;
+            margin-bottom: 1.5rem !important;
+            border-radius: 16px !important;
           }
         }
 
         @media (max-width: 480px) {
+          .product-layout-grid {
+            padding: 0.85rem 0.65rem !important;
+            gap: 1rem !important;
+            margin-bottom: 1.15rem !important;
+          }
           .product-actions-row {
             flex-direction: column;
             align-items: stretch;

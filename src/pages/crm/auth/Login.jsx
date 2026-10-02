@@ -1,21 +1,26 @@
-// Professional CRM Login Screen for Samarth Kolhapur
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, Lock, Mail, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function Login() {
-  const { login, availableUsers } = useAuth();
+  const { currentUser, login, availableUsers } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState('admin@samarthkolhapur.com');
-  const [password, setPassword] = useState('Admin@123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
   const from = location.state?.from?.pathname || '/crm';
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate(from, { replace: true });
+    }
+  }, [currentUser, from, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +31,15 @@ export default function Login() {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.message || 'Login failed. Please check credentials.');
+      let msg = err.message || 'Login failed. Please check credentials.';
+      if (msg.includes('auth/wrong-password') || msg.includes('auth/invalid-credential')) {
+        msg = 'Incorrect email or password. Please verify credentials.';
+      } else if (msg.includes('auth/network-request-failed')) {
+        msg = 'Network error connecting to Firebase. Please check internet connection.';
+      } else if (msg.includes('auth/too-many-requests')) {
+        msg = 'Too many failed attempts. Please wait a few seconds and try again.';
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -34,7 +47,7 @@ export default function Login() {
 
   const handleQuickSelect = (userEmail) => {
     setEmail(userEmail);
-    setPassword('Demo@123');
+    setPassword(userEmail.toLowerCase().includes('admin') ? 'Admin@123' : 'Demo@123');
     setError('');
   };
 
@@ -43,22 +56,20 @@ export default function Login() {
       <div className="crm-auth-box">
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div 
-            style={{ 
-              width: '54px', 
-              height: '54px', 
-              margin: '0 auto 1rem', 
-              borderRadius: '12px', 
-              background: 'linear-gradient(135deg, #c69214, #eab308)', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              color: '#0f2d24',
-              fontSize: '1.6rem',
-              fontWeight: 900
-            }}
-          >
-            सा
+          <div style={{ margin: '0 auto 1.25rem', display: 'flex', justifyContent: 'center' }}>
+            <img 
+              src="/sahara-logo.jpg" 
+              alt="Sahara Social Foundation Official Logo" 
+              style={{
+                width: '76px',
+                height: '76px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                boxShadow: '0 6px 18px rgba(27, 77, 62, 0.2)',
+                border: '2px solid #F4A261',
+                backgroundColor: '#ffffff'
+              }}
+            />
           </div>
           <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#1b4d3e' }}>
             Sahara Social Foundation

@@ -49,7 +49,7 @@ const VideoCard = ({ video }) => {
       <video
         ref={videoRef}
         src={video.videoUrl}
-        preload="metadata"
+        preload="none"
         playsInline
         controls={isPlaying}
         onPlay={() => setIsPlaying(true)}

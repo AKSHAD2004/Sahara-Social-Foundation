@@ -7,11 +7,11 @@ import {
   X, 
   Globe, 
   ShieldCheck, 
-  User,
-  Heart,
-  Users,
-  LogOut,
-  ChevronDown
+  User, 
+  LogOut, 
+  ChevronDown,
+  Sparkles,
+  Heart
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
@@ -29,21 +29,30 @@ const Navbar = () => {
     openLanguageModal, 
     selectLanguage, 
     currentLanguageObj, 
-    languagesList, 
-    t 
+    languagesList 
   } = useLanguage();
   const { totalCount } = useCart();
   const { customerUser, logoutCustomer } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
+    let lastScrolled = false;
+    let ticking = false;
+
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = window.scrollY > 20;
+          if (scrolled !== lastScrolled) {
+            lastScrolled = scrolled;
+            setIsScrolled(scrolled);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
@@ -70,7 +79,8 @@ const Navbar = () => {
     { nameEn: 'Home', nameMr: 'मुख्यपृष्ठ', path: '/' },
     { nameEn: 'About', nameMr: 'संस्थेविषयी', path: '/about' },
     { nameEn: 'Services', nameMr: 'सेवा', path: '/services' },
-    { nameEn: 'Shop', nameMr: 'उत्पादने', path: '/shop' },
+    { nameEn: 'Products', nameMr: 'उत्पादने', path: '/shop' },
+    { nameEn: 'Clinical Report', nameMr: 'क्लिनिकल रिपोर्ट', path: '/study-report' },
     { nameEn: 'Photos', nameMr: 'फोटो', path: '/photos' },
     { nameEn: 'Videos', nameMr: 'व्हिडिओ', path: '/videos' },
     { nameEn: 'Contact', nameMr: 'संपर्क', path: '/contact' },
@@ -78,1014 +88,1218 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top Announcement Bar */}
-      <div className="top-announcement-bar">
-        <div className="container topbar-container">
-          {/* Mission Tagline with Left-to-Right moving animation */}
-          <div className="topbar-mission">
-            <div className="topbar-marquee-wrapper">
-              <div className="topbar-marquee-track">
-                <span className="topbar-mission-text">
-                  <ShieldCheck size={14} className="topbar-icon" />
-                  <span>
-                    {language === 'mr' 
-                      ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ८४२११५४०९०' 
-                      : 'Madhumeh Mukt Bharat & Vyasanmukt Bharat Abhiyan • Helpline: 8421154090'}
+      <div className="theme-header-wrapper">
+        {/* Top Navbar (Yess Infotech top bar style with brand theme) */}
+        <div className="theme-header__top-navbar">
+          <div className="container theme-header__top-container">
+            {/* Left: Direct Phone Helpline */}
+            <div className="theme-header__top-left">
+              <a 
+                href={`tel:${organizationInfo.contact.primaryPhone}`} 
+                className="top-phone-link"
+                title="Call Helpline"
+              >
+                <Phone size={14} className="top-phone-icon" />
+                <span className="top-phone-number">+91 {organizationInfo.contact.primaryPhone}</span>
+              </a>
+            </div>
+
+            {/* Center: Mission Tagline Marquee */}
+            <div className="theme-header__top-center">
+              <div className="topbar-marquee-wrapper">
+                <div className="topbar-marquee-track">
+                  <span className="topbar-mission-text">
+                    <ShieldCheck size={14} className="topbar-badge-icon" />
+                    <span>
+                      {language === 'mr' 
+                        ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ७७४५०६६७०७' 
+                        : 'Diabetes Free India & Vyasan Free India Campaign • Helpline: 7745066707'}
+                    </span>
                   </span>
-                </span>
-                <span className="topbar-mission-text">
-                  <ShieldCheck size={14} className="topbar-icon" />
-                  <span>
-                    {language === 'mr' 
-                      ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP' 
-                      : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP'}
+                  <span className="topbar-mission-text">
+                    <ShieldCheck size={14} className="topbar-badge-icon" />
+                    <span>
+                      {language === 'mr' 
+                        ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP • अधिकृत आयुर्वेदिक मार्गदर्शन' 
+                        : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP • Authentic Ayurvedic Guidance'}
+                    </span>
                   </span>
+
+                  {/* Duplicate set for seamless continuous marquee on desktop */}
+                  <span className="topbar-mission-text" aria-hidden="true">
+                    <ShieldCheck size={14} className="topbar-badge-icon" />
+                    <span>
+                      {language === 'mr' 
+                        ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ७७४५०६६७०७' 
+                        : 'Diabetes Free India & Vyasan Free India Campaign • Helpline: 7745066707'}
+                    </span>
+                  </span>
+                  <span className="topbar-mission-text" aria-hidden="true">
+                    <ShieldCheck size={14} className="topbar-badge-icon" />
+                    <span>
+                      {language === 'mr' 
+                        ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP • अधिकृत आयुर्वेदिक मार्गदर्शन' 
+                        : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP • Authentic Ayurvedic Guidance'}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Language Switcher & WhatsApp Action */}
+            <div className="theme-header__top-right">
+              <button 
+                onClick={openLanguageModal}
+                className="top-lang-pill notranslate"
+                title="Change Language / भाषा बदला"
+                aria-label="Change language"
+              >
+                <Globe size={13} style={{ color: '#FFC928' }} />
+                <span className="notranslate" style={{ fontWeight: 700 }}>
+                  {currentLanguageObj?.name || 'English'}
                 </span>
+                <ChevronDown size={11} style={{ opacity: 0.8 }} />
+              </button>
+
+              <a
+                href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
+                  language === 'mr'
+                    ? 'नमस्कार, मला सहारा सोशल फाऊंडेशनच्या आरोग्य सेवांबद्दल माहिती हवी आहे.'
+                    : 'Hello, I want details regarding Sahara Social Foundation services.'
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="top-wa-pill"
+                title="WhatsApp Support"
+              >
+                <WhatsAppIcon size={14} animated={true} />
+                <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Floating Rounded Header (Yess Infotech Rounded-24 Island Card Style) */}
+        <header className={`theme-header__main ${isScrolled ? 'theme-header__main--scrolled' : ''}`}>
+          <div className="container">
+            <div className="theme-header-card">
+              {/* Brand Logo & Title on Left */}
+              <div className="theme-header-brand-col">
+                <Link to="/" className="brand-link" onClick={() => setMobileMenuOpen(false)}>
+                  <div className="brand-logo-wrap">
+                    <MissionLogoBadge size={46} style={{ flexShrink: 0 }} />
+                  </div>
+                  <div className="brand-text-block">
+                    <div className="brand-title">
+                      {language === 'mr' ? organizationInfo.nameMr : organizationInfo.name}
+                    </div>
+                    <div className="brand-subtitle">
+                      {language === 'mr' ? 'मधुमेह मुक्त भारत अभियान • कोल्हापूर' : 'Mission Diabetes Free India • Kolhapur'}
+                    </div>
+                  </div>
+                </Link>
+              </div>
+
+              {/* Desktop Menu Section (Pill-shaped Navigation Links) */}
+              <nav className="desktop-menu-section" aria-label="Main Navigation">
+                <div className="desktop-main-nav">
+                  {navLinks.map((link) => {
+                    const isActive = location.pathname === link.path;
+                    return (
+                      <Link
+                        key={link.path}
+                        to={link.path}
+                        className={`header-main-nav-link ${isActive ? 'header-main-nav-link--active' : ''}`}
+                      >
+                        <span>{language === 'mr' ? link.nameMr : link.nameEn}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </nav>
+
+              {/* Right Action Buttons: CTA Pill + Cart + Account + Hamburger */}
+              <div className="theme-header-actions-col">
+                {/* Yess Infotech Style Accent CTA Pill Button */}
+                <Link
+                  to="/shop"
+                  className="header-main-nav-link--cta"
+                  title={language === 'mr' ? 'आयुर्वेदिक उत्पादने खरेदी करा' : 'Explore Products'}
+                >
+                  <Sparkles size={15} className="cta-icon" />
+                  <span>{language === 'mr' ? 'ऑर्डर करा' : 'Shop'}</span>
+                </Link>
+
+                {/* Shopping Cart Icon with Badge */}
+                <Link
+                  to="/cart"
+                  className="header-icon-btn header-icon-btn--cart"
+                  title={language === 'mr' ? 'कार्ट पहा' : 'View Cart'}
+                  aria-label="Shopping Cart"
+                >
+                  <ShoppingCart size={20} />
+                  {totalCount > 0 && (
+                    <span className="cart-badge-count">{totalCount}</span>
+                  )}
+                </Link>
+
+                {/* User Account Icon */}
+                <Link
+                  to="/account"
+                  className="header-icon-btn header-icon-btn--account"
+                  title={customerUser ? (customerUser.fullName || 'My Account') : (language === 'mr' ? 'माझे खाते' : 'My Account')}
+                  aria-label="User Account"
+                >
+                  <User size={20} />
+                  {customerUser && (
+                    <span className="user-active-dot" title={language === 'mr' ? 'लॉगिन केलेले आहे' : 'Logged in'} />
+                  )}
+                </Link>
+
+                {/* Mobile Menu Toggle (Yess Infotech clean rounded hamburger style) */}
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen((prev) => !prev)}
+                  className="mobile-menu-toggle"
+                  aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                >
+                  {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
               </div>
             </div>
           </div>
+        </header>
 
-          {/* Right Group: Affiliate + CRM + Language */}
-          <div className="topbar-actions">
-            {/* Affiliate Portal link */}
-            <Link 
-              to="/affiliate" 
-              className="topbar-affiliate-link"
-              title="Affiliate / समाज सेवक पोर्टल"
-            >
-              <Users size={13} className="topbar-affiliate-icon" />
-              <span>{language === 'mr' ? 'समाज सेवक' : 'Affiliate'}</span>
-            </Link>
+        {/* Mobile Sub-Navbar Moving Announcement Marquee (Aligned below navbar, highly visible in mobile view) */}
+        <div className="mobile-subnav-ticker" aria-label="Announcement ticker">
+          <div className="mobile-ticker-track">
+            {/* Group 1 */}
+            <div className="mobile-ticker-group">
+              <span className="mobile-ticker-item">
+                <ShieldCheck size={13} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान' 
+                    : 'Diabetes Free India & Vyasan Free India Campaign'}
+                </span>
+              </span>
+              <span className="mobile-ticker-dot">•</span>
+              <a href={`tel:${organizationInfo.contact.primaryPhone}`} className="mobile-ticker-item mobile-ticker-link" title="Call Helpline">
+                <Phone size={12} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? 'हेल्पलाइन: ७७४५०६६७०७' 
+                    : 'Helpline: 7745066707'}
+                </span>
+              </a>
+              <span className="mobile-ticker-dot">•</span>
+              <span className="mobile-ticker-item">
+                <ShieldCheck size={13} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP' 
+                    : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP'}
+                </span>
+              </span>
+              <span className="mobile-ticker-dot">•</span>
+              <span className="mobile-ticker-item">
+                <Sparkles size={12} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? '१००% आयुर्वेदिक संशोधन व मार्गदर्शन' 
+                    : '100% Ayurvedic Research & Guidance'}
+                </span>
+              </span>
+              <span className="mobile-ticker-dot">•</span>
+            </div>
 
-            <span className="topbar-divider">|</span>
-
-            {/* CRM Admin Portal link */}
-            <Link 
-              to="/crm" 
-              className="topbar-crm-link"
-              title="Sahara CRM & Sales Management Portal"
-            >
-              <ShieldCheck size={13} className="topbar-affiliate-icon" />
-              <span>{language === 'mr' ? 'प्रशासन CRM' : 'Staff CRM'}</span>
-            </Link>
-
-            {/* Language Switcher (Pan-India) */}
-            <button 
-              onClick={openLanguageModal}
-              className="topbar-lang-btn notranslate"
-              title="Change Language / भाषा बदला"
-              aria-label="Change language"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-            >
-              <Globe size={13} style={{ color: '#F4A261' }} />
-              <span className="notranslate" style={{ fontWeight: 700 }}>{currentLanguageObj?.name || 'English'}</span>
-              <ChevronDown size={11} style={{ opacity: 0.8 }} />
-            </button>
+            {/* Group 2 (Exact duplicate for seamless continuous infinite loop) */}
+            <div className="mobile-ticker-group" aria-hidden="true">
+              <span className="mobile-ticker-item">
+                <ShieldCheck size={13} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान' 
+                    : 'Diabetes Free India & Vyasan Free India Campaign'}
+                </span>
+              </span>
+              <span className="mobile-ticker-dot">•</span>
+              <a href={`tel:${organizationInfo.contact.primaryPhone}`} className="mobile-ticker-item mobile-ticker-link" title="Call Helpline">
+                <Phone size={12} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? 'हेल्पलाइन: ७७४५०६६७०७' 
+                    : 'Helpline: 7745066707'}
+                </span>
+              </a>
+              <span className="mobile-ticker-dot">•</span>
+              <span className="mobile-ticker-item">
+                <ShieldCheck size={13} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP' 
+                    : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP'}
+                </span>
+              </span>
+              <span className="mobile-ticker-dot">•</span>
+              <span className="mobile-ticker-item">
+                <Sparkles size={12} className="mobile-ticker-icon" />
+                <span>
+                  {language === 'mr' 
+                    ? '१००% आयुर्वेदिक संशोधन व मार्गदर्शन' 
+                    : '100% Ayurvedic Research & Guidance'}
+                </span>
+              </span>
+              <span className="mobile-ticker-dot">•</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Sticky Header */}
-      <header className={`main-header ${isScrolled ? 'main-header-scrolled' : ''}`}>
-        <div className="container header-container">
-          {/* Logo & Brand Identity */}
-          <Link to="/" className="brand-identity-link" onClick={() => setMobileMenuOpen(false)}>
-            <MissionLogoBadge size={isScrolled ? 38 : 44} style={{ filter: 'none', flexShrink: 0 }} />
-            <div className="brand-text-block">
-              <div className="brand-title">
-                {language === 'mr' ? organizationInfo.nameMr : organizationInfo.name}
-              </div>
-              <div className="brand-subtitle">
-                {language === 'mr' ? 'मधुमेह मुक्त भारत अभियान • कोल्हापूर' : 'Mission Diabetes Free India • Kolhapur'}
-              </div>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <nav className="desktop-nav-menu" aria-label="Main Navigation">
-            <ul className="desktop-nav-list">
-              {navLinks.map((link) => {
-                const isActive = location.pathname === link.path;
-                return (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      className={`desktop-nav-item ${isActive ? 'active' : ''}`}
-                    >
-                      {language === 'mr' ? link.nameMr : link.nameEn}
-                      {isActive && <span className="nav-active-indicator" />}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          {/* Right Action Icons & Buttons */}
-          <div className="header-actions">
-            {/* Desktop Direct Helpline */}
-            <a
-              href={`tel:${organizationInfo.contact.primaryPhone}`}
-              className="btn btn-call btn-sm desktop-action-btn"
-            >
-              <Phone size={14} />
-              <span>{organizationInfo.contact.primaryPhone}</span>
-            </a>
-
-            {/* Desktop WhatsApp Action */}
-            <a
-              href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
-                language === 'mr'
-                  ? 'नमस्कार, मला सहारा सोशल फाऊंडेशनच्या आरोग्य सेवा आणि फॉर्म्युलाबद्दल माहिती हवी आहे.'
-                  : 'Hello, I would like to know more about Sahara Social Foundation and your health services.'
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-whatsapp btn-sm desktop-action-btn"
-            >
-              <WhatsAppIcon size={15} animated={true} />
-              <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
-            </a>
-
-            {/* Cart Icon */}
-            <Link
-              to="/cart"
-              className="header-icon-btn"
-              title={language === 'mr' ? 'कार्ट पहा' : 'View Cart'}
-              aria-label="Shopping Cart"
-            >
-              <ShoppingCart size={19} />
-              {totalCount > 0 && (
-                <span className="cart-badge-count">
-                  {totalCount}
-                </span>
-              )}
-            </Link>
-
-            {/* Account Icon */}
-            <Link
-              to="/account"
-              className="header-icon-btn"
-              title={customerUser ? (customerUser.fullName || 'My Account') : (language === 'mr' ? 'माझे खाते' : 'My Account')}
-              aria-label="User Account"
-            >
-              <User size={19} />
-              {customerUser && (
-                <span 
-                  style={{
-                    position: 'absolute',
-                    top: '3px',
-                    right: '3px',
-                    width: '9px',
-                    height: '9px',
-                    borderRadius: '50%',
-                    backgroundColor: '#10b981',
-                    border: '1.5px solid #ffffff'
-                  }}
-                  title={language === 'mr' ? 'लॉगिन केलेले आहे' : 'Logged in'}
-                />
-              )}
-            </Link>
-
-            {/* Mobile Hamburger Menu Toggle (Min 44x44px touch target) */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setMobileMenuOpen((prev) => !prev);
-              }}
-              className="mobile-hamburger-btn"
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Navigation Drawer & Backdrop (Rendered outside header to avoid backdrop-filter/stacking clipping) */}
-      {mobileMenuOpen && (
+      {/* Mobile Slide-Over Menu (Yess Infotech mobile-menu-wrapper & panel) */}
+      <div 
+        className={`mobile-menu-wrapper ${mobileMenuOpen ? 'active' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+      >
         <div 
-          className="mobile-drawer-overlay" 
-          onClick={() => setMobileMenuOpen(false)}
+          className="mobile-menu-panel"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div 
-            className="mobile-drawer-container" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mobile-drawer-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '1rem 1.15rem', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', boxSizing: 'border-box' }}>
-              <div className="mobile-drawer-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0, flex: 1, marginRight: '0.75rem' }}>
-                <MissionLogoBadge size={34} />
-                <span className="mobile-drawer-brand-title" style={{ fontSize: '0.88rem', fontWeight: 800, color: '#064e3b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+          {/* Mobile Header with Brand & Close Button */}
+          <div className="mobile-menu-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <MissionLogoBadge size={34} />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#006B2D' }}>
                   {language === 'mr' ? organizationInfo.nameMr : organizationInfo.name}
                 </span>
+                <span style={{ fontSize: '0.68rem', color: '#159B32', fontWeight: 700 }}>
+                  {language === 'mr' ? 'कोल्हापूर • नोंदणीकृत' : 'Kolhapur • Regd.'}
+                </span>
               </div>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mobile-drawer-close-btn"
-                aria-label="Close menu"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '40px',
-                  height: '40px',
-                  minWidth: '40px',
-                  minHeight: '40px',
-                  borderRadius: '10px',
-                  border: '1px solid #cbd5e1',
-                  backgroundColor: '#ffffff',
-                  color: '#334155',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  marginLeft: 'auto',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
-                }}
-              >
-                <X size={20} />
-              </button>
             </div>
 
-            <ul className="mobile-drawer-list">
-              {navLinks.map((link) => {
-                const isActive = location.pathname === link.path;
-                return (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`mobile-drawer-link ${isActive ? 'active' : ''}`}
-                    >
-                      <span>{language === 'mr' ? link.nameMr : link.nameEn}</span>
-                      {isActive && <span className="mobile-link-dot" />}
-                    </Link>
-                  </li>
-                );
-              })}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mobile-menu-close"
+              aria-label="Close menu"
+            >
+              <X size={22} />
+            </button>
+          </div>
 
-              {/* Mobile Drawer Cart Link */}
-              <li style={{ borderTop: '1px solid #e2eaf4', paddingTop: '0.6rem', marginTop: '0.4rem' }}>
+          {/* Mobile Navigation Links */}
+          <div className="mobile-menu-content">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
                 <Link
-                  to="/cart"
+                  key={link.path}
+                  to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`mobile-drawer-link ${location.pathname === '/cart' ? 'active' : ''}`}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                  className={`mobile-nav-link ${isActive ? 'header-main-nav-link--active' : ''}`}
                 >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <ShoppingCart size={18} style={{ color: '#087E8B' }} />
-                    <span>{language === 'mr' ? 'माझी कार्ट (खरेदी)' : 'My Cart'}</span>
-                  </span>
-                  {totalCount > 0 ? (
-                    <span style={{ fontSize: '0.74rem', backgroundColor: '#F4A261', color: '#172033', padding: '0.2rem 0.65rem', borderRadius: '9999px', fontWeight: 800 }}>
-                      {totalCount} {language === 'mr' ? 'वस्तू' : 'items'}
-                    </span>
-                  ) : (
-                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                      {language === 'mr' ? 'रिकामी' : 'Empty'}
-                    </span>
-                  )}
+                  <span>{language === 'mr' ? link.nameMr : link.nameEn}</span>
                 </Link>
-              </li>
+              );
+            })}
 
-              {/* Mobile Drawer Account & Logout Link */}
-              <li>
-                <Link
-                  to="/account"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`mobile-drawer-link ${location.pathname === '/account' ? 'active' : ''}`}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <User size={18} style={{ color: '#087E8B' }} />
-                    <span>{customerUser ? (customerUser.fullName || (language === 'mr' ? 'माझे खाते' : 'My Account')) : (language === 'mr' ? 'माझे खाते / लॉगिन' : 'My Account / Login')}</span>
+            {/* Mobile Recruiter / Shop CTA Banner */}
+            <Link
+              to="/shop"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mobile-cta-pill"
+            >
+              <Sparkles size={16} />
+              <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने ऑर्डर करा' : 'Explore & Order Products'}</span>
+            </Link>
+
+            {/* Cart & Account Items in Drawer */}
+            <div style={{ borderTop: '1px solid #e9edf3', marginTop: '1rem', paddingTop: '0.75rem' }}>
+              <Link
+                to="/cart"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mobile-nav-link"
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <ShoppingCart size={18} style={{ color: '#006B2D' }} />
+                  <span>{language === 'mr' ? 'माझी कार्ट (खरेदी)' : 'My Cart'}</span>
+                </span>
+                {totalCount > 0 && (
+                  <span style={{ fontSize: '0.75rem', backgroundColor: '#FFC928', color: '#17251B', padding: '0.2rem 0.6rem', borderRadius: '999px', fontWeight: 800 }}>
+                    {totalCount}
                   </span>
-                  {customerUser && (
-                    <span style={{ fontSize: '0.72rem', backgroundColor: '#dbf7fa', color: '#087E8B', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700 }}>
-                      {language === 'mr' ? 'सक्रिय' : 'Active'}
-                    </span>
-                  )}
-                </Link>
-              </li>
+                )}
+              </Link>
+
+              <Link
+                to="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mobile-nav-link"
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <User size={18} style={{ color: '#006B2D' }} />
+                  <span>{customerUser ? (customerUser.fullName || (language === 'mr' ? 'माझे खाते' : 'My Account')) : (language === 'mr' ? 'माझे खाते / लॉगिन' : 'My Account / Login')}</span>
+                </span>
+                {customerUser && (
+                  <span style={{ fontSize: '0.72rem', backgroundColor: '#e2faea', color: '#006B2D', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 700 }}>
+                    {language === 'mr' ? 'सक्रिय' : 'Active'}
+                  </span>
+                )}
+              </Link>
 
               {customerUser && (
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      logoutCustomer();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="mobile-drawer-logout-btn"
-                  >
-                    <LogOut size={16} />
-                    <span>{language === 'mr' ? 'खाते लॉग आऊट करा' : 'Logout Account'}</span>
-                  </button>
-                </li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    logoutCustomer();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="mobile-logout-btn"
+                >
+                  <LogOut size={16} />
+                  <span>{language === 'mr' ? 'खाते लॉग आऊट करा' : 'Logout Account'}</span>
+                </button>
               )}
+            </div>
 
-              {/* Pan-India Language Selector in Drawer */}
-              <li style={{ borderTop: '1px solid #e2eaf4', paddingTop: '0.85rem', marginTop: '0.4rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', padding: '0 0.25rem' }}>
-                  <span className="notranslate" style={{ fontSize: '0.78rem', color: '#4f6182', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                    <Globe size={14} style={{ color: '#087E8B' }} />
-                    <span className="notranslate">Language ({currentLanguageObj?.name || 'English'})</span>
-                  </span>
-                  <button 
-                    type="button"
-                    onClick={() => { openLanguageModal(); setMobileMenuOpen(false); }}
-                    style={{ background: 'none', border: 'none', color: '#087E8B', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+            {/* Language Selector in Drawer */}
+            <div style={{ borderTop: '1px solid #e9edf3', marginTop: '1rem', paddingTop: '1rem' }}>
+              <div style={{ fontSize: '0.8rem', color: '#5F6B61', fontWeight: 700, marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <Globe size={14} style={{ color: '#006B2D' }} />
+                <span>भाषा बदला / SELECT LANGUAGE</span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                {languagesList.slice(0, 6).map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => selectLanguage(lang.code)}
+                    style={{
+                      padding: '0.35rem 0.65rem',
+                      borderRadius: '8px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      border: language === lang.code ? '1.5px solid #006B2D' : '1px solid #e9edf3',
+                      backgroundColor: language === lang.code ? '#e2faea' : '#ffffff',
+                      color: language === lang.code ? '#006B2D' : '#17251B',
+                      cursor: 'pointer'
+                    }}
                   >
-                    All Languages (सर्व भाषा)
+                    {lang.name}
                   </button>
-                </div>
+                ))}
+              </div>
+            </div>
 
-                {/* Quick Language Chips */}
-                <div className="notranslate" style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.35rem', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                  {languagesList.map((lang) => (
-                    <button
-                      key={lang.code}
-                      type="button"
-                      onClick={() => selectLanguage(lang.code)}
-                      className="notranslate"
-                      style={{
-                        padding: '0.4rem 0.75rem',
-                        borderRadius: '8px',
-                        fontSize: '0.8rem',
-                        fontWeight: 700,
-                        whiteSpace: 'nowrap',
-                        border: language === lang.code ? '1.5px solid #087E8B' : '1px solid #e2eaf4',
-                        backgroundColor: language === lang.code ? '#dbf7fa' : '#ffffff',
-                        color: language === lang.code ? '#087E8B' : '#12355B',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        boxShadow: language === lang.code ? '0 2px 6px rgba(8,126,139,0.2)' : 'none'
-                      }}
-                    >
-                      {lang.name}
-                    </button>
-                  ))}
-                </div>
-              </li>
-
-              {/* Mobile Call & WhatsApp quick shortcuts in drawer */}
-              <li className="mobile-drawer-actions">
-                <a
-                  href={`tel:${organizationInfo.contact.primaryPhone}`}
-                  className="btn btn-call btn-sm"
-                  style={{ flex: 1 }}
-                >
-                  <Phone size={15} />
-                  <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
-                </a>
-                <a
-                  href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-whatsapp btn-sm"
-                  style={{ flex: 1 }}
-                >
-                  <WhatsAppIcon size={16} animated={true} />
-                  <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
-                </a>
-              </li>
-            </ul>
+            {/* Quick Contact Action Buttons at Bottom */}
+            <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #e9edf3' }}>
+              <a
+                href={`tel:${organizationInfo.contact.primaryPhone}`}
+                className="btn btn-call btn-sm"
+                style={{ flex: 1, padding: '0.65rem', justifyContent: 'center' }}
+              >
+                <Phone size={15} />
+                <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
+              </a>
+              <a
+                href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-whatsapp btn-sm"
+                style={{ flex: 1, padding: '0.65rem', justifyContent: 'center' }}
+              >
+                <WhatsAppIcon size={16} animated={true} />
+                <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
+              </a>
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Embedded Styles for Header and Mobile Drawer */}
+      <LanguageModal />
+
+      {/* Embedded Styles Replicating Yess Infotech's 2-Tier Floating Card Structure */}
       <style>{`
-        /* Top Announcement Bar */
-        .top-announcement-bar {
-          background: linear-gradient(90deg, #0a1b2e 0%, #12355B 50%, #087E8B 100%);
-          color: #e2effc;
-          font-size: 0.82rem;
-          padding: 0.35rem 0;
-          border-bottom: 1px solid rgba(8, 126, 139, 0.3);
-          width: 100%;
-        }
-
-        .topbar-container {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
-          gap: 0.75rem;
-        }
-
-        .topbar-mission {
-          display: flex;
-          align-items: center;
-          min-width: 0;
-          flex: 1;
-          overflow: hidden;
-          margin-right: 0.75rem;
-        }
-
-        .topbar-marquee-wrapper {
-          overflow: hidden;
-          white-space: nowrap;
-          width: 100%;
-          position: relative;
-        }
-
-        .topbar-marquee-track {
-          display: inline-flex;
-          align-items: center;
-          gap: 3rem;
-          white-space: nowrap;
-          animation: moveRightToLeft 16s linear infinite;
-          will-change: transform;
-        }
-
-        .topbar-marquee-track:hover {
-          animation-play-state: paused;
-        }
-
-        @keyframes moveRightToLeft {
-          0% {
-            transform: translateX(100%);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-
-        .topbar-mission-text {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4rem;
-          font-weight: 700;
-          color: #ffffff;
-          white-space: nowrap;
-          font-size: 0.82rem;
-          flex-shrink: 0;
-        }
-
-        .topbar-icon {
-          color: #F4A261;
-          flex-shrink: 0;
-        }
-
-        .topbar-actions {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          margin-left: auto;
-          flex-shrink: 0;
-        }
-
-        .topbar-divider {
-          color: rgba(255, 255, 255, 0.35);
-          font-size: 0.8rem;
-          user-select: none;
-        }
-
-        .topbar-affiliate-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          color: #dbf7fa;
-          font-size: 0.8rem;
-          font-weight: 700;
-          text-decoration: underline;
-          transition: color 0.2s ease;
-        }
-
-        .topbar-affiliate-link:hover {
-          color: #ffffff;
-        }
-
-        .topbar-crm-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          color: #F4A261;
-          font-size: 0.8rem;
-          font-weight: 700;
-          text-decoration: none;
-          transition: color 0.2s ease;
-        }
-
-        .topbar-crm-link:hover {
-          color: #ffffff;
-        }
-
-        .topbar-lang-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          background: rgba(255, 255, 255, 0.16);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          color: #ffffff;
-          padding: 0.25rem 0.6rem;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 0.76rem;
-          font-weight: 700;
-          transition: all 0.2s ease;
-          min-height: 28px;
-        }
-
-        .topbar-lang-btn:hover {
-          background: rgba(255, 255, 255, 0.28);
-          border-color: #ffffff;
-        }
-
-        /* Main Header - Locked on scroll */
-        .main-header {
+        /* Wrapper */
+        .theme-header-wrapper {
           position: sticky;
           top: 0;
           left: 0;
           right: 0;
           width: 100%;
           z-index: 1000;
-          background-color: #ffffff;
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-bottom: 1px solid #e2eaf4;
-          padding: 0.75rem 0;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 1px 3px rgba(18, 53, 91, 0.05);
+          transition: all 0.25s ease;
         }
 
-        .main-header-scrolled {
-          background-color: rgba(255, 255, 255, 0.98);
-          padding: 0.45rem 0;
-          box-shadow: 0 4px 20px rgba(18, 53, 91, 0.12);
-          border-bottom: 1px solid #cbd7e8;
+        /* 1. Top Navbar (Deep Emerald Green Bar) */
+        .theme-header__top-navbar {
+          background: linear-gradient(90deg, #04200e 0%, #006B2D 50%, #08481c 100%);
+          color: #ffffff;
+          padding: 8px 0 32px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          transition: all 0.25s ease;
         }
 
-        .header-container {
+        .theme-header__top-container {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 0.75rem;
+          gap: 1rem;
         }
 
-        .brand-identity-link {
+        /* Top Left: Phone Helpline */
+        .theme-header__top-left {
+          flex-shrink: 0;
+        }
+
+        .top-phone-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          color: #ffffff;
+          text-decoration: none;
+          font-size: 0.82rem;
+          font-weight: 700;
+          padding: 4px 8px;
+          border-radius: 6px;
+          background: rgba(255, 255, 255, 0.12);
+          transition: all 0.2s ease;
+        }
+
+        .top-phone-link:hover {
+          background: rgba(255, 255, 255, 0.22);
+          color: #FFC928;
+        }
+
+        .top-phone-icon {
+          color: #FFC928;
+          flex-shrink: 0;
+        }
+
+        /* Top Center: Marquee */
+        .theme-header__top-center {
+          flex: 1;
+          overflow: hidden;
+          min-width: 0;
+        }
+
+        .topbar-marquee-wrapper {
+          overflow: hidden;
+          width: 100%;
+          mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+        }
+
+        .topbar-marquee-track {
+          display: flex;
+          gap: 3rem;
+          width: max-content;
+          animation: marqueeLeftToRight 28s linear infinite;
+        }
+
+        .topbar-marquee-track:hover {
+          animation-play-state: paused;
+        }
+
+        @keyframes marqueeLeftToRight {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+
+        .topbar-mission-text {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.80rem;
+          font-weight: 700;
+          color: #ffffff;
+          white-space: nowrap;
+        }
+
+        .topbar-badge-icon {
+          color: #FFC928;
+          flex-shrink: 0;
+        }
+
+        /* Top Right: Language & WhatsApp */
+        .theme-header__top-right {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 0.6rem;
+          flex-shrink: 0;
+        }
+
+        .top-lang-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          background: rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #ffffff;
+          font-size: 0.78rem;
+          padding: 4px 10px;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .top-lang-pill:hover {
+          background: rgba(255, 255, 255, 0.22);
+        }
+
+        .top-wa-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          background: #159B32;
+          color: #ffffff;
+          font-size: 0.78rem;
+          font-weight: 700;
+          padding: 4px 11px;
+          border-radius: 999px;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+
+        .top-wa-pill:hover {
+          background: #006B2D;
+          transform: translateY(-1px);
+        }
+
+        /* 2. Main Header (Floating Island Card - Rock-solid stable on scroll) */
+        .theme-header__main {
+          margin-top: -24px;
+        }
+
+        .theme-header-card {
+          background-color: #ffffff;
+          border-radius: 28px;
+          box-shadow: 0 10px 30px rgba(0, 107, 45, 0.09), 0 2px 8px rgba(0, 0, 0, 0.04);
+          border: 1px solid #E1E9DF;
+          padding: 10px 22px;
+          min-height: 68px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1.25rem;
+        }
+
+        .theme-header__main--scrolled .theme-header-card {
+          box-shadow: 0 12px 34px rgba(0, 107, 45, 0.13), 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Brand Column on Left */
+        .theme-header-brand-col {
+          flex: 0 1 auto;
+          min-width: 0;
+        }
+
+        .brand-link {
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
           text-decoration: none;
           min-width: 0;
-          flex-shrink: 1;
+        }
+
+        .brand-logo-wrap {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .brand-text-block {
           min-width: 0;
+          flex: 1;
         }
 
         .brand-title {
-          font-size: 1.08rem;
+          font-size: 1.14rem;
           font-weight: 800;
-          color: #12355B;
-          line-height: 1.15;
+          color: #006B2D;
+          line-height: 1.2;
           text-transform: uppercase;
-          letter-spacing: 0.02em;
+          letter-spacing: 0.025em;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
         .brand-subtitle {
-          font-size: 0.68rem;
-          color: #087E8B;
+          font-size: 0.72rem;
+          color: #159B32;
           font-weight: 700;
-          margin-top: 1px;
+          margin-top: 2px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
-        /* Desktop Nav */
-        .desktop-nav-menu {
+        /* Desktop Menu (Yess Infotech Pill Navigation) */
+        .desktop-menu-section {
           display: none;
+          flex: 1;
+          justify-content: center;
         }
 
-        .desktop-nav-list {
+        .desktop-main-nav {
           display: flex;
           align-items: center;
-          list-style: none;
-          gap: 0.5rem;
-          margin: 0;
-          padding: 0;
+          gap: 5px;
+          flex-wrap: nowrap;
+          justify-content: center;
         }
 
-        .desktop-nav-item {
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #243048;
-          position: relative;
-          padding: 0.45rem 0.65rem;
+        .header-main-nav-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 7px 13px;
+          border-radius: 999px;
           text-decoration: none;
+          font-size: 0.91rem;
+          font-weight: 600;
+          color: #17251B;
           white-space: nowrap;
-          display: inline-block;
           transition: all 0.2s ease;
-          border-radius: 8px;
-        }
-
-        .desktop-nav-item:hover,
-        .desktop-nav-item.active {
-          color: #087E8B;
-          background-color: #eefcfd;
-          font-weight: 700;
-        }
-
-        .nav-active-indicator {
-          position: absolute;
-          bottom: 2px;
-          left: 8px;
-          right: 8px;
-          height: 2.5px;
-          background-color: #087E8B;
-          border-radius: 2px;
-        }
-
-        /* Action Buttons */
-        .header-actions {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
           flex-shrink: 0;
         }
 
-        .desktop-action-btn {
-          display: none;
+        .header-main-nav-link:hover:not(.header-main-nav-link--active) {
+          color: #006B2D;
+          background-color: #F3F8F1;
         }
 
-        .header-icon-btn {
-          position: relative;
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          background-color: #f0f4f9;
-          color: #172033;
+        /* Active item: Solid brand background, white text (pill shape) */
+        .header-main-nav-link--active {
+          background-color: #006B2D !important;
+          color: #ffffff !important;
+          font-weight: 700;
+          padding: 7px 18px;
+          box-shadow: 0 3px 10px rgba(0, 107, 45, 0.28);
+        }
+
+        /* Right Action Items */
+        .theme-header-actions-col {
           display: flex;
           align-items: center;
-          justify-content: center;
-          border: 1px solid #e2eaf4;
-          text-decoration: none;
-          transition: all 0.2s ease;
-          touch-action: manipulation;
+          gap: 0.65rem;
+          flex-shrink: 0;
         }
 
-        .header-icon-btn:hover,
-        .header-icon-btn:active {
-          background-color: #e2effc;
-          color: #12355B;
+        /* Yess Infotech Style Accent CTA Pill Button */
+        .header-main-nav-link--cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: linear-gradient(135deg, #FFC928 0%, #F5B000 100%);
+          color: #17251B !important;
+          font-weight: 800;
+          font-size: 0.90rem;
+          padding: 8px 18px;
+          border-radius: 999px;
+          text-decoration: none;
+          box-shadow: 0 4px 14px rgba(255, 201, 40, 0.38);
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .header-main-nav-link--cta:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(255, 201, 40, 0.48);
+          filter: brightness(1.03);
+        }
+
+        .cta-icon {
+          color: #17251B;
+        }
+
+        /* Header Icon Buttons (Cart & Account) */
+        .header-icon-btn {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background-color: #F3F8F1;
+          color: #006B2D;
+          text-decoration: none;
+          border: 1px solid #E1E9DF;
+          transition: all 0.2s ease;
+        }
+
+        .header-icon-btn:hover {
+          background-color: #e2faea;
+          border-color: #006B2D;
+          transform: translateY(-1px);
         }
 
         .cart-badge-count {
           position: absolute;
           top: -4px;
           right: -4px;
-          background-color: #F4A261;
-          color: #172033;
-          font-size: 0.7rem;
+          background-color: #FFC928;
+          color: #17251B;
+          font-size: 0.70rem;
           font-weight: 800;
-          width: 20px;
-          height: 20px;
+          width: 19px;
+          height: 19px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-          border: 2px solid #ffffff;
+          border: 1.5px solid #ffffff;
         }
 
-        .mobile-hamburger-btn {
-          display: flex;
+        .user-active-dot {
+          position: absolute;
+          top: 3px;
+          right: 3px;
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background-color: #10b981;
+          border: 1.5px solid #ffffff;
+        }
+
+        /* Mobile Hamburger Toggle */
+        .mobile-menu-toggle {
+          display: none;
           align-items: center;
           justify-content: center;
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          border: 1px solid #cbd7e8;
-          background-color: #f8fafc;
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
+          background: #f0f4f9;
+          border: 1px solid #e2e8f0;
+          color: #17251B;
           cursor: pointer;
-          color: #12355B;
-          transition: all 0.2s ease;
-          touch-action: manipulation;
+          transition: background 0.2s;
         }
 
-        .mobile-hamburger-btn:hover,
-        .mobile-hamburger-btn:active {
-          background-color: #eefcfd;
-          border-color: #087E8B;
+        .mobile-menu-toggle:hover {
+          background: #e2e8f0;
         }
 
-        /* Mobile Drawer */
-        .mobile-drawer-overlay {
+        /* Mobile Drawer (Yess Infotech structure) */
+        .mobile-menu-wrapper {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+          z-index: 9999;
+          display: none;
+        }
+
+        .mobile-menu-wrapper.active {
+          display: block;
+        }
+
+        .mobile-menu-panel {
           position: fixed;
           top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          width: 100vw;
-          height: 100vh;
-          height: 100dvh;
-          background-color: rgba(10, 27, 46, 0.75);
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          z-index: 999999;
-          display: flex;
-          justifyContent: flex-end;
-          animation: fadeInOverlay 0.2s ease-out;
-          touch-action: pan-y;
-        }
-
-        .mobile-drawer-container {
-          background-color: #ffffff;
-          width: min(85vw, 360px);
+          right: -100%;
+          width: 82%;
+          max-width: 320px;
           height: 100%;
-          height: 100dvh;
-          display: flex;
-          flex-direction: column;
-          box-shadow: -10px 0 35px rgba(10, 27, 46, 0.35);
+          background: #ffffff;
+          box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+          z-index: 10000;
+          transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-          animation: slideInRightDrawer 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-          position: relative;
-          z-index: 1000000;
-        }
-
-        @keyframes fadeInOverlay {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        @keyframes slideInRightDrawer {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-
-        .mobile-drawer-header {
-          display: flex;
-          align-items: center;
-          justifyContent: space-between;
-          padding: 1.1rem 1.25rem;
-          border-bottom: 1px solid #e2eaf4;
-          background-color: #f8fafc;
-        }
-
-        .mobile-drawer-brand {
-          display: flex;
-          align-items: center;
-          gap: 0.6rem;
-        }
-
-        .mobile-drawer-brand-title {
-          font-size: 0.92rem;
-          font-weight: 800;
-          color: #12355B;
-        }
-
-        .mobile-drawer-close-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 8px;
-          border: 1px solid #cbd7e8;
-          background-color: #ffffff;
-          color: #172033;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-        }
-
-        .mobile-drawer-list {
-          list-style: none;
           display: flex;
           flex-direction: column;
-          gap: 0.35rem;
-          padding: 1.25rem 1rem;
         }
 
-        .mobile-drawer-list > li {
-          animation: drawerItemFadeSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+        .mobile-menu-wrapper.active .mobile-menu-panel {
+          right: 0;
         }
 
-        .mobile-drawer-list > li:nth-child(1) { animation-delay: 0.04s; }
-        .mobile-drawer-list > li:nth-child(2) { animation-delay: 0.08s; }
-        .mobile-drawer-list > li:nth-child(3) { animation-delay: 0.12s; }
-        .mobile-drawer-list > li:nth-child(4) { animation-delay: 0.16s; }
-        .mobile-drawer-list > li:nth-child(5) { animation-delay: 0.20s; }
-        .mobile-drawer-list > li:nth-child(6) { animation-delay: 0.24s; }
-        .mobile-drawer-list > li:nth-child(7) { animation-delay: 0.28s; }
-        .mobile-drawer-list > li:nth-child(8) { animation-delay: 0.32s; }
-        .mobile-drawer-list > li:nth-child(9) { animation-delay: 0.36s; }
-        .mobile-drawer-list > li:nth-child(10) { animation-delay: 0.40s; }
-
-        @keyframes drawerItemFadeSlide {
-          from {
-            opacity: 0;
-            transform: translateX(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .mobile-drawer-link {
+        .mobile-menu-header {
+          padding: 16px 20px;
+          border-bottom: 1px solid #e9edf3;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0.8rem 1rem;
-          border-radius: 10px;
-          background-color: transparent;
-          color: #172033;
-          font-weight: 600;
-          font-size: 1rem;
-          text-decoration: none;
-          transition: all 0.2s ease;
-          min-height: 44px;
+          background: #F3F8F1;
         }
 
-        .mobile-drawer-link:active,
-        .mobile-drawer-link.active {
-          background-color: #eefcfd;
-          color: #087E8B;
-          font-weight: 700;
-        }
-
-        .mobile-link-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background-color: #087E8B;
-        }
-
-        .mobile-drawer-logout-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: 10px;
-          backgroundColor: #fff1f2;
-          color: #e11d48;
-          font-weight: 700;
-          font-size: 0.92rem;
-          border: 1px solid #fecdd3;
-          cursor: pointer;
-          text-align: left;
-          min-height: 44px;
-        }
-
-        .mobile-drawer-lang-toggle {
+        .mobile-menu-close {
+          background: #ffffff;
+          border: 1px solid #E1E9DF;
+          border-radius: 8px;
+          width: 34px;
+          height: 34px;
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: pointer;
+          color: #5F6B61;
+        }
+
+        .mobile-menu-content {
+          padding: 16px 20px;
+          flex: 1;
+        }
+
+        .mobile-nav-link {
+          display: block;
+          padding: 12px 14px;
+          color: #17251B;
+          text-decoration: none;
+          font-size: 0.95rem;
+          font-weight: 600;
+          border-radius: 10px;
+          transition: all 0.2s ease;
+          margin-bottom: 4px;
+        }
+
+        .mobile-nav-link:hover {
+          background: #F3F8F1;
+          color: #006B2D;
+        }
+
+        .mobile-cta-pill {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: linear-gradient(135deg, #FFC928 0%, #F5B000 100%);
+          color: #17251B;
+          font-weight: 800;
+          text-decoration: none;
+          padding: 12px;
+          border-radius: 12px;
+          margin: 12px 0 6px;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(255, 201, 40, 0.3);
+        }
+
+        .mobile-logout-btn {
+          display: flex;
+          align-items: center;
           gap: 0.5rem;
           width: 100%;
-          padding: 0.7rem 1rem;
+          padding: 10px 14px;
           border-radius: 10px;
-          background-color: #f1f5f9;
-          color: #0f172a;
-          font-weight: 700;
+          border: none;
+          background-color: #fff1f2;
+          color: #e11d48;
           font-size: 0.88rem;
-          border: 1px solid #cbd5e1;
+          font-weight: 700;
           cursor: pointer;
-          min-height: 44px;
+          margin-top: 6px;
         }
 
-        .mobile-drawer-actions {
-          padding-top: 0.75rem;
-          border-top: 1px solid #e2e8f0;
+        /* Mobile Sub-Navbar Moving Announcement Marquee (Aligned below navbar, highly visible in mobile view) */
+        .mobile-subnav-ticker {
+          display: none;
+          background: linear-gradient(90deg, #02200d 0%, #006B2D 50%, #02200d 100%);
+          border-top: 1px solid rgba(255, 255, 255, 0.14);
+          border-bottom: 2px solid #FFC928;
+          box-shadow: 0 4px 14px rgba(0, 32, 14, 0.28);
+          overflow: hidden;
+          width: 100%;
+          position: relative;
+          z-index: 998;
+          padding: 6px 0;
+          touch-action: pan-y;
+        }
+
+        .mobile-ticker-track {
           display: flex;
-          gap: 0.6rem;
-          margin-top: 0.5rem;
+          width: max-content;
+          animation: mobileTickerScroll 22s linear infinite;
+          will-change: transform;
+          -webkit-transform: translateZ(0);
         }
 
-        /* Breakpoints */
-        @media (min-width: 1024px) {
-          .desktop-nav-menu {
-            display: block !important;
+        .mobile-ticker-track:active,
+        .mobile-ticker-track:hover {
+          animation-play-state: paused;
+        }
+
+        @keyframes mobileTickerScroll {
+          0% {
+            transform: translateX(0);
           }
-          .desktop-action-btn {
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+
+        .mobile-ticker-group {
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+          padding-right: 0.85rem;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        .mobile-ticker-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          color: #ffffff;
+          font-size: 0.76rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          white-space: nowrap;
+        }
+
+        .mobile-ticker-link {
+          text-decoration: none;
+          color: #17251B;
+          background: #FFC928;
+          padding: 2px 8px;
+          border-radius: 999px;
+          font-weight: 800;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          transition: transform 0.15s ease;
+        }
+
+        .mobile-ticker-link:active {
+          transform: scale(0.96);
+        }
+
+        .mobile-ticker-icon {
+          color: #FFC928;
+          flex-shrink: 0;
+        }
+
+        .mobile-ticker-link .mobile-ticker-icon {
+          color: #17251B;
+        }
+
+        .mobile-ticker-dot {
+          color: #FFC928;
+          font-size: 0.85rem;
+          line-height: 1;
+          opacity: 0.85;
+        }
+
+        /* Responsive Breakpoints */
+        @media (min-width: 1080px) {
+          .desktop-menu-section {
+            display: flex !important;
+          }
+          .mobile-menu-toggle {
+            display: none !important;
+          }
+        }
+
+        @media (min-width: 1280px) {
+          .theme-header-card {
+            padding: 12px 26px;
+            min-height: 72px;
+          }
+          .desktop-main-nav {
+            gap: 7px;
+          }
+          .header-main-nav-link {
+            padding: 8px 15px;
+            font-size: 0.93rem;
+          }
+          .header-main-nav-link--active {
+            padding: 8px 20px;
+          }
+        }
+
+        @media (max-width: 1079px) {
+          .theme-header__top-center {
+            display: none;
+          }
+          .mobile-subnav-ticker {
+            display: block;
+            margin-top: 6px;
+          }
+          .mobile-menu-toggle {
             display: inline-flex !important;
           }
-          .mobile-hamburger-btn {
-            display: none !important;
+          .header-main-nav-link--cta {
+            display: none;
           }
         }
 
-        @media (max-width: 1023px) {
-          .header-icon-btn {
-            display: none !important;
-          }
-          .brand-identity-link {
-            flex: 1;
-            gap: 0.65rem;
-          }
-          .brand-title {
-            font-size: clamp(0.95rem, 3.6vw, 1.12rem);
-            max-width: none !important;
-            white-space: normal !important;
-            line-height: 1.25;
-          }
-          .brand-subtitle {
-            font-size: clamp(0.68rem, 2.4vw, 0.78rem);
-            max-width: none !important;
-            white-space: normal !important;
-            line-height: 1.3;
+        @media (max-width: 768px) {
+          .theme-header-card {
+            border-radius: 20px;
+            padding: 8px 14px;
+            min-height: auto;
           }
         }
 
-        @media (max-width: 767px) {
-          .top-announcement-bar {
-            padding: 0.3rem 0;
-            overflow: hidden;
+        @media (max-width: 640px) {
+          .theme-header__top-navbar {
+            padding: 6px 0 20px;
           }
 
-          .topbar-container {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.25rem;
+          .theme-header__top-container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            gap: 0.35rem;
           }
 
-          .topbar-mission {
-            width: 100%;
-            margin-right: 0;
-            overflow: hidden;
-            justify-content: flex-start;
-          }
-
-          .topbar-marquee-wrapper {
-            width: 100%;
-            overflow: hidden;
-          }
-
-          .topbar-marquee-track {
-            animation: moveRightToLeft 13s linear infinite;
-            gap: 2rem;
-          }
-
-          .topbar-mission-text {
+          .top-phone-link {
             font-size: 0.74rem;
+            padding: 3px 8px;
+            gap: 4px;
+            border-radius: 999px;
+          }
+
+          .theme-header__top-right {
+            gap: 0.3rem;
+          }
+
+          .top-lang-pill {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            gap: 3px;
+          }
+
+          .top-wa-pill {
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            gap: 3px;
+          }
+
+          .theme-header__main {
+            margin-top: -14px;
+          }
+
+          .theme-header__main .container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+          }
+
+          .theme-header-card {
+            padding: 5px 10px;
+            border-radius: 16px;
+            gap: 0.4rem;
+          }
+
+          .theme-header-brand-col {
+            flex: 1;
+            min-width: 0;
+          }
+
+          .brand-link {
+            gap: 0.45rem;
+            min-width: 0;
+          }
+
+          .brand-logo-wrap {
+            transform: scale(0.85);
+            transform-origin: left center;
+          }
+
+          .brand-title {
+            font-size: clamp(0.72rem, 3.2vw, 0.88rem);
+            font-weight: 800;
+            line-height: 1.15;
             white-space: nowrap;
-            line-height: 1.25;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
-          .topbar-actions {
-            justify-content: space-between;
-            width: 100%;
-            margin-left: 0;
-            padding: 0 0.25rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.14);
-            padding-top: 0.25rem;
-          }
-
-          .topbar-divider {
+          .brand-subtitle {
             display: none;
           }
 
-          .topbar-affiliate-link,
-          .topbar-crm-link {
-            font-size: 0.75rem;
+          .theme-header-actions-col {
+            gap: 0.35rem;
+            flex-shrink: 0;
           }
 
-          .topbar-lang-btn {
-            padding: 0.15rem 0.5rem;
-            font-size: 0.72rem;
+          .header-icon-btn--account {
+            display: none !important;
+          }
+
+          .header-icon-btn--cart {
+            width: 35px;
+            height: 35px;
+            min-width: 35px;
+          }
+
+          .mobile-menu-toggle {
+            width: 35px;
+            height: 35px;
+            min-width: 35px;
+            border-radius: 10px;
+            background: #006B2D;
+            color: #ffffff;
+            border: none;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 107, 45, 0.25);
+          }
+
+          .mobile-menu-toggle:hover {
+            background: #08481c;
+          }
+
+          .mobile-subnav-ticker {
+            margin-top: 5px;
+            padding: 5px 0;
+          }
+
+          .mobile-ticker-item {
+            font-size: 0.73rem;
           }
         }
 
-        @media (max-width: 480px) {
-          .header-container {
-            gap: 0.5rem;
+        @media (max-width: 375px) {
+          .theme-header__top-container,
+          .theme-header__main .container {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
           }
-          .brand-identity-link {
-            gap: 0.55rem;
+
+          .mobile-subnav-ticker {
+            margin-top: 4px;
+            padding: 4px 0;
           }
+
+          .mobile-ticker-item {
+            font-size: 0.70rem;
+          }
+
+          .top-phone-link {
+            font-size: 0.70rem;
+            padding: 2px 6px;
+          }
+
+          .top-lang-pill,
+          .top-wa-pill {
+            font-size: 0.68rem;
+            padding: 2px 6px;
+          }
+
+          .theme-header-card {
+            padding: 4px 8px;
+            gap: 0.3rem;
+          }
+
           .brand-title {
-            font-size: clamp(0.92rem, 3.8vw, 1.05rem) !important;
-            max-width: none !important;
+            font-size: 0.74rem;
           }
-          .brand-subtitle {
-            font-size: clamp(0.66rem, 2.5vw, 0.74rem) !important;
-            max-width: none !important;
-          }
-          .mobile-hamburger-btn {
-            width: 42px;
-            height: 42px;
-            min-width: 42px;
-            min-height: 42px;
-            border-radius: 10px;
-          }
-          .header-actions {
-            gap: 0.35rem;
+
+          .header-icon-btn--cart,
+          .mobile-menu-toggle {
+            width: 33px;
+            height: 33px;
+            min-width: 33px;
           }
         }
       `}</style>
-
-      {/* Pan-India Language Selection Modal */}
-      <LanguageModal />
     </>
   );
 };

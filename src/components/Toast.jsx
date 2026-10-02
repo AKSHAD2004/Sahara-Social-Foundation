@@ -9,7 +9,7 @@ const Toast = () => {
 
   return (
     <div className="toast-container">
-      <CheckCircle2 size={20} style={{ color: '#34d399', flexShrink: 0 }} />
+      <CheckCircle2 size={20} style={{ color: '#159B32', flexShrink: 0 }} />
       <span style={{ flex: 1, fontWeight: 500 }}>{toastMessage}</span>
       <button
         onClick={() => setToastMessage(null)}

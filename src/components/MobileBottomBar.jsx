@@ -38,7 +38,7 @@ const MobileBottomBar = ({ onOpenConsultation }) => {
           className="mobile-bottom-item bottom-item-wa"
           aria-label="WhatsApp Chat"
         >
-          <WhatsAppIcon size={21} color="#16a34a" animated={true} />
+          <WhatsAppIcon size={21} color="#159B32" animated={true} />
           <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
         </a>
 
@@ -49,7 +49,7 @@ const MobileBottomBar = ({ onOpenConsultation }) => {
           aria-label="Shop Products"
         >
           <ShoppingBag size={20} />
-          <span>{language === 'mr' ? 'ऑर्डर' : 'Shop'}</span>
+          <span>{language === 'mr' ? 'उत्पादने' : 'Products'}</span>
         </Link>
 
         {/* Counseling Consultation */}
@@ -74,8 +74,8 @@ const MobileBottomBar = ({ onOpenConsultation }) => {
           background-color: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
-          border-top: 1px solid #e2eaf4;
-          box-shadow: 0 -4px 20px rgba(18, 53, 91, 0.08);
+          border-top: 1px solid #E1E9DF;
+          box-shadow: 0 -4px 20px rgba(0, 107, 45, 0.08);
           display: none;
           padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom, 0px)) 0.5rem;
         }
@@ -110,17 +110,17 @@ const MobileBottomBar = ({ onOpenConsultation }) => {
 
         .mobile-bottom-item:active {
           transform: scale(0.94);
-          background-color: #f0f4f9;
+          background-color: #F3F8F1;
         }
 
-        .bottom-item-call { color: #087E8B; }
-        .bottom-item-wa { color: #16a34a; }
-        .bottom-item-shop { color: #F4A261; }
+        .bottom-item-call { color: #006B2D; }
+        .bottom-item-wa { color: #159B32; }
+        .bottom-item-shop { color: #17251B; }
         .bottom-item-shop.active {
-          color: #087E8B;
-          background-color: #eefcfd;
+          color: #006B2D;
+          background-color: #F3F8F1;
         }
-        .bottom-item-counsel { color: #12355B; }
+        .bottom-item-counsel { color: #006B2D; }
 
         @media (max-width: 768px) {
           .mobile-bottom-bar {

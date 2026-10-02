@@ -31,14 +31,14 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div style={{ backgroundColor: '#F5F7FA', padding: '4rem 0', minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
+      <div style={{ backgroundColor: '#F3F8F1', padding: '4rem 0', minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '600px' }}>
           <div style={{
             width: '72px',
             height: '72px',
             borderRadius: '50%',
-            backgroundColor: '#dbf7fa',
-            color: '#087E8B',
+            backgroundColor: '#e2faea',
+            color: '#006B2D',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -46,10 +46,10 @@ const Cart = () => {
           }}>
             <ShoppingCart size={36} />
           </div>
-          <h2 style={{ fontSize: '1.65rem', color: '#12355B', fontWeight: 800, marginBottom: '0.65rem', fontFamily: 'var(--font-heading)' }}>
+          <h2 style={{ fontSize: '1.65rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.65rem', fontFamily: 'var(--font-heading)' }}>
             {language === 'mr' ? 'आपली कार्ट रिकामी आहे' : 'Your Cart is Empty'}
           </h2>
-          <p style={{ color: '#4f6182', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+          <p style={{ color: '#5F6B61', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
             {language === 'mr'
               ? 'आपण अद्याप कोणतेही आयुर्वेदिक उत्पादन जोडलेले नाही. आमच्या दर्जेदार फॉर्म्युलामधून निवड करा.'
               : 'You have not added any wellness formula yet. Explore our authentic Ayurvedic store.'}
@@ -64,9 +64,9 @@ const Cart = () => {
   }
 
   return (
-    <div className="cart-page" style={{ backgroundColor: '#F5F7FA', padding: '2.5rem 0 4.5rem 0' }}>
+    <div className="cart-page" style={{ backgroundColor: '#F3F8F1', padding: '2.5rem 0 4.5rem 0' }}>
       <div className="container">
-        <h1 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', color: '#12355B', fontWeight: 800, marginBottom: '1.25rem', fontFamily: 'var(--font-heading)' }}>
+        <h1 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.2rem)', color: '#006B2D', fontWeight: 800, marginBottom: '1.25rem', fontFamily: 'var(--font-heading)' }}>
           {language === 'mr' ? 'आपली शॉपिंग कार्ट' : 'Shopping Cart'}
         </h1>
 
@@ -81,9 +81,9 @@ const Cart = () => {
             <div style={{
               backgroundColor: '#ffffff',
               borderRadius: '20px',
-              border: '1px solid #e2eaf4',
+              border: '1px solid #E1E9DF',
               overflow: 'hidden',
-              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
+              boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)'
             }}>
               {cartItems.map((item) => (
                 <div
@@ -91,7 +91,7 @@ const Cart = () => {
                   className="cart-item-row"
                   style={{
                     padding: '1.25rem',
-                    borderBottom: '1px solid #e2eaf4',
+                    borderBottom: '1px solid #E1E9DF',
                     display: 'flex',
                     gap: '1rem',
                     alignItems: 'center'
@@ -109,20 +109,20 @@ const Cart = () => {
                       height: '74px',
                       borderRadius: '12px',
                       objectFit: 'contain',
-                      backgroundColor: '#F5F7FA',
+                      backgroundColor: '#F3F8F1',
                       flexShrink: 0,
                       padding: '0.25rem',
-                      border: '1px solid #e2eaf4'
+                      border: '1px solid #E1E9DF'
                     }}
                   />
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <Link to={`/shop/${item.id}`}>
-                      <h4 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#12355B', marginBottom: '0.2rem', lineHeight: 1.3, fontFamily: 'var(--font-heading)' }}>
+                      <h4 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.2rem', lineHeight: 1.3, fontFamily: 'var(--font-heading)' }}>
                         {language === 'mr' ? item.nameMr : item.nameEn}
                       </h4>
                     </Link>
-                    <div style={{ fontSize: '0.8rem', color: '#4f6182', marginBottom: '0.45rem' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#5F6B61', marginBottom: '0.45rem' }}>
                       ₹{item.price} / युनिट
                     </div>
 
@@ -131,7 +131,7 @@ const Cart = () => {
                       <div style={{
                         display: 'inline-flex',
                         alignItems: 'center',
-                        border: '1px solid #cbd5e1',
+                        border: '1px solid #E1E9DF',
                         borderRadius: '8px',
                         overflow: 'hidden'
                       }}>
@@ -140,17 +140,17 @@ const Cart = () => {
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           style={{
                             padding: '0.35rem 0.75rem',
-                            background: '#f1f5f9',
+                            background: '#F3F8F1',
                             border: 'none',
                             cursor: 'pointer',
                             fontWeight: 700,
                             minHeight: '36px',
-                            color: '#12355B'
+                            color: '#006B2D'
                           }}
                         >
                           -
                         </button>
-                        <span style={{ padding: '0.35rem 0.85rem', fontSize: '0.88rem', fontWeight: 700, color: '#172033' }}>
+                        <span style={{ padding: '0.35rem 0.85rem', fontSize: '0.88rem', fontWeight: 700, color: '#17251B' }}>
                           {item.quantity}
                         </span>
                         <button
@@ -158,12 +158,12 @@ const Cart = () => {
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           style={{
                             padding: '0.35rem 0.75rem',
-                            background: '#f1f5f9',
+                            background: '#F3F8F1',
                             border: 'none',
                             cursor: 'pointer',
                             fontWeight: 700,
                             minHeight: '36px',
-                            color: '#12355B'
+                            color: '#006B2D'
                           }}
                         >
                           +
@@ -192,7 +192,7 @@ const Cart = () => {
                     </div>
                   </div>
 
-                  <div style={{ textAlign: 'right', fontWeight: 800, fontSize: '1.15rem', color: '#12355B', flexShrink: 0 }}>
+                  <div style={{ textAlign: 'right', fontWeight: 800, fontSize: '1.15rem', color: '#006B2D', flexShrink: 0 }}>
                     ₹{item.price * item.quantity}
                   </div>
                 </div>
@@ -200,7 +200,7 @@ const Cart = () => {
 
               <div style={{
                 padding: '1rem 1.25rem',
-                backgroundColor: '#F5F7FA',
+                backgroundColor: '#F3F8F1',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -213,7 +213,7 @@ const Cart = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.35rem',
-                    color: '#087E8B',
+                    color: '#006B2D',
                     fontSize: '0.88rem',
                     fontWeight: 700
                   }}
@@ -228,7 +228,7 @@ const Cart = () => {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: '#4f6182',
+                    color: '#5F6B61',
                     fontSize: '0.82rem',
                     cursor: 'pointer',
                     textDecoration: 'underline'
@@ -246,37 +246,37 @@ const Cart = () => {
               backgroundColor: '#ffffff',
               borderRadius: '20px',
               padding: '1.75rem',
-              border: '1px solid #e2eaf4',
-              boxShadow: '0 4px 15px rgba(18,53,91,0.04)'
+              border: '1px solid #E1E9DF',
+              boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)'
             }}>
-              <h3 style={{ fontSize: '1.25rem', color: '#12355B', fontWeight: 800, marginBottom: '1.15rem', fontFamily: 'var(--font-heading)' }}>
+              <h3 style={{ fontSize: '1.25rem', color: '#006B2D', fontWeight: 800, marginBottom: '1.15rem', fontFamily: 'var(--font-heading)' }}>
                 {language === 'mr' ? 'ऑर्डर सारांश (Summary)' : 'Order Summary'}
               </h3>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem', fontSize: '0.92rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4f6182' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#5F6B61' }}>
                   <span>{language === 'mr' ? 'उपएकूण (Subtotal)' : 'Subtotal'}</span>
-                  <span style={{ fontWeight: 700, color: '#172033' }}>₹{subtotal}</span>
+                  <span style={{ fontWeight: 700, color: '#17251B' }}>₹{subtotal}</span>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4f6182' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#5F6B61' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                    <Truck size={15} style={{ color: '#087E8B' }} />
+                    <Truck size={15} style={{ color: '#006B2D' }} />
                     {language === 'mr' ? 'डिलिव्हरी शुल्क' : 'Delivery Charges'}
                   </span>
-                  <span style={{ fontWeight: 700, color: '#087E8B' }}>
+                  <span style={{ fontWeight: 700, color: '#006B2D' }}>
                     {deliveryCharges === 0 ? (language === 'mr' ? 'मोफत (Free)' : 'FREE') : `₹${deliveryCharges}`}
                   </span>
                 </div>
 
                 <div style={{
                   paddingTop: '0.75rem',
-                  borderTop: '2px dashed #e2eaf4',
+                  borderTop: '2px dashed #E1E9DF',
                   display: 'flex',
                   justifyContent: 'space-between',
                   fontSize: '1.2rem',
                   fontWeight: 800,
-                  color: '#12355B'
+                  color: '#006B2D'
                 }}>
                   <span>{language === 'mr' ? 'एकूण रक्कम' : 'Total Amount'}</span>
                   <span>₹{grandTotal}</span>
@@ -285,17 +285,17 @@ const Cart = () => {
 
               {/* Mandatory Helpline Reminder Notice */}
               <div style={{
-                backgroundColor: '#fff3ec',
-                borderLeft: '4px solid #F4A261',
+                backgroundColor: '#fff9e6',
+                borderLeft: '4px solid #FFC928',
                 padding: '0.75rem 0.95rem',
                 borderRadius: '8px',
                 fontSize: '0.82rem',
-                color: '#7c2d12',
+                color: '#785300',
                 lineHeight: 1.5,
                 marginBottom: '1.25rem'
               }}>
                 <strong>{language === 'mr' ? 'महत्त्वाचे:' : 'Note:'}</strong>{' '}
-                <span style={{ color: '#172033' }}>
+                <span style={{ color: '#17251B' }}>
                   {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
                 </span>
               </div>
@@ -310,8 +310,8 @@ const Cart = () => {
                 <ArrowRight size={18} />
               </button>
 
-              <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#4f6182' }}>
-                <ShieldCheck size={14} style={{ display: 'inline', color: '#087E8B', marginRight: '4px' }} />
+              <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#5F6B61' }}>
+                <ShieldCheck size={14} style={{ display: 'inline', color: '#006B2D', marginRight: '4px' }} />
                 {language === 'mr' ? 'सुरक्षित ऑर्डर व सीलबंद पॅकिंग' : '100% Safe & Sealed Delivery'}
               </div>
             </div>
@@ -323,15 +323,14 @@ const Cart = () => {
         @media (max-width: 960px) {
           .cart-layout-grid {
             grid-template-columns: 1fr !important;
-            gap: 1.5rem !important;
+            gap: 1.15rem !important;
           }
         }
 
         @media (max-width: 480px) {
           .cart-item-row {
-            flex-direction: column;
-            align-items: flex-start !important;
-            gap: 0.75rem !important;
+            padding: 0.85rem !important;
+            gap: 0.65rem !important;
           }
         }
       `}</style>

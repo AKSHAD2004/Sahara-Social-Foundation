@@ -1,18 +1,11 @@
-import React, { useState } from 'react';
-import { Globe, X, Check, Search, Sparkles } from 'lucide-react';
+import React from 'react';
+import { Globe, X, Check, Sparkles } from 'lucide-react';
 import { useLanguage, INDIAN_LANGUAGES } from '../context/LanguageContext';
 
 const LanguageModal = () => {
   const { isLanguageModalOpen, closeLanguageModal, language, selectLanguage } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
 
   if (!isLanguageModalOpen) return null;
-
-  const filteredLanguages = INDIAN_LANGUAGES.filter(lang => 
-    lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.englishName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.region.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div
@@ -92,28 +85,6 @@ const LanguageModal = () => {
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div style={{ padding: '1rem 1.25rem 0.5rem 1.25rem', backgroundColor: '#F5F7FA', borderBottom: '1px solid #e2eaf4' }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#087E8B' }} />
-            <input
-              type="text"
-              placeholder="भाषा किंवा राज्य शोधा (उदा. मराठी, Hindi, Gujarati, Kannada...)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.65rem 0.75rem 0.65rem 2.3rem',
-                borderRadius: '10px',
-                border: '1.5px solid #cbd5e1',
-                fontSize: '0.88rem',
-                boxSizing: 'border-box',
-                backgroundColor: '#ffffff'
-              }}
-            />
-          </div>
-        </div>
-
         {/* Languages Grid */}
         <div style={{ 
           padding: '1.25rem', 
@@ -123,7 +94,7 @@ const LanguageModal = () => {
           gridTemplateColumns: 'repeat(2, 1fr)',
           gap: '0.75rem'
         }}>
-          {filteredLanguages.map((lang) => {
+          {INDIAN_LANGUAGES.map((lang) => {
             const isSelected = language === lang.code;
             return (
               <button

@@ -26,21 +26,16 @@ const Videos = () => {
   return (
     <div className="videos-page">
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
-        color: '#ffffff',
-        padding: '3.5rem 0',
-        textAlign: 'center'
-      }}>
+      <div className="page-hero-header">
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(244,162,97,0.2)', color: '#F4A261', border: '1px solid rgba(244,162,97,0.4)' }}>
-            <VideoIcon size={16} />
+          <div className="section-badge">
+            <VideoIcon size={14} />
             <span>{language === 'mr' ? 'अधिकृत व्हिडिओ संग्रह' : 'Official Result Videos'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
+          <h1>
             {language === 'mr' ? 'लाभार्थ्यांचे मनोगत व प्रत्यक्ष निकाल व्हिडिओ' : 'Patient Recovery & Beneficiary Videos'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#e2effc', maxWidth: '750px', margin: '0 auto' }}>
+          <p>
             {language === 'mr'
               ? 'मधुमेह मुक्त भारत व व्यसनमुक्त भारत अभियानांतर्गत सहारा सोशल फाऊंडेशनच्या संपर्कात येऊन आजारांवर मात केलेल्या रुग्णांचे प्रत्यक्ष मनोगत.'
               : 'Authentic recorded testimonials and clinical counseling videos directly from Sahara Social Foundation, Kolhapur.'}
@@ -48,10 +43,10 @@ const Videos = () => {
         </div>
       </div>
 
-      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
+      <section className="section" style={{ backgroundColor: '#F3F8F1' }}>
         <div className="container">
           {/* Category Filter Chips */}
-          <div style={{
+          <div className="videos-filter-chips" style={{
             display: 'flex',
             justifyContent: 'center',
             gap: '0.6rem',
@@ -70,11 +65,11 @@ const Videos = () => {
                     fontSize: '0.9rem',
                     fontWeight: 700,
                     border: '1.5px solid',
-                    borderColor: isActive ? '#087E8B' : '#e2eaf4',
-                    backgroundColor: isActive ? '#087E8B' : '#ffffff',
-                    color: isActive ? '#ffffff' : '#172033',
+                    borderColor: isActive ? '#006B2D' : '#E1E9DF',
+                    backgroundColor: isActive ? '#006B2D' : '#ffffff',
+                    color: isActive ? '#ffffff' : '#17251B',
                     cursor: 'pointer',
-                    boxShadow: isActive ? '0 4px 12px rgba(8, 126, 139, 0.25)' : '0 2px 6px rgba(18,53,91,0.04)',
+                    boxShadow: isActive ? '0 4px 12px rgba(0, 107, 45, 0.25)' : '0 2px 6px rgba(0, 107, 45, 0.04)',
                     transition: 'all 0.2s ease'
                   }}
                 >
@@ -85,27 +80,27 @@ const Videos = () => {
           </div>
 
           {/* 9:16 Vertical Reels Grid (All 12 Videos) */}
-          <div className="grid-reels" style={{ marginBottom: '3.5rem' }}>
+          <div className="grid-reels videos-grid-reels" style={{ marginBottom: '3.5rem' }}>
             {filteredVideos.map((video) => (
               <VideoCard key={video.id} video={video} />
             ))}
           </div>
 
           {/* Video Counseling Strip */}
-          <div style={{
+          <div className="videos-counseling-strip" style={{
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '2.5rem',
-            boxShadow: '0 10px 30px rgba(18,53,91,0.05)',
-            border: '1px solid #e2eaf4',
+            boxShadow: '0 10px 30px rgba(0, 107, 45, 0.05)',
+            border: '1px solid #E1E9DF',
             textAlign: 'center',
             maxWidth: '840px',
             margin: '0 auto'
           }}>
-            <h3 style={{ fontSize: '1.5rem', color: '#12355B', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
+            <h3 style={{ fontSize: '1.5rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
               {language === 'mr' ? 'आपलाही अनुभव शेअर करायचा आहे किंवा सल्ला हवा आहे?' : 'Want to Share Your Story or Consult With Our Health Staff?'}
             </h3>
-            <p style={{ color: '#4f6182', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+            <p style={{ color: '#5F6B61', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
               {language === 'mr'
                 ? 'सहारा सोशल फाऊंडेशनच्या कोल्हापूर कार्यालयाशी थेट संपर्क साधा आणि मोफत फोन मार्गदर्शन मिळवा.'
                 : 'Call our dedicated Kolhapur helpline directly or connect on WhatsApp for personalized guidance.'}
@@ -133,6 +128,30 @@ const Videos = () => {
           </div>
         </div>
       </section>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .videos-filter-chips {
+            margin-bottom: 1.25rem !important;
+            gap: 0.4rem !important;
+          }
+          .videos-grid-reels {
+            margin-bottom: 1.5rem !important;
+          }
+          .videos-counseling-strip {
+            padding: 1.25rem 1rem !important;
+            border-radius: 14px !important;
+          }
+          .videos-counseling-strip h3 {
+            font-size: 1.2rem !important;
+            margin-bottom: 0.35rem !important;
+          }
+          .videos-counseling-strip p {
+            font-size: 0.82rem !important;
+            margin-bottom: 1rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

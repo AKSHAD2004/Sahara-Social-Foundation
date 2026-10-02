@@ -11,8 +11,8 @@ const TestimonialCard = ({ testimonial }) => {
         backgroundColor: '#ffffff',
         borderRadius: '18px',
         padding: '1.75rem',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
+        border: '1px solid #E1E9DF',
+        boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative'
@@ -28,17 +28,17 @@ const TestimonialCard = ({ testimonial }) => {
         {/* Rating Stars */}
         <div style={{ display: 'flex', gap: '0.2rem' }}>
           {[...Array(testimonial.rating || 5)].map((_, i) => (
-            <Star key={i} size={16} fill="#F4A261" color="#F4A261" />
+            <Star key={i} size={16} fill="#FFC928" color="#FFC928" />
           ))}
         </div>
 
-        <Quote size={28} style={{ color: '#087E8B', opacity: 0.3 }} />
+        <Quote size={28} style={{ color: '#159B32', opacity: 0.35 }} />
       </div>
 
       {/* Review text */}
       <p style={{
         fontSize: '0.92rem',
-        color: '#172033',
+        color: '#17251B',
         lineHeight: 1.65,
         marginBottom: '1.25rem',
         flex: 1,
@@ -50,7 +50,7 @@ const TestimonialCard = ({ testimonial }) => {
       {/* Patient info */}
       <div style={{
         paddingTop: '0.85rem',
-        borderTop: '1px solid #e2eaf4',
+        borderTop: '1px solid #E1E9DF',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -58,18 +58,18 @@ const TestimonialCard = ({ testimonial }) => {
         gap: '0.5rem'
       }}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#12355B' }}>
+          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#17251B' }}>
             {testimonial.name}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.78rem', color: '#4f6182' }}>
-            <MapPin size={12} style={{ color: '#087E8B' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.78rem', color: '#5F6B61' }}>
+            <MapPin size={12} style={{ color: '#006B2D' }} />
             <span>{testimonial.location}</span>
           </div>
         </div>
 
         <div style={{
-          backgroundColor: '#dbf7fa',
-          color: '#087E8B',
+          backgroundColor: '#e2faea',
+          color: '#006B2D',
           fontSize: '0.72rem',
           fontWeight: 700,
           padding: '0.25rem 0.6rem',
@@ -77,7 +77,7 @@ const TestimonialCard = ({ testimonial }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '0.25rem',
-          border: '1px solid #abedf5'
+          border: '1px solid #c2f5d2'
         }}>
           <CheckCircle2 size={12} />
           <span>{testimonial.conditionEn}</span>

@@ -66,7 +66,7 @@ const TestimonialsCarousel = () => {
   return (
     <section 
       className="section testimonials-section" 
-      style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4', position: 'relative' }}
+      style={{ backgroundColor: '#ffffff', borderTop: '1px solid #E1E9DF', position: 'relative' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -113,17 +113,17 @@ const TestimonialsCarousel = () => {
                 height: '40px',
                 borderRadius: '50%',
                 backgroundColor: '#ffffff',
-                border: '1.5px solid #cbd5e1',
-                color: '#12355B',
+                border: '1.5px solid #E1E9DF',
+                color: '#006B2D',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(18,53,91,0.08)',
+                boxShadow: '0 2px 8px rgba(0, 107, 45, 0.08)',
                 transition: 'all 0.2s ease'
               }}
-              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
-              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#006B2D'; }}
               aria-label="Previous testimonial"
             >
               <ChevronLeft size={20} />
@@ -140,7 +140,7 @@ const TestimonialsCarousel = () => {
                     width: dotIdx === currentIndex ? '24px' : '8px',
                     height: '8px',
                     borderRadius: '9999px',
-                    backgroundColor: dotIdx === currentIndex ? '#087E8B' : '#cbd5e1',
+                    backgroundColor: dotIdx === currentIndex ? '#006B2D' : '#E1E9DF',
                     border: 'none',
                     padding: 0,
                     cursor: 'pointer',
@@ -159,17 +159,17 @@ const TestimonialsCarousel = () => {
                 height: '40px',
                 borderRadius: '50%',
                 backgroundColor: '#ffffff',
-                border: '1.5px solid #cbd5e1',
-                color: '#12355B',
+                border: '1.5px solid #E1E9DF',
+                color: '#006B2D',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(18,53,91,0.08)',
+                boxShadow: '0 2px 8px rgba(0, 107, 45, 0.08)',
                 transition: 'all 0.2s ease'
               }}
-              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
-              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#006B2D'; }}
               aria-label="Next testimonial"
             >
               <ChevronRight size={20} />
@@ -234,7 +234,7 @@ const GalleryStaggeredPreview = () => {
   }, []);
 
   return (
-    <section ref={galleryRef} className={`section-sm gallery-section ${inView ? 'gallery-in-view' : ''}`} style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2eaf4' }}>
+    <section ref={galleryRef} className={`section-sm gallery-section ${inView ? 'gallery-in-view' : ''}`} style={{ backgroundColor: '#ffffff', borderTop: '1px solid #E1E9DF' }}>
       <div className="container">
         <div style={{
           display: 'flex',
@@ -249,7 +249,7 @@ const GalleryStaggeredPreview = () => {
               <Sparkles size={14} />
               <span>{language === 'mr' ? 'छायाचित्रे' : 'Photo Gallery'}</span>
             </div>
-            <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.85rem)', color: '#12355B', margin: 0 }}>
+            <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.85rem)', color: '#006B2D', margin: 0 }}>
               {language === 'mr' ? 'संस्थेचे आरोग्य उपक्रम व शिबिरे' : 'Health Camps & Field Activities'}
             </h2>
           </div>
@@ -270,8 +270,8 @@ const GalleryStaggeredPreview = () => {
                 overflow: 'hidden',
                 position: 'relative',
                 height: '240px',
-                boxShadow: '0 4px 15px rgba(18,53,91,0.08)',
-                backgroundColor: '#0a1b2e'
+                boxShadow: '0 4px 15px rgba(0, 107, 45, 0.08)',
+                backgroundColor: '#04200e'
               }}
             >
               <img
@@ -287,7 +287,7 @@ const GalleryStaggeredPreview = () => {
               <div style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(to top, rgba(10,27,46,0.85) 0%, transparent 60%)'
+                background: 'linear-gradient(to top, rgba(4,32,14,0.9) 0%, transparent 60%)'
               }} />
               <div style={{
                 position: 'absolute',
@@ -356,15 +356,15 @@ const Home = () => {
       <Hero onOpenConsultation={() => setIsConsultationOpen(true)} />
 
       {/* Product / Shop Section (Moved Upside First) */}
-      <section className="section" style={{ backgroundColor: '#ffffff', paddingTop: '3.5rem' }}>
+      <section className="section home-products-section" style={{ backgroundColor: '#ffffff' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
               <ShoppingBag size={15} />
-              <span>{language === 'mr' ? 'Antox आयुर्वेदिक उत्पादने' : 'Antox Formulations'}</span>
+              <span>{language === 'mr' ? 'Antox आयुर्वेदिक उत्पादने' : 'Antox Products'}</span>
             </div>
             <h2>
-              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Ayurvedic Formulas'}
+              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Ayurvedic Products'}
             </h2>
             <p>
               {language === 'mr'
@@ -382,14 +382,14 @@ const Home = () => {
           <div style={{ textAlign: 'center' }}>
             <Link to="/shop" className="btn btn-primary btn-lg">
               <ShoppingBag size={18} />
-              <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा' : 'Explore Complete Shop'}</span>
+              <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा' : 'Explore All Products'}</span>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Result Videos / Reels Horizontal Slider Section */}
-      <section className="section" style={{ backgroundColor: '#F5F7FA', borderTop: '1px solid #e2eaf4' }}>
+      <section className="section" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF' }}>
         <div className="container">
           <div className="section-header" style={{ marginBottom: '1.75rem' }}>
             <div className="section-badge">
@@ -414,7 +414,7 @@ const Home = () => {
             marginBottom: '1rem',
             padding: '0 0.25rem'
           }}>
-            <div style={{ fontSize: '0.86rem', color: '#4f6182', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.86rem', color: '#5F6B61', fontWeight: 600 }}>
               {language === 'mr' ? '👈 स्वाइप करा / प्ले करा' : '👈 Swipe / Click to Play 👉'}
             </div>
 
@@ -427,17 +427,17 @@ const Home = () => {
                   height: '38px',
                   borderRadius: '50%',
                   backgroundColor: '#ffffff',
-                  border: '1.5px solid #e2eaf4',
-                  color: '#12355B',
+                  border: '1.5px solid #E1E9DF',
+                  color: '#006B2D',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 6px rgba(18,53,91,0.08)',
+                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.08)',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
+                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#006B2D'; }}
                 aria-label="Previous reel"
               >
                 <ChevronLeft size={18} />
@@ -451,17 +451,17 @@ const Home = () => {
                   height: '38px',
                   borderRadius: '50%',
                   backgroundColor: '#ffffff',
-                  border: '1.5px solid #e2eaf4',
-                  color: '#12355B',
+                  border: '1.5px solid #E1E9DF',
+                  color: '#006B2D',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 6px rgba(18,53,91,0.08)',
+                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.08)',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#12355B'; e.currentTarget.style.color = '#ffffff'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#12355B'; }}
+                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
+                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#006B2D'; }}
                 aria-label="Next reel"
               >
                 <ChevronRight size={18} />
@@ -543,7 +543,7 @@ const Home = () => {
       </section>
 
       {/* Health Categories / Services Grid */}
-      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
+      <section className="section" style={{ backgroundColor: '#F3F8F1' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
@@ -586,7 +586,7 @@ const Home = () => {
       <GalleryStaggeredPreview />
 
       {/* Frequently Asked Questions */}
-      <section className="section-sm" style={{ backgroundColor: '#F5F7FA', borderTop: '1px solid #e2eaf4' }}>
+      <section className="section-sm" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF' }}>
         <div className="container" style={{ maxWidth: '880px' }}>
           <div className="section-header" style={{ marginBottom: '2.5rem' }}>
             <div className="section-badge">
@@ -604,14 +604,14 @@ const Home = () => {
                   backgroundColor: '#ffffff',
                   borderRadius: '14px',
                   padding: '1.25rem 1.4rem',
-                  border: '1px solid #e2eaf4',
-                  boxShadow: '0 2px 8px rgba(18,53,91,0.04)'
+                  border: '1px solid #E1E9DF',
+                  boxShadow: '0 2px 8px rgba(0, 107, 45, 0.04)'
                 }}
               >
-                <h3 style={{ fontSize: '1.02rem', fontWeight: 700, color: '#12355B', marginBottom: '0.35rem' }}>
+                <h3 style={{ fontSize: '1.02rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
                   Q: {language === 'mr' ? faq.qMr : faq.qEn}
                 </h3>
-                <p style={{ fontSize: '0.9rem', color: '#4f6182', lineHeight: 1.6, margin: 0 }}>
+                <p style={{ fontSize: '0.9rem', color: '#5F6B61', lineHeight: 1.6, margin: 0 }}>
                   {language === 'mr' ? faq.aMr : faq.aEn}
                 </p>
               </div>
@@ -622,7 +622,7 @@ const Home = () => {
 
       {/* Final Call to Action Banner */}
       <section style={{
-        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
+        background: 'linear-gradient(135deg, #006B2D 0%, #04200e 100%)',
         color: '#ffffff',
         padding: '3.5rem 0',
         textAlign: 'center'
@@ -633,14 +633,14 @@ const Home = () => {
               ? 'आजच निरोगी आणि व्यसनमुक्त आयुष्याकडे पाऊल टाका'
               : 'Take the Step Towards a Healthier, Addiction-Free Life Today'}
           </h2>
-          <p style={{ fontSize: 'clamp(0.95rem, 1vw + 0.5rem, 1.1rem)', color: '#e2effc', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 1vw + 0.5rem, 1.1rem)', color: '#d6fae0', lineHeight: 1.6, marginBottom: '1.75rem' }}>
             {language === 'mr'
               ? 'सहारा सोशल फाऊंडेशनच्या तज्ज्ञ समुपदेशकांकडून मोफत फोन मार्गदर्शन मिळवण्यासाठी आताच संपर्क साधा किंवा फॉर्म्युला मागवा.'
-              : 'Contact our helpline at 8421154090 or explore our authentic Ayurvedic kits.'}
+              : 'Contact our helpline at 7745066707 or explore our authentic Ayurvedic kits.'}
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-            <Link to="/shop" className="btn btn-light-primary btn-lg" style={{ backgroundColor: '#F4A261', color: '#172033', fontWeight: 700 }}>
+            <Link to="/shop" className="btn btn-accent btn-lg" style={{ backgroundColor: '#FFC928', color: '#17251B', fontWeight: 700 }}>
               <ShoppingBag size={18} />
               <span>{language === 'mr' ? 'फॉर्म्युला ऑर्डर करा' : 'Order Formula Online'}</span>
             </Link>
@@ -650,7 +650,7 @@ const Home = () => {
               className="btn btn-call btn-lg"
             >
               <Phone size={18} />
-              <span>{language === 'mr' ? 'कॉल: ८४२११५४०९०' : 'Call 8421154090'}</span>
+              <span>{language === 'mr' ? 'कॉल: ७७४५०६६७०७' : 'Call 7745066707'}</span>
             </a>
 
             <button

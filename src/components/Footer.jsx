@@ -44,10 +44,10 @@ const Footer = () => {
             <ShieldAlert size={20} />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, color: '#fef3c7', fontSize: '0.98rem', marginBottom: '0.2rem' }}>
+            <div style={{ fontWeight: 700, color: '#FFC928', fontSize: '0.98rem', marginBottom: '0.2rem' }}>
               {language === 'mr' ? 'महत्त्वाची सूचना व मार्गदर्शन:' : 'Important Notice & Regimen Guidance:'}
             </div>
-            <p style={{ fontSize: '0.88rem', color: '#e2e8f0', lineHeight: 1.5, margin: 0 }}>
+            <p style={{ fontSize: '0.88rem', color: '#e2faea', lineHeight: 1.5, margin: 0 }}>
               {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
             </p>
           </div>
@@ -151,7 +151,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/shop" className="footer-link">
-                  → {language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Shop / Formulas'}
+                  → {language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}
                 </Link>
               </li>
               <li>
@@ -162,6 +162,11 @@ const Footer = () => {
               <li>
                 <Link to="/videos" className="footer-link">
                   → {language === 'mr' ? 'रुग्णांचे व्हिडिओ' : 'Result Videos'}
+                </Link>
+              </li>
+              <li>
+                <Link to="/study-report" className="footer-link">
+                  → {language === 'mr' ? 'क्लिनिकल रिपोर्ट (Study Report)' : 'Clinical Report'}
                 </Link>
               </li>
             </ul>
@@ -250,8 +255,8 @@ const Footer = () => {
                 padding: '0.6rem 0.8rem',
                 borderRadius: '8px',
                 fontSize: '0.78rem',
-                color: '#fef3c7',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
+                color: '#FFC928',
+                border: '1px solid rgba(255, 201, 40, 0.25)'
               }}>
                 {language === 'mr' ? organizationInfo.contact.visitingNoteMr : organizationInfo.contact.visitingNote}
               </div>
@@ -281,20 +286,20 @@ const Footer = () => {
 
       <style>{`
         .site-footer {
-          background-color: #0a1b2e;
-          color: #e2eaf4;
+          background-color: #04200e;
+          color: #d6fae0;
           padding-top: 3.5rem;
           padding-bottom: 2rem;
-          border-top: 4px solid #087E8B;
+          border-top: 4px solid #159B32;
           margin-top: auto;
         }
 
         .footer-notice-box {
-          background-color: rgba(255, 255, 255, 0.08);
+          background-color: rgba(255, 255, 255, 0.06);
           border-radius: 14px;
           padding: 1.15rem 1.35rem;
           margin-bottom: 2.75rem;
-          border: 1px solid rgba(244, 162, 97, 0.3);
+          border: 1px solid rgba(255, 201, 40, 0.35);
           display: flex;
           align-items: flex-start;
           gap: 0.85rem;
@@ -302,8 +307,8 @@ const Footer = () => {
         }
 
         .footer-notice-icon-box {
-          background: linear-gradient(135deg, #F4A261, #dc6a1b);
-          color: #ffffff;
+          background: linear-gradient(135deg, #FFC928, #e6a70a);
+          color: #17251B;
           padding: 0.4rem;
           border-radius: 8px;
           display: flex;
@@ -321,7 +326,7 @@ const Footer = () => {
           font-size: 0.98rem;
           font-weight: 700;
           margin-bottom: 1rem;
-          border-bottom: 2px solid #087E8B;
+          border-bottom: 2px solid #159B32;
           padding-bottom: 0.35rem;
           display: inline-block;
         }
@@ -335,29 +340,29 @@ const Footer = () => {
         }
 
         .footer-link {
-          color: #b8d4f6;
+          color: #d6fae0;
           transition: color 0.2s ease;
           display: inline-block;
         }
 
         .footer-link:hover {
-          color: #F4A261;
+          color: #FFC928;
         }
 
         .footer-social-btn {
           width: 40px;
           height: 40px;
           border-radius: 10px;
-          background-color: rgba(255, 255, 255, 0.12);
+          background-color: rgba(255, 255, 255, 0.1);
           color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: background 0.2s;
+          transition: all 0.2s;
         }
 
         .footer-social-btn:hover {
-          background-color: rgba(8, 126, 139, 0.4);
+          background-color: #159B32;
           color: #ffffff;
         }
 
@@ -374,7 +379,7 @@ const Footer = () => {
           flex-wrap: wrap;
           gap: 1rem;
           font-size: 0.82rem;
-          color: #b8d4f6;
+          color: #a7f0ba;
         }
 
         .footer-medical-disclaimer {
@@ -382,7 +387,7 @@ const Footer = () => {
           padding-top: 0.75rem;
           border-top: 1px dashed rgba(255, 255, 255, 0.1);
           font-size: 0.74rem;
-          color: #9cb0ce;
+          color: #80c497;
           text-align: center;
           line-height: 1.4;
         }

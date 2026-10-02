@@ -18,9 +18,9 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
       style={{
         backgroundColor: '#ffffff',
         borderRadius: '20px',
-        border: '1px solid #e2e8f0',
+        border: '1px solid #E1E9DF',
         overflow: 'hidden',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
+        boxShadow: '0 10px 30px rgba(0, 107, 45, 0.06)',
         display: 'flex',
         flexDirection: 'column'
       }}
@@ -30,6 +30,8 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
       <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
         <img
           src={campaign.image}
+          loading="lazy"
+          decoding="async"
           alt={campaign.titleMr || campaign.titleEn}
           style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
         />
@@ -43,13 +45,13 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
             position: 'absolute',
             top: '0.85rem',
             left: '0.85rem',
-            backgroundColor: '#087E8B',
+            backgroundColor: '#006B2D',
             color: '#ffffff',
             padding: '0.3rem 0.75rem',
             borderRadius: '9999px',
             fontSize: '0.75rem',
             fontWeight: 700,
-            boxShadow: '0 2px 8px rgba(8,126,139,0.35)'
+            boxShadow: '0 2px 8px rgba(0, 107, 45, 0.35)'
           }}
         >
           {language === 'mr' ? campaign.badgeMr : campaign.badgeEn}
@@ -69,7 +71,7 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
 
       {/* Body Content */}
       <div style={{ padding: '1.35rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <p style={{ fontSize: '0.92rem', color: '#374765', lineHeight: 1.6, marginBottom: '1.15rem' }}>
+        <p style={{ fontSize: '0.92rem', color: '#5F6B61', lineHeight: 1.6, marginBottom: '1.15rem' }}>
           {language === 'mr' ? campaign.descriptionMr : campaign.descriptionEn}
         </p>
 
@@ -79,14 +81,14 @@ const CampaignCard = ({ campaign, onOpenConsultation }) => {
           flexDirection: 'column',
           gap: '0.55rem',
           marginBottom: '1.35rem',
-          backgroundColor: '#f0f4f9',
+          backgroundColor: '#F3F8F1',
           padding: '0.85rem 1rem',
           borderRadius: '12px',
-          border: '1px solid #e2eaf4'
+          border: '1px solid #E1E9DF'
         }}>
           {campaign.points.map((pt, idx) => (
-            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.84rem', color: '#172033' }}>
-              <CheckCircle size={15} style={{ color: '#087E8B', flexShrink: 0, marginTop: '2px' }} />
+            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.84rem', color: '#17251B' }}>
+              <CheckCircle size={15} style={{ color: '#159B32', flexShrink: 0, marginTop: '2px' }} />
               <span>{language === 'mr' ? pt.mr : pt.en}</span>
             </div>
           ))}

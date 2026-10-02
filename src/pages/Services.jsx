@@ -22,21 +22,16 @@ const Services = () => {
   return (
     <div className="services-page">
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #12355B 0%, #087E8B 100%)',
-        color: '#ffffff',
-        padding: '3.5rem 0',
-        textAlign: 'center'
-      }}>
+      <div className="page-hero-header">
         <div className="container">
-          <div className="section-badge" style={{ backgroundColor: 'rgba(255,255,255,0.18)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.3)' }}>
-            <Activity size={16} />
+          <div className="section-badge">
+            <Activity size={14} />
             <span>{language === 'mr' ? 'आरोग्य मार्गदर्शन व सेवा' : 'Health Guidance & Services'}</span>
           </div>
-          <h1 style={{ fontSize: '2.5rem', color: '#ffffff', marginBottom: '0.75rem' }}>
+          <h1>
             {language === 'mr' ? 'आरोग्य सेवा व विशेष अभियाने' : 'Health Services & Campaigns'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: '#dbf7fa', maxWidth: '700px', margin: '0 auto' }}>
+          <p>
             {language === 'mr'
               ? 'मधुमेह नियंत्रण, व्यसनमुक्ती, सांधेदुखी व जुनाट विकारांवर शास्त्रीय आयुर्वेदिक मार्गदर्शन आणि आहाराचे नियोजन.'
               : 'Holistic Ayurvedic care, dietary pathya, and lifestyle counseling for lifestyle health conditions.'}
@@ -62,7 +57,7 @@ const Services = () => {
             </p>
           </div>
 
-          <div className="grid-2" style={{ marginBottom: '3rem' }}>
+          <div className="grid-2 services-campaigns-grid" style={{ marginBottom: '3rem' }}>
             {campaignsData.map((campaign) => (
               <CampaignCard
                 key={campaign.id}
@@ -75,7 +70,7 @@ const Services = () => {
       </section>
 
       {/* All Health Categories Grid */}
-      <section className="section" style={{ backgroundColor: '#F5F7FA' }}>
+      <section className="section" style={{ backgroundColor: '#F3F8F1' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
@@ -92,7 +87,7 @@ const Services = () => {
             </p>
           </div>
 
-          <div className="grid-3" style={{ marginBottom: '3.5rem' }}>
+          <div className="grid-3 services-categories-grid" style={{ marginBottom: '3.5rem' }}>
             {healthCategories.map((service) => (
               <ServiceCard
                 key={service.id}
@@ -103,20 +98,20 @@ const Services = () => {
           </div>
 
           {/* Helpline Callout */}
-          <div style={{
+          <div className="services-helpline-callout" style={{
             backgroundColor: '#ffffff',
             borderRadius: '20px',
             padding: '2.5rem',
-            boxShadow: '0 10px 30px rgba(18,53,91,0.08)',
-            border: '1px solid #e2eaf4',
+            boxShadow: '0 10px 30px rgba(0, 107, 45, 0.08)',
+            border: '1px solid #E1E9DF',
             textAlign: 'center',
             maxWidth: '800px',
             margin: '0 auto'
           }}>
-            <h3 style={{ fontSize: '1.6rem', color: '#12355B', fontWeight: 800, marginBottom: '0.75rem' }}>
+            <h3 style={{ fontSize: '1.6rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.75rem' }}>
               {language === 'mr' ? 'आपल्या आरोग्यासाठी मोफत तज्ज्ञ सल्ला हवा आहे?' : 'Need Free Health Guidance for Your Condition?'}
             </h3>
-            <p style={{ fontSize: '1rem', color: '#4f6182', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+            <p style={{ fontSize: '1rem', color: '#5F6B61', lineHeight: 1.6, marginBottom: '1.75rem' }}>
               {language === 'mr'
                 ? 'सहारा सोशल फाऊंडेशनच्या समुपदेशकांशी थेट बोला किंवा मोफत मार्गदर्शनासाठी नोंदणी करा.'
                 : 'Call our dedicated Kolhapur helpline directly or register your counseling request.'}
@@ -128,7 +123,7 @@ const Services = () => {
                 className="btn btn-call btn-lg"
               >
                 <Phone size={18} />
-                <span>{language === 'mr' ? 'कॉल करा: ८४२११५४०९०' : 'Call 8421154090'}</span>
+                <span>{language === 'mr' ? `कॉल करा: ${organizationInfo.contact.primaryPhone}` : `Call ${organizationInfo.contact.primaryPhone}`}</span>
               </a>
 
               <button
@@ -142,6 +137,27 @@ const Services = () => {
           </div>
         </div>
       </section>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .services-campaigns-grid,
+          .services-categories-grid {
+            margin-bottom: 1.25rem !important;
+          }
+          .services-helpline-callout {
+            padding: 1.25rem 1rem !important;
+            border-radius: 14px !important;
+          }
+          .services-helpline-callout h3 {
+            font-size: 1.2rem !important;
+            margin-bottom: 0.4rem !important;
+          }
+          .services-helpline-callout p {
+            font-size: 0.82rem !important;
+            margin-bottom: 1rem !important;
+          }
+        }
+      `}</style>
 
       <ConsultationModal
         isOpen={isConsultationOpen}
