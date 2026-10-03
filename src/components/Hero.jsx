@@ -193,153 +193,152 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           </div>
         </div>
 
-        {/* 2. HERO CONTENT SECTION (Below Slideshow) */}
-        <div className="hero-content-col">
-          {/* Campaign Badge (Without any logo) */}
-          <div className="hero-badge-row">
-            <div className="hero-slide-badge hero-animated-badge">
-              <Sparkles size={15} className="hero-sparkle-icon" style={{ color: '#FFC928' }} />
-              <span>
-                {language === 'mr' ? 'मधुमेह मुक्त भारत व व्यसनमुक्त भारत अभियान' : 'National Health & De-Addiction Initiative'}
-              </span>
+        {/* 2. HERO CONTENT SECTION (Below Slideshow) - Side-by-Side Space Utilization */}
+        <div className="hero-split-grid">
+          {/* Left Column: Mission Branding & Headline */}
+          <div className="hero-left-col">
+            <div className="hero-badge-row">
+              <div className="hero-slide-badge hero-animated-badge">
+                <Sparkles size={14} className="hero-sparkle-icon" style={{ color: '#FFC928' }} />
+                <span>
+                  {language === 'mr' ? 'मधुमेह मुक्त भारत व व्यसनमुक्त भारत अभियान' : 'National Health & De-Addiction Initiative'}
+                </span>
+              </div>
+            </div>
+
+            <h1 className="hero-title hero-animated-title">
+              {language === 'mr' ? (
+                <>
+                  <span className="hero-title-highlight">सहारा सोशल फाऊंडेशन</span>, कोल्हापूर<br />
+                  <span className="hero-campaign-highlight">मधुमेह मुक्त भारत अभियान</span>
+                </>
+              ) : (
+                <>
+                  <span className="hero-title-highlight">Sahara Social Foundation</span><br />
+                  <span className="hero-campaign-highlight">Diabetes-Free India Campaign</span>
+                </>
+              )}
+            </h1>
+
+            <div className="hero-subtext-container">
+              <button
+                type="button"
+                onClick={() => setShowMore(prev => !prev)}
+                className="hero-read-more-btn"
+                aria-expanded={showMore}
+              >
+                <span>
+                  {showMore 
+                    ? (language === 'mr' ? 'कमी माहिती दाखवा (Show Less)' : 'Show Less')
+                    : (language === 'mr' ? 'अधिक माहिती वाचा (More Details)' : 'More Details')}
+                </span>
+                {showMore ? <ChevronUp size={15} style={{ color: '#006B2D' }} /> : <ChevronDown size={15} style={{ color: '#006B2D' }} />}
+              </button>
             </div>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="hero-title hero-animated-title">
-            {language === 'mr' ? (
-              <>
-                <span className="hero-title-highlight">सहारा सोशल फाऊंडेशन</span>, कोल्हापूर<br />
-                <span className="hero-campaign-highlight">मधुमेह मुक्त भारत अभियान</span>
-              </>
-            ) : (
-              <>
-                <span className="hero-title-highlight">Sahara Social Foundation</span><br />
-                <span className="hero-campaign-highlight">Diabetes-Free India Campaign</span>
-              </>
-            )}
-          </h1>
-
-          {/* Interactive More Details Toggle */}
-          <div className="hero-subtext-container">
-            <button
-              type="button"
-              onClick={() => setShowMore(prev => !prev)}
-              className="hero-read-more-btn"
-              aria-expanded={showMore}
-            >
-              <span>
-                {showMore 
-                  ? (language === 'mr' ? 'कमी माहिती दाखवा (Show Less)' : 'Show Less')
-                  : (language === 'mr' ? 'अधिक माहिती वाचा (More Details)' : 'More Details')}
-              </span>
-              {showMore ? <ChevronUp size={15} style={{ color: '#006B2D' }} /> : <ChevronDown size={15} style={{ color: '#006B2D' }} />}
-            </button>
-
-            {/* Expandable Information Box */}
-            {showMore && (
-              <div className="hero-expanded-content">
-                <p className="hero-expanded-desc">
+          {/* Right Column: Registration Trust Strip & Quick Action Buttons */}
+          <div className="hero-right-col">
+            <div className="hero-action-card">
+              <div className="hero-trust-strip">
+                <ShieldCheck size={16} style={{ color: '#006B2D', flexShrink: 0 }} />
+                <span>
                   {language === 'mr'
-                    ? 'आधार मधुमेह-मुक्ती मार्गदर्शन केंद्राच्या सहयोगाने नैसर्गिक आयुर्वेदिक फॉर्म्युला, योग्य आहाराचे पथ्य आणि समुपदेशनाद्वारे रक्तातील साखर व व्यसनावर मात करण्यासाठी प्रभावी मार्गदर्शन.'
-                    : 'In collaboration with Aadhar Madhumeh-Mukti Margdarshan Kendra, delivering authentic Ayurvedic wellness formulas, dietary counseling, and dedicated guidance for diabetes control and de-addiction.'}
-                </p>
+                    ? 'नोंदणीकृत संस्था (Reg. No. MAH/582/2014/KOP) • अधिकृत आयुर्वेद सल्ला'
+                    : 'Registered Foundation (Reg. No. MAH/582/2014/KOP) • Ayurvedic Guidance'}
+                </span>
+              </div>
 
-                <div className="hero-expanded-grid">
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={15} className="hero-check-icon" />
-                    <div>
-                      <strong>{language === 'mr' ? 'मधुमेह नियंत्रण:' : 'Diabetes Support:'}</strong>{' '}
-                      {language === 'mr' 
-                        ? 'स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नैसर्गिकरीत्या नियंत्रित ठेवण्यास मदत.'
-                        : 'Natural support for cellular insulin uptake and blood glucose balance.'}
-                    </div>
-                  </div>
+              <div className="hero-cta-group">
+                <button
+                  type="button"
+                  onClick={onOpenConsultation}
+                  className="btn btn-primary hero-main-cta"
+                >
+                  <Heart size={18} style={{ color: '#FFC928' }} />
+                  <span>{language === 'mr' ? 'मोफत मार्गदर्शन नोंदणी' : 'Free Consultation'}</span>
+                </button>
 
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={15} className="hero-check-icon" />
-                    <div>
-                      <strong>{language === 'mr' ? 'आहाराचे पथ्य:' : 'Dietary Pathya:'}</strong>{' '}
-                      {language === 'mr'
-                        ? 'प्रत्येक रुग्णाला फोन व प्रत्यक्ष भेटीत आहाराचे शास्त्रीय नियोजन व पथ्य मार्गदर्शन.'
-                        : 'Scientific nutritional schedule and personalized dietary guidelines.'}
-                    </div>
-                  </div>
+                <div className="hero-secondary-cta-row">
+                  <a
+                    href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
+                      language === 'mr'
+                        ? 'नमस्कार, मला मधुमेह मुक्ती अभियानाबद्दल माहिती हवी आहे.'
+                        : 'Hello, I want details about the Diabetes-Free India campaign.'
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-whatsapp hero-sub-cta"
+                  >
+                    <WhatsAppIcon size={18} animated={true} />
+                    <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
+                  </a>
 
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={15} className="hero-check-icon" />
-                    <div>
-                      <strong>{language === 'mr' ? 'व्यसनमुक्ती अभियान:' : 'De-Addiction Drive:'}</strong>{' '}
-                      {language === 'mr'
-                        ? 'दारू, तंबाखू व सिगारेटची तीव्र तलफ नैसर्गिक हर्बल फॉर्म्युलाने कमी करणे.'
-                        : 'Safe herbal support to curb urges for alcohol, tobacco, and smoking.'}
-                    </div>
-                  </div>
-
-                  <div className="hero-expanded-item">
-                    <CheckCircle2 size={15} className="hero-check-icon" />
-                    <div>
-                      <strong>{language === 'mr' ? 'मोफत फोन सल्ला:' : 'Free Helpline:'}</strong>{' '}
-                      {language === 'mr'
-                        ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर कार्यालयाशी थेट संपर्क: ७७४५०६६७०७.'
-                        : 'Direct counselor support at Kolhapur center: 7745066707.'}
-                    </div>
-                  </div>
+                  <a
+                    href={`tel:${organizationInfo.contact.primaryPhone}`}
+                    className="btn btn-call hero-sub-cta"
+                  >
+                    <Phone size={17} />
+                    <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
+                  </a>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Key Notice Strip */}
-          <div className="hero-trust-strip">
-            <ShieldCheck size={17} style={{ color: '#006B2D', flexShrink: 0 }} />
-            <span>
-              {language === 'mr'
-                ? 'नोंदणीकृत सामाजिक संस्था (Reg. No. MAH/582/2014/KOP) • अधिकृत आयुर्वेद सल्ला'
-                : 'Registered Foundation (Reg. No. MAH/582/2014/KOP) • Authentic Ayurvedic Guidance'}
-            </span>
-          </div>
-
-          {/* CTA Action Buttons */}
-          <div className="hero-cta-group">
-            <button
-              type="button"
-              onClick={onOpenConsultation}
-              className="btn btn-primary btn-lg hero-main-cta"
-            >
-              <Heart size={18} style={{ color: '#FFC928' }} />
-              <span>{language === 'mr' ? 'मोफत मार्गदर्शन नोंदणी' : 'Free Consultation'}</span>
-            </button>
-
-            <div className="hero-cta-micro-trust">
-              <span>{language === 'mr' ? '✓ मोफत तज्ज्ञ समुपदेशन • अधिकृत आयुर्वेदिक मार्गदर्शन' : '✓ Free Counselor Guidance • Authentic Ayurvedic Support'}</span>
-            </div>
-
-            <div className="hero-secondary-cta-row">
-              <a
-                href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
-                  language === 'mr'
-                    ? 'नमस्कार, मला मधुमेह मुक्ती अभियानाबद्दल माहिती हवी आहे.'
-                    : 'Hello, I want details about the Diabetes-Free India campaign.'
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-whatsapp btn-lg hero-sub-cta"
-              >
-                <WhatsAppIcon size={18} animated={true} />
-                <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
-              </a>
-
-              <a
-                href={`tel:${organizationInfo.contact.primaryPhone}`}
-                className="btn btn-call btn-lg hero-sub-cta"
-              >
-                <Phone size={17} />
-                <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
-              </a>
             </div>
           </div>
         </div>
+
+        {/* Expandable Information Box (Spans Full Width Below Grid) */}
+        {showMore && (
+          <div className="hero-expanded-content">
+            <p className="hero-expanded-desc">
+              {language === 'mr'
+                ? 'आधार मधुमेह-मुक्ती मार्गदर्शन केंद्राच्या सहयोगाने नैसर्गिक आयुर्वेदिक फॉर्म्युला, योग्य आहाराचे पथ्य आणि समुपदेशनाद्वारे रक्तातील साखर व व्यसनावर मात करण्यासाठी प्रभावी मार्गदर्शन.'
+                : 'In collaboration with Aadhar Madhumeh-Mukti Margdarshan Kendra, delivering authentic Ayurvedic wellness formulas, dietary counseling, and dedicated guidance for diabetes control and de-addiction.'}
+            </p>
+
+            <div className="hero-expanded-grid">
+              <div className="hero-expanded-item">
+                <CheckCircle2 size={15} className="hero-check-icon" />
+                <div>
+                  <strong>{language === 'mr' ? 'मधुमेह नियंत्रण:' : 'Diabetes Support:'}</strong>{' '}
+                  {language === 'mr' 
+                    ? 'स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नैसर्गिकरीत्या नियंत्रित ठेवण्यास मदत.'
+                    : 'Natural support for cellular insulin uptake and blood glucose balance.'}
+                </div>
+              </div>
+
+              <div className="hero-expanded-item">
+                <CheckCircle2 size={15} className="hero-check-icon" />
+                <div>
+                  <strong>{language === 'mr' ? 'आहाराचे पथ्य:' : 'Dietary Pathya:'}</strong>{' '}
+                  {language === 'mr'
+                    ? 'प्रत्येक रुग्णाला फोन व प्रत्यक्ष भेटीत आहाराचे शास्त्रीय नियोजन व पथ्य मार्गदर्शन.'
+                    : 'Scientific nutritional schedule and personalized dietary guidelines.'}
+                </div>
+              </div>
+
+              <div className="hero-expanded-item">
+                <CheckCircle2 size={15} className="hero-check-icon" />
+                <div>
+                  <strong>{language === 'mr' ? 'व्यसनमुक्ती अभियान:' : 'De-Addiction Drive:'}</strong>{' '}
+                  {language === 'mr'
+                    ? 'दारू, तंबाखू व सिगारेटची तीव्र तलफ नैसर्गिक हर्बल फॉर्म्युलाने कमी करणे.'
+                    : 'Safe herbal support to curb urges for alcohol, tobacco, and smoking.'}
+                </div>
+              </div>
+
+              <div className="hero-expanded-item">
+                <CheckCircle2 size={15} className="hero-check-icon" />
+                <div>
+                  <strong>{language === 'mr' ? 'मोफत फोन सल्ला:' : 'Free Helpline:'}</strong>{' '}
+                  {language === 'mr'
+                    ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर कार्यालयाशी थेट संपर्क: ७७४५०६६७०७.'
+                    : 'Direct counselor support at Kolhapur center: 7745066707.'}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`
@@ -348,7 +347,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           position: relative;
           background: linear-gradient(180deg, #F3F8F1 0%, #FFFFFF 55%, #EDF6EB 100%);
           color: #17251B;
-          padding: 2.25rem 0 3.25rem 0;
+          padding: 1.25rem 0 1.5rem 0;
           overflow: hidden;
           font-family: var(--font-family);
           border-bottom: 1px solid #E1E9DF;
@@ -374,7 +373,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
         .hero-slideshow-wrapper {
           width: 100%;
           max-width: 1040px;
-          margin: 0 auto 2.25rem auto;
+          margin: 0 auto 1.15rem auto;
           display: flex;
           justify-content: center;
           padding: 0 0.5rem;
@@ -514,50 +513,64 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
         }
 
         /* =======================================================
-           HERO CONTENT SECTION (BELOW SLIDESHOW)
-           Clean, centered presentation with brand green colors
+           HERO CONTENT SECTION: SPLIT 2-COLUMN SIDE-BY-SIDE
+           Removes center alignment and utilizes side remaining spaces
            ======================================================= */
-        .hero-content-col {
+        .hero-split-grid {
+          display: grid;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 2.25rem;
+          align-items: center;
+          max-width: 1040px;
+          margin: 0 auto;
+        }
+
+        .hero-left-col {
           display: flex;
           flex-direction: column;
-          align-items: center;
-          text-align: center;
-          max-width: 920px;
-          margin: 0 auto;
+          align-items: flex-start;
+          text-align: left;
+        }
+
+        .hero-right-col {
+          display: flex;
+          justify-content: flex-end;
+          width: 100%;
         }
 
         .hero-badge-row {
           display: flex;
           align-items: center;
-          justify-content: center;
-          margin-bottom: 1.15rem;
+          justify-content: flex-start;
+          margin-bottom: 0.35rem;
         }
 
         .hero-animated-badge {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.45rem;
           font-family: 'Baloo 2', 'Poppins', sans-serif;
           background: #e2faea;
-          padding: 0.45rem 1.15rem;
+          padding: 0.28rem 0.95rem;
           border-radius: 9999px;
           border: 1px solid rgba(21, 155, 50, 0.35);
           color: #006B2D;
-          font-size: 0.92rem;
+          font-size: 0.84rem;
           font-weight: 700;
           letter-spacing: 0.015em;
-          box-shadow: 0 4px 14px rgba(0, 107, 45, 0.08);
+          box-shadow: 0 2px 8px rgba(0, 107, 45, 0.06);
         }
 
         /* Main Headline */
         .hero-title {
           font-family: 'Baloo 2', 'Poppins', sans-serif;
-          font-size: clamp(1.85rem, 3.4vw + 0.5rem, 2.75rem);
+          font-size: clamp(1.5rem, 2.7vw + 0.2rem, 2.25rem);
           font-weight: 800;
           color: #006B2D;
-          line-height: 1.3;
-          margin-bottom: 1.15rem;
+          line-height: 1.22;
+          margin-bottom: 0.4rem;
           letter-spacing: -0.01em;
+          text-align: left;
         }
 
         .hero-title-highlight {
@@ -574,25 +587,25 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
         /* Expandable More Details Button & Container */
         .hero-subtext-container {
           width: 100%;
-          margin-bottom: 1.35rem;
+          margin-bottom: 0;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-start;
         }
 
         .hero-read-more-btn {
           display: inline-flex;
           align-items: center;
-          gap: 0.45rem;
+          gap: 0.4rem;
           background-color: #ffffff;
           border: 1.5px solid #E1E9DF;
           color: #006B2D;
-          padding: 0.45rem 1.1rem;
+          padding: 0.28rem 0.85rem;
           border-radius: 9999px;
-          font-size: 0.86rem;
+          font-size: 0.82rem;
           font-weight: 700;
           cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0, 107, 45, 0.05);
+          box-shadow: 0 2px 6px rgba(0, 107, 45, 0.05);
           transition: all 0.25s ease;
         }
 
@@ -604,34 +617,36 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
         .hero-expanded-content {
           margin-top: 1rem;
           width: 100%;
-          max-width: 820px;
+          max-width: 1040px;
+          margin-left: auto;
+          margin-right: auto;
           background-color: #ffffff;
           border: 1.5px solid #E1E9DF;
-          border-radius: 16px;
-          padding: 1.25rem;
+          border-radius: 14px;
+          padding: 1.15rem;
           text-align: left;
-          box-shadow: 0 10px 30px rgba(0, 107, 45, 0.08);
+          box-shadow: 0 8px 24px rgba(0, 107, 45, 0.08);
           animation: fadeIn 0.3s ease-out;
         }
 
         .hero-expanded-desc {
           color: #5F6B61;
-          font-size: 0.9rem;
-          line-height: 1.6;
-          margin-bottom: 1rem;
+          font-size: 0.88rem;
+          line-height: 1.55;
+          margin-bottom: 0.85rem;
         }
 
         .hero-expanded-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 0.85rem;
+          gap: 0.75rem;
         }
 
         .hero-expanded-item {
           display: flex;
           align-items: flex-start;
           gap: 0.45rem;
-          font-size: 0.84rem;
+          font-size: 0.82rem;
           color: #17251B;
         }
 
@@ -645,63 +660,99 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           margin-top: 2px;
         }
 
-        /* Trust Strip */
-        .hero-trust-strip {
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          font-weight: 600;
-          background-color: #ffffff;
-          border-left: 4px solid #006B2D;
-          padding: 0.75rem 1.35rem;
-          border-radius: 12px;
-          font-size: 0.92rem;
-          color: #17251B;
-          margin-bottom: 1.6rem;
-          border-top: 1px solid #E1E9DF;
-          border-right: 1px solid #E1E9DF;
-          border-bottom: 1px solid #E1E9DF;
+        /* Unified Action Container - Straight Aligned Edges */
+        .hero-action-card {
+          width: 100%;
+          max-width: 440px;
           display: flex;
-          align-items: center;
-          justify-content: center;
+          flex-direction: column;
           gap: 0.65rem;
-          box-shadow: 0 4px 16px rgba(0, 107, 45, 0.06);
+          background: #ffffff;
+          padding: 0.95rem 1.15rem;
+          border-radius: 16px;
+          border: 1.5px solid #E1E9DF;
+          box-shadow: 0 8px 24px rgba(0, 107, 45, 0.08);
+          box-sizing: border-box;
         }
 
-        /* CTA Buttons */
-        .hero-cta-group {
+        /* Trust Strip - Top of Action Box */
+        .hero-trust-strip {
+          font-family: 'Baloo 2', 'Poppins', sans-serif;
+          font-weight: 700;
+          background-color: #F3F8F1;
+          border-left: 3.5px solid #006B2D;
+          padding: 0.42rem 0.85rem;
+          border-radius: 8px;
+          font-size: 0.8rem;
+          color: #17251B;
+          border-top: 1px solid rgba(21, 155, 50, 0.2);
+          border-right: 1px solid rgba(21, 155, 50, 0.2);
+          border-bottom: 1px solid rgba(21, 155, 50, 0.2);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.85rem;
-          flex-wrap: wrap;
+          gap: 0.45rem;
+          width: 100%;
+          box-sizing: border-box;
+          line-height: 1.35;
+          text-align: center;
+        }
+
+        /* CTA Buttons Group - Perfectly aligned, full-width */
+        .hero-cta-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.55rem;
           width: 100%;
           font-family: 'Baloo 2', 'Poppins', sans-serif;
         }
 
         .hero-main-cta {
-          flex: 0 0 auto;
-          font-weight: 700;
+          width: 100% !important;
+          font-weight: 800;
           letter-spacing: 0.01em;
           background: linear-gradient(135deg, #006B2D, #08481c);
           color: #ffffff;
-          box-shadow: 0 4px 16px rgba(0, 107, 45, 0.3);
+          padding: 0.72rem 1.25rem !important;
+          border-radius: 10px;
+          min-height: 44px;
+          box-shadow: 0 4px 14px rgba(0, 107, 45, 0.28);
           transition: all 0.25s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          box-sizing: border-box;
         }
 
         .hero-main-cta:hover {
           transform: translateY(-2px);
           background: linear-gradient(135deg, #028f3d, #006B2D);
-          box-shadow: 0 8px 24px rgba(0, 107, 45, 0.4);
+          box-shadow: 0 6px 20px rgba(0, 107, 45, 0.35);
         }
 
+        /* 50/50 Split for WhatsApp & Call */
         .hero-secondary-cta-row {
-          display: flex;
-          gap: 0.75rem;
-          align-items: center;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.55rem;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .hero-sub-cta {
+          width: 100% !important;
           font-weight: 700;
+          padding: 0.65rem 0.75rem !important;
+          border-radius: 10px;
+          min-height: 44px;
           transition: all 0.25s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.45rem;
+          box-sizing: border-box;
+          text-align: center;
         }
 
         .hero-sub-cta:hover {
@@ -713,6 +764,40 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
         }
 
         /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+          .hero-split-grid {
+            grid-template-columns: 1fr;
+            gap: 1.15rem;
+          }
+
+          .hero-left-col {
+            align-items: center;
+            text-align: center;
+          }
+
+          .hero-badge-row {
+            justify-content: center;
+          }
+
+          .hero-title {
+            text-align: center;
+          }
+
+          .hero-subtext-container {
+            align-items: center;
+          }
+
+          .hero-right-col {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+          }
+
+          .hero-action-card {
+            max-width: 420px;
+            margin: 0 auto;
+          }
+        }
         @media (max-width: 992px) {
           .hero-slideshow-wrapper {
             max-width: 820px;
@@ -756,18 +841,18 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           }
 
           .hero-animated-badge {
-            font-size: 0.8rem;
-            padding: 0.38rem 0.85rem;
+            font-size: 0.78rem;
+            padding: 0.25rem 0.8rem;
           }
 
           .hero-title {
-            font-size: clamp(1.4rem, 5.8vw, 1.95rem) !important;
-            line-height: 1.25 !important;
-            margin-bottom: 0.65rem !important;
+            font-size: clamp(1.35rem, 5.5vw, 1.85rem) !important;
+            line-height: 1.2 !important;
+            margin-bottom: 0.35rem !important;
           }
 
           .hero-campaign-highlight {
-            font-size: clamp(1.25rem, 5vw, 1.65rem) !important;
+            font-size: clamp(1.2rem, 4.8vw, 1.55rem) !important;
           }
 
           .hero-expanded-grid {
@@ -775,11 +860,11 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           }
 
           .hero-trust-strip {
-            font-size: 0.8rem !important;
-            padding: 0.55rem 0.85rem !important;
-            margin-bottom: 1.15rem !important;
-            text-align: left;
-            justify-content: flex-start;
+            font-size: 0.78rem !important;
+            padding: 0.32rem 0.75rem !important;
+            margin-bottom: 0.65rem !important;
+            text-align: center;
+            justify-content: center;
           }
 
           .hero-cta-group {

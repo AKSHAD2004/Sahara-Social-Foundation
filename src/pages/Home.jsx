@@ -356,7 +356,7 @@ const Home = () => {
       <Hero onOpenConsultation={() => setIsConsultationOpen(true)} />
 
       {/* Product / Shop Section (Moved Upside First) */}
-      <section className="section home-products-section" style={{ backgroundColor: '#ffffff' }}>
+      <section className="section home-products-section" style={{ backgroundColor: '#ffffff', paddingTop: '2.5rem' }}>
         <div className="container">
           <div className="section-header">
             <div className="section-badge">
