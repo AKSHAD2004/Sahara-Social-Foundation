@@ -158,10 +158,13 @@ export function AuthProvider({ children }) {
   };
 
   const loginCustomer = (userData) => {
+    const cleanPhone = (userData.phone || userData.mobile || userData.mobileNumber || '').replace(/\D/g, '').trim();
     const customerObj = {
-      id: userData.id || `CUST-${Date.now()}`,
+      id: userData.id || (cleanPhone ? `CUST-${cleanPhone}` : `CUST-${Date.now()}`),
       fullName: userData.fullName || userData.name || 'ग्राहक (Customer)',
-      phone: userData.phone || userData.mobile || '',
+      phone: cleanPhone,
+      mobileNumber: cleanPhone,
+      whatsappNumber: userData.whatsappNumber || cleanPhone,
       email: userData.email || '',
       address: userData.address || '',
       city: userData.city || '',
@@ -172,6 +175,13 @@ export function AuthProvider({ children }) {
 
     setCustomerUser(customerObj);
     localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customerObj));
+
+    // Automatically store and synchronize customer profile with Cloud Firestore
+    try {
+      dbService.saveCustomerProfile(customerObj);
+    } catch (e) {
+      console.warn('Auto Firebase profile sync note:', e);
+    }
 
     setIsCustomerAuthModalOpen(false);
 

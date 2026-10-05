@@ -72,6 +72,23 @@ function AppTracker() {
     if (refCode) {
       localStorage.setItem('sahara_active_ref', refCode.toUpperCase());
     }
+
+    // Global single-video playback: whenever any video plays, pause all other videos
+    const handleGlobalVideoPlay = (e) => {
+      const playingVideo = e.target;
+      if (playingVideo && playingVideo.tagName === 'VIDEO') {
+        document.querySelectorAll('video').forEach((v) => {
+          if (v !== playingVideo && !v.paused) {
+            v.pause();
+          }
+        });
+      }
+    };
+
+    document.addEventListener('play', handleGlobalVideoPlay, true);
+    return () => {
+      document.removeEventListener('play', handleGlobalVideoPlay, true);
+    };
   }, [location]);
 
   return null;

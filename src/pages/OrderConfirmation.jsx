@@ -211,10 +211,10 @@ const OrderConfirmation = () => {
                 {language === 'mr' ? 'पेमेंट प्रकार:' : 'Payment Method:'}
               </div>
               <div style={{ fontWeight: 700, color: '#17251B', marginTop: '0.2rem' }}>
-                {order.paymentMethod?.includes('Razorpay') || order.paymentMethod === 'online'
-                  ? (language === 'mr' ? 'Razorpay ऑनलाईन (Paid)' : 'Razorpay Online (Paid)')
-                  : (order.paymentMethod === 'cod' || order.paymentMethod?.includes('Cash')
-                    ? (language === 'mr' ? 'कॅश ऑन डिलिव्हरी (COD)' : 'Cash on Delivery')
+                {order.pricing?.isCod || order.paymentMethod?.includes('Advance Paid')
+                  ? (language === 'mr' ? 'कॅश ऑन डिलिव्हरी (₹२०० ॲडव्हान्स Paid)' : 'Cash on Delivery (₹200 Advance Paid)')
+                  : (order.paymentMethod?.includes('Razorpay') || order.paymentMethod === 'online'
+                    ? (language === 'mr' ? 'Razorpay ऑनलाईन (पूर्ण रक्कम Paid)' : 'Razorpay Online (Full Amount Paid)')
                     : order.paymentMethod || 'Online Payment')}
               </div>
               {order.transactionId && (
@@ -223,7 +223,9 @@ const OrderConfirmation = () => {
                 </div>
               )}
               <div style={{ fontSize: '0.88rem', color: '#5F6B61', marginTop: '0.2rem' }}>
-                Status: {order.paymentStatus === 'Paid' ? 'Paid & Confirmed' : 'Confirmed & Dispatched within 24 Hours'}
+                Status: {order.paymentStatus === 'Paid' 
+                  ? 'Paid in Full & Confirmed' 
+                  : (order.pricing?.isCod ? '₹200 Advance Paid • Balance on Delivery' : 'Confirmed')}
               </div>
               <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.2rem' }}>
                 {language === 'mr' ? 'तारीख:' : 'Date:'} {order.date || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -255,9 +257,29 @@ const OrderConfirmation = () => {
               borderTop: '2px dashed #E1E9DF',
               marginTop: '0.75rem'
             }}>
-              <span>{language === 'mr' ? 'एकूण रक्कम:' : 'Total Amount:'}</span>
-              <span>₹{order.pricing.grandTotal}</span>
+              <span>{language === 'mr' ? 'एकूण ऑर्डर रक्कम (Grand Total):' : 'Grand Total Amount:'}</span>
+              <span>₹{order.pricing?.grandTotal}</span>
             </div>
+
+            {order.pricing?.isCod && (
+              <div style={{
+                marginTop: '0.75rem',
+                backgroundColor: '#fefce8',
+                border: '1px solid #fef08a',
+                borderRadius: '10px',
+                padding: '0.75rem 1rem',
+                fontSize: '0.88rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#006B2D', fontWeight: 700, marginBottom: '0.35rem' }}>
+                  <span>{language === 'mr' ? 'Razorpay ने भरलेला ॲडव्हान्स:' : 'Advance Paid via Razorpay:'}</span>
+                  <span>₹{order.pricing.advancePaid || 200}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#854d0e', fontWeight: 800 }}>
+                  <span>{language === 'mr' ? 'डिलिव्हरीच्या वेळी रोख देय शिल्लक:' : 'Remaining Cash to Pay on Delivery:'}</span>
+                  <span>₹{order.pricing.balanceDue ?? (order.pricing.grandTotal - (order.pricing.advancePaid || 200))}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons (Print & Return to Home) */}

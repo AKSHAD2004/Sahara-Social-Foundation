@@ -104,6 +104,56 @@ export async function testFirebaseConnection() {
   }
 }
 
+/**
+ * Saves or updates a customer or user profile directly to Cloud Firestore.
+ * Automatically synchronizes profile data to the 'customers' collection in Firebase.
+ * 
+ * @param {Object} profile - Profile data object
+ * @returns {Promise<{success: boolean, id: string, message?: string}>}
+ */
+export async function syncProfileToFirebase(profile) {
+  if (!profile) return { success: false, message: 'No profile data provided' };
+
+  const cleanPhone = (profile.phone || profile.mobileNumber || profile.mobile || '').replace(/\D/g, '').trim();
+  const profileId = profile.id || (cleanPhone ? `CUST-${cleanPhone}` : `CUST-${Date.now()}`);
+
+  const payload = {
+    id: profileId,
+    customerId: profileId,
+    fullName: (profile.fullName || profile.name || '').trim() || 'ग्राहक (Customer)',
+    phone: cleanPhone,
+    mobileNumber: cleanPhone,
+    whatsappNumber: profile.whatsappNumber || cleanPhone,
+    email: (profile.email || '').trim(),
+    address: (profile.address || '').trim(),
+    city: (profile.city || '').trim() || 'कोल्हापूर',
+    state: profile.state || 'Maharashtra',
+    pincode: (profile.pincode || '').trim(),
+    category: profile.category || 'Nutraceutical Buyer',
+    source: profile.source || 'Website Customer Profile',
+    status: profile.status || 'Active',
+    updatedAt: new Date().toISOString()
+  };
+
+  // Direct Cloud Firestore write
+  if (isFirebaseConfigured && db) {
+    try {
+      const docRef = doc(db, 'customers', profileId);
+      await setDoc(docRef, {
+        ...payload,
+        firebaseUpdatedAt: serverTimestamp()
+      }, { merge: true });
+      console.log(`[Firebase] Profile successfully stored on Cloud Firestore: customers/${profileId}`);
+      return { success: true, id: profileId, data: payload };
+    } catch (err) {
+      console.warn(`[Firebase] Firestore write note (customers/${profileId}):`, err.message);
+      return { success: false, error: err.message, data: payload };
+    }
+  }
+
+  return { success: true, id: profileId, data: payload, note: 'Cached locally' };
+}
+
 export { 
   app, 
   auth, 

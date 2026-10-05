@@ -19,7 +19,7 @@ import CampaignCard from '../components/CampaignCard';
 import ServiceCard from '../components/ServiceCard';
 import ProductCard from '../components/ProductCard';
 import TestimonialCard from '../components/TestimonialCard';
-import VideoCard from '../components/VideoCard';
+import HorizontalVideoCard from '../components/HorizontalVideoCard';
 import ConsultationModal from '../components/ConsultationModal';
 
 import { 
@@ -27,6 +27,7 @@ import {
   campaignsData, 
   healthCategories, 
   productsData, 
+  horizontalVideosData,
   resultVideos, 
   testimonialsData, 
   galleryPhotos, 
@@ -341,14 +342,6 @@ const GalleryStaggeredPreview = () => {
 const Home = () => {
   const { language } = useLanguage();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
-  const reelsScrollRef = useRef(null);
-
-  const scrollReels = (direction) => {
-    if (reelsScrollRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
-      reelsScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
 
   return (
     <div className="home-page">
@@ -388,119 +381,58 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Result Videos / Reels Horizontal Slider Section */}
-      <section className="section" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF' }}>
+      {/* Official Beneficiary & Campaign Videos from samarthkolhapur.com */}
+      <section className="section home-videos-section" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF' }}>
         <div className="container">
-          <div className="section-header" style={{ marginBottom: '1.75rem' }}>
+          <div className="section-header" style={{ marginBottom: '2rem' }}>
             <div className="section-badge">
               <Play size={15} />
-              <span>{language === 'mr' ? 'प्रत्यक्ष परिणाम व अनुभव' : 'Patient Experiences'}</span>
+              <span>{language === 'mr' ? 'अधिकृत व्हिडिओ निकाल' : 'Official Result Videos'}</span>
             </div>
             <h2>
-              {language === 'mr' ? 'लाभार्थ्यांचे मनोगत व व्हिडिओ' : 'Result & Beneficiary Videos'}
+              {language === 'mr' ? 'सहारा सोशल फाऊंडेशन - प्रत्यक्ष निकाल व्हिडिओ' : 'Official Patient Recovery & Beneficiary Videos'}
             </h2>
             <p>
               {language === 'mr'
-                ? 'मधुमेह नियंत्रण, व्यसनमुक्ती आणि सांधेदुखीत आराम मिळालेल्या रुग्णांचे प्रत्यक्ष अनुभव.'
-                : 'Real video experiences of patients who regained health through our counseling and formulas.'}
+                ? 'samarthkolhapur.com वरील अधिकृत व्हिडिओ: Antox D & T चा प्रत्यक्ष वापर आणि शुगरमुक्ती अभियानाचे अनुभव.'
+                : 'Direct recorded testimonials from samarthkolhapur.com: Antox D & T patient results and Sugar-Free Mission.'}
             </p>
           </div>
 
-          {/* Slider Controls Bar */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '1rem',
-            padding: '0 0.25rem'
-          }}>
-            <div style={{ fontSize: '0.86rem', color: '#5F6B61', fontWeight: 600 }}>
-              {language === 'mr' ? '👈 स्वाइप करा / प्ले करा' : '👈 Swipe / Click to Play 👉'}
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button
-                type="button"
-                onClick={() => scrollReels('left')}
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  backgroundColor: '#ffffff',
-                  border: '1.5px solid #E1E9DF',
-                  color: '#006B2D',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.08)',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#006B2D'; }}
-                aria-label="Previous reel"
-              >
-                <ChevronLeft size={18} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => scrollReels('right')}
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  backgroundColor: '#ffffff',
-                  border: '1.5px solid #E1E9DF',
-                  color: '#006B2D',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.08)',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
-                onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#006B2D'; }}
-                aria-label="Next reel"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Horizontal Reels Slider Track */}
-          <div
-            ref={reelsScrollRef}
+          {/* Featured Primary Videos Grid (Matching Image 2 from samarthkolhapur.com) */}
+          <div 
             style={{
-              display: 'flex',
-              gap: '1.15rem',
-              overflowX: 'auto',
-              scrollSnapType: 'x mandatory',
-              scrollbarWidth: 'none',
-              WebkitOverflowScrolling: 'touch',
-              paddingBottom: '1.5rem',
-              marginBottom: '1rem'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))',
+              gap: '1.75rem',
+              marginBottom: '2rem'
             }}
-            className="reels-slider-track"
           >
-            {resultVideos.map((video) => (
-              <div
-                key={video.id}
-                style={{
-                  flex: '0 0 clamp(250px, 72vw, 290px)',
-                  scrollSnapAlign: 'start'
-                }}
-              >
-                <VideoCard video={video} />
-              </div>
+            {horizontalVideosData.slice(0, 2).map((video) => (
+              <HorizontalVideoCard key={video.id} video={video} />
             ))}
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <Link to="/videos" className="btn btn-outline btn-lg" style={{ gap: '0.6rem' }}>
-              <Play size={18} />
-              <span>{language === 'mr' ? 'सर्व व्हिडिओ व रील्स पहा' : 'Explore All Videos & Reels'}</span>
+          {/* "More Videos" Action Button */}
+          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
+            <Link 
+              to="/videos" 
+              className="btn btn-primary btn-lg" 
+              style={{ 
+                gap: '0.75rem', 
+                padding: '0.95rem 2.8rem', 
+                borderRadius: '9999px',
+                fontSize: '1.05rem',
+                fontWeight: 700,
+                boxShadow: '0 8px 24px rgba(0, 107, 45, 0.22)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Play size={20} fill="currentColor" />
+              <span>{language === 'mr' ? 'More Videos (अधिक व्हिडिओ पहा)' : 'More Videos'}</span>
+              <ArrowRight size={20} />
             </Link>
           </div>
         </div>

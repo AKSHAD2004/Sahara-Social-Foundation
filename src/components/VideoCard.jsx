@@ -12,13 +12,39 @@ const VideoCard = ({ video }) => {
   const title = language === 'mr' ? video.titleMr : video.titleEn;
   const summary = language === 'mr' ? video.summaryMr : video.summaryEn;
 
+  const handleLoadedMetadata = () => {
+    if (videoRef.current && videoRef.current.currentTime === 0) {
+      try {
+        videoRef.current.currentTime = 0.5;
+      } catch (e) {
+        // Ignore seek errors
+      }
+    }
+  };
+
+  const pauseOtherVideos = () => {
+    document.querySelectorAll('video').forEach((v) => {
+      if (v !== videoRef.current && !v.paused) {
+        v.pause();
+      }
+    });
+  };
+
   const handlePlayToggle = (e) => {
     e.stopPropagation();
     if (videoRef.current) {
       if (videoRef.current.paused) {
+        pauseOtherVideos();
+        videoRef.current.muted = false;
         videoRef.current.play()
           .then(() => setIsPlaying(true))
-          .catch((err) => console.log('Video play error:', err));
+          .catch((err) => {
+            console.log('Video play error:', err);
+            if (videoRef.current) {
+              videoRef.current.muted = true;
+              videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+            }
+          });
       } else {
         videoRef.current.pause();
         setIsPlaying(false);
@@ -35,9 +61,9 @@ const VideoCard = ({ video }) => {
         aspectRatio: '9 / 16',
         borderRadius: '20px',
         overflow: 'hidden',
-        backgroundColor: '#000000',
-        border: '1px solid rgba(255, 255, 255, 0.14)',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
+        background: '#04180d',
+        border: '1px solid rgba(255, 255, 255, 0.18)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -45,14 +71,19 @@ const VideoCard = ({ video }) => {
       }}
       onClick={handlePlayToggle}
     >
-      {/* Pure Direct HTML5 MP4 Video - NO Image Thumbnail */}
+      {/* Real Original Video Element (Displays original video frame directly) */}
       <video
         ref={videoRef}
-        src={video.videoUrl}
-        preload="none"
+        src={`${video.videoUrl}#t=0.5`}
+        preload="auto"
         playsInline
+        muted={!isPlaying}
         controls={isPlaying}
-        onPlay={() => setIsPlaying(true)}
+        onLoadedMetadata={handleLoadedMetadata}
+        onPlay={() => {
+          pauseOtherVideos();
+          setIsPlaying(true);
+        }}
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}
         style={{
@@ -60,7 +91,7 @@ const VideoCard = ({ video }) => {
           inset: 0,
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'contain',
           backgroundColor: '#000000',
           zIndex: 1
         }}

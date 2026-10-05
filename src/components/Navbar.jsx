@@ -88,7 +88,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="theme-header-wrapper">
+      <div className={`theme-header-wrapper ${isScrolled ? 'theme-header-wrapper--scrolled' : ''}`}>
         {/* Top Navbar (Yess Infotech top bar style with brand theme) */}
         <div className="theme-header__top-navbar">
           <div className="container theme-header__top-container">
@@ -168,13 +168,13 @@ const Navbar = () => {
 
         {/* Main Floating Rounded Header (Yess Infotech Rounded-24 Island Card Style) */}
         <header className={`theme-header__main ${isScrolled ? 'theme-header__main--scrolled' : ''}`}>
-          <div className="container">
+          <div className="container theme-header-container">
             <div className="theme-header-card">
               {/* Brand Logo & Title on Left */}
               <div className="theme-header-brand-col">
                 <Link to="/" className="brand-link" onClick={() => setMobileMenuOpen(false)}>
                   <div className="brand-logo-wrap">
-                    <MissionLogoBadge size={46} style={{ flexShrink: 0 }} />
+                    <MissionLogoBadge size={44} className="brand-logo-emblem" style={{ flexShrink: 0 }} />
                   </div>
                   <div className="brand-text-block">
                     <div className="brand-title">
@@ -249,8 +249,9 @@ const Navbar = () => {
         </header>
       </div>
 
-      {/* Mobile Sub-Navbar Moving Announcement Marquee (Aligned below navbar, scrolls away with page) */}
-      <div className="mobile-subnav-ticker" aria-label="Announcement ticker">
+      {/* Mobile Sub-Navbar Moving Announcement Marquee (Hidden on scroll, only shown when at top) */}
+      {!isScrolled && (
+        <div className="mobile-subnav-ticker" aria-label="Announcement ticker">
           <div className="mobile-ticker-track">
             {/* Group 1 */}
             <div className="mobile-ticker-group">
@@ -333,6 +334,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
+      )}
 
       {/* Mobile Slide-Over Menu (Yess Infotech mobile-menu-wrapper & panel) */}
       <div 
@@ -522,6 +524,17 @@ const Navbar = () => {
           transition: all 0.25s ease;
         }
 
+        /* Remove upper green section and ticker when scrolled */
+        .theme-header-wrapper--scrolled .theme-header__top-navbar {
+          display: none !important;
+        }
+
+        .theme-header-wrapper--scrolled .theme-header__main {
+          margin-top: 0 !important;
+          padding-top: 6px !important;
+          padding-bottom: 6px !important;
+        }
+
         .theme-header__top-container {
           display: flex;
           align-items: center;
@@ -648,40 +661,56 @@ const Navbar = () => {
           transform: translateY(-1px);
         }
 
-        /* 2. Main Header (Floating Island Card - Rock-solid stable on scroll) */
+        /* 2. Main Header (Floating Island Card - Rock-solid flexible & auto-adjusting) */
         .theme-header__main {
           margin-top: -24px;
+          transition: all 0.25s ease;
+          width: 100%;
+        }
+
+        .theme-header-container {
+          max-width: 1400px;
+          width: 100%;
+          margin-left: auto;
+          margin-right: auto;
+          padding-left: clamp(10px, 2vw, 24px);
+          padding-right: clamp(10px, 2vw, 24px);
         }
 
         .theme-header-card {
           background-color: #ffffff;
-          border-radius: 28px;
-          box-shadow: 0 10px 30px rgba(0, 107, 45, 0.09), 0 2px 8px rgba(0, 0, 0, 0.04);
+          border-radius: 9999px;
+          box-shadow: 0 10px 30px rgba(0, 107, 45, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
           border: 1px solid #E1E9DF;
-          padding: 10px 22px;
-          min-height: 68px;
+          padding: 8px clamp(12px, 1.6vw, 24px);
+          min-height: clamp(54px, 5.2vw, 68px);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 1.25rem;
+          gap: clamp(8px, 1.2vw, 20px);
+          width: 100%;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .theme-header__main--scrolled .theme-header-card {
-          box-shadow: 0 12px 34px rgba(0, 107, 45, 0.13), 0 2px 8px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 10px 32px rgba(0, 107, 45, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05);
+          background-color: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
         }
 
-        /* Brand Column on Left - Full Visibility without Truncation */
+        /* Brand Column on Left - Auto-Adjusting & Responsive */
         .theme-header-brand-col {
-          flex: 0 0 auto;
-          min-width: max-content;
+          flex: 0 1 auto;
+          min-width: 0;
         }
 
         .brand-link {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: clamp(6px, 0.8vw, 12px);
           text-decoration: none;
-          flex-shrink: 0;
+          min-width: 0;
         }
 
         .brand-logo-wrap {
@@ -691,58 +720,66 @@ const Navbar = () => {
           justify-content: center;
         }
 
+        .brand-logo-emblem {
+          width: clamp(34px, 3.6vw, 44px) !important;
+          height: clamp(34px, 3.6vw, 44px) !important;
+        }
+
         .brand-text-block {
-          flex-shrink: 0;
+          flex: 0 1 auto;
+          min-width: 0;
           display: flex;
           flex-direction: column;
           justify-content: center;
         }
 
         .brand-title {
-          font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+          font-size: clamp(0.78rem, 1.1vw, 1.10rem);
           font-weight: 800;
           color: #006B2D;
-          line-height: 1.2;
+          line-height: 1.15;
           text-transform: uppercase;
-          letter-spacing: 0.02em;
+          letter-spacing: 0.01em;
           white-space: nowrap;
-          overflow: visible;
-          text-overflow: clip;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .brand-subtitle {
-          font-size: clamp(0.68rem, 0.75vw, 0.74rem);
+          font-size: clamp(0.60rem, 0.7vw, 0.72rem);
           color: #159B32;
           font-weight: 700;
-          margin-top: 2px;
+          margin-top: 1px;
           white-space: nowrap;
-          overflow: visible;
-          text-overflow: clip;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
-        /* Desktop Menu (Yess Infotech Pill Navigation) */
+        /* Desktop Menu (Fluid Auto-Scaling Pill Navigation) */
         .desktop-menu-section {
           display: none;
-          flex: 1;
+          flex: 1 1 auto;
           justify-content: center;
+          min-width: 0;
         }
 
         .desktop-main-nav {
           display: flex;
           align-items: center;
-          gap: 5px;
+          gap: clamp(2px, 0.4vw, 7px);
           flex-wrap: nowrap;
           justify-content: center;
+          max-width: 100%;
         }
 
         .header-main-nav-link {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          padding: 7px 13px;
-          border-radius: 999px;
+          padding: clamp(6px, 0.55vw, 8px) clamp(8px, 0.8vw, 15px);
+          border-radius: 9999px;
           text-decoration: none;
-          font-size: 0.91rem;
+          font-size: clamp(0.78rem, 0.86vw, 0.92rem);
           font-weight: 600;
           color: #17251B;
           white-space: nowrap;
@@ -755,12 +792,12 @@ const Navbar = () => {
           background-color: #F3F8F1;
         }
 
-        /* Active item: Solid brand background, white text (pill shape) */
+        /* Active item: Solid brand green background, white text (pill shape) */
         .header-main-nav-link--active {
           background-color: #006B2D !important;
           color: #ffffff !important;
           font-weight: 700;
-          padding: 7px 18px;
+          padding: clamp(6px, 0.55vw, 8px) clamp(12px, 1.1vw, 20px);
           box-shadow: 0 3px 10px rgba(0, 107, 45, 0.28);
         }
 
@@ -768,35 +805,8 @@ const Navbar = () => {
         .theme-header-actions-col {
           display: flex;
           align-items: center;
-          gap: 0.65rem;
+          gap: clamp(5px, 0.8vw, 10px);
           flex-shrink: 0;
-        }
-
-        /* Yess Infotech Style Accent CTA Pill Button */
-        .header-main-nav-link--cta {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background: linear-gradient(135deg, #FFC928 0%, #F5B000 100%);
-          color: #17251B !important;
-          font-weight: 800;
-          font-size: 0.90rem;
-          padding: 8px 18px;
-          border-radius: 999px;
-          text-decoration: none;
-          box-shadow: 0 4px 14px rgba(255, 201, 40, 0.38);
-          transition: all 0.2s ease;
-          white-space: nowrap;
-        }
-
-        .header-main-nav-link--cta:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(255, 201, 40, 0.48);
-          filter: brightness(1.03);
-        }
-
-        .cta-icon {
-          color: #17251B;
         }
 
         /* Header Icon Buttons (Cart & Account) */
@@ -805,14 +815,15 @@ const Navbar = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 42px;
-          height: 42px;
+          width: clamp(36px, 2.8vw, 42px);
+          height: clamp(36px, 2.8vw, 42px);
           border-radius: 50%;
           background-color: #F3F8F1;
           color: #006B2D;
           text-decoration: none;
           border: 1px solid #E1E9DF;
           transition: all 0.2s ease;
+          flex-shrink: 0;
         }
 
         .header-icon-btn:hover {
@@ -854,21 +865,23 @@ const Navbar = () => {
           display: none;
           align-items: center;
           justify-content: center;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-          background: #f0f4f9;
-          border: 1px solid #e2e8f0;
-          color: #17251B;
+          width: clamp(36px, 2.8vw, 42px);
+          height: clamp(36px, 2.8vw, 42px);
+          border-radius: 50%;
+          background: #006B2D;
+          border: none;
+          color: #ffffff;
           cursor: pointer;
-          transition: background 0.2s;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 6px rgba(0, 107, 45, 0.2);
+          flex-shrink: 0;
         }
 
         .mobile-menu-toggle:hover {
-          background: #e2e8f0;
+          background: #08481c;
         }
 
-        /* Mobile Drawer (Yess Infotech structure) */
+        /* Mobile Drawer */
         .mobile-menu-wrapper {
           position: fixed;
           inset: 0;
@@ -978,7 +991,7 @@ const Navbar = () => {
           margin-top: 6px;
         }
 
-        /* Mobile Sub-Navbar Moving Announcement Marquee (Aligned below navbar, highly visible in mobile view) */
+        /* Mobile Sub-Navbar Moving Announcement Marquee */
         .mobile-subnav-ticker {
           display: none;
           background: linear-gradient(90deg, #02200d 0%, #006B2D 50%, #02200d 100%);
@@ -1066,8 +1079,12 @@ const Navbar = () => {
           opacity: 0.85;
         }
 
-        /* Responsive Breakpoints */
-        @media (min-width: 1080px) {
+        /* =========================================================
+           RESPONSIVE SYSTEM - AUTO-ADJUSTS ACROSS ALL SCREENS
+           ========================================================= */
+
+        /* 1. Large Desktops & Laptops (>= 1160px) */
+        @media (min-width: 1160px) {
           .desktop-menu-section {
             display: flex !important;
           }
@@ -1076,44 +1093,12 @@ const Navbar = () => {
           }
         }
 
-        @media (min-width: 1080px) and (max-width: 1279px) {
-          .theme-header-card {
-            padding: 10px 16px;
-            gap: 0.65rem;
+        /* 2. Tablets in Landscape, Small Laptops & Surface Devices (<= 1159px) */
+        @media (max-width: 1159px) {
+          /* Hide upper green bar on tablets and mobile */
+          .theme-header__top-navbar {
+            display: none !important;
           }
-          .desktop-main-nav {
-            gap: 2px;
-          }
-          .header-main-nav-link {
-            padding: 6px 9px;
-            font-size: 0.84rem;
-          }
-          .header-main-nav-link--active {
-            padding: 6px 14px;
-          }
-          .theme-header-actions-col {
-            gap: 0.45rem;
-          }
-        }
-
-        @media (min-width: 1280px) {
-          .theme-header-card {
-            padding: 12px 26px;
-            min-height: 72px;
-          }
-          .desktop-main-nav {
-            gap: 7px;
-          }
-          .header-main-nav-link {
-            padding: 8px 15px;
-            font-size: 0.93rem;
-          }
-          .header-main-nav-link--active {
-            padding: 8px 20px;
-          }
-        }
-
-        @media (max-width: 1079px) {
           .theme-header-wrapper {
             position: -webkit-sticky !important;
             position: sticky !important;
@@ -1123,191 +1108,123 @@ const Navbar = () => {
             width: 100% !important;
             z-index: 9995 !important;
           }
-          .theme-header__top-center {
-            display: none;
+          .theme-header__main {
+            margin-top: 0 !important;
+            padding: 6px 0 !important;
           }
-          .mobile-subnav-ticker {
-            display: block;
-            margin-top: 6px;
+          .desktop-menu-section {
+            display: none !important;
           }
           .mobile-menu-toggle {
             display: inline-flex !important;
           }
-          .header-main-nav-link--cta {
-            display: none;
+          .mobile-subnav-ticker {
+            display: block;
+            margin-top: 4px;
           }
         }
 
-        @media (max-width: 768px) {
+        /* 3. Tablets in Portrait & Mid Screens (<= 992px) */
+        @media (max-width: 992px) {
           .theme-header-card {
-            border-radius: 20px;
-            padding: 8px 14px;
-            min-height: auto;
+            border-radius: 9999px;
+            padding: 6px clamp(10px, 1.8vw, 18px);
+            min-height: 56px;
           }
         }
 
+        /* 4. Mobile Devices (<= 768px) */
+        @media (max-width: 768px) {
+          .theme-header-container {
+            padding-left: clamp(8px, 1.5vw, 16px);
+            padding-right: clamp(8px, 1.5vw, 16px);
+          }
+
+          .theme-header-card {
+            border-radius: 9999px;
+            padding: 6px 12px;
+            min-height: 54px;
+            gap: 8px;
+          }
+
+          .brand-subtitle {
+            font-size: 0.64rem;
+          }
+        }
+
+        /* 5. Phones (<= 640px) */
         @media (max-width: 640px) {
-          .theme-header__top-navbar {
-            padding: 6px 0 20px;
-          }
-
-          .theme-header__top-container {
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
-            gap: 0.35rem;
-          }
-
-          .top-phone-link {
-            font-size: 0.74rem;
-            padding: 3px 8px;
-            gap: 4px;
-            border-radius: 999px;
-          }
-
-          .theme-header__top-right {
-            gap: 0.3rem;
-          }
-
-          .top-lang-pill {
-            font-size: 0.72rem;
-            padding: 3px 8px;
-            gap: 3px;
-          }
-
-          .top-wa-pill {
-            font-size: 0.72rem;
-            padding: 3px 8px;
-            gap: 3px;
-          }
-
           .theme-header__main {
-            margin-top: -14px;
+            padding: 4px 0 !important;
           }
 
-          .theme-header__main .container {
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
+          .theme-header-container {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
           }
 
           .theme-header-card {
             padding: 5px 10px;
-            border-radius: 16px;
-            gap: 0.4rem;
-          }
-
-          .theme-header-brand-col {
-            flex: 1;
-            min-width: 0;
-          }
-
-          .brand-link {
-            gap: 0.45rem;
-            min-width: 0;
-          }
-
-          .brand-logo-wrap {
-            transform: scale(0.85);
-            transform-origin: left center;
-          }
-
-          .brand-title {
-            font-size: clamp(0.76rem, 3.4vw, 0.92rem);
-            font-weight: 800;
-            line-height: 1.18;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            word-break: break-word;
+            border-radius: 9999px;
+            gap: 6px;
+            min-height: 50px;
           }
 
           .brand-subtitle {
             display: none;
           }
 
-          .theme-header-actions-col {
-            gap: 0.35rem;
-            flex-shrink: 0;
+          .brand-title {
+            font-size: clamp(0.74rem, 3.2vw, 0.88rem);
+            white-space: normal;
+            line-height: 1.15;
+            max-width: 165px;
           }
 
-          .header-icon-btn--account {
-            display: none !important;
-          }
-
-          .header-icon-btn--cart {
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
+          .header-icon-btn {
+            width: 36px;
+            height: 36px;
           }
 
           .mobile-menu-toggle {
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
-            border-radius: 10px;
-            background: #006B2D;
-            color: #ffffff;
-            border: none;
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 107, 45, 0.25);
-          }
-
-          .mobile-menu-toggle:hover {
-            background: #08481c;
-          }
-
-          .mobile-subnav-ticker {
-            margin-top: 5px;
-            padding: 5px 0;
-          }
-
-          .mobile-ticker-item {
-            font-size: 0.73rem;
+            width: 36px;
+            height: 36px;
           }
         }
 
+        /* 6. Compact & Foldable Phones (<= 375px) */
         @media (max-width: 375px) {
-          .theme-header__top-container,
-          .theme-header__main .container {
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
-          }
-
-          .mobile-subnav-ticker {
-            margin-top: 4px;
-            padding: 4px 0;
-          }
-
-          .mobile-ticker-item {
-            font-size: 0.70rem;
-          }
-
-          .top-phone-link {
-            font-size: 0.70rem;
-            padding: 2px 6px;
-          }
-
-          .top-lang-pill,
-          .top-wa-pill {
-            font-size: 0.68rem;
-            padding: 2px 6px;
+          .theme-header-container {
+            padding-left: 0.35rem;
+            padding-right: 0.35rem;
           }
 
           .theme-header-card {
             padding: 4px 8px;
-            gap: 0.3rem;
+            gap: 4px;
+            min-height: 48px;
+          }
+
+          .brand-logo-emblem {
+            width: 32px !important;
+            height: 32px !important;
           }
 
           .brand-title {
-            font-size: 0.74rem;
+            font-size: 0.72rem;
+            max-width: 125px;
           }
 
-          .header-icon-btn--cart,
+          .header-icon-btn,
           .mobile-menu-toggle {
             width: 33px;
             height: 33px;
-            min-width: 33px;
+          }
+
+          .cart-badge-count {
+            width: 17px;
+            height: 17px;
+            font-size: 0.65rem;
           }
         }
       `}</style>

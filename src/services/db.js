@@ -460,6 +460,59 @@ export const dbService = {
     return state[collectionName];
   },
 
+  // Save or update customer profile both in reactive cache and Cloud Firestore
+  async saveCustomerProfile(profile) {
+    if (!profile) return null;
+
+    const cleanPhone = (profile.phone || profile.mobileNumber || '').replace(/\D/g, '').trim();
+    const custId = profile.id || (cleanPhone ? `CUST-${cleanPhone}` : `CUST-${Date.now()}`);
+
+    const existingList = state.customers || [];
+    const existing = existingList.find((c) => 
+      c.id === custId || 
+      (cleanPhone && (c.phone === cleanPhone || c.mobileNumber === cleanPhone))
+    );
+
+    const payload = {
+      ...profile,
+      id: existing ? existing.id : custId,
+      customerId: existing ? (existing.customerId || existing.id) : custId,
+      fullName: (profile.fullName || profile.name || '').trim() || 'ग्राहक (Customer)',
+      phone: cleanPhone || profile.phone || '',
+      mobileNumber: cleanPhone || profile.phone || '',
+      whatsappNumber: profile.whatsappNumber || cleanPhone || profile.phone || '',
+      email: (profile.email || '').trim(),
+      address: (profile.address || '').trim(),
+      city: (profile.city || '').trim() || 'कोल्हापूर',
+      state: profile.state || 'Maharashtra',
+      pincode: (profile.pincode || '').trim(),
+      category: profile.category || 'Nutraceutical Buyer',
+      source: profile.source || 'Website Profile',
+      status: 'Active',
+      updatedAt: new Date().toISOString()
+    };
+
+    if (existing) {
+      await this.update('customers', existing.id, payload);
+    } else {
+      payload.createdAt = new Date().toISOString();
+      await this.add('customers', payload);
+    }
+
+    // Direct Cloud Firestore write guarantee
+    if (isFirebaseConfigured && firestoreDb) {
+      try {
+        const docRef = doc(firestoreDb, 'customers', payload.id);
+        await setDoc(docRef, { ...payload, syncedToFirebase: true }, { merge: true });
+        console.log(`[Firebase] Profile successfully stored on Cloud Firestore: customers/${payload.id}`);
+      } catch (err) {
+        console.warn(`[Firebase] Firestore customer profile write note:`, err.message);
+      }
+    }
+
+    return payload;
+  },
+
   // Commission Engine triggers
   async processOrderCommission(order, currentUser = null) {
     const settings = this.getAll('settings');

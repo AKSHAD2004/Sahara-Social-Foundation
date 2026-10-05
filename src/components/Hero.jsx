@@ -16,6 +16,7 @@ export const heroSlidesData = [
     id: 1,
     image: '/slide-antox-d.jpg',
     fallback: '/hero-slide-1.jpg',
+    pillText: 'Antox D + Antox T',
     badgeEn: 'Antox D + Antox T • Diabetes Care',
     badgeMr: 'मधुमेहमुक्त भारत अभियान • Antox D + Antox T',
     titleEn: 'Nutrifeel Antox D & Antox T Herbal Formula',
@@ -25,6 +26,7 @@ export const heroSlidesData = [
     id: 2,
     image: '/slide-vyasanmukt.jpg',
     fallback: '/slide-vyasanmukt.jpg',
+    pillText: 'Antox B-AL-NICO SPRAY + Antox T',
     badgeEn: 'Addiction-Free Campaign • Antox B-AL-NICO + Antox T',
     badgeMr: 'व्यसनमुक्त भारत अभियान • Antox B-AL-NICO + Antox T',
     titleEn: 'Herbal Spray & Tea for Tobacco & Alcohol De-addiction',
@@ -34,6 +36,7 @@ export const heroSlidesData = [
     id: 3,
     image: '/slide-rogmukt-hlk.jpg',
     fallback: '/slide-rogmukt-hlk.jpg',
+    pillText: 'Antox HLK + Antox T',
     badgeEn: 'Disease-Free Campaign • Heart, Liver & Kidney Care',
     badgeMr: 'रोगमुक्त भारत अभियान • Antox HLK + Antox T',
     titleEn: 'Arjun & Methi Nutraceutical Formulation for Vital Organs',
@@ -43,6 +46,7 @@ export const heroSlidesData = [
     id: 4,
     image: '/slide-vednamukt.jpg',
     fallback: '/slide-vednamukt.jpg',
+    pillText: 'Antox PN Powder + Oil',
     badgeEn: 'Pain-Free Campaign • Joint, Bone & Spine Care',
     badgeMr: 'वेदनामुक्त भारत अभियान • Antox PN Powder + Oil',
     titleEn: 'Marine Collagen & Herbal Oil for Joint and Back Relief',
@@ -52,6 +56,7 @@ export const heroSlidesData = [
     id: 5,
     image: '/slide-rogmukt-bacid.jpg',
     fallback: '/slide-rogmukt-bacid.jpg',
+    pillText: 'Antox B-Acid + Antox T',
     badgeEn: 'Disease-Free Campaign • Acidity & Digestion Care',
     badgeMr: 'रोगमुक्त भारत अभियान • Antox B-Acid + Antox T',
     titleEn: 'Electro-Homeopathic & Herbal Formula for Hyperacidity Relief',
@@ -61,6 +66,7 @@ export const heroSlidesData = [
     id: 6,
     image: '/slide-rogmukt-antox-x.jpg',
     fallback: '/slide-rogmukt-antox-x.jpg',
+    pillText: 'Antox X + Antox T',
     badgeEn: 'Disease-Free Campaign • Vitality & Men Strength',
     badgeMr: 'रोगमुक्त भारत अभियान • Antox X + Antox T',
     titleEn: 'Safed Musali & Botanical Extracts for Energy & Vitality',
@@ -70,6 +76,7 @@ export const heroSlidesData = [
     id: 7,
     image: '/slide-antox-amrut.jpg',
     fallback: '/hero-slide-2.jpg',
+    pillText: 'Antox Amrut 51 + Antox T',
     badgeEn: 'Pre-Clinically Tested • Sharir Shuddhi Panchakarma',
     badgeMr: 'शरीरशुद्धी पंचकर्म • Antox Amrut 51 + Antox T',
     titleEn: 'Detoxification & Essential Nutrition for Complete Body Health',
@@ -170,6 +177,29 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
                         }
                       }}
                     />
+
+                    {/* Official Clean Product Pill Overlay - Completely eliminates Gemini AI Watermark */}
+                    {slide.id === 2 ? (
+                      <div className="hero-slide-overlay-card slide-card-2 notranslate" translate="no" aria-hidden="true">
+                        <span className="overlay-pill-line1">Antox B-AL-NICO SPRAY</span>
+                        <span className="overlay-pill-plus">+</span>
+                        <span className="overlay-pill-line2">Antox T</span>
+                      </div>
+                    ) : slide.id === 4 ? (
+                      <div className="hero-slide-overlay-vednamukt notranslate" translate="no" aria-hidden="true">
+                        <div className="overlay-pill-red">
+                          <span>Skin • Bone • Joint</span>
+                        </div>
+                        <div className="overlay-pill-green">
+                          <span className="overlay-pill-bold">Antox PN</span>
+                          <span className="overlay-pill-sub">Powder + Oil</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={`hero-slide-overlay-pill slide-pill-${slide.id} notranslate`} translate="no" aria-hidden="true">
+                        <span>{slide.pillText}</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -321,6 +351,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
             0 0 25px rgba(255, 201, 40, 0.28),
             inset 0 0 0 1px rgba(255, 255, 255, 0.15);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          container-type: inline-size;
         }
 
         .hero-slides-wrapper {
@@ -351,6 +382,142 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           object-position: center;
           display: block;
           border-radius: 15px;
+        }
+
+        /* =======================================================
+           CLEAN HERO SLIDE BADGE OVERLAYS (Removes Gemini AI Watermark)
+           ======================================================= */
+        .hero-slide-overlay-pill {
+          position: absolute;
+          bottom: 5.6%;
+          right: 3.2%;
+          background: linear-gradient(180deg, #1f8242 0%, #135d2d 100%);
+          color: #ffffff;
+          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+          font-weight: 800;
+          font-size: clamp(0.55rem, 2.2cqw, 1.35rem);
+          letter-spacing: 0.02em;
+          padding: clamp(3px, 0.9cqw, 13px) clamp(12px, 3.2cqw, 38px);
+          min-height: clamp(22px, 8.5cqw, 56px);
+          border-radius: 9999px;
+          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
+          box-shadow: 
+            0 8px 22px rgba(0, 0, 0, 0.45), 
+            0 2px 6px rgba(0, 107, 45, 0.4),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          white-space: nowrap;
+          pointer-events: none;
+          z-index: 4;
+          line-height: 1;
+        }
+
+        /* Slide 2: Multi-line Card for Addiction Spray + Tea */
+        .hero-slide-overlay-card.slide-card-2 {
+          position: absolute;
+          bottom: 4.5%;
+          right: 3.2%;
+          background: linear-gradient(180deg, #1e7d3f 0%, #12582a 100%);
+          color: #ffffff;
+          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+          font-weight: 800;
+          border-radius: clamp(10px, 2.5cqw, 24px);
+          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
+          box-shadow: 
+            0 8px 22px rgba(0, 0, 0, 0.45), 
+            0 2px 6px rgba(0, 107, 45, 0.4),
+            inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+          padding: clamp(4px, 1.2cqw, 15px) clamp(10px, 2.6cqw, 32px);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          pointer-events: none;
+          z-index: 4;
+          line-height: 1.2;
+        }
+
+        .slide-card-2 .overlay-pill-line1 {
+          font-size: clamp(0.52rem, 1.9cqw, 1.2rem);
+          white-space: nowrap;
+        }
+
+        .slide-card-2 .overlay-pill-plus {
+          font-size: clamp(0.58rem, 2.2cqw, 1.3rem);
+          margin: 1px 0;
+          line-height: 1;
+        }
+
+        .slide-card-2 .overlay-pill-line2 {
+          font-size: clamp(0.52rem, 1.9cqw, 1.2rem);
+          white-space: nowrap;
+        }
+
+        /* Slide 4: Pain relief card (Skin • Bone • Joint + Antox PN Powder + Oil) */
+        .hero-slide-overlay-vednamukt {
+          position: absolute;
+          bottom: 1.2%;
+          right: 1.2%;
+          width: 58cqw;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: clamp(4px, 1.1cqw, 12px);
+          pointer-events: none;
+          z-index: 4;
+        }
+
+        .hero-slide-overlay-vednamukt .overlay-pill-red {
+          background: #e60050;
+          color: #ffffff;
+          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+          font-weight: 800;
+          font-size: clamp(0.6rem, 2.4cqw, 1.45rem);
+          padding: clamp(3px, 0.9cqw, 12px) clamp(14px, 3cqw, 36px);
+          border-radius: 9999px;
+          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+          white-space: nowrap;
+          text-align: center;
+          width: 82%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .hero-slide-overlay-vednamukt .overlay-pill-green {
+          background: linear-gradient(180deg, #1f8242 0%, #135d2d 100%);
+          color: #ffffff;
+          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+          font-weight: 800;
+          padding: clamp(4px, 1cqw, 14px) clamp(12px, 2.5cqw, 30px);
+          border-radius: clamp(10px, 2.2cqw, 22px);
+          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          line-height: 1.25;
+          margin-right: 47%;
+        }
+
+        .hero-slide-overlay-vednamukt .overlay-pill-bold {
+          font-size: clamp(0.55rem, 2.1cqw, 1.3rem);
+          white-space: nowrap;
+        }
+
+        .hero-slide-overlay-vednamukt .overlay-pill-sub {
+          font-size: clamp(0.52rem, 1.9cqw, 1.2rem);
+          white-space: nowrap;
         }
 
         /* Slide Counter Pill */

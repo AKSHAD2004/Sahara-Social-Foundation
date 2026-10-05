@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Play, Sparkles, Phone, Video as VideoIcon, CheckCircle2 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import VideoCard from '../components/VideoCard';
-import { resultVideos, organizationInfo } from '../data/websiteData';
+import HorizontalVideoCard from '../components/HorizontalVideoCard';
+import { resultVideos, horizontalVideosData, organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 
 const Videos = () => {
@@ -10,16 +11,20 @@ const Videos = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const categories = [
-    { id: 'All', nameEn: 'All Videos (12)', nameMr: 'सर्व व्हिडिओ (१२)' },
-    { id: 'Diabetes', nameEn: 'Diabetes (मधुमेह)', nameMr: 'मधुमेह मुक्त भारत' },
+    { id: 'All', nameEn: 'All Videos', nameMr: 'सर्व व्हिडिओ' },
+    { id: 'Diabetes', nameEn: 'Diabetes (मधुमेह)', nameMr: 'मधुमेह मुक्ती' },
     { id: 'Addiction', nameEn: 'De-Addiction (व्यसनमुक्ती)', nameMr: 'व्यसनमुक्त भारत' },
     { id: 'Bones', nameEn: 'Joint Pain (सांधेदुखी)', nameMr: 'सांधेदुखी व हाडे' },
     { id: 'Acidity', nameEn: 'Acidity & Digestion', nameMr: 'पित्त व पचन' },
-    { id: 'Ayurveda', nameEn: 'Ayurveda & Pathya', nameMr: 'आयुर्वेद व पथ्य' },
+    { id: 'Ayurveda', nameEn: 'Ayurveda & Guidance', nameMr: 'आयुर्वेद व पथ्य' },
     { id: 'Camps', nameEn: 'Health Camps', nameMr: 'आरोग्य शिबिरे' }
   ];
 
-  const filteredVideos = selectedCategory === 'All'
+  const filteredHorizontalVideos = selectedCategory === 'All'
+    ? horizontalVideosData
+    : horizontalVideosData.filter((v) => v.category === selectedCategory);
+
+  const filteredReels = selectedCategory === 'All'
     ? resultVideos
     : resultVideos.filter((v) => v.category === selectedCategory);
 
@@ -79,12 +84,45 @@ const Videos = () => {
             })}
           </div>
 
-          {/* 9:16 Vertical Reels Grid (All 12 Videos) */}
-          <div className="grid-reels videos-grid-reels" style={{ marginBottom: '3.5rem' }}>
-            {filteredVideos.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
+          {/* Authentic Videos Grid (Direct from samarthkolhapur.com) */}
+          {filteredHorizontalVideos.length > 0 && (
+            <div style={{ marginBottom: '3.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem' }}>
+                <Sparkles size={20} style={{ color: '#006B2D' }} />
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#17251B', margin: 0 }}>
+                  {language === 'mr' ? 'अधिकृत निकाल व्हिडिओ (samarthkolhapur.com)' : 'Featured Patient Recovery Videos'}
+                </h2>
+              </div>
+              <div 
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))',
+                  gap: '1.75rem'
+                }}
+              >
+                {filteredHorizontalVideos.map((video) => (
+                  <HorizontalVideoCard key={video.id} video={video} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 9:16 Vertical Reels & Guidance Grid */}
+          {filteredReels.length > 0 && (
+            <div style={{ marginBottom: '3.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem' }}>
+                <Play size={20} style={{ color: '#006B2D' }} />
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#17251B', margin: 0 }}>
+                  {language === 'mr' ? 'लघु व्हिडिओ व मार्गदर्शन' : 'Short Video Stories & Guidance'}
+                </h2>
+              </div>
+              <div className="grid-reels videos-grid-reels">
+                {filteredReels.map((video) => (
+                  <VideoCard key={video.id} video={video} />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Video Counseling Strip */}
           <div className="videos-counseling-strip" style={{

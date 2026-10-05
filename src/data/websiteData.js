@@ -894,6 +894,99 @@ export const productsData = [
   }
 ];
 
+export const horizontalVideosData = [
+  {
+    id: "hvid-01",
+    titleMr: "Antox-D आणि Antox-T चा प्रत्यक्ष निकाल (अर्चना चंदनशिवे)",
+    titleEn: "Antox-D & Antox-T Live Patient Recovery (Archana Chandanshive)",
+    speakerMr: "अर्चना चंदनशिवे व कुटुंब (Archana Chandanshive)",
+    speakerEn: "Archana Chandanshive & Family",
+    duration: "02:09",
+    category: "Diabetes",
+    categoryMr: "मधुमेह नियंत्रण",
+    videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/Archana-Chandanshive-1.mp4",
+    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    fallbackThumbnail: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    summaryMr: "Antox-D आणि Antox-T किटच्या नियमित सेवनाने रक्तातील साखर वेगाने कशी नियंत्रणात आली याचा प्रत्यक्ष अनुभव.",
+    summaryEn: "Live testimonial of how Antox-D and Antox-T helped normalize blood sugar and restore vitality."
+  },
+  {
+    id: "hvid-02",
+    titleMr: "शुगरमुक्ती अभियान - साखर ९५ mg/dL वर नियंत्रित (दिनकर नलवडे)",
+    titleEn: "Sugar-Free Mission - Blood Sugar Controlled at 95 mg/dL (Dinkar Nalvade)",
+    speakerMr: "दिनकर नलवडे व लाभार्थी (Dinkar Nalvade & Beneficiary)",
+    speakerEn: "Dinkar Nalvade & Beneficiary",
+    duration: "01:00",
+    category: "Diabetes",
+    categoryMr: "मधुमेह मुक्ती",
+    videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/Dinkar-Nalvade.mp4",
+    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251211_143007598.jpg",
+    fallbackThumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251211_143007598.jpg",
+    summaryMr: "सहारा सोशल फाऊंडेशनच्या शुगरमुक्ती अभियानामुळे अवघ्या काही दिवसांत साखर ९५ mg/dL वर आल्याचा प्रत्यक्ष पुरावा.",
+    summaryEn: "Beneficiary demonstrates normal blood sugar reading of 95 mg/dL following the foundation's dietary pathya."
+  },
+  {
+    id: "hvid-03",
+    titleMr: "मधुमेह नियंत्रण व रुग्ण सुधारणा प्रत्यक्ष अनुभव",
+    titleEn: "Diabetes Recovery & Patient Experience",
+    speakerMr: "सहारा सोशल फाऊंडेशन लाभार्थी (Sahara Beneficiary)",
+    speakerEn: "Sahara Beneficiary",
+    duration: "02:45",
+    category: "Diabetes",
+    categoryMr: "मधुमेह नियंत्रण",
+    videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208154114993_sys.mp4",
+    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    fallbackThumbnail: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    summaryMr: "Antox D आणि योग्य पथ्यामुळे रक्तातील साखर वेगाने कशी नियंत्रणात आली याचा प्रत्यक्ष अनुभव.",
+    summaryEn: "Authentic patient testimonial on blood sugar normalization with Antox D and dietary discipline."
+  },
+  {
+    id: "hvid-04",
+    titleMr: "व्यसनमुक्ती यशोगाथा - दारू व तंबाखूच्या व्यसनातून सुटका",
+    titleEn: "Permanent Relief from Alcohol & Tobacco Addiction",
+    speakerMr: "सहारा सोशल फाऊंडेशन लाभार्थी (Sahara Beneficiary)",
+    speakerEn: "Sahara Beneficiary",
+    duration: "03:10",
+    category: "Addiction",
+    categoryMr: "व्यसनमुक्ती",
+    videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260210094701655_sys.mp4",
+    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251211_143007598.jpg",
+    fallbackThumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251211_143007598.jpg",
+    summaryMr: "Antox B-AL-NICO स्प्रेच्या वापराने व्यसनातून मिळालेल्या कायमस्वरूपी मुक्तीचा कौटुंबिक अनुभव.",
+    summaryEn: "Family sharing their happiness after successful de-addiction recovery through herbal support."
+  },
+  {
+    id: "hvid-05",
+    titleMr: "सांधेदुखी व गुडघेदुखीतून संपूर्ण आराम",
+    titleEn: "Natural Relief for Chronic Joint & Knee Pain",
+    speakerMr: "सहारा सोशल फाऊंडेशन लाभार्थी (Sahara Beneficiary)",
+    speakerEn: "Sahara Beneficiary",
+    duration: "02:30",
+    category: "Bones",
+    categoryMr: "सांधेदुखी व हाडे",
+    videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208155851547_sys.mp4",
+    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251126_120357024-1024x1024.jpg",
+    fallbackThumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251126_120357024-1024x1024.jpg",
+    summaryMr: "Antox PN फॉर्म्युला आणि तेलाच्या वापराने सांधेदुखीत झालेली लक्षणीय सुधारणा.",
+    summaryEn: "Severe joint pain patient able to walk comfortably after regular Nutraceutical regimen."
+  },
+  {
+    id: "hvid-06",
+    titleMr: "जुनाट पित्त, ॲसिडिटी व पोटाच्या तक्रारींवर आराम",
+    titleEn: "Relief from Hyperacidity & Stomach Distress",
+    speakerMr: "सहारा सोशल फाऊंडेशन लाभार्थी (Sahara Beneficiary)",
+    speakerEn: "Sahara Beneficiary",
+    duration: "02:15",
+    category: "Acidity",
+    categoryMr: "पित्त व पचन",
+    videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208160519953_sys.mp4",
+    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    fallbackThumbnail: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    summaryMr: "छातीतील जळजळ, गॅसेस आणि पित्ताचा त्रास Antox HLK मुळे पूर्णपणे कमी झाल्याचा अनुभव.",
+    summaryEn: "Complete relief from hyperacidity, gas, and digestive discomfort using natural herbal remedies."
+  }
+];
+
 export const resultVideos = [
   {
     id: "vid-01",
@@ -903,7 +996,7 @@ export const resultVideos = [
     duration: "2:45",
     category: "Diabetes",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208154114993_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251211_155751542.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Authentic patient testimonial on blood sugar normalization with Antox D and dietary discipline.",
     summaryMr: "Antox D आणि योग्य पथ्यामुळे रक्तातील साखर वेगाने कशी नियंत्रणात आली याचा प्रत्यक्ष अनुभव."
@@ -916,7 +1009,7 @@ export const resultVideos = [
     duration: "3:10",
     category: "Addiction",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260210094701655_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251211_142408009.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Family sharing their happiness after successful de-addiction recovery through herbal support.",
     summaryMr: "Antox B-AL-NICO स्प्रेच्या वापराने व्यसनातून मिळालेल्या कायमस्वरूपी मुक्तीचा कौटुंबिक अनुभव."
@@ -929,7 +1022,7 @@ export const resultVideos = [
     duration: "2:30",
     category: "Bones",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208155851547_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_161630954.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Severe joint pain patient able to walk comfortably after regular Nutraceutical regimen.",
     summaryMr: "Antox PN फॉर्म्युला आणि तेलाच्या वापराने सांधेदुखीत झालेली लक्षणीय सुधारणा."
@@ -942,10 +1035,10 @@ export const resultVideos = [
     duration: "2:55",
     category: "Ayurveda",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208171224882_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_161131109.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Special guidance on liver detox, acidity balance and regular dietary habits.",
-    summaryMr: "आहार नियम, पित्त नियंत्रण आणि पोटाच्या तक्रारींवर मिळालेले समुपदेशन मार्गदर्शन.",
+    summaryMr: "आहार नियम, पित्त नियंत्रण आणि पोटाच्या तक्रारींवर मिळालेले समुपदेशन मार्गदर्शन."
   },
   {
     id: "vid-05",
@@ -955,7 +1048,7 @@ export const resultVideos = [
     duration: "3:40",
     category: "Diabetes",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/Archana-Chandanshive-1.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_154941913.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Archana Chandanshive speaks on how her chronic health issues were cured with Sahara Social Foundation formulas.",
     summaryMr: "अर्चना चंदनशिवे यांनी सहारा सोशल फाऊंडेशनच्या उपचाराने त्यांच्या प्रकृतीत झालेली सुधारणा सांगितली."
@@ -968,7 +1061,7 @@ export const resultVideos = [
     duration: "2:20",
     category: "Diabetes",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208160819048_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_153723326.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Patient reviews positive blood test reports after following the prescribed Nutraceutical pathya.",
     summaryMr: "नियमित पथ्य आणि Antox D मुळे रक्ताच्या तपासणीत आलेले सकारात्मक बदल."
@@ -981,7 +1074,7 @@ export const resultVideos = [
     duration: "4:05",
     category: "Addiction",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/Dinkar-Nalvade.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_152643886.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Dinkar Nalvade shares his journey to becoming completely free from long-term addiction.",
     summaryMr: "दिनकर नलवडे यांनी व्यसनातून पूर्णपणे मुक्त होऊन नवीन निरोगी जीवन सुरू केल्याचा अनुभव सांगितला."
@@ -994,7 +1087,7 @@ export const resultVideos = [
     duration: "2:40",
     category: "Camps",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208171224882_sys-1.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_151907727.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Public appreciation for the free health camps and genuine counseling provided in rural areas.",
     summaryMr: "ग्रामीण भागात आयोजित केलेल्या मोफत तपासणी शिबिरांबद्दल रुग्णांचे मनोगत."
@@ -1007,7 +1100,7 @@ export const resultVideos = [
     duration: "2:15",
     category: "Acidity",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208160519953_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_151240212.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Complete relief from hyperacidity, gas, and digestive discomfort using natural herbal remedies.",
     summaryMr: "छातीतील जळजळ, गॅसेस आणि पित्ताचा त्रास Antox HLK मुळे पूर्णपणे कमी झाल्याचा अनुभव."
@@ -1020,7 +1113,7 @@ export const resultVideos = [
     duration: "3:05",
     category: "Ayurveda",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260210095347067_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_150707371.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Guidance on maintaining energy, balanced diet and mental wellness for long term health.",
     summaryMr: "दीर्घकालीन निरोगी आरोग्यासाठी योग्य आहार आणि नियमित फॉर्म्युला सेवनाचे मार्गदर्शन."
@@ -1033,7 +1126,7 @@ export const resultVideos = [
     duration: "2:50",
     category: "Addiction",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260210095020621_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_150334812.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Patient shares how the craving for tobacco disappeared within weeks of starting the herbal spray.",
     summaryMr: "हर्बल स्प्रेच्या वापराने तंबाखू खाण्याची तीव्र इच्छा कशी नष्ट झाली याचे रुग्णाचे मनोगत."
@@ -1046,7 +1139,7 @@ export const resultVideos = [
     duration: "3:30",
     category: "Diabetes",
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260210101851087_sys.mp4",
-    thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_145925345.jpg",
+    thumbnail: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
     fallbackThumbnail: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Inspiring video calling on all diabetic patients to adopt natural Nutraceutical remedies and phone counseling.",
     summaryMr: "मधुमेहावर मात करण्यासाठी सर्व नागरिकांनी योग्य मार्गदर्शन घेण्याचे आवाहन."

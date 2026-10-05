@@ -10,8 +10,7 @@ import {
   CheckCircle2, 
   Sparkles,
   MapPin,
-  LogIn,
-  UserPlus
+  LogIn
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -21,7 +20,7 @@ const CustomerAuthModal = () => {
   const { isCustomerAuthModalOpen, closeCustomerAuthModal, loginCustomer } = useAuth();
   const { language } = useLanguage();
 
-  // 'existing' (Login with Mobile), 'new' (Register Name+Mobile+City), 'password' (Email/Password)
+  // 'existing' (Login with Mobile), 'password' (Email/Password)
   const [authMode, setAuthMode] = useState('existing'); 
   
   const [formData, setFormData] = useState({
@@ -46,15 +45,6 @@ const CustomerAuthModal = () => {
     if (authMode === 'existing') {
       if (!cleanPhone || cleanPhone.length < 10) {
         setError(language === 'mr' ? 'कृपया १० अंकी वैध मोबाईल नंबर टाका.' : 'Please enter a valid 10-digit mobile number.');
-        return;
-      }
-    } else if (authMode === 'new') {
-      if (!formData.fullName.trim()) {
-        setError(language === 'mr' ? 'कृपया आपले पूर्ण नाव टाका' : 'Please enter your full name');
-        return;
-      }
-      if (!cleanPhone || cleanPhone.length < 10) {
-        setError(language === 'mr' ? 'कृपया १० अंकी वैध मोबाईल नंबर टाका' : 'Please enter a valid 10-digit mobile number');
         return;
       }
     } else {
@@ -109,59 +99,18 @@ const CustomerAuthModal = () => {
               pincode: pastOrder.pincode || ''
             };
           } else {
-            // Not found in existing CRM, switch to new customer registration with phone prefilled
-            setError(
-              language === 'mr' 
-                ? 'या मोबाईल नंबरचे जुने खाते आढळले नाही. कृपया खाली नाव टाकून नवीन नोंदणी करा.' 
-                : 'No existing account found for this number. Please register your details below.'
-            );
-            setAuthMode('new');
-            setIsSubmitting(false);
-            return;
+            // Not found in existing records, direct login with phone
+            customerPayload = {
+              id: `CUST-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
+              fullName: 'ग्राहक (Customer)',
+              phone: cleanPhone,
+              email: '',
+              address: '',
+              city: 'कोल्हापूर',
+              state: 'Maharashtra',
+              pincode: ''
+            };
           }
-        }
-      } else if (authMode === 'new') {
-        if (existingCustomer) {
-          // Update existing
-          customerPayload = {
-            id: existingCustomer.id,
-            fullName: formData.fullName.trim() || existingCustomer.fullName,
-            phone: cleanPhone,
-            email: formData.email.trim() || existingCustomer.email || '',
-            address: formData.address.trim() || existingCustomer.address || '',
-            city: formData.city.trim() || existingCustomer.city || 'कोल्हापूर',
-            state: existingCustomer.state || 'Maharashtra',
-            pincode: existingCustomer.pincode || ''
-          };
-        } else {
-          // Create new CRM Customer
-          const newCustId = `CUST-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
-          const created = dbService.add('customers', {
-            customerId: newCustId,
-            fullName: formData.fullName.trim(),
-            mobileNumber: cleanPhone,
-            whatsappNumber: cleanPhone,
-            email: formData.email.trim() || '',
-            address: formData.address.trim() || '',
-            city: formData.city.trim() || 'कोल्हापूर',
-            state: 'Maharashtra',
-            pincode: '',
-            category: 'Ayurvedic Buyer',
-            source: 'Website Direct Buy',
-            status: 'Active',
-            totalPurchases: 0
-          });
-
-          customerPayload = {
-            id: created?.id || newCustId,
-            fullName: formData.fullName.trim(),
-            phone: cleanPhone,
-            email: formData.email.trim() || '',
-            address: formData.address.trim() || '',
-            city: formData.city.trim() || 'कोल्हापूर',
-            state: 'Maharashtra',
-            pincode: ''
-          };
         }
       } else {
         // Password mode
@@ -177,8 +126,9 @@ const CustomerAuthModal = () => {
         };
       }
 
-      // Log in the customer and execute the pending direct buy action
+      // Log in the customer and synchronize profile with Cloud Firestore
       loginCustomer(customerPayload);
+      dbService.saveCustomerProfile(customerPayload);
     } catch (err) {
       console.error(err);
       setError(language === 'mr' ? 'लॉगिन करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.' : 'Login failed. Please try again.');
@@ -258,18 +208,18 @@ const CustomerAuthModal = () => {
           </div>
 
           <h2 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '0 0 0.35rem 0', color: '#ffffff' }}>
-            {authMode === 'existing'
-              ? (language === 'mr' ? 'आधीच्या खात्याने खरेदी करा' : 'Login to Existing Account')
-              : (language === 'mr' ? 'नवीन ग्राहक नोंदणी व खरेदी' : 'Customer Account Register')}
+            {authMode === 'password'
+              ? (language === 'mr' ? 'पासवर्डने लॉगिन करा' : 'Sign In with Password')
+              : (language === 'mr' ? 'मोबाईल नंबरने लॉगिन करा' : 'Sign In with Mobile')}
           </h2>
           <p style={{ fontSize: '0.85rem', color: '#d6fae0', margin: 0, lineHeight: 1.4 }}>
-            {authMode === 'existing'
-              ? (language === 'mr' ? 'आपला १० अंकी नोंदणीकृत मोबाईल नंबर टाका आणि खरेदी पुढे न्या.' : 'Enter your registered mobile number to proceed with order.')
-              : (language === 'mr' ? 'उत्पादन खरेदी व मोफत मार्गदर्शनासाठी नाव व मोबाईल नंबर प्रविष्ट करा.' : 'Please enter your name & mobile number to proceed.')}
+            {authMode === 'password'
+              ? (language === 'mr' ? 'आपला ईमेल किंवा मोबाईल आणि पासवर्ड प्रविष्ट करा.' : 'Enter your registered email/phone and password.')
+              : (language === 'mr' ? 'आपला १० अंकी मोबाईल नंबर टाका आणि खरेदी पुढे न्या.' : 'Enter your 10-digit mobile number to proceed.')}
           </p>
         </div>
 
-        {/* Auth Mode Toggle Tabs (Existing vs New vs Password) */}
+        {/* Auth Mode Toggle Tabs (Mobile vs Password) */}
         <div style={{ display: 'flex', borderBottom: '1px solid #E1E9DF', backgroundColor: '#F3F8F1', padding: '0.35rem', gap: '0.35rem' }}>
           <button
             type="button"
@@ -282,7 +232,7 @@ const CustomerAuthModal = () => {
               backgroundColor: authMode === 'existing' ? '#ffffff' : 'transparent',
               color: authMode === 'existing' ? '#006B2D' : '#5F6B61',
               fontWeight: authMode === 'existing' ? 700 : 600,
-              fontSize: '0.82rem',
+              fontSize: '0.85rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -292,47 +242,22 @@ const CustomerAuthModal = () => {
               transition: 'all 0.2s ease'
             }}
           >
-            <LogIn size={14} />
-            <span>{language === 'mr' ? 'आधीचे खाते' : 'Existing Account'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setAuthMode('new'); setError(''); }}
-            style={{
-              flex: 1,
-              padding: '0.65rem 0.5rem',
-              borderRadius: '8px',
-              border: 'none',
-              backgroundColor: authMode === 'new' ? '#ffffff' : 'transparent',
-              color: authMode === 'new' ? '#006B2D' : '#5F6B61',
-              fontWeight: authMode === 'new' ? 700 : 600,
-              fontSize: '0.82rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.35rem',
-              boxShadow: authMode === 'new' ? '0 2px 5px rgba(0,107,45,0.08)' : 'none',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <UserPlus size={14} />
-            <span>{language === 'mr' ? 'नवीन नोंदणी' : 'New Account'}</span>
+            <LogIn size={15} />
+            <span>{language === 'mr' ? 'मोबाईल नंबर लॉगिन' : 'Mobile Number'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => { setAuthMode('password'); setError(''); }}
             style={{
-              flex: 0.9,
+              flex: 1,
               padding: '0.65rem 0.5rem',
               borderRadius: '8px',
               border: 'none',
               backgroundColor: authMode === 'password' ? '#ffffff' : 'transparent',
               color: authMode === 'password' ? '#006B2D' : '#5F6B61',
               fontWeight: authMode === 'password' ? 700 : 600,
-              fontSize: '0.82rem',
+              fontSize: '0.85rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -342,8 +267,8 @@ const CustomerAuthModal = () => {
               transition: 'all 0.2s ease'
             }}
           >
-            <Lock size={14} />
-            <span>{language === 'mr' ? 'पासवर्ड' : 'Password'}</span>
+            <Lock size={15} />
+            <span>{language === 'mr' ? 'पासवर्ड लॉगिन' : 'Password Login'}</span>
           </button>
         </div>
 
@@ -400,85 +325,7 @@ const CustomerAuthModal = () => {
             </div>
           )}
 
-          {/* Mode 2: New Customer Registration */}
-          {authMode === 'new' && (
-            <>
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
-                  {language === 'mr' ? 'आपले पूर्ण नाव (Full Name) *' : 'Full Name *'}
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <User size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#5F6B61' }} />
-                  <input
-                    type="text"
-                    required
-                    placeholder={language === 'mr' ? 'उदा. सचिन जाधव' : 'e.g. Ramesh Patil'}
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.65rem 0.75rem 0.65rem 2.4rem',
-                      borderRadius: '10px',
-                      border: '1.5px solid #E1E9DF',
-                      fontSize: '0.92rem',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
-                  {language === 'mr' ? 'मोबाईल नंबर (Mobile Number) *' : 'Mobile Number (10 Digits) *'}
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#006B2D', fontWeight: 700, fontSize: '0.88rem' }}>+91</span>
-                  <input
-                    type="tel"
-                    required
-                    maxLength={10}
-                    placeholder="8421154090"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
-                    style={{
-                      width: '100%',
-                      padding: '0.65rem 0.75rem 0.65rem 3.2rem',
-                      borderRadius: '10px',
-                      border: '1.5px solid #E1E9DF',
-                      fontSize: '0.92rem',
-                      fontWeight: 600,
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '1.25rem' }}>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
-                  {language === 'mr' ? 'डिलिव्हरी शहर / गाव (City / Village)' : 'Delivery City / Town (Optional)'}
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#5F6B61' }} />
-                  <input
-                    type="text"
-                    placeholder={language === 'mr' ? 'उदा. कोल्हापूर / सांगली' : 'e.g. Kolhapur / Pune'}
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.65rem 0.75rem 0.65rem 2.4rem',
-                      borderRadius: '10px',
-                      border: '1.5px solid #E1E9DF',
-                      fontSize: '0.92rem',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Mode 3: Password Login */}
+          {/* Mode 2: Password Login */}
           {authMode === 'password' && (
             <>
               <div style={{ marginBottom: '1rem' }}>
@@ -563,39 +410,12 @@ const CustomerAuthModal = () => {
             ) : (
               <>
                 <span>
-                  {authMode === 'existing'
-                    ? (language === 'mr' ? 'लॉगिन करा व खरेदी पुढे न्या' : 'Sign In & Buy Now')
-                    : (language === 'mr' ? 'नोंदणी करा व खरेदी सुरू करा' : 'Register & Buy Now')}
+                  {language === 'mr' ? 'लॉगिन करा व खरेदी पुढे न्या' : 'Sign In & Buy Now'}
                 </span>
                 <ArrowRight size={18} />
               </>
             )}
           </button>
-
-          {/* Switch link below submit */}
-          {authMode === 'existing' ? (
-            <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.84rem', color: '#5F6B61' }}>
-              <span>{language === 'mr' ? 'नवीन ग्राहक आहात? ' : 'New customer? '}</span>
-              <button
-                type="button"
-                onClick={() => { setAuthMode('new'); setError(''); }}
-                style={{ background: 'none', border: 'none', color: '#006B2D', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-              >
-                {language === 'mr' ? 'येथे नवीन नोंदणी करा' : 'Create an Account'}
-              </button>
-            </div>
-          ) : authMode === 'new' ? (
-            <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.84rem', color: '#5F6B61' }}>
-              <span>{language === 'mr' ? 'आधीपासून खाते आहे? ' : 'Already registered? '}</span>
-              <button
-                type="button"
-                onClick={() => { setAuthMode('existing'); setError(''); }}
-                style={{ background: 'none', border: 'none', color: '#006B2D', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-              >
-                {language === 'mr' ? 'येथे लॉगिन करा' : 'Sign In with Mobile'}
-              </button>
-            </div>
-          ) : null}
 
           {/* Trust Footer Notice */}
           <div style={{

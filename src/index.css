@@ -1058,5 +1058,19 @@ body {
   }
 }
 
+/* ==========================================================================
+   Horizontal Videos Track & 16:9 Card Styling
+   ========================================================================== */
+.horizontal-videos-track::-webkit-scrollbar {
+  display: none;
+}
 
+.horizontal-video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 107, 45, 0.12) !important;
+}
 
+.horizontal-video-card:hover .horizontal-play-btn {
+  transform: scale(1.1);
+  background-color: #159B32 !important;
+}

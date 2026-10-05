@@ -59,6 +59,7 @@ export function getRazorpayKeyId() {
 export async function initializeRazorpayPayment({
   amountInRupees = 0,
   orderId = '',
+  description = '',
   customer = {},
   notes = {},
   onSuccess = () => {},
@@ -79,7 +80,7 @@ export async function initializeRazorpayPayment({
     amount: amountInPaise,
     currency: 'INR',
     name: 'Sahara Social Foundation',
-    description: `Ayurvedic Order #${orderId}`,
+    description: description || `Nutraceutical Order #${orderId}`,
     image: '/favicon.ico',
     notes: {
       orderId: orderId,

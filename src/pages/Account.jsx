@@ -167,24 +167,29 @@ const Account = () => {
     setProfileData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (!customerUser) return;
 
+    const cleanPhone = (profileData.phone || customerUser.phone || '').replace(/\D/g, '').trim();
+
     const updatedUser = {
       ...customerUser,
-      ...profileData
+      ...profileData,
+      phone: cleanPhone,
+      mobileNumber: cleanPhone,
+      whatsappNumber: profileData.whatsappNumber || cleanPhone,
+      updatedAt: new Date().toISOString()
     };
 
-    // Update in local auth & dbService
+    // Update in local auth context
     loginCustomer(updatedUser);
 
-    // Save in CRM customers if present
-    const existingCusts = dbService.getAll('customers') || [];
-    const idx = existingCusts.findIndex(c => c.phone === profileData.phone || c.mobileNumber === profileData.phone || c.id === customerUser.id);
-    if (idx >= 0) {
-      existingCusts[idx] = { ...existingCusts[idx], ...profileData, updatedAt: new Date().toISOString() };
-      dbService.save('customers', existingCusts);
+    // Save and store profile in Firebase Cloud Firestore
+    try {
+      await dbService.saveCustomerProfile(updatedUser);
+    } catch (err) {
+      console.warn('Error saving profile to Firebase:', err);
     }
 
     setSaveSuccess(true);
@@ -216,6 +221,8 @@ const Account = () => {
         id: foundCustomer.id,
         fullName: foundCustomer.fullName || foundCustomer.name || 'ग्राहक (Customer)',
         phone: cleanMobile,
+        mobileNumber: cleanMobile,
+        whatsappNumber: foundCustomer.whatsappNumber || cleanMobile,
         email: foundCustomer.email || '',
         address: foundCustomer.address || '',
         city: foundCustomer.city || 'कोल्हापूर',
@@ -223,6 +230,7 @@ const Account = () => {
         pincode: foundCustomer.pincode || ''
       };
       loginCustomer(userPayload);
+      dbService.saveCustomerProfile(userPayload);
     } else {
       // Check if user has past orders with this phone
       const allOrders = dbService.getAll('orders') || [];
@@ -230,78 +238,40 @@ const Account = () => {
 
       if (pastOrder) {
         const userPayload = {
-          id: pastOrder.customerId || `CUST-${Date.now()}`,
+          id: pastOrder.customerId || `CUST-${cleanMobile}`,
           fullName: pastOrder.customerName || 'ग्राहक (Customer)',
           phone: cleanMobile,
+          mobileNumber: cleanMobile,
+          whatsappNumber: cleanMobile,
           email: pastOrder.customerEmail || '',
           address: pastOrder.shippingAddress || '',
           city: pastOrder.city || 'कोल्हापूर',
           state: pastOrder.state || 'Maharashtra',
-          pincode: pastOrder.pincode || ''
+          pincode: pastOrder.pincode || '',
+          source: 'Website Buyer'
         };
         loginCustomer(userPayload);
+        dbService.saveCustomerProfile(userPayload);
       } else {
-        // Not found, notify user and switch to Register tab with prefilled mobile
-        setRegisterMobile(cleanMobile);
-        setLoginError(
-          language === 'mr' 
-            ? 'या मोबाईल नंबरचे जुने खाते सापडले नाही. कृपया नवीन खात्यासाठी नोंदणी करा.' 
-            : 'No existing account found with this mobile number. Please register your details below.'
-        );
-        setAuthMode('new');
+        // Direct seamless login with mobile number - create new customer profile & store on Firebase!
+        const userPayload = {
+          id: `CUST-${cleanMobile}`,
+          customerId: `CUST-${cleanMobile}`,
+          fullName: 'ग्राहक (Customer)',
+          phone: cleanMobile,
+          mobileNumber: cleanMobile,
+          whatsappNumber: cleanMobile,
+          email: '',
+          address: '',
+          city: 'कोल्हापूर',
+          state: 'Maharashtra',
+          pincode: '',
+          source: 'Website Mobile Direct'
+        };
+        loginCustomer(userPayload);
+        dbService.saveCustomerProfile(userPayload);
       }
     }
-  };
-
-  // New Customer Register
-  const handleNewCustomerRegister = (e) => {
-    e.preventDefault();
-    setLoginError('');
-
-    const cleanMobile = registerMobile.replace(/\D/g, '').trim();
-    if (!cleanMobile || cleanMobile.length < 10) {
-      setLoginError(language === 'mr' ? 'कृपया वैध १० अंकी मोबाईल नंबर टाका.' : 'Please enter a valid 10-digit mobile number.');
-      return;
-    }
-
-    if (!registerName.trim()) {
-      setLoginError(language === 'mr' ? 'कृपया आपले पूर्ण नाव टाका.' : 'Please enter your full name.');
-      return;
-    }
-
-    // Create and save new customer record
-    const newCustId = `CUST-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
-    const newCustomerObj = {
-      customerId: newCustId,
-      fullName: registerName.trim(),
-      mobileNumber: cleanMobile,
-      whatsappNumber: cleanMobile,
-      email: '',
-      address: '',
-      city: registerCity.trim() || 'कोल्हापूर',
-      state: 'Maharashtra',
-      pincode: '',
-      category: 'Ayurvedic Buyer',
-      source: 'Website Account Registration',
-      status: 'Active',
-      totalPurchases: 0,
-      createdAt: new Date().toISOString()
-    };
-
-    const created = dbService.add('customers', newCustomerObj);
-
-    const userPayload = {
-      id: created?.id || newCustId,
-      fullName: registerName.trim(),
-      phone: cleanMobile,
-      email: '',
-      address: '',
-      city: registerCity.trim() || 'कोल्हापूर',
-      state: 'Maharashtra',
-      pincode: ''
-    };
-
-    loginCustomer(userPayload);
   };
 
   const handleLogout = () => {
@@ -382,75 +352,13 @@ const Account = () => {
                 <User size={32} />
               </div>
               <h2 style={{ fontSize: '1.45rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.35rem', fontFamily: 'var(--font-heading)' }}>
-                {authMode === 'existing' 
-                  ? (language === 'mr' ? 'आधीच्या खात्यात लॉगिन करा' : 'Login to Existing Account')
-                  : (language === 'mr' ? 'नवीन ग्राहक नोंदणी' : 'Create Customer Account')}
+                {language === 'mr' ? 'खात्यात लॉगिन करा' : 'Customer Account Login'}
               </h2>
               <p style={{ color: '#5F6B61', fontSize: '0.88rem', margin: 0 }}>
-                {authMode === 'existing'
-                  ? (language === 'mr' ? 'आपला नोंदणीकृत १० अंकी मोबाईल नंबर टाकून लॉगिन करा' : 'Enter your registered 10-digit mobile number to access your account')
-                  : (language === 'mr' ? 'आपल्या पहिल्या खरेदीसाठी व ऑर्डर ट्रॅकिंगसाठी नाव व मोबाईल नोंदवा' : 'Register your details for instant order tracking & delivery')}
+                {language === 'mr' 
+                  ? 'आपला १० अंकी मोबाईल नंबर टाकून आपल्या ऑर्डर्स व माहिती पहा' 
+                  : 'Enter your 10-digit mobile number to access your orders and profile'}
               </p>
-            </div>
-
-            {/* Switch Tabs: Existing Account vs New Registration */}
-            <div style={{
-              display: 'flex',
-              backgroundColor: '#F3F8F1',
-              borderRadius: '12px',
-              padding: '0.35rem',
-              marginBottom: '1.75rem',
-              border: '1px solid #E1E9DF'
-            }}>
-              <button
-                type="button"
-                onClick={() => { setAuthMode('existing'); setLoginError(''); }}
-                style={{
-                  flex: 1,
-                  padding: '0.65rem',
-                  borderRadius: '9px',
-                  border: 'none',
-                  backgroundColor: authMode === 'existing' ? '#ffffff' : 'transparent',
-                  color: authMode === 'existing' ? '#006B2D' : '#5F6B61',
-                  fontWeight: authMode === 'existing' ? 700 : 600,
-                  fontSize: '0.88rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.4rem',
-                  cursor: 'pointer',
-                  boxShadow: authMode === 'existing' ? '0 2px 6px rgba(0,107,45,0.08)' : 'none',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <LogIn size={15} />
-                <span>{language === 'mr' ? 'आधीचे खाते (Login)' : 'Existing Account'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setAuthMode('new'); setLoginError(''); }}
-                style={{
-                  flex: 1,
-                  padding: '0.65rem',
-                  borderRadius: '9px',
-                  border: 'none',
-                  backgroundColor: authMode === 'new' ? '#ffffff' : 'transparent',
-                  color: authMode === 'new' ? '#006B2D' : '#5F6B61',
-                  fontWeight: authMode === 'new' ? 700 : 600,
-                  fontSize: '0.88rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.4rem',
-                  cursor: 'pointer',
-                  boxShadow: authMode === 'new' ? '0 2px 6px rgba(0,107,45,0.08)' : 'none',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <UserPlus size={15} />
-                <span>{language === 'mr' ? 'नवीन नोंदणी (Register)' : 'New Account'}</span>
-              </button>
             </div>
 
             {/* Error Message */}
@@ -472,217 +380,69 @@ const Account = () => {
               </div>
             )}
 
-            {/* Form 1: Existing Customer Login (Mobile Number only) */}
-            {authMode === 'existing' ? (
-              <form onSubmit={handleExistingCustomerLogin}>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
-                    {language === 'mr' ? 'नोंदणीकृत १० अंकी मोबाईल नंबर (Mobile Number) *' : 'Registered 10-Digit Mobile Number *'}
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{
-                      position: 'absolute',
-                      left: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#006B2D',
-                      fontWeight: 700,
-                      fontSize: '0.9rem'
-                    }}>
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      maxLength={10}
-                      autoFocus
-                      placeholder="8421154090"
-                      value={loginMobile}
-                      onChange={(e) => setLoginMobile(e.target.value.replace(/\D/g, ''))}
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem 0.75rem 3.2rem',
-                        borderRadius: '10px',
-                        border: '1.5px solid #E1E9DF',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        letterSpacing: '1px',
-                        fontWeight: 600,
-                        boxSizing: 'border-box'
-                      }}
-                      required
-                    />
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#5F6B61', marginTop: '0.35rem' }}>
-                    {language === 'mr' 
-                      ? 'आपल्या पूर्वीच्या ऑर्डरमध्ये दिलेला मोबाईल नंबर येथे प्रविष्ट करा.' 
-                      : 'Enter the mobile number used during your previous purchase or consultation.'}
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  style={{
-                    width: '100%',
-                    padding: '0.85rem',
-                    fontSize: '1rem',
+            {/* Form: Customer Login (Mobile Number only) */}
+            <form onSubmit={handleExistingCustomerLogin}>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
+                  {language === 'mr' ? '१० अंकी मोबाईल नंबर (Mobile Number) *' : '10-Digit Mobile Number *'}
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <span style={{
+                    position: 'absolute',
+                    left: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#006B2D',
                     fontWeight: 700,
-                    borderRadius: '12px',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 14px rgba(0, 107, 45, 0.25)'
-                  }}
-                >
-                  <LogIn size={18} />
-                  <span>{language === 'mr' ? 'लॉगिन करा (Sign In)' : 'Sign In with Mobile'}</span>
-                </button>
-
-                {/* Switch helper link */}
-                <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E1E9DF' }}>
-                  <span style={{ fontSize: '0.86rem', color: '#5F6B61' }}>
-                    {language === 'mr' ? 'नवीन ग्राहक आहात का? ' : 'New to Sahara Social Foundation? '}
+                    fontSize: '0.9rem'
+                  }}>
+                    +91
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('new'); setLoginError(''); }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#006B2D',
-                      fontWeight: 700,
-                      fontSize: '0.86rem',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      padding: 0
-                    }}
-                  >
-                    {language === 'mr' ? 'येथे नवीन खाते तयार करा' : 'Create New Account'}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              /* Form 2: New Customer Registration */
-              <form onSubmit={handleNewCustomerRegister}>
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
-                    {language === 'mr' ? 'पूर्ण नाव (Full Name) *' : 'Full Name *'}
-                  </label>
                   <input
-                    type="text"
+                    type="tel"
+                    maxLength={10}
+                    autoFocus
+                    placeholder="8421154090"
+                    value={loginMobile}
+                    onChange={(e) => setLoginMobile(e.target.value.replace(/\D/g, ''))}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem 0.75rem 3.2rem',
+                      borderRadius: '10px',
+                      border: '1.5px solid #E1E9DF',
+                      fontSize: '1rem',
+                      outline: 'none',
+                      letterSpacing: '1px',
+                      fontWeight: 600,
+                      boxSizing: 'border-box'
+                    }}
                     required
-                    placeholder={language === 'mr' ? 'उदा. बाबासाहेब जाधव' : 'e.g. Ramesh Patil'}
-                    value={registerName}
-                    onChange={(e) => setRegisterName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem',
-                      borderRadius: '10px',
-                      border: '1.5px solid #E1E9DF',
-                      fontSize: '0.95rem',
-                      outline: 'none',
-                      boxSizing: 'border-box'
-                    }}
                   />
                 </div>
-
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
-                    {language === 'mr' ? '१० अंकी मोबाईल नंबर (Mobile Number) *' : '10-Digit Mobile Number *'}
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{
-                      position: 'absolute',
-                      left: '12px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      color: '#006B2D',
-                      fontWeight: 700,
-                      fontSize: '0.9rem'
-                    }}>
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      maxLength={10}
-                      required
-                      placeholder="8421154090"
-                      value={registerMobile}
-                      onChange={(e) => setRegisterMobile(e.target.value.replace(/\D/g, ''))}
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem 0.75rem 3.2rem',
-                        borderRadius: '10px',
-                        border: '1.5px solid #E1E9DF',
-                        fontSize: '0.95rem',
-                        outline: 'none',
-                        letterSpacing: '1px',
-                        fontWeight: 600,
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
+                <div style={{ fontSize: '0.78rem', color: '#5F6B61', marginTop: '0.35rem' }}>
+                  {language === 'mr' 
+                    ? 'आपल्या ऑर्डरमध्ये दिलेला मोबाईल नंबर येथे प्रविष्ट करा.' 
+                    : 'Enter the mobile number used during your purchase to view orders.'}
                 </div>
+              </div>
 
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.4rem' }}>
-                    {language === 'mr' ? 'शहर / गाव (City / Village)' : 'City / Town'}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={language === 'mr' ? 'उदा. कोल्हापूर' : 'e.g. Kolhapur'}
-                    value={registerCity}
-                    onChange={(e) => setRegisterCity(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem',
-                      borderRadius: '10px',
-                      border: '1.5px solid #E1E9DF',
-                      fontSize: '0.95rem',
-                      outline: 'none',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  style={{
-                    width: '100%',
-                    padding: '0.85rem',
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    borderRadius: '12px',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <UserPlus size={18} />
-                  <span>{language === 'mr' ? 'नोंदणी करा व खाते सुरू करा' : 'Register & Create Account'}</span>
-                </button>
-
-                {/* Switch helper link */}
-                <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E1E9DF' }}>
-                  <span style={{ fontSize: '0.86rem', color: '#5F6B61' }}>
-                    {language === 'mr' ? 'आधीपासून खाते आहे का? ' : 'Already have an existing account? '}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => { setAuthMode('existing'); setLoginError(''); }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#006B2D',
-                      fontWeight: 700,
-                      fontSize: '0.86rem',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      padding: 0
-                    }}
-                  >
-                    {language === 'mr' ? 'येथे लॉगिन करा' : 'Sign In here'}
-                  </button>
-                </div>
-              </form>
-            )}
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{
+                  width: '100%',
+                  padding: '0.85rem',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  borderRadius: '12px',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 14px rgba(0, 107, 45, 0.25)'
+                }}
+              >
+                <LogIn size={18} />
+                <span>{language === 'mr' ? 'लॉगिन करा (Sign In)' : 'Sign In with Mobile'}</span>
+              </button>
+            </form>
 
             {/* Security note */}
             <div style={{
