@@ -247,9 +247,10 @@ const Navbar = () => {
             </div>
           </div>
         </header>
+      </div>
 
-        {/* Mobile Sub-Navbar Moving Announcement Marquee (Aligned below navbar, highly visible in mobile view) */}
-        <div className="mobile-subnav-ticker" aria-label="Announcement ticker">
+      {/* Mobile Sub-Navbar Moving Announcement Marquee (Aligned below navbar, scrolls away with page) */}
+      <div className="mobile-subnav-ticker" aria-label="Announcement ticker">
           <div className="mobile-ticker-track">
             {/* Group 1 */}
             <div className="mobile-ticker-group">
@@ -332,7 +333,6 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Mobile Slide-Over Menu (Yess Infotech mobile-menu-wrapper & panel) */}
       <div 
@@ -503,12 +503,13 @@ const Navbar = () => {
       <style>{`
         /* Wrapper */
         .theme-header-wrapper {
+          position: -webkit-sticky;
           position: sticky;
           top: 0;
           left: 0;
           right: 0;
           width: 100%;
-          z-index: 1000;
+          z-index: 9995;
           transition: all 0.25s ease;
         }
 
@@ -987,7 +988,7 @@ const Navbar = () => {
           overflow: hidden;
           width: 100%;
           position: relative;
-          z-index: 998;
+          z-index: 10;
           padding: 6px 0;
           touch-action: pan-y;
         }
@@ -1113,6 +1114,15 @@ const Navbar = () => {
         }
 
         @media (max-width: 1079px) {
+          .theme-header-wrapper {
+            position: -webkit-sticky !important;
+            position: sticky !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            z-index: 9995 !important;
+          }
           .theme-header__top-center {
             display: none;
           }

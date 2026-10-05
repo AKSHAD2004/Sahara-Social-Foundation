@@ -77,32 +77,68 @@ export const heroSlidesData = [
   }
 ];
 
+// Localize digits across Indian languages (Marathi, Hindi, Gujarati, etc.)
+export const formatNumberByLanguage = (num, lang) => {
+  const digitMaps = {
+    mr: ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'],
+    hi: ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'],
+    gu: ['૦', '૧', '૨', '૩', '૪', '૫', '૬', '૭', '૮', '૯'],
+    bn: ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'],
+    pa: ['੦', '੧', '੨', '੩', '੪', '੫', '੬', '੭', '੮', '੯'],
+    or: ['୦', '୧', '୨', '୩', '૪', '୫', '୬', '୭', '୮', '୯'],
+    te: ['౦', '౧', '౨', '౩', '౪', '౫', '౬', '౭', '౮', '౯'],
+    kn: ['೦', '೧', '೨', '೩', '೪', '೫', '೬', '೭', '೮', '೯'],
+    ta: ['௦', '௧', '௨', '௩', '௪', '௫', '௬', '௭', '௮', '௯'],
+    ml: ['൦', '൧', '൨', '൩', '൪', '൫', '൬', '൭', '൮', '൯']
+  };
+
+  const map = digitMaps[lang];
+  if (map) {
+    return String(num).replace(/[0-9]/g, (d) => map[parseInt(d, 10)]);
+  }
+  return String(num);
+};
+
 const Hero = ({ onOpenConsultation, customSlides = null }) => {
   const { language } = useLanguage();
 
   // Slideshow state
   const slides = customSlides && customSlides.length > 0 ? customSlides : heroSlidesData;
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef(null);
+
+  // Unstoppable auto-advance timer: smoothly moves forward every 4.5 seconds
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (slides.length > 1) {
+      timerRef.current = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+      }, 4500);
+    }
+  }, [slides.length]);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, [slides.length]);
+    resetTimer();
+  }, [slides.length, resetTimer]);
 
   const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  }, [slides.length]);
+    resetTimer();
+  }, [slides.length, resetTimer]);
 
-  // Autoplay timer
+  const goToSlide = useCallback((index) => {
+    setCurrentSlide(index);
+    resetTimer();
+  }, [resetTimer]);
+
+  // Keep slideshow continuously moving forward
   useEffect(() => {
-    if (!isPaused && slides.length > 1) {
-      timerRef.current = setInterval(nextSlide, 4500);
-    }
+    resetTimer();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPaused, nextSlide, slides.length]);
+  }, [resetTimer]);
 
   return (
     <section className="hero-section">
@@ -111,12 +147,8 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
 
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
         {/* 1. SLIDESHOW VISIBLE FIRST AT THE TOP */}
-        <div 
-          className="hero-slideshow-wrapper"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          <div className="hero-slideshow-container">
+        <div className="hero-slideshow-wrapper">
+          <div className="hero-slideshow-container notranslate" translate="no">
             {/* Slides Wrapper */}
             <div className="hero-slides-wrapper">
               {slides.map((slide, index) => {
@@ -166,8 +198,19 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
             )}
 
             {/* Slide Counter Indicator */}
-            <div className="hero-slide-counter">
-              {currentSlide + 1} / {slides.length}
+            <div 
+              key={`hero-slide-counter-${language}-${currentSlide}`}
+              className="hero-slide-counter notranslate"
+              translate="no"
+              aria-label={`Slide ${currentSlide + 1} of ${slides.length}`}
+            >
+              <span className="notranslate" translate="no">
+                {formatNumberByLanguage(currentSlide + 1, language)}
+              </span>
+              <span style={{ margin: '0 2px', opacity: 0.85 }}>/</span>
+              <span className="notranslate" translate="no">
+                {formatNumberByLanguage(slides.length, language)}
+              </span>
             </div>
 
             {/* Dot Pagination */}
@@ -177,7 +220,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
                   <button
                     key={dotIndex}
                     type="button"
-                    onClick={() => setCurrentSlide(dotIndex)}
+                    onClick={() => goToSlide(dotIndex)}
                     className={`hero-slide-dot ${dotIndex === currentSlide ? 'dot-active' : ''}`}
                     aria-label={`Go to slide ${dotIndex + 1}`}
                   />

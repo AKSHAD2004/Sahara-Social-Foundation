@@ -77,10 +77,10 @@ const Checkout = () => {
   const validate = () => {
     const newErrors = {};
     if (!formData.fullName.trim()) {
-      newErrors.fullName = language === 'mr' ? 'कृपया पूर्ण नाव टाका' : 'Full name is required';
+      newErrors.fullName = language === 'mr' ? 'कृपया पूर्ण नाव प्रविष्ट करा' : 'Full name is required';
     }
     if (!formData.phone.trim()) {
-      newErrors.phone = language === 'mr' ? 'मोबाईल नंबर आवश्यक आहे' : 'Mobile number is required';
+      newErrors.phone = language === 'mr' ? '१० अंकी मोबाईल नंबर आवश्यक आहे' : 'Mobile number is required';
     } else if (!/^[6-9]\d{9}$/.test(formData.phone.trim())) {
       newErrors.phone = language === 'mr' ? 'वैध १० अंकी मोबाईल नंबर प्रविष्ट करा' : 'Valid 10-digit mobile number required';
     }
@@ -96,7 +96,20 @@ const Checkout = () => {
       newErrors.pincode = language === 'mr' ? 'वैध ६ अंकी पिनकोड टाका' : 'Valid 6-digit pincode required';
     }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    const errorKeys = Object.keys(newErrors);
+    if (errorKeys.length > 0) {
+      const firstFieldId = `input-${errorKeys[0]}`;
+      setTimeout(() => {
+        const targetElement = document.getElementById(firstFieldId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetElement.focus();
+        }
+      }, 60);
+      return false;
+    }
+    return true;
   };
 
   const completeOrderPlacement = (orderId, paymentDetails = {}) => {
@@ -294,6 +307,36 @@ const Checkout = () => {
           </div>
         )}
 
+        {Object.keys(errors).length > 0 && (
+          <div style={{
+            backgroundColor: '#FEF2F2',
+            border: '2px solid #F87171',
+            borderRadius: '16px',
+            padding: '1.15rem 1.35rem',
+            marginBottom: '1.5rem',
+            color: '#991B1B',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.85rem',
+            boxShadow: '0 6px 20px rgba(220, 38, 38, 0.1)',
+            animation: 'shake 0.35s ease-in-out'
+          }}>
+            <AlertCircle size={26} style={{ color: '#DC2626', flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#991B1B', marginBottom: '0.35rem' }}>
+                {language === 'mr'
+                  ? 'कृपया ऑर्डर पुढे नेण्यासाठी आवश्यक माहिती पूर्ण भरा:'
+                  : 'Please fill in the required delivery details to place order:'}
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6, fontSize: '0.9rem', color: '#B91C1C' }}>
+                {Object.values(errors).map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handlePlaceOrder}>
           <div className="checkout-layout-grid" style={{
             display: 'grid',
@@ -336,32 +379,54 @@ const Checkout = () => {
 
                 <div className="checkout-form-row">
                   <div className="form-group">
-                    <label className="form-label">
+                    <label className="form-label" htmlFor="input-fullName">
                       {language === 'mr' ? 'पूर्ण नाव *' : 'Full Name *'}
                     </label>
                     <input
+                      id="input-fullName"
                       type="text"
-                      className="form-input"
+                      className={`form-input ${errors.fullName ? 'input-has-error' : ''}`}
                       placeholder={language === 'mr' ? 'उदा. बाबासाहेब जाधव' : 'Ramesh Patil'}
                       value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, fullName: e.target.value });
+                        if (errors.fullName) {
+                          setErrors(prev => { const n = { ...prev }; delete n.fullName; return n; });
+                        }
+                      }}
                     />
-                    {errors.fullName && <div className="form-error">{errors.fullName}</div>}
+                    {errors.fullName && (
+                      <div className="form-error">
+                        <AlertCircle size={14} />
+                        <span>{errors.fullName}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">
+                    <label className="form-label" htmlFor="input-phone">
                       {language === 'mr' ? '१० अंकी मोबाईल नंबर *' : 'Mobile Number *'}
                     </label>
                     <input
+                      id="input-phone"
                       type="tel"
-                      className="form-input"
+                      className={`form-input ${errors.phone ? 'input-has-error' : ''}`}
                       maxLength={10}
                       placeholder="8421154090"
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') });
+                        if (errors.phone) {
+                          setErrors(prev => { const n = { ...prev }; delete n.phone; return n; });
+                        }
+                      }}
                     />
-                    {errors.phone && <div className="form-error">{errors.phone}</div>}
+                    {errors.phone && (
+                      <div className="form-error">
+                        <AlertCircle size={14} />
+                        <span>{errors.phone}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -409,17 +474,28 @@ const Checkout = () => {
                 </h3>
 
                 <div className="form-group">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="input-address">
                     {language === 'mr' ? 'घर / फ्लॅट नं., गल्ली, इमारतीचे नाव, सविस्तर पत्ता *' : 'House / Street / Area Address *'}
                   </label>
                   <textarea
+                    id="input-address"
                     rows={2}
-                    className="form-textarea"
+                    className={`form-textarea ${errors.address ? 'input-has-error' : ''}`}
                     placeholder={language === 'mr' ? 'उदा. फ्लॅट नं. ४, शिवशंभू अपार्टमेंट, जनता बाजार जवळ' : 'Flat/House No, Building, Street...'}
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, address: e.target.value });
+                      if (errors.address) {
+                        setErrors(prev => { const n = { ...prev }; delete n.address; return n; });
+                      }
+                    }}
                   />
-                  {errors.address && <div className="form-error">{errors.address}</div>}
+                  {errors.address && (
+                    <div className="form-error">
+                      <AlertCircle size={14} />
+                      <span>{errors.address}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="checkout-form-row">
@@ -437,17 +513,28 @@ const Checkout = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">
+                    <label className="form-label" htmlFor="input-city">
                       {language === 'mr' ? 'शहर / गाव *' : 'City / Village *'}
                     </label>
                     <input
+                      id="input-city"
                       type="text"
-                      className="form-input"
+                      className={`form-input ${errors.city ? 'input-has-error' : ''}`}
                       placeholder={language === 'mr' ? 'उदा. कोल्हापूर' : 'Kolhapur'}
                       value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, city: e.target.value });
+                        if (errors.city) {
+                          setErrors(prev => { const n = { ...prev }; delete n.city; return n; });
+                        }
+                      }}
                     />
-                    {errors.city && <div className="form-error">{errors.city}</div>}
+                    {errors.city && (
+                      <div className="form-error">
+                        <AlertCircle size={14} />
+                        <span>{errors.city}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -470,18 +557,29 @@ const Checkout = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">
+                    <label className="form-label" htmlFor="input-pincode">
                       {language === 'mr' ? '६ अंकी पिनकोड *' : 'Pincode *'}
                     </label>
                     <input
+                      id="input-pincode"
                       type="text"
-                      className="form-input"
+                      className={`form-input ${errors.pincode ? 'input-has-error' : ''}`}
                       placeholder="416001"
                       maxLength={6}
                       value={formData.pincode}
-                      onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, '') });
+                        if (errors.pincode) {
+                          setErrors(prev => { const n = { ...prev }; delete n.pincode; return n; });
+                        }
+                      }}
                     />
-                    {errors.pincode && <div className="form-error">{errors.pincode}</div>}
+                    {errors.pincode && (
+                      <div className="form-error">
+                        <AlertCircle size={14} />
+                        <span>{errors.pincode}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -650,6 +748,33 @@ const Checkout = () => {
                   </div>
                 </div>
 
+                {/* Immediate Warning Box right above the action button */}
+                {Object.keys(errors).length > 0 && (
+                  <div
+                    style={{
+                      backgroundColor: '#FEF2F2',
+                      border: '1.5px solid #F87171',
+                      borderRadius: '14px',
+                      padding: '0.85rem 1rem',
+                      marginBottom: '1rem',
+                      boxShadow: '0 4px 14px rgba(220, 38, 38, 0.1)',
+                      animation: 'shake 0.35s ease-in-out'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontWeight: 800, color: '#991B1B', fontSize: '0.88rem', marginBottom: '0.35rem' }}>
+                      <AlertCircle size={17} style={{ color: '#DC2626', flexShrink: 0 }} />
+                      <span>
+                        {language === 'mr' ? 'कृपया आवश्यक माहिती पूर्ण भरा:' : 'Please fill required details:'}
+                      </span>
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#B91C1C', fontSize: '0.82rem', lineHeight: 1.5 }}>
+                      {Object.values(errors).map((err, idx) => (
+                        <li key={idx}>{err}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -685,6 +810,28 @@ const Checkout = () => {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 1rem;
+        }
+
+        .input-has-error {
+          border-color: #EF4444 !important;
+          background-color: #FEF2F2 !important;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        .form-error {
+          color: #DC2626;
+          font-size: 0.8rem;
+          font-weight: 600;
+          margin-top: 0.35rem;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20%, 60% { transform: translateX(-6px); }
+          40%, 80% { transform: translateX(6px); }
         }
 
         @media (max-width: 960px) {
