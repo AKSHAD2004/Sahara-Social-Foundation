@@ -24,7 +24,7 @@ const ProductDetails = () => {
   const { id } = useParams();
   const { language } = useLanguage();
   const { addToCart } = useCart();
-  const { customerUser, currentUser, openCustomerAuthModal } = useAuth();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -136,13 +136,6 @@ const ProductDetails = () => {
   };
 
   const handleOrderNow = () => {
-    if (!customerUser) {
-      openCustomerAuthModal(() => {
-        addToCart(product, quantity);
-        navigate('/checkout');
-      });
-      return;
-    }
     addToCart(product, quantity);
     navigate('/checkout');
   };

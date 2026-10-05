@@ -10,22 +10,14 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
-import { useAuth } from '../context/AuthContext';
 import { organizationInfo } from '../data/websiteData';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, subtotal, deliveryCharges, grandTotal } = useCart();
   const { language } = useLanguage();
-  const { customerUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
 
   const handleProceedToCheckout = () => {
-    if (!customerUser) {
-      openCustomerAuthModal(() => {
-        navigate('/checkout');
-      });
-      return;
-    }
     navigate('/checkout');
   };
 

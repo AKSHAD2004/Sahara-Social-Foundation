@@ -22,7 +22,7 @@ import { initializeRazorpayPayment } from '../services/razorpay';
 const Checkout = () => {
   const { cartItems, subtotal, deliveryCharges, grandTotal, clearCart } = useCart();
   const { language } = useLanguage();
-  const { customerUser, openCustomerAuthModal } = useAuth();
+  const { customerUser, loginCustomer } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -198,6 +198,24 @@ const Checkout = () => {
 
     localStorage.setItem('ssf_last_order', JSON.stringify(orderDetails));
 
+    // Seamlessly associate buyer profile so they have direct access to their order
+    if (!customerUser && loginCustomer) {
+      try {
+        loginCustomer({
+          id: customer.id,
+          fullName: formData.fullName,
+          phone: formData.phone,
+          email: formData.email,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode
+        });
+      } catch (err) {
+        console.warn('Auto customer login:', err);
+      }
+    }
+
     clearCart();
     setIsSubmitting(false);
     navigate('/order-confirmation', { state: { order: orderDetails } });
@@ -207,13 +225,7 @@ const Checkout = () => {
     e.preventDefault();
     if (!validate()) return;
 
-    if (!customerUser) {
-      openCustomerAuthModal(() => {
-        // Continue after auth
-      });
-      return;
-    }
-
+    // Direct buy without forcing login: just fill necessary information
     setIsSubmitting(true);
     setPaymentNotice('');
 

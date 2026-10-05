@@ -11,25 +11,16 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ product }) => {
   const { language } = useLanguage();
   const { addToCart } = useCart();
-  const { customerUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   const effectivePrice = product.price || product.sellingPrice;
 
   const handleOrderNow = () => {
-    if (!customerUser) {
-      openCustomerAuthModal(() => {
-        addToCart(product, 1);
-        navigate('/checkout');
-      });
-      return;
-    }
     addToCart(product, 1);
     navigate('/checkout');
   };
