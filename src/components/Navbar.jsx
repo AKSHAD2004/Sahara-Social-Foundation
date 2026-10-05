@@ -121,7 +121,7 @@ const Navbar = () => {
                     <span>
                       {language === 'mr' 
                         ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP • अधिकृत आयुर्वेदिक मार्गदर्शन' 
-                        : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP • Authentic Ayurvedic Guidance'}
+                        : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP • Authentic Nutraceutical Guidance'}
                     </span>
                   </span>
 
@@ -139,7 +139,7 @@ const Navbar = () => {
                     <span>
                       {language === 'mr' 
                         ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर • नोंदणी क्र. MAH/582/2014/KOP • अधिकृत आयुर्वेदिक मार्गदर्शन' 
-                        : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP • Authentic Ayurvedic Guidance'}
+                        : 'Sahara Social Foundation, Kolhapur • Reg. No. MAH/582/2014/KOP • Authentic Nutraceutical Guidance'}
                     </span>
                   </span>
                 </div>
@@ -205,17 +205,8 @@ const Navbar = () => {
                 </div>
               </nav>
 
-              {/* Right Action Buttons: CTA Pill + Cart + Account + Hamburger */}
+              {/* Right Action Buttons: Cart + Account + Hamburger */}
               <div className="theme-header-actions-col">
-                {/* Yess Infotech Style Accent CTA Pill Button */}
-                <Link
-                  to="/shop"
-                  className="header-main-nav-link--cta"
-                  title={language === 'mr' ? 'आयुर्वेदिक उत्पादने खरेदी करा' : 'Explore Products'}
-                >
-                  <Sparkles size={15} className="cta-icon" />
-                  <span>{language === 'mr' ? 'ऑर्डर करा' : 'Shop'}</span>
-                </Link>
 
                 {/* Shopping Cart Icon with Badge */}
                 <Link
@@ -294,7 +285,7 @@ const Navbar = () => {
                 <span>
                   {language === 'mr' 
                     ? '१००% आयुर्वेदिक संशोधन व मार्गदर्शन' 
-                    : '100% Ayurvedic Research & Guidance'}
+                    : '100% Nutraceutical Research & Guidance'}
                 </span>
               </span>
               <span className="mobile-ticker-dot">•</span>
@@ -334,7 +325,7 @@ const Navbar = () => {
                 <span>
                   {language === 'mr' 
                     ? '१००% आयुर्वेदिक संशोधन व मार्गदर्शन' 
-                    : '100% Ayurvedic Research & Guidance'}
+                    : '100% Nutraceutical Research & Guidance'}
                 </span>
               </span>
               <span className="mobile-ticker-dot">•</span>

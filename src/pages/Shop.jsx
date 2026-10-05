@@ -108,12 +108,12 @@ const Shop = () => {
             <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}</span>
           </div>
           <h1>
-            {language === 'mr' ? 'आयुर्वेदिक उत्पादने व फॉर्म्युला' : 'Authentic Ayurvedic Products'}
+            {language === 'mr' ? 'आयुर्वेदिक उत्पादने व फॉर्म्युला' : 'Authentic Nutraceutical Products'}
           </h1>
           <p>
             {language === 'mr'
               ? '१००% शुद्ध आयुर्वेदिक औषधी, मोफत होम डिलिव्हरी आणि पार्सल मिळाल्यावर फोनवर वैयक्तिक पथ्य मार्गदर्शन.'
-              : 'Pure Ayurvedic wellness solutions with free shipping and dedicated telephone guidance upon delivery.'}
+              : 'Pure Nutraceutical wellness solutions with free shipping and dedicated telephone guidance upon delivery.'}
           </p>
         </div>
       </div>

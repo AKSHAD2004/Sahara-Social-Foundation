@@ -364,7 +364,7 @@ const Home = () => {
               <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}</span>
             </div>
             <h2>
-              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Ayurvedic Products'}
+              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Nutraceutical Products'}
             </h2>
             <p>
               {language === 'mr'
@@ -526,7 +526,7 @@ const Home = () => {
             <p>
               {language === 'mr'
                 ? 'मधुमेह आणि व्यसनाधीनतेविरुद्धच्या लढ्यात नागरिकांना योग्य दिशा, मार्गदर्शन आणि नैसर्गिक उपचार देणारे उपक्रम.'
-                : 'Pioneering health movements delivering authentic Ayurvedic counseling, dietary pathya, and herbal support.'}
+                : 'Pioneering health movements delivering authentic Nutraceutical counseling, dietary pathya, and herbal support.'}
             </p>
           </div>
 
@@ -551,7 +551,7 @@ const Home = () => {
               <span>{language === 'mr' ? 'आरोग्य मार्गदर्शन वर्ग' : 'Health Categories'}</span>
             </div>
             <h2>
-              {language === 'mr' ? 'आरोग्य समस्या व आयुर्वेदिक मार्गदर्शन' : 'Health Conditions & Ayurvedic Care'}
+              {language === 'mr' ? 'आरोग्य समस्या व आयुर्वेदिक मार्गदर्शन' : 'Health Conditions & Nutraceutical Care'}
             </h2>
             <p>
               {language === 'mr'
@@ -636,7 +636,7 @@ const Home = () => {
           <p style={{ fontSize: 'clamp(0.95rem, 1vw + 0.5rem, 1.1rem)', color: '#d6fae0', lineHeight: 1.6, marginBottom: '1.75rem' }}>
             {language === 'mr'
               ? 'सहारा सोशल फाऊंडेशनच्या तज्ज्ञ समुपदेशकांकडून मोफत फोन मार्गदर्शन मिळवण्यासाठी आताच संपर्क साधा किंवा फॉर्म्युला मागवा.'
-              : 'Contact our helpline at 7745066707 or explore our authentic Ayurvedic kits.'}
+              : 'Contact our helpline at 7745066707 or explore our authentic Nutraceutical kits.'}
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>

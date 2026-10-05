@@ -40,12 +40,12 @@ export const organizationInfo = {
   about: {
     titleEn: "About Sahara Social Foundation",
     titleMr: "सहारा सोशल फाऊंडेशन बद्दल",
-    subtitleEn: "Dedicated to building a healthier, disease-free and addiction-free society through awareness, counseling, and natural Ayurvedic health guidance.",
+    subtitleEn: "Dedicated to building a healthier, disease-free and addiction-free society through awareness, counseling, and natural Nutraceutical health guidance.",
     subtitleMr: "जनजागृती, आरोग्य समुपदेशन आणि नैसर्गिक आयुर्वेदिक मार्गदर्शनातून निरोगी, मधुमेहमुक्त आणि व्यसनमुक्त समाज निर्मितीसाठी कटिबद्ध.",
-    descriptionEn: "Sahara Social Foundation is a social welfare and public health organization established in Kolhapur, Maharashtra. In collaboration with 'Aadhar Madhumeh-Mukti Margdarshan Kendra', our foundation actively conducts statewide health awareness camps, free counseling sessions, and provides authentic Ayurvedic wellness formulas to help citizens manage lifestyle disorders effectively without harmful chemical dependencies.",
+    descriptionEn: "Sahara Social Foundation is a social welfare and public health organization established in Kolhapur, Maharashtra. In collaboration with 'Aadhar Madhumeh-Mukti Margdarshan Kendra', our foundation actively conducts statewide health awareness camps, free counseling sessions, and provides authentic Nutraceutical wellness formulas to help citizens manage lifestyle disorders effectively without harmful chemical dependencies.",
     descriptionMr: "सहारा सोशल फाऊंडेशन ही कोल्हापूर येथील एक अग्रगण्य सामाजिक आणि आरोग्य संवर्धन संस्था आहे. 'आधार मधुमेह-मुक्ती मार्गदर्शन केंद्र' यांच्या सहकार्याने संस्था राज्यभरात आरोग्य जनजागृती शिबिरे, मोफत समुपदेशन आणि जीवनशैली विकार नियंत्रणासाठी नैसर्गिक व शुद्ध आयुर्वेदिक फॉर्म्युलाचे मार्गदर्शन पुरवते. नागरिकांचे आरोग्य सुधारून त्यांना स्वावलंबी व निरोगी जीवन जगण्यास प्रवृत्त करणे हे संस्थेचे ध्येय आहे.",
     
-    missionEn: "To spearhead a nationwide revolution through the 'Diabetes-Free India' and 'Addiction-Free India' campaigns by delivering evidence-informed Ayurvedic health solutions, scientific lifestyle counseling, and accessible care to every household.",
+    missionEn: "To spearhead a nationwide revolution through the 'Diabetes-Free India' and 'Addiction-Free India' campaigns by delivering evidence-informed Nutraceutical health solutions, scientific lifestyle counseling, and accessible care to every household.",
     missionMr: "'मधुमेह मुक्त भारत अभियान' आणि 'व्यसनमुक्त भारत अभियान' यांद्वारे समाजातील प्रत्येक घटकापर्यंत योग्य आरोग्य जनजागृती, समुपदेशन व उच्च दर्जाचे आयुर्वेदिक मार्गदर्शन पोहोचवून देशाला निरोगी व व्यसनमुक्त बनवणे.",
     
     visionEn: "A society where every individual lives free from chronic metabolic disorders and toxic addictions, embracing holistic wellness, balanced nutrition, and natural lifestyle practices.",
@@ -59,7 +59,7 @@ export const organizationInfo = {
         descMr: "प्रत्येक रुग्णाला फोन व प्रत्यक्ष भेटीत आहाराचे पथ्य, जीवनशैली आणि योग्य फॉर्म्युला वापराचे मोफत मार्गदर्शन."
       },
       {
-        titleEn: "Pure Ayurvedic Heritage",
+        titleEn: "Pure Nutraceutical Heritage",
         titleMr: "शुद्ध व दर्जेदार आयुर्वेद",
         descEn: "100% natural herbs and classical formulations manufactured with strict quality standards.",
         descMr: "१००% नैसर्गिक वनौषधी आणि पारंपरिक शास्त्रीय फॉर्म्युला, कोणत्याही हानिकारक केमिकल विरहित."
@@ -232,10 +232,10 @@ export const productsData = [
     inStock: true,
     badgeEn: "Nutrifeel Official",
     badgeMr: "न्युट्रीफील अधिकृत",
-    shortDescEn: "Specialized Ayurvedic liquid formulation for blood glucose balance and pancreatic beta-cell rejuvenation.",
+    shortDescEn: "Specialized Nutraceutical liquid formulation for blood glucose balance and pancreatic beta-cell rejuvenation.",
     shortDescMr: "स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नियंत्रणात ठेवणारा शुद्ध आयुर्वेदिक फॉर्म्युला (३०० मिली).",
-    description: "Specialized Ayurvedic liquid formulation for blood glucose balance and pancreatic beta-cell rejuvenation.",
-    descriptionEn: "Nutrifeel ANTOX-D is backed by clinical research and traditional Ayurvedic wisdom. It works at cellular glucose receptors, supports insulin sensitivity, cleanses metabolic pathways, and protects vital organs from diabetic complications.",
+    description: "Specialized Nutraceutical liquid formulation for blood glucose balance and pancreatic beta-cell rejuvenation.",
+    descriptionEn: "Nutrifeel ANTOX-D is backed by clinical research and traditional Nutraceutical wisdom. It works at cellular glucose receptors, supports insulin sensitivity, cleanses metabolic pathways, and protects vital organs from diabetic complications.",
     descriptionMr: "ANTOX-D हे रक्तातील साखर नियंत्रित ठेवण्यासाठी व स्वादुपिंडातील इन्सुलिन निर्मितीला चालना देण्यासाठी सर्वोत्तम आयुर्वेदिक औषध आहे. पार्सल मिळाल्यावर पथ्यासाठी ७७४५०६६७०७ वर कॉल करा.",
     features: [
       { en: "1 Single Bottle (300 ml Liquid)", mr: "१ बाटली (३०० मिली लिक्विड)" },
@@ -287,7 +287,7 @@ export const productsData = [
     features: [
       { en: "1 Box containing 60 Herbal Tea Bags", mr: "१ बॉक्स (६० हर्बल टी बॅग्स)" },
       { en: "Flushes deep metabolic toxins & uric acid", mr: "शरीरातील विषारी घटक बाहेर काढण्यास मदत" },
-      { en: "100% Caffeine-free natural Ayurvedic infusion", mr: "कॅफिन-मुक्त पौष्टिक आयुर्वेदिक चहा" },
+      { en: "100% Caffeine-free natural Nutraceutical infusion", mr: "कॅफिन-मुक्त पौष्टिक आयुर्वेदिक चहा" },
       { en: "Accelerates absorption of liquid herbal extracts", mr: "इतर आयुर्वेदिक औषधांचे परिणाम गतिमान करतो" }
     ],
     dosageEn: "Dip 1 tea bag in 1 cup boiling water, infuse for 3-5 minutes. Drink morning & evening.",
@@ -374,7 +374,7 @@ export const productsData = [
     shortDescEn: "Potent herbal blend of 10 vital rasayanas for physical stamina, reducing fatigue, and boosting vigor.",
     shortDescMr: "शारीरिक थकवा, अशक्तपणा घालवून ऊर्जा, स्टॅमिना आणि उत्साह वाढवणारा १० वनौषधींचा फॉर्म्युला (३०० मिली).",
     description: "Potent herbal blend of 10 vital rasayanas for physical stamina, reducing fatigue, and boosting vigor.",
-    descriptionEn: "Nutrifeel ANTOX- X contains a synergized blend of ten rejuvenating Ayurvedic herbs (Ashwagandha, Safed Musli, Kaunch, Shatavari) formulated to rebuild stamina, reduce physical stress, enhance nervous vitality, and restore youthful energy.",
+    descriptionEn: "Nutrifeel ANTOX- X contains a synergized blend of ten rejuvenating Nutraceutical herbs (Ashwagandha, Safed Musli, Kaunch, Shatavari) formulated to rebuild stamina, reduce physical stress, enhance nervous vitality, and restore youthful energy.",
     descriptionMr: "ANTOX- X हे अश्वगंधा, पांढरी मुसळी आणि कौंच यांसारख्या १० वनौषधींनी युक्त महा-टॉनिक आहे. हे जुनाट थकवा दूर करून उत्साह व शक्ती टिकवून ठेवते.",
     features: [
       { en: "1 Single Bottle (300 ml Liquid)", mr: "१ बाटली (३०० मिली लिक्विड)" },
@@ -562,7 +562,7 @@ export const productsData = [
     shortDescEn: "Comprehensive natural organ detoxifier and revitalizer supporting cardiac performance, liver enzyme balance, and kidney filtration wellness.",
     shortDescMr: "हृदय, लिव्हर आणि किडनीचे कार्य सुरळीत ठेवणारे व शरीरातील टॉक्सिन्स बाहेर टाकणारे प्रभावी कॉम्बो किट.",
     description: "Comprehensive natural organ detoxifier and revitalizer supporting cardiac performance, liver enzyme balance, and kidney filtration wellness.",
-    descriptionEn: "ANTOX-HLK & ANTOX-T combines powerful cardioprotective, hepatoprotective, and nephroprotective Ayurvedic herbs with systemic detox brew for vital organ rejuvenation.",
+    descriptionEn: "ANTOX-HLK & ANTOX-T combines powerful cardioprotective, hepatoprotective, and nephroprotective Nutraceutical herbs with systemic detox brew for vital organ rejuvenation.",
     descriptionMr: "अर्जुन, पुनर्नवा, भुईआवळा आणि गोखरू यांसारख्या वनौषधींचा संगम असलेले हे कॉम्बो किट अवयवांचे आरोग्य सुधारण्यास मदत करते.",
     features: [
       { en: "Full vital organ combo: ANTOX-HLK bottle + ANTOX-T detox tea", mr: "संपूर्ण किट: ANTOX-HLK बाटली + ANTOX-T डिटॉक्स चहा" },
@@ -594,9 +594,9 @@ export const productsData = [
     inStock: true,
     badgeEn: "Digestive Care Combo",
     badgeMr: "पित्तमुक्ती कॉम्बो पॅक",
-    shortDescEn: "Comprehensive Ayurvedic duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.",
+    shortDescEn: "Comprehensive Nutraceutical duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.",
     shortDescMr: "वारंवार होणारे पित्त, छातीत जळजळ, अपचन, पोट फुगणे व पचनाच्या तक्रारींवर मुळापासून आराम देणारा किट.",
-    description: "Comprehensive Ayurvedic duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.",
+    description: "Comprehensive Nutraceutical duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.",
     descriptionEn: "ANTOX-B ACID & ANTOX-T neutralizes stomach acid secretions and cleanses intestinal pathways, providing long-term relief from GERD and indigestion.",
     descriptionMr: "हे किट आम्लपित्त, जळजळ आणि बद्धकोष्ठतेवर अत्यंत गुणकारी आहे. फोन: ७७४५०६६७०७.",
     features: [
@@ -835,9 +835,9 @@ export const productsData = [
     inStock: true,
     badgeEn: "Nutrifeel Official",
     badgeMr: "न्युट्रीफील अधिकृत",
-    shortDescEn: "Fast-acting soothing Ayurvedic liquid for hyperacidity, acid reflux (GERD), heartburn, nausea, and bile distress.",
+    shortDescEn: "Fast-acting soothing Nutraceutical liquid for hyperacidity, acid reflux (GERD), heartburn, nausea, and bile distress.",
     shortDescMr: "पित्त, छातीत जळजळ, उलट्या, मळमळ व अपचनावर तात्काळ शांतता देणारा हर्बल फॉर्म्युला (३०० मिली).",
-    description: "Fast-acting soothing Ayurvedic liquid for hyperacidity, acid reflux (GERD), heartburn, nausea, and bile distress.",
+    description: "Fast-acting soothing Nutraceutical liquid for hyperacidity, acid reflux (GERD), heartburn, nausea, and bile distress.",
     descriptionEn: "Nutrifeel ANTOX-B ACID quickly neutralizes excess stomach acid, soothes irritated esophageal lining, relieves sour belching and gas bloating, while promoting restful sleep free of midnight gastric distress.",
     descriptionMr: "ANTOX-B ACID हे आम्लपित्त, छातीत होणारी जळजळ, आंबट ढेकर आणि पित्तामुळे होणाऱ्या त्रासावर अत्यंत प्रभावी औषध आहे.",
     features: [
@@ -878,9 +878,9 @@ export const productsData = [
     inStock: true,
     badgeEn: "Nutrifeel Official",
     badgeMr: "न्युट्रीफील अधिकृत",
-    shortDescEn: "Master Ayurvedic formulation of 51 therapeutic Himalayan herbs for full-body cellular rejuvenation, stamina, and immune defenses.",
+    shortDescEn: "Master Nutraceutical formulation of 51 therapeutic Himalayan herbs for full-body cellular rejuvenation, stamina, and immune defenses.",
     shortDescMr: "५१ दुर्मिळ वनौषधींचा अर्क. संपूर्ण शरीराला नवचैतन्य, ऊर्जा, स्टॅमिना आणि रोगप्रतिकारक कवच देणारे महा-रसायन (३०० मिली).",
-    description: "Master Ayurvedic formulation of 51 therapeutic Himalayan herbs for full-body cellular rejuvenation, stamina, and immune defenses.",
+    description: "Master Nutraceutical formulation of 51 therapeutic Himalayan herbs for full-body cellular rejuvenation, stamina, and immune defenses.",
     descriptionEn: "Nutrifeel ANTOX – AMRUT 51 is a master multi-botanical Rasayana composed of 51 medicinal plant extracts. It supports deep cellular detoxification, boosts natural immune defenses, enhances energy reserves, and promotes overall longevity.",
     descriptionMr: "ANTOX – AMRUT 51 हे आयुर्वेदातील सर्वोच्च रसायन आहे. ५१ वनौषधींच्या गुणांनी युक्त हा फॉर्म्युला रोगप्रतिकारशक्ती प्रचंड वाढवतो आणि संपूर्ण शरीराला टवटवीत ठेवतो.",
     features: [
@@ -931,7 +931,7 @@ export const resultVideos = [
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208155851547_sys.mp4",
     thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_161630954.jpg",
     fallbackThumbnail: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&auto=format&fit=crop&q=80",
-    summaryEn: "Severe joint pain patient able to walk comfortably after regular Ayurvedic regimen.",
+    summaryEn: "Severe joint pain patient able to walk comfortably after regular Nutraceutical regimen.",
     summaryMr: "Antox PN फॉर्म्युला आणि तेलाच्या वापराने सांधेदुखीत झालेली लक्षणीय सुधारणा."
   },
   {
@@ -945,7 +945,7 @@ export const resultVideos = [
     thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_161131109.jpg",
     fallbackThumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
     summaryEn: "Special guidance on liver detox, acidity balance and regular dietary habits.",
-    summaryMr: "आहार नियम, पित्त नियंत्रण आणि पोटाच्या तक्रारींवर मिळालेले समुपदेशन मार्गदर्शन."
+    summaryMr: "आहार नियम, पित्त नियंत्रण आणि पोटाच्या तक्रारींवर मिळालेले समुपदेशन मार्गदर्शन.",
   },
   {
     id: "vid-05",
@@ -970,7 +970,7 @@ export const resultVideos = [
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260208160819048_sys.mp4",
     thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_153723326.jpg",
     fallbackThumbnail: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80",
-    summaryEn: "Patient reviews positive blood test reports after following the prescribed Ayurvedic pathya.",
+    summaryEn: "Patient reviews positive blood test reports after following the prescribed Nutraceutical pathya.",
     summaryMr: "नियमित पथ्य आणि Antox D मुळे रक्ताच्या तपासणीत आलेले सकारात्मक बदल."
   },
   {
@@ -1048,7 +1048,7 @@ export const resultVideos = [
     videoUrl: "https://samarthkolhapur.com/wp-content/uploads/2026/02/kapkap_20260210101851087_sys.mp4",
     thumbnail: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251210_145925345.jpg",
     fallbackThumbnail: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80",
-    summaryEn: "Inspiring video calling on all diabetic patients to adopt natural Ayurvedic remedies and phone counseling.",
+    summaryEn: "Inspiring video calling on all diabetic patients to adopt natural Nutraceutical remedies and phone counseling.",
     summaryMr: "मधुमेहावर मात करण्यासाठी सर्व नागरिकांनी योग्य मार्गदर्शन घेण्याचे आवाहन."
   }
 ];
@@ -1078,7 +1078,7 @@ export const testimonialsData = [
     location: "Ichalkaranji, Kolhapur",
     rating: 5,
     conditionEn: "Arthritis & Knee Pain (सांधेदुखी)",
-    reviewEn: "Doctors had advised knee surgery due to cartilage wear. Antox PN Powder and Oil provided genuine relief. I can now climb stairs and walk comfortably every morning. 100% genuine Ayurvedic approach.",
+    reviewEn: "Doctors had advised knee surgery due to cartilage wear. Antox PN Powder and Oil provided genuine relief. I can now climb stairs and walk comfortably every morning. 100% genuine Nutraceutical approach.",
     reviewMr: "डॉक्टरांनी मला गुडघे बदलण्याचा सल्ला दिला होता. पण Antox PN पावडर आणि तेलाच्या नियमित वापराने मला इतका आराम मिळाला की मी आता न दुखता रोज सकाळी १ किमी फिरू शकतो. संस्थेचे खूप खूप आभार."
   },
   {
@@ -1144,7 +1144,7 @@ export const galleryPhotos = [
   {
     id: "gal-06",
     category: "Ayurveda",
-    titleEn: "Ayurvedic Health Counseling & Regimen",
+    titleEn: "Nutraceutical Health Counseling & Regimen",
     titleMr: "आयुर्वेदिक आरोग्य समुपदेशन व पथ्य नियोजन",
     image: "https://samarthkolhapur.com/wp-content/uploads/2025/10/609a1f97-6d7a-45da-9737-e0f041792228.jpeg",
     fallback: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&auto=format&fit=crop&q=80"
@@ -1303,7 +1303,7 @@ export const faqsData = [
     aMr: "संस्थेच्या नियमानुसार: फॉर्म्युला मिळाल्यावर कृपया ८४२११५४०९० या नंबरवर कॉल करा. आमचे समुपदेशक तुमच्या प्रकृतीनुसार आणि आजारानुसार औषध घेण्याची पद्धत व पथ्याची सविस्तर माहिती देतील."
   },
   {
-    qEn: "Are the products 100% Ayurvedic and safe?",
+    qEn: "Are the products 100% Nutraceutical and safe?",
     qMr: "ही औषधे १००% आयुर्वेदिक व सुरक्षित आहेत का?",
     aEn: "Yes, all Antox formulations are prepared from natural classical herbal extracts without harmful chemicals, heavy metals, or steroids. They are safe for long-term supportive care under guidance.",
     aMr: "होय, Antox चे सर्व फॉर्म्युला पूर्णपणे नैसर्गिक वनौषधींपासून बनवलेले आहेत. यात कोणतेही घातक रसायने किंवा स्टिरॉइड्स नसून ते मार्गदर्शनाखाली वापरण्यासाठी पूर्णपणे सुरक्षित आहेत."
@@ -1365,7 +1365,7 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
     titleEn: "Refund and Returns Policy",
     titleMr: "परतावा आणि बदली धोरण (Refund & Returns Policy)",
     lastUpdated: "August 2026",
-    contentEn: `At Sahara Social Foundation, we strive to deliver authentic and sealed Ayurvedic health products to support your health journey.
+    contentEn: `At Sahara Social Foundation, we strive to deliver authentic and sealed Nutraceutical health products to support your health journey.
 
 1. Returns Eligibility:
 - Returns are accepted if you receive a damaged, leaked, or wrong product package during transit.
@@ -1410,7 +1410,7 @@ export const heroSlidesData = [
     categoryMr: "मधुमेह मुक्ती",
     image: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
     fallbackImage: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop&q=80",
-    descriptionEn: "Natural Ayurvedic formula for blood sugar balance, pancreatic health, and metabolic detox.",
+    descriptionEn: "Natural Nutraceutical formula for blood sugar balance, pancreatic health, and metabolic detox.",
     descriptionMr: "रक्तातील साखर नियंत्रण, स्वादुपिंड पोषण आणि शरीर शुद्धीकरणासाठी प्रभावी आयुर्वेदिक फॉर्म्युला.",
     link: "/shop",
     ctaEn: "Order Antox D & T",
@@ -1506,7 +1506,7 @@ export const heroSlidesData = [
     categoryMr: "ऊर्जा व स्टॅमिना",
     image: "https://samarthkolhapur.com/wp-content/uploads/2025/12/InShot_20251126_120357024-1024x1024.jpg",
     fallbackImage: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&auto=format&fit=crop&q=80",
-    descriptionEn: "Revitalizing Ayurvedic tonic for physical endurance, stress relief, and total wellness.",
+    descriptionEn: "Revitalizing Nutraceutical tonic for physical endurance, stress relief, and total wellness.",
     descriptionMr: "शारीरिक अशक्तपणा दूर करून स्टॅमिना व ऊर्जा वाढवणारे शुद्ध आयुर्वेदिक रसायन.",
     link: "/shop",
     ctaEn: "Explore Antox X",

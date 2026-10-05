@@ -52,7 +52,7 @@ const Cart = () => {
           <p style={{ color: '#5F6B61', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
             {language === 'mr'
               ? 'आपण अद्याप कोणतेही आयुर्वेदिक उत्पादन जोडलेले नाही. आमच्या दर्जेदार फॉर्म्युलामधून निवड करा.'
-              : 'You have not added any wellness formula yet. Explore our authentic Ayurvedic store.'}
+              : 'You have not added any wellness formula yet. Explore our authentic Nutraceutical store.'}
           </p>
           <Link to="/shop" className="btn btn-primary btn-lg">
             <ShoppingCart size={18} />

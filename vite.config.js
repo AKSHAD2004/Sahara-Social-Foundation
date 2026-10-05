@@ -24,9 +24,6 @@ function syncFavicon() {
   <image href="data:image/jpeg;base64,${b64}" xlink:href="data:image/jpeg;base64,${b64}" x="0" y="0" width="500" height="500" clip-path="url(#circleClip)" />
 </svg>`
       fs.writeFileSync(path.join(publicDir, 'favicon.svg'), svgContent, 'utf8')
-      fs.writeFileSync(path.join(publicDir, 'favicon.ico'), buffer)
-      fs.writeFileSync(path.join(publicDir, 'favicon.png'), buffer)
-      fs.writeFileSync(path.join(publicDir, 'logo.png'), buffer)
     }
   } catch (e) {
     console.error('[Favicon Sync Error]', e)

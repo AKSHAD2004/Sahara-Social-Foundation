@@ -125,7 +125,7 @@ const Checkout = () => {
     // 2. Format products for CRM
     const productsList = cartItems.map((item) => ({
       productId: item.id || `prod_${Date.now()}`,
-      name: item.title || item.name || 'Ayurvedic Wellness Product',
+      name: item.title || item.name || 'Nutraceutical Wellness Product',
       quantity: Number(item.quantity || 1),
       price: Number(item.price || 0),
       total: Number(item.price || 0) * Number(item.quantity || 1)

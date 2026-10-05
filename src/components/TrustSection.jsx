@@ -14,9 +14,9 @@ const TrustSection = () => {
   const trustPoints = [
     {
       icon: <Leaf size={26} style={{ color: '#006B2D' }} />,
-      titleEn: "Pure Ayurvedic Formulations",
+      titleEn: "Pure Nutraceutical Formulations",
       titleMr: "१००% शुद्ध आयुर्वेदिक औषधी",
-      descEn: "Natural herbal ingredients prepared under Ayurvedic safety standards with zero harmful chemicals.",
+      descEn: "Natural herbal ingredients prepared under Nutraceutical safety standards with zero harmful chemicals.",
       descMr: "कोणत्याही घातक रसायनांशिवाय, प्राचीन आयुर्वेदिक ग्रंथांच्या आधारे तयार केलेले शुद्ध व सुरक्षित फॉर्म्युला."
     },
     {
@@ -56,7 +56,7 @@ const TrustSection = () => {
           <p>
             {language === 'mr'
               ? 'कोणत्याही अंधश्रद्धेशिवाय किंवा खोट्या दाव्यांशिवाय, आयुर्वेदाचे मूळ तत्त्व आणि योग्य जीवनशैलीचे महत्त्व पटवून देणारे कार्य.'
-              : 'Empowering individuals with genuine Ayurvedic wisdom, dietary discipline, and continuous counselor support.'}
+              : 'Empowering individuals with genuine Nutraceutical wisdom, dietary discipline, and continuous counselor support.'}
           </p>
         </div>
 

@@ -2,23 +2,92 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Official Company Logo Favicons -->
-    <link rel="icon" type="image/jpeg" sizes="32x32 48x48 96x96 192x192" href="/sahara-logo.jpg?v=6" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=6" />
-    <link rel="shortcut icon" href="/favicon.ico?v=6" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/sahara-logo.jpg?v=6" />
+    <!-- Official Sahara Social Foundation Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=12" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/sahara-logo.jpg?v=12" />
+    <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg?v=12" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/sahara-logo.jpg?v=12" />
+    
+    <!-- Instant Client-Side Favicon Renderer (Guarantees fresh round PNG favicon across all browsers) -->
+    <script type="text/javascript">
+      (function() {
+        function renderLiveFavicon() {
+          try {
+            var img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+              var canvas = document.createElement('canvas');
+              canvas.width = 64;
+              canvas.height = 64;
+              var ctx = canvas.getContext('2d');
+              if (!ctx) return;
+              ctx.beginPath();
+              ctx.arc(32, 32, 31, 0, Math.PI * 2);
+              ctx.closePath();
+              ctx.clip();
+              ctx.drawImage(img, 0, 0, 64, 64);
+              var pngUrl = canvas.toDataURL('image/png');
+              
+              var oldIcons = document.querySelectorAll("link[rel*='icon']");
+              for (var i = 0; i < oldIcons.length; i++) {
+                if (oldIcons[i].parentNode) oldIcons[i].parentNode.removeChild(oldIcons[i]);
+              }
+              
+              var fav = document.createElement('link');
+              fav.rel = 'icon';
+              fav.type = 'image/png';
+              fav.href = pngUrl;
+              document.head.appendChild(fav);
+              
+              var short = document.createElement('link');
+              short.rel = 'shortcut icon';
+              short.type = 'image/png';
+              short.href = pngUrl;
+              document.head.appendChild(short);
+            };
+            img.src = '/sahara-logo.jpg?v=' + Date.now();
+          } catch (e) {}
+        }
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          renderLiveFavicon();
+        } else {
+          window.addEventListener('DOMContentLoaded', renderLiveFavicon);
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#006B2D" />
     
     <!-- SEO & Metadata -->
     <title>Sahara Social Foundation | सहारा सोशल फाऊंडेशन - मधुमेह मुक्त भारत अभियान</title>
-    <meta name="description" content="सहारा सोशल फाऊंडेशन, कोल्हापूर - मधुमेह मुक्त भारत अभियान आणि व्यसनमुक्त भारत अभियान. आयुर्वेदिक मार्गदर्शन, आरोग्य शिबिरे व समुपदेशन." />
-    <meta name="keywords" content="Sahara Social Foundation, मधुमेह मुक्त भारत, व्यसनमुक्त भारत, Antox D, Antox T, Kolhapur Health Foundation, Ayurveda Kolhapur" />
+    <meta name="description" content="सहारा सोशल फाऊंडेशन, कोल्हापूर - मधुमेह मुक्त भारत अभियान आणि व्यसनमुक्त भारत अभियान. न्युट्रास्युटिकल मार्गदर्शन, आरोग्य शिबिरे व समुपदेशन." />
+    <meta name="keywords" content="Sahara Social Foundation, मधुमेह मुक्त भारत, व्यसनमुक्त भारत, Antox D, Antox T, Kolhapur Health Foundation, Nutraceutical Kolhapur" />
     <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph & WhatsApp Link Preview (Requires Absolute Public URL) -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sahara Social Foundation" />
     <meta property="og:title" content="Sahara Social Foundation | सहारा सोशल फाऊंडेशन" />
-    <meta property="og:description" content="तुम्ही जर या वेबसाईट वरून फॉर्म्युला ऑर्डर केला असेल, वरील (Order Now) या बटन वर क्लिक करून, तर फॉर्म्युला मिळाल्यावर 7745066707 या नंबर वर कॉल करा." />
-    <meta property="og:image" content="/sahara-logo.jpg" />
+    <meta property="og:description" content="मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियान. शुद्ध न्युट्रास्युटिकल्स, मोफत आरोग्य समुपदेशन व मार्गदर्शन केंद्र, कोल्हापूर. हेल्पलाइन: 7745066707." />
+    <meta property="og:url" content="https://samarthkolhapur.com/" />
+    
+    <!-- Primary WhatsApp Preview Image (Public Raw CDN guarantees 200 OK preview) -->
+    <meta property="og:image" content="https://raw.githubusercontent.com/AKSHAD2004/Sahara-Social-Foundation/main/public/sahara-logo.jpg" />
+    <meta property="og:image:secure_url" content="https://raw.githubusercontent.com/AKSHAD2004/Sahara-Social-Foundation/main/public/sahara-logo.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="600" />
+    <meta property="og:image:height" content="600" />
+    <meta property="og:image:alt" content="Sahara Social Foundation Logo" />
+    
+    <!-- WhatsApp & Search Engine Meta Tags -->
+    <link rel="image_src" href="https://raw.githubusercontent.com/AKSHAD2004/Sahara-Social-Foundation/main/public/sahara-logo.jpg" />
+    <meta itemprop="image" content="https://raw.githubusercontent.com/AKSHAD2004/Sahara-Social-Foundation/main/public/sahara-logo.jpg" />
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Sahara Social Foundation | सहारा सोशल फाऊंडेशन" />
+    <meta name="twitter:description" content="मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियान. शुद्ध न्युट्रास्युटिकल्स, मोफत आरोग्य समुपदेशन व मार्गदर्शन केंद्र, कोल्हापूर. हेल्पलाइन: 7745066707." />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/AKSHAD2004/Sahara-Social-Foundation/main/public/sahara-logo.jpg" />
 
     <!-- Google Fonts for English & Devanagari (Marathi) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

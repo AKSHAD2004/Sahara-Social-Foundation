@@ -73,7 +73,7 @@ const ProductDetails = () => {
     nameEn: rawProduct.name || staticMeta.nameEn || rawProduct.nameEn,
     nameMr: staticMeta.nameMr || rawProduct.name,
     sku: rawProduct.sku || staticMeta.sku,
-    categoryNameEn: rawProduct.category || staticMeta.categoryNameEn || 'Ayurvedic Formula',
+    categoryNameEn: rawProduct.category || staticMeta.categoryNameEn || 'Nutraceutical Formula',
     categoryNameMr: staticMeta.categoryNameMr || rawProduct.category,
     isCombo: rawProduct.isCombo !== undefined ? rawProduct.isCombo : (staticMeta.isCombo !== undefined ? staticMeta.isCombo : (Number(rawProduct.price || staticMeta.price) >= 3000)),
     price: Number(rawProduct.price || rawProduct.sellingPrice || staticMeta.price || 0),
@@ -87,7 +87,7 @@ const ProductDetails = () => {
     descriptionMr: staticMeta.descriptionMr || rawProduct.description || '',
     features: staticMeta.features || [
       { en: "100% Herbal with no chemical additives", mr: "कोणत्याही केमिकल विरहित १००% शुद्ध आयुर्वेदिक" },
-      { en: "Formulated under classical Ayurvedic guidelines", mr: "शास्त्रीय आयुर्वेदिक पद्धतीनुसार तयार" }
+      { en: "Formulated under classical Nutraceutical guidelines", mr: "शास्त्रीय आयुर्वेदिक पद्धतीनुसार तयार" }
     ],
     rating: rawProduct.rating || staticMeta.rating || 4.8,
     reviewsCount: rawProduct.reviewsCount || staticMeta.reviewsCount || 100,
@@ -300,7 +300,7 @@ const ProductDetails = () => {
               <div style={{ backgroundColor: '#e2faea', padding: '0.65rem 0.4rem', borderRadius: '10px', border: '1px solid #c3edd2' }}>
                 <ShieldCheck size={18} style={{ color: '#006B2D', margin: '0 auto 0.2rem auto' }} />
                 <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#006B2D' }}>
-                  {language === 'mr' ? '१००% आयुर्वेदिक' : '100% Ayurvedic'}
+                  {language === 'mr' ? '१००% आयुर्वेदिक' : '100% Nutraceutical'}
                 </div>
               </div>
 

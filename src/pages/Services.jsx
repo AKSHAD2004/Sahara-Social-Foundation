@@ -34,7 +34,7 @@ const Services = () => {
           <p>
             {language === 'mr'
               ? 'मधुमेह नियंत्रण, व्यसनमुक्ती, सांधेदुखी व जुनाट विकारांवर शास्त्रीय आयुर्वेदिक मार्गदर्शन आणि आहाराचे नियोजन.'
-              : 'Holistic Ayurvedic care, dietary pathya, and lifestyle counseling for lifestyle health conditions.'}
+              : 'Holistic Nutraceutical care, dietary pathya, and lifestyle counseling for lifestyle health conditions.'}
           </p>
         </div>
       </div>

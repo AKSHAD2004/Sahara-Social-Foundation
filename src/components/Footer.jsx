@@ -72,7 +72,7 @@ const Footer = () => {
             <p className="footer-brand-desc" style={{ fontSize: '0.84rem', color: '#a7f3d0', lineHeight: 1.55, marginBottom: '1rem' }}>
               {language === 'mr' 
                 ? 'मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियानांतर्गत समाजातील प्रत्येक व्यक्तीला निरोगी बनवण्यासाठी कटिबद्ध सामाजिक संस्था.'
-                : 'A dedicated social welfare foundation promoting nationwide diabetes awareness, addiction-free rehabilitation, and Ayurvedic wellness.'}
+                : 'A dedicated social welfare foundation promoting nationwide diabetes awareness, addiction-free rehabilitation, and Nutraceutical wellness.'}
             </p>
 
             {/* Official Social Media Links */}

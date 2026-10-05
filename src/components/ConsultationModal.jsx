@@ -46,7 +46,7 @@ const ConsultationModal = ({ isOpen, onClose }) => {
         mobile: formData.phone,
         email: '',
         source: activeRef ? 'Affiliate' : 'Website Consultation',
-        interestedProduct: formData.category === 'diabetes' ? 'Antox D & Antox T (Diabetes Support Kit)' : 'Samarth Ayurvedic Consultation',
+        interestedProduct: formData.category === 'diabetes' ? 'Antox D & Antox T (Diabetes Support Kit)' : 'Samarth Nutraceutical Consultation',
         assignedEmployee: 'usr_emp_sneha',
         assignedAffiliate: matchingAffiliate ? matchingAffiliate.id : '',
         leadStatus: 'New',
@@ -101,7 +101,7 @@ const ConsultationModal = ({ isOpen, onClose }) => {
             <p style={{ fontSize: '0.86rem', color: '#5F6B61', marginBottom: '1.25rem', lineHeight: 1.5 }}>
               {language === 'mr'
                 ? 'खालील फॉर्म भरा. सहारा सोशल फाऊंडेशनचे तज्ज्ञ समुपदेशक तुम्हाला आहार व आयुर्वेदिक उपचारांसाठी फोनवर मार्गदर्शन करतील.'
-                : 'Fill the form below. Our health counselor will contact you for dietary advice and natural Ayurvedic support.'}
+                : 'Fill the form below. Our health counselor will contact you for dietary advice and natural Nutraceutical support.'}
             </p>
 
             <form onSubmit={handleSubmit}>

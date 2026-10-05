@@ -56,7 +56,7 @@ export const initialProducts = [
     commissionEligible: true,
     commissionType: 'standard',
     image: 'https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png',
-    description: 'Specialized Ayurvedic liquid formulation for blood glucose balance and pancreatic beta-cell rejuvenation.',
+    description: 'Specialized Nutraceutical liquid formulation for blood glucose balance and pancreatic beta-cell rejuvenation.',
     status: 'active'
   },
 
@@ -212,7 +212,7 @@ export const initialProducts = [
     commissionEligible: true,
     commissionType: 'standard',
     image: 'https://nutrifeel.org/wp-content/uploads/b-acid-new-266x400.png',
-    description: 'Comprehensive Ayurvedic duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.',
+    description: 'Comprehensive Nutraceutical duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.',
     status: 'active'
   },
   {
@@ -310,7 +310,7 @@ export const initialProducts = [
     commissionEligible: true,
     commissionType: 'standard',
     image: 'https://nutrifeel.org/wp-content/uploads/b-acid-new-266x400.png',
-    description: 'Fast-acting soothing Ayurvedic liquid for hyperacidity, acid reflux (GERD), heartburn, nausea, and bile distress.',
+    description: 'Fast-acting soothing Nutraceutical liquid for hyperacidity, acid reflux (GERD), heartburn, nausea, and bile distress.',
     status: 'active'
   },
   {
@@ -326,7 +326,7 @@ export const initialProducts = [
     commissionEligible: true,
     commissionType: 'standard',
     image: 'https://nutrifeel.org/wp-content/uploads/amrut-new-266x400.png',
-    description: 'Master Ayurvedic formulation of 51 therapeutic Himalayan herbs for full-body cellular rejuvenation, stamina, and immune defenses.',
+    description: 'Master Nutraceutical formulation of 51 therapeutic Himalayan herbs for full-body cellular rejuvenation, stamina, and immune defenses.',
     status: 'active'
   }
 ];
