@@ -81,6 +81,7 @@ function initCollection(collectionName, defaultData) {
           return defProd;
         });
         state[collectionName] = merged;
+        localStorage.setItem(key, JSON.stringify(merged));
       } else if (collectionName === 'settings' && parsed && defaultData) {
         const mergedSettings = { ...parsed, phone: defaultData.phone, whatsappNumber: defaultData.whatsappNumber };
         state[collectionName] = mergedSettings;

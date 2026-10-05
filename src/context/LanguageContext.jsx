@@ -17,7 +17,14 @@ export const INDIAN_LANGUAGES = [
 export const applyGoogleTranslate = (langCode) => {
   try {
     const targetCode = langCode || 'en';
-    const cookieVal = `/mr/${targetCode}`;
+    
+    // If GTranslate floating widget is active, trigger it directly
+    if (typeof window.doGTranslate === 'function') {
+      window.doGTranslate('en|' + targetCode);
+      return;
+    }
+
+    const cookieVal = `/en/${targetCode}`;
     
     // Set cookies across root and domain
     document.cookie = `googtrans=${cookieVal}; path=/;`;
@@ -31,9 +38,13 @@ export const applyGoogleTranslate = (langCode) => {
       }
     }
 
-    // Direct trigger for Google Translate select element
+    // Direct trigger for Google Translate select element if present
     let attempts = 0;
     const triggerCombo = () => {
+      if (typeof window.doGTranslate === 'function') {
+        window.doGTranslate('en|' + targetCode);
+        return;
+      }
       const select = document.querySelector('.goog-te-combo');
       if (select) {
         select.value = targetCode;

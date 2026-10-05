@@ -34,6 +34,9 @@ const Shop = () => {
     { id: 'heart', nameEn: 'Heart & Organs', nameMr: 'हृदय व लिव्हर' },
     { id: 'addiction', nameEn: 'De-Addiction', nameMr: 'व्यसनमुक्ती' },
     { id: 'bones', nameEn: 'Joints & Bones', nameMr: 'सांधेदुखी' },
+    { id: 'acidity', nameEn: 'Acidity & Digestion', nameMr: 'पित्त व पचन' },
+    { id: 'vitality', nameEn: 'Immunity & Vitality', nameMr: 'रोगप्रतिकार व ऊर्जा' },
+    { id: 'combos', nameEn: 'Value Kits', nameMr: 'कॉम्बो किट्स' },
   ];
 
   // Merge live admin-edited database product data with rich metadata
@@ -45,9 +48,11 @@ const Shop = () => {
     const catStr = (p.category || staticMeta.category || '').toLowerCase();
     let catKey = 'diabetes';
     if (catStr.includes('diabet')) catKey = 'diabetes';
-    else if (catStr.includes('heart') || catStr.includes('organ') || catStr.includes('liver')) catKey = 'heart';
+    else if (catStr.includes('heart') || catStr.includes('organ') || catStr.includes('liver') || catStr.includes('kidney')) catKey = 'heart';
     else if (catStr.includes('addict')) catKey = 'addiction';
     else if (catStr.includes('bone') || catStr.includes('joint')) catKey = 'bones';
+    else if (catStr.includes('acid') || catStr.includes('digest')) catKey = 'acidity';
+    else if (catStr.includes('amrut') || catStr.includes('vital') || catStr.includes('immun') || catStr.includes('stamina')) catKey = 'vitality';
 
     return {
       ...staticMeta,
@@ -79,7 +84,8 @@ const Shop = () => {
 
   const filteredProducts = normalizedProducts.filter((product) => {
     const matchesCategory =
-      selectedCategory === 'all' || product.category === selectedCategory;
+      selectedCategory === 'all' ||
+      (selectedCategory === 'combos' ? product.isCombo : product.category === selectedCategory);
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       !searchQuery ||
@@ -99,7 +105,7 @@ const Shop = () => {
         <div className="container">
           <div className="section-badge">
             <ShoppingBag size={14} />
-            <span>{language === 'mr' ? 'Antox आयुर्वेदिक औषधी' : 'Antox Ayurvedic Formulas'}</span>
+            <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}</span>
           </div>
           <h1>
             {language === 'mr' ? 'आयुर्वेदिक उत्पादने व फॉर्म्युला' : 'Authentic Ayurvedic Products'}

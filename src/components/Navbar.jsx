@@ -146,21 +146,8 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Right: Language Switcher & WhatsApp Action */}
+            {/* Right: WhatsApp Support Action */}
             <div className="theme-header__top-right">
-              <button 
-                onClick={openLanguageModal}
-                className="top-lang-pill notranslate"
-                title="Change Language / भाषा बदला"
-                aria-label="Change language"
-              >
-                <Globe size={13} style={{ color: '#FFC928' }} />
-                <span className="notranslate" style={{ fontWeight: 700 }}>
-                  {currentLanguageObj?.name || 'English'}
-                </span>
-                <ChevronDown size={11} style={{ opacity: 0.8 }} />
-              </button>
-
               <a
                 href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
                   language === 'mr'
@@ -691,18 +678,18 @@ const Navbar = () => {
           box-shadow: 0 12px 34px rgba(0, 107, 45, 0.13), 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        /* Brand Column on Left */
+        /* Brand Column on Left - Full Visibility without Truncation */
         .theme-header-brand-col {
-          flex: 0 1 auto;
-          min-width: 0;
+          flex: 0 0 auto;
+          min-width: max-content;
         }
 
         .brand-link {
           display: flex;
           align-items: center;
-          gap: 0.85rem;
+          gap: 0.75rem;
           text-decoration: none;
-          min-width: 0;
+          flex-shrink: 0;
         }
 
         .brand-logo-wrap {
@@ -713,30 +700,32 @@ const Navbar = () => {
         }
 
         .brand-text-block {
-          min-width: 0;
-          flex: 1;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
 
         .brand-title {
-          font-size: 1.14rem;
+          font-size: clamp(0.95rem, 1.25vw, 1.15rem);
           font-weight: 800;
           color: #006B2D;
           line-height: 1.2;
           text-transform: uppercase;
-          letter-spacing: 0.025em;
+          letter-spacing: 0.02em;
           white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          overflow: visible;
+          text-overflow: clip;
         }
 
         .brand-subtitle {
-          font-size: 0.72rem;
+          font-size: clamp(0.68rem, 0.75vw, 0.74rem);
           color: #159B32;
           font-weight: 700;
           margin-top: 2px;
           white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          overflow: visible;
+          text-overflow: clip;
         }
 
         /* Desktop Menu (Yess Infotech Pill Navigation) */
@@ -1095,6 +1084,26 @@ const Navbar = () => {
           }
         }
 
+        @media (min-width: 1080px) and (max-width: 1279px) {
+          .theme-header-card {
+            padding: 10px 16px;
+            gap: 0.65rem;
+          }
+          .desktop-main-nav {
+            gap: 2px;
+          }
+          .header-main-nav-link {
+            padding: 6px 9px;
+            font-size: 0.84rem;
+          }
+          .header-main-nav-link--active {
+            padding: 6px 14px;
+          }
+          .theme-header-actions-col {
+            gap: 0.45rem;
+          }
+        }
+
         @media (min-width: 1280px) {
           .theme-header-card {
             padding: 12px 26px;
@@ -1201,12 +1210,13 @@ const Navbar = () => {
           }
 
           .brand-title {
-            font-size: clamp(0.72rem, 3.2vw, 0.88rem);
+            font-size: clamp(0.76rem, 3.4vw, 0.92rem);
             font-weight: 800;
-            line-height: 1.15;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.18;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            word-break: break-word;
           }
 
           .brand-subtitle {

@@ -1011,4 +1011,53 @@ body {
   }
 }
 
+/* ==========================================================================
+   GTranslate Floating Language Widget (Identical to Nutrifeel.org)
+   ========================================================================== */
+#gt_float_wrapper,
+.gtranslate_wrapper,
+.gtranslate_wrapper #gt_float_wrapper {
+  z-index: 999999 !important;
+}
+
+.gt_float_switcher {
+  font-family: var(--font-family) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.gt_float_switcher:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24) !important;
+}
+
+/* Ensure mobile bottom bar doesn't overlap the floating language button */
+@media (max-width: 768px) {
+  #gt_float_wrapper,
+  .gtranslate_wrapper #gt_float_wrapper,
+  div[id="gt_float_wrapper"] {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 8px) !important;
+    left: 12px !important;
+    z-index: 999999 !important;
+  }
+
+  .gt_float_switcher {
+    font-size: 15px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22) !important;
+  }
+
+  .gt_float_switcher .gt-selected .gt-current-lang {
+    padding: 6px 10px !important;
+  }
+
+  .gt_float_switcher img {
+    width: 24px !important;
+    margin: 0 4px 0 0 !important;
+  }
+}
+
+
 

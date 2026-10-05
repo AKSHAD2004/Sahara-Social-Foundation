@@ -41,10 +41,12 @@ export default function ProductList() {
         setProducts(initialProducts);
       } else {
         const filtered = prods.filter((p) => validIds.has(p.id));
-        if (filtered.length !== prods.length || filtered.length === 0) {
-          const toSave = filtered.length > 0 ? filtered : initialProducts;
-          dbService.setCollection('products', toSave);
-          setProducts(toSave);
+        const currentIds = new Set(filtered.map((p) => p.id));
+        const missingProducts = initialProducts.filter((p) => !currentIds.has(p.id));
+        if (missingProducts.length > 0 || filtered.length !== prods.length) {
+          const merged = [...filtered, ...missingProducts];
+          dbService.setCollection('products', merged);
+          setProducts(merged);
         } else {
           setProducts(filtered);
         }

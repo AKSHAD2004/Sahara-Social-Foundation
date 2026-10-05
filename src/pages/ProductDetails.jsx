@@ -27,6 +27,7 @@ const ProductDetails = () => {
   const { customerUser, currentUser, openCustomerAuthModal } = useAuth();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editFormData, setEditFormData] = useState({
     name: '',
@@ -41,6 +42,10 @@ const ProductDetails = () => {
     const fromDb = dbService.getAll('products');
     return (Array.isArray(fromDb) && fromDb.length > 0) ? fromDb : productsData;
   });
+
+  useEffect(() => {
+    setSelectedImage(null);
+  }, [id]);
 
   useEffect(() => {
     const unsub = dbService.subscribe('products', (dbProducts) => {
@@ -191,7 +196,7 @@ const ProductDetails = () => {
               padding: '1.25rem'
             }}>
               <img
-                src={product.image}
+                src={selectedImage || product.image}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = product.fallbackImage;
@@ -216,6 +221,74 @@ const ProductDetails = () => {
                 </div>
               )}
             </div>
+
+            {/* Gallery Thumbnails Strip (from Nutrifeel) */}
+            {product.gallery && product.gallery.length > 0 && (
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedImage(product.image)}
+                  style={{
+                    border: (!selectedImage || selectedImage === product.image) ? '2px solid #006B2D' : '1px solid #E1E9DF',
+                    borderRadius: '8px',
+                    padding: '3px',
+                    backgroundColor: '#ffffff',
+                    cursor: 'pointer',
+                    width: '60px',
+                    height: '60px',
+                    flexShrink: 0
+                  }}
+                  title="Main Product View"
+                >
+                  <img src={product.image} alt="Main View" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </button>
+                {product.gallery.map((gImg, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setSelectedImage(gImg)}
+                    style={{
+                      border: selectedImage === gImg ? '2px solid #006B2D' : '1px solid #E1E9DF',
+                      borderRadius: '8px',
+                      padding: '3px',
+                      backgroundColor: '#ffffff',
+                      cursor: 'pointer',
+                      width: '60px',
+                      height: '60px',
+                      flexShrink: 0
+                    }}
+                    title={`Catalogue Slide ${idx + 1}`}
+                  >
+                    <img src={gImg} alt={`Slide ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {product.nutrifeelUrl && (
+              <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
+                <a
+                  href={product.nutrifeelUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    fontSize: '0.78rem',
+                    color: '#006B2D',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    backgroundColor: '#e6f4ea',
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '20px',
+                    border: '1px solid #b7e1cd'
+                  }}
+                >
+                  <span>{language === 'mr' ? 'अधिकृत न्युट्रीफील वेबसाईट पहा ↗' : 'View on Official Nutrifeel ↗'}</span>
+                </a>
+              </div>
+            )}
 
             {/* Trust Badges */}
             <div style={{

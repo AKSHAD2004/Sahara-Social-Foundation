@@ -361,7 +361,7 @@ const Home = () => {
           <div className="section-header">
             <div className="section-badge">
               <ShoppingBag size={15} />
-              <span>{language === 'mr' ? 'Antox आयुर्वेदिक उत्पादने' : 'Antox Products'}</span>
+              <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}</span>
             </div>
             <h2>
               {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Ayurvedic Products'}
@@ -374,7 +374,7 @@ const Home = () => {
           </div>
 
           <div className="products-grid" style={{ marginBottom: '2.5rem' }}>
-            {productsData.slice(0, 6).map((product) => (
+            {productsData.slice(0, 9).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

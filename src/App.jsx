@@ -92,6 +92,10 @@ function PublicLayout() {
           <Route path="/services" element={<Services />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/:id" element={<ProductDetails />} />
+          <Route path="/nutrifeel-product" element={<Shop />} />
+          <Route path="/nutrifeel-products" element={<Shop />} />
+          <Route path="/products" element={<Shop />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />

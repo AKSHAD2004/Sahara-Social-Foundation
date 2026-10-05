@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  Phone, 
-  ShieldCheck, 
-  Heart, 
-  Sparkles,
-  ChevronDown,
-  ChevronUp,
-  CheckCircle2,
+  Phone,
+  Heart,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -84,7 +79,6 @@ export const heroSlidesData = [
 
 const Hero = ({ onOpenConsultation, customSlides = null }) => {
   const { language } = useLanguage();
-  const [showMore, setShowMore] = useState(false);
 
   // Slideshow state
   const slides = customSlides && customSlides.length > 0 ? customSlides : heroSlidesData;
@@ -193,152 +187,43 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           </div>
         </div>
 
-        {/* 2. HERO CONTENT SECTION (Below Slideshow) - Side-by-Side Space Utilization */}
-        <div className="hero-split-grid">
-          {/* Left Column: Mission Branding & Headline */}
-          <div className="hero-left-col">
-            <div className="hero-badge-row">
-              <div className="hero-slide-badge hero-animated-badge">
-                <Sparkles size={14} className="hero-sparkle-icon" style={{ color: '#FFC928' }} />
-                <span>
-                  {language === 'mr' ? 'मधुमेह मुक्त भारत व व्यसनमुक्त भारत अभियान' : 'National Health & De-Addiction Initiative'}
-                </span>
-              </div>
-            </div>
-
-            <h1 className="hero-title hero-animated-title">
-              {language === 'mr' ? (
-                <>
-                  <span className="hero-title-highlight">सहारा सोशल फाऊंडेशन</span>, कोल्हापूर<br />
-                  <span className="hero-campaign-highlight">मधुमेह मुक्त भारत अभियान</span>
-                </>
-              ) : (
-                <>
-                  <span className="hero-title-highlight">Sahara Social Foundation</span><br />
-                  <span className="hero-campaign-highlight">Diabetes-Free India Campaign</span>
-                </>
-              )}
-            </h1>
-
-            <div className="hero-subtext-container">
+        {/* 2. HERO ACTION BUTTONS (Directly below slideshow) */}
+        <div className="hero-action-bar-wrapper">
+          <div className="hero-action-card">
+            <div className="hero-cta-group">
               <button
                 type="button"
-                onClick={() => setShowMore(prev => !prev)}
-                className="hero-read-more-btn"
-                aria-expanded={showMore}
+                onClick={onOpenConsultation}
+                className="btn btn-primary hero-main-cta"
               >
-                <span>
-                  {showMore 
-                    ? (language === 'mr' ? 'कमी माहिती दाखवा (Show Less)' : 'Show Less')
-                    : (language === 'mr' ? 'अधिक माहिती वाचा (More Details)' : 'More Details')}
-                </span>
-                {showMore ? <ChevronUp size={15} style={{ color: '#006B2D' }} /> : <ChevronDown size={15} style={{ color: '#006B2D' }} />}
+                <Heart size={20} style={{ color: '#FFC928' }} />
+                <span>{language === 'mr' ? 'मोफत मार्गदर्शन नोंदणी' : 'Free Consultation'}</span>
               </button>
-            </div>
-          </div>
 
-          {/* Right Column: Registration Trust Strip & Quick Action Buttons */}
-          <div className="hero-right-col">
-            <div className="hero-action-card">
-              <div className="hero-trust-strip">
-                <ShieldCheck size={16} style={{ color: '#006B2D', flexShrink: 0 }} />
-                <span>
-                  {language === 'mr'
-                    ? 'नोंदणीकृत संस्था (Reg. No. MAH/582/2014/KOP) • अधिकृत आयुर्वेद सल्ला'
-                    : 'Registered Foundation (Reg. No. MAH/582/2014/KOP) • Ayurvedic Guidance'}
-                </span>
-              </div>
+              <a
+                href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
+                  language === 'mr'
+                    ? 'नमस्कार, मला मधुमेह मुक्ती अभियानाबद्दल माहिती हवी आहे.'
+                    : 'Hello, I want details about the Diabetes-Free India campaign.'
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-whatsapp hero-sub-cta"
+              >
+                <WhatsAppIcon size={20} animated={true} />
+                <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप मार्गदर्शन' : 'WhatsApp Support'}</span>
+              </a>
 
-              <div className="hero-cta-group">
-                <button
-                  type="button"
-                  onClick={onOpenConsultation}
-                  className="btn btn-primary hero-main-cta"
-                >
-                  <Heart size={18} style={{ color: '#FFC928' }} />
-                  <span>{language === 'mr' ? 'मोफत मार्गदर्शन नोंदणी' : 'Free Consultation'}</span>
-                </button>
-
-                <div className="hero-secondary-cta-row">
-                  <a
-                    href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(
-                      language === 'mr'
-                        ? 'नमस्कार, मला मधुमेह मुक्ती अभियानाबद्दल माहिती हवी आहे.'
-                        : 'Hello, I want details about the Diabetes-Free India campaign.'
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-whatsapp hero-sub-cta"
-                  >
-                    <WhatsAppIcon size={18} animated={true} />
-                    <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
-                  </a>
-
-                  <a
-                    href={`tel:${organizationInfo.contact.primaryPhone}`}
-                    className="btn btn-call hero-sub-cta"
-                  >
-                    <Phone size={17} />
-                    <span>{language === 'mr' ? 'कॉल करा' : 'Call'}</span>
-                  </a>
-                </div>
-              </div>
+              <a
+                href={`tel:${organizationInfo.contact.primaryPhone}`}
+                className="btn btn-call hero-sub-cta"
+              >
+                <Phone size={18} />
+                <span>{language === 'mr' ? 'कॉल करा: ७७४५०६६७०७' : 'Call: 7745066707'}</span>
+              </a>
             </div>
           </div>
         </div>
-
-        {/* Expandable Information Box (Spans Full Width Below Grid) */}
-        {showMore && (
-          <div className="hero-expanded-content">
-            <p className="hero-expanded-desc">
-              {language === 'mr'
-                ? 'आधार मधुमेह-मुक्ती मार्गदर्शन केंद्राच्या सहयोगाने नैसर्गिक आयुर्वेदिक फॉर्म्युला, योग्य आहाराचे पथ्य आणि समुपदेशनाद्वारे रक्तातील साखर व व्यसनावर मात करण्यासाठी प्रभावी मार्गदर्शन.'
-                : 'In collaboration with Aadhar Madhumeh-Mukti Margdarshan Kendra, delivering authentic Ayurvedic wellness formulas, dietary counseling, and dedicated guidance for diabetes control and de-addiction.'}
-            </p>
-
-            <div className="hero-expanded-grid">
-              <div className="hero-expanded-item">
-                <CheckCircle2 size={15} className="hero-check-icon" />
-                <div>
-                  <strong>{language === 'mr' ? 'मधुमेह नियंत्रण:' : 'Diabetes Support:'}</strong>{' '}
-                  {language === 'mr' 
-                    ? 'स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नैसर्गिकरीत्या नियंत्रित ठेवण्यास मदत.'
-                    : 'Natural support for cellular insulin uptake and blood glucose balance.'}
-                </div>
-              </div>
-
-              <div className="hero-expanded-item">
-                <CheckCircle2 size={15} className="hero-check-icon" />
-                <div>
-                  <strong>{language === 'mr' ? 'आहाराचे पथ्य:' : 'Dietary Pathya:'}</strong>{' '}
-                  {language === 'mr'
-                    ? 'प्रत्येक रुग्णाला फोन व प्रत्यक्ष भेटीत आहाराचे शास्त्रीय नियोजन व पथ्य मार्गदर्शन.'
-                    : 'Scientific nutritional schedule and personalized dietary guidelines.'}
-                </div>
-              </div>
-
-              <div className="hero-expanded-item">
-                <CheckCircle2 size={15} className="hero-check-icon" />
-                <div>
-                  <strong>{language === 'mr' ? 'व्यसनमुक्ती अभियान:' : 'De-Addiction Drive:'}</strong>{' '}
-                  {language === 'mr'
-                    ? 'दारू, तंबाखू व सिगारेटची तीव्र तलफ नैसर्गिक हर्बल फॉर्म्युलाने कमी करणे.'
-                    : 'Safe herbal support to curb urges for alcohol, tobacco, and smoking.'}
-                </div>
-              </div>
-
-              <div className="hero-expanded-item">
-                <CheckCircle2 size={15} className="hero-check-icon" />
-                <div>
-                  <strong>{language === 'mr' ? 'मोफत फोन सल्ला:' : 'Free Helpline:'}</strong>{' '}
-                  {language === 'mr'
-                    ? 'सहारा सोशल फाऊंडेशन, कोल्हापूर कार्यालयाशी थेट संपर्क: ७७४५०६६७०७.'
-                    : 'Direct counselor support at Kolhapur center: 7745066707.'}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       <style>{`
@@ -513,209 +398,49 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
         }
 
         /* =======================================================
-           HERO CONTENT SECTION: SPLIT 2-COLUMN SIDE-BY-SIDE
-           Removes center alignment and utilizes side remaining spaces
+           HERO ACTION BUTTONS (Directly below slideshow)
            ======================================================= */
-        .hero-split-grid {
-          display: grid;
-          grid-template-columns: 1.15fr 0.85fr;
-          gap: 2.25rem;
-          align-items: center;
-          max-width: 1040px;
-          margin: 0 auto;
-        }
-
-        .hero-left-col {
+        .hero-action-bar-wrapper {
           display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-        }
-
-        .hero-right-col {
-          display: flex;
-          justify-content: flex-end;
-          width: 100%;
-        }
-
-        .hero-badge-row {
-          display: flex;
+          justify-content: center;
           align-items: center;
-          justify-content: flex-start;
-          margin-bottom: 0.35rem;
-        }
-
-        .hero-animated-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.45rem;
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          background: #e2faea;
-          padding: 0.28rem 0.95rem;
-          border-radius: 9999px;
-          border: 1px solid rgba(21, 155, 50, 0.35);
-          color: #006B2D;
-          font-size: 0.84rem;
-          font-weight: 700;
-          letter-spacing: 0.015em;
-          box-shadow: 0 2px 8px rgba(0, 107, 45, 0.06);
-        }
-
-        /* Main Headline */
-        .hero-title {
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          font-size: clamp(1.5rem, 2.7vw + 0.2rem, 2.25rem);
-          font-weight: 800;
-          color: #006B2D;
-          line-height: 1.22;
-          margin-bottom: 0.4rem;
-          letter-spacing: -0.01em;
-          text-align: left;
-        }
-
-        .hero-title-highlight {
-          color: #17251B;
-          font-weight: 800;
-        }
-
-        .hero-campaign-highlight {
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          font-weight: 800;
-          color: #159B32;
-        }
-
-        /* Expandable More Details Button & Container */
-        .hero-subtext-container {
-          width: 100%;
-          margin-bottom: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .hero-read-more-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4rem;
-          background-color: #ffffff;
-          border: 1.5px solid #E1E9DF;
-          color: #006B2D;
-          padding: 0.28rem 0.85rem;
-          border-radius: 9999px;
-          font-size: 0.82rem;
-          font-weight: 700;
-          cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0, 107, 45, 0.05);
-          transition: all 0.25s ease;
-        }
-
-        .hero-read-more-btn:hover {
-          background-color: #F3F8F1;
-          border-color: #159B32;
-        }
-
-        .hero-expanded-content {
-          margin-top: 1rem;
           width: 100%;
           max-width: 1040px;
-          margin-left: auto;
-          margin-right: auto;
-          background-color: #ffffff;
-          border: 1.5px solid #E1E9DF;
-          border-radius: 14px;
-          padding: 1.15rem;
-          text-align: left;
-          box-shadow: 0 8px 24px rgba(0, 107, 45, 0.08);
-          animation: fadeIn 0.3s ease-out;
+          margin: 0.85rem auto 0 auto;
         }
 
-        .hero-expanded-desc {
-          color: #5F6B61;
-          font-size: 0.88rem;
-          line-height: 1.55;
-          margin-bottom: 0.85rem;
-        }
-
-        .hero-expanded-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.75rem;
-        }
-
-        .hero-expanded-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.45rem;
-          font-size: 0.82rem;
-          color: #17251B;
-        }
-
-        .hero-expanded-item strong {
-          color: #006B2D;
-        }
-
-        .hero-check-icon {
-          color: #159B32;
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-
-        /* Unified Action Container - Straight Aligned Edges */
         .hero-action-card {
           width: 100%;
-          max-width: 440px;
-          display: flex;
-          flex-direction: column;
-          gap: 0.65rem;
+          max-width: 1040px;
           background: #ffffff;
-          padding: 0.95rem 1.15rem;
-          border-radius: 16px;
+          padding: 0.85rem 1.15rem;
+          border-radius: 18px;
           border: 1.5px solid #E1E9DF;
           box-shadow: 0 8px 24px rgba(0, 107, 45, 0.08);
           box-sizing: border-box;
         }
 
-        /* Trust Strip - Top of Action Box */
-        .hero-trust-strip {
-          font-family: 'Baloo 2', 'Poppins', sans-serif;
-          font-weight: 700;
-          background-color: #F3F8F1;
-          border-left: 3.5px solid #006B2D;
-          padding: 0.42rem 0.85rem;
-          border-radius: 8px;
-          font-size: 0.8rem;
-          color: #17251B;
-          border-top: 1px solid rgba(21, 155, 50, 0.2);
-          border-right: 1px solid rgba(21, 155, 50, 0.2);
-          border-bottom: 1px solid rgba(21, 155, 50, 0.2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.45rem;
-          width: 100%;
-          box-sizing: border-box;
-          line-height: 1.35;
-          text-align: center;
-        }
-
-        /* CTA Buttons Group - Perfectly aligned, full-width */
+        /* Desktop: 3-column horizontal spread across full 1040px width */
         .hero-cta-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.55rem;
+          display: grid;
+          grid-template-columns: 1.25fr 1fr 1fr;
+          gap: 0.95rem;
           width: 100%;
+          align-items: center;
           font-family: 'Baloo 2', 'Poppins', sans-serif;
+          box-sizing: border-box;
         }
 
         .hero-main-cta {
           width: 100% !important;
           font-weight: 800;
+          font-size: 0.96rem;
           letter-spacing: 0.01em;
           background: linear-gradient(135deg, #006B2D, #08481c);
           color: #ffffff;
-          padding: 0.72rem 1.25rem !important;
-          border-radius: 10px;
-          min-height: 44px;
+          padding: 0.75rem 1rem !important;
+          border-radius: 12px;
+          min-height: 48px;
           box-shadow: 0 4px 14px rgba(0, 107, 45, 0.28);
           transition: all 0.25s ease;
           display: flex;
@@ -723,6 +448,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           justify-content: center;
           gap: 0.5rem;
           box-sizing: border-box;
+          white-space: nowrap;
         }
 
         .hero-main-cta:hover {
@@ -731,21 +457,13 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           box-shadow: 0 6px 20px rgba(0, 107, 45, 0.35);
         }
 
-        /* 50/50 Split for WhatsApp & Call */
-        .hero-secondary-cta-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.55rem;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
         .hero-sub-cta {
           width: 100% !important;
           font-weight: 700;
-          padding: 0.65rem 0.75rem !important;
-          border-radius: 10px;
-          min-height: 44px;
+          font-size: 0.92rem;
+          padding: 0.75rem 0.85rem !important;
+          border-radius: 12px;
+          min-height: 48px;
           transition: all 0.25s ease;
           display: flex;
           align-items: center;
@@ -753,64 +471,30 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           gap: 0.45rem;
           box-sizing: border-box;
           text-align: center;
+          white-space: nowrap;
         }
 
         .hero-sub-cta:hover {
           transform: translateY(-2px);
         }
 
-        .hero-cta-micro-trust {
-          display: none;
-        }
-
         /* Responsive Breakpoints */
-        @media (max-width: 900px) {
-          .hero-split-grid {
-            grid-template-columns: 1fr;
-            gap: 1.15rem;
-          }
-
-          .hero-left-col {
-            align-items: center;
-            text-align: center;
-          }
-
-          .hero-badge-row {
-            justify-content: center;
-          }
-
-          .hero-title {
-            text-align: center;
-          }
-
-          .hero-subtext-container {
-            align-items: center;
-          }
-
-          .hero-right-col {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-          }
-
-          .hero-action-card {
-            max-width: 420px;
-            margin: 0 auto;
-          }
-        }
         @media (max-width: 992px) {
           .hero-slideshow-wrapper {
             max-width: 820px;
           }
+          .hero-action-bar-wrapper {
+            max-width: 820px;
+          }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .hero-section {
-            padding: 0.75rem 0 1.25rem 0 !important;
+            padding: 0.65rem 0 0.85rem 0 !important;
           }
 
           .hero-slideshow-wrapper {
-            margin-bottom: 0.85rem;
+            margin-bottom: 0.65rem;
             padding: 0;
           }
 
@@ -840,69 +524,53 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
             right: 8px;
           }
 
-          .hero-animated-badge {
-            font-size: 0.78rem;
-            padding: 0.25rem 0.8rem;
-          }
-
-          .hero-title {
-            font-size: clamp(1.35rem, 5.5vw, 1.85rem) !important;
-            line-height: 1.2 !important;
-            margin-bottom: 0.35rem !important;
-          }
-
-          .hero-campaign-highlight {
-            font-size: clamp(1.2rem, 4.8vw, 1.55rem) !important;
-          }
-
-          .hero-expanded-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .hero-trust-strip {
-            font-size: 0.78rem !important;
-            padding: 0.32rem 0.75rem !important;
-            margin-bottom: 0.65rem !important;
-            text-align: center;
-            justify-content: center;
-          }
-
-          .hero-cta-group {
-            flex-direction: column;
-            align-items: center;
+          .hero-action-bar-wrapper {
+            margin: 0.35rem auto 0 auto;
             width: 100%;
-            gap: 0.45rem !important;
-            margin-top: 0.25rem;
+          }
+
+          /* Mobile Action Card */
+          .hero-action-card {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            padding: 0.72rem 0.85rem !important;
+            border-radius: 14px !important;
+            background: #ffffff !important;
+            border: 1.5px solid #E1E9DF !important;
+            box-shadow: 0 4px 16px rgba(0, 107, 45, 0.08) !important;
+          }
+
+          /* 2-row layout on tablet/mobile: Free Consultation full width, WhatsApp & Call 50/50 */
+          .hero-cta-group {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
           }
 
           .hero-main-cta {
+            grid-column: 1 / -1 !important;
             width: 100% !important;
-            max-width: 360px;
-            margin: 0 auto;
+            margin: 0 !important;
             justify-content: center !important;
-            font-size: 0.98rem !important;
-            font-weight: 800;
-            padding: 0.82rem 1.6rem !important;
-            border-radius: 999px !important;
-            background: linear-gradient(135deg, #006B2D 0%, #08481c 100%) !important;
-            box-shadow: 0 4px 18px rgba(0, 107, 45, 0.28) !important;
-            letter-spacing: 0.01em;
+            font-size: 0.94rem !important;
+            font-weight: 800 !important;
+            padding: 0.68rem 1rem !important;
+            border-radius: 10px !important;
+            min-height: 42px !important;
           }
 
-          .hero-cta-micro-trust {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.72rem;
-            color: #5F6B61;
-            font-weight: 700;
-            text-align: center;
-            margin-top: 2px;
-          }
-
-          /* Remove bulky Call & WhatsApp secondary block buttons from mobile view */
-          .hero-secondary-cta-row {
-            display: none !important;
+          .hero-sub-cta {
+            width: 100% !important;
+            min-height: 38px !important;
+            padding: 0.55rem 0.45rem !important;
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            border-radius: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.35rem !important;
           }
         }
       `}</style>

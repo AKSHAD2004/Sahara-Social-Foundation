@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, ChevronRight } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo, socialLinks } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
@@ -17,13 +17,13 @@ const FloatingActions = () => {
         aria-label="Call Helpline"
         className="floating-call-btn"
       >
-        <Phone size={20} />
-        <span className="floating-call-tooltip">
+        <Phone size={18} />
+        <span className="floating-action-tooltip">
           {language === 'mr' ? 'कॉल करा' : 'Call Helpline'}
         </span>
       </a>
 
-      {/* Floating Eye-Catching "Join our WhatsApp Group" Pill */}
+      {/* Floating WhatsApp Logo Button (Logo Only, Clean & Simple) */}
       <div className="whatsapp-float-wrapper">
         {/* Pulsing Radar Ring Halos */}
         <div className="wa-radar-ring" aria-hidden="true" />
@@ -33,35 +33,21 @@ const FloatingActions = () => {
           href={groupUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="whatsapp-group-pill-btn"
-          title="Join our WhatsApp Group / व्हॉट्सअ‍ॅप ग्रुप जॉईन करा"
+          className="floating-whatsapp-btn"
+          title={language === 'mr' ? 'व्हॉट्सअ‍ॅप ग्रुप जॉईन करा' : 'Join our WhatsApp Group'}
           aria-label="Join our WhatsApp Group"
         >
-          {/* Animated WhatsApp Icon with Unread Badge */}
-          <div className="wa-icon-container">
-            <div className="wa-icon-circle">
-              <WhatsAppIcon size={26} color="#ffffff" animated={true} />
-            </div>
-            <span className="wa-notification-badge" title="Active Community">
-              1
-            </span>
-          </div>
+          <WhatsAppIcon size={30} color="#ffffff" animated={true} />
+          
+          {/* Subtle notification badge */}
+          <span className="wa-notification-badge" title="Active Community">
+            1
+          </span>
 
-          {/* Text Content */}
-          <div className="wa-text-container">
-            <div className="wa-tagline">
-              <span className="wa-live-dot" />
-              <span>{language === 'mr' ? 'मोफत मार्गदर्शन • थेट अपडेट्स' : 'FREE UPDATES • LIVE'}</span>
-            </div>
-            <span className="wa-headline">
-              Join our WhatsApp Group
-            </span>
-          </div>
-
-          {/* Action Arrow Icon */}
-          <div className="wa-arrow-container" aria-hidden="true">
-            <ChevronRight size={18} />
-          </div>
+          {/* Desktop Hover Tooltip */}
+          <span className="floating-action-tooltip">
+            {language === 'mr' ? 'व्हॉट्सअ‍ॅप ग्रुप जॉईन करा' : 'Join WhatsApp Group'}
+          </span>
         </a>
       </div>
 
@@ -74,23 +60,23 @@ const FloatingActions = () => {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
-          gap: 0.85rem;
+          gap: 0.75rem;
           pointer-events: auto;
         }
 
         /* Call Button */
         .floating-call-btn {
           position: relative;
-          width: 46px;
-          height: 46px;
+          width: 42px;
+          height: 42px;
           border-radius: 50%;
           background: linear-gradient(135deg, #006B2D 0%, #04200e 100%);
           color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 6px 20px rgba(0, 107, 45, 0.35);
-          border: 2px solid rgba(255, 255, 255, 0.25);
+          box-shadow: 0 4px 14px rgba(0, 107, 45, 0.35);
+          border: 1.5px solid rgba(255, 255, 255, 0.25);
           transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
           cursor: pointer;
           text-decoration: none;
@@ -98,15 +84,16 @@ const FloatingActions = () => {
 
         .floating-call-btn:hover {
           transform: scale(1.1) translateY(-2px);
-          box-shadow: 0 10px 25px rgba(0, 107, 45, 0.45);
+          box-shadow: 0 8px 18px rgba(0, 107, 45, 0.45);
         }
 
-        .floating-call-tooltip {
+        /* Tooltip shared by both buttons */
+        .floating-action-tooltip {
           position: absolute;
-          right: 54px;
+          right: 52px;
           background: #17251B;
           color: #ffffff;
-          padding: 0.3rem 0.65rem;
+          padding: 0.35rem 0.75rem;
           border-radius: 6px;
           font-size: 0.75rem;
           font-weight: 700;
@@ -117,20 +104,22 @@ const FloatingActions = () => {
           transition: all 0.2s ease;
           pointer-events: none;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          font-family: var(--font-family);
         }
 
-        .floating-call-btn:hover .floating-call-tooltip {
+        .floating-call-btn:hover .floating-action-tooltip,
+        .floating-whatsapp-btn:hover .floating-action-tooltip {
           opacity: 1;
           visibility: visible;
           transform: translateX(0);
         }
 
-        /* WhatsApp Wrapper & Floating Breathing Animation */
+        /* WhatsApp Floating Wrapper */
         .whatsapp-float-wrapper {
           position: relative;
           display: flex;
           align-items: center;
-          justify-content: flex-end;
+          justify-content: center;
           animation: waFloatBreathing 3.6s ease-in-out infinite;
         }
 
@@ -139,7 +128,7 @@ const FloatingActions = () => {
             transform: translateY(0px);
           }
           50% {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
           }
         }
 
@@ -147,7 +136,7 @@ const FloatingActions = () => {
         .wa-radar-ring {
           position: absolute;
           inset: -4px;
-          border-radius: 9999px;
+          border-radius: 50%;
           border: 2px solid rgba(37, 211, 102, 0.65);
           pointer-events: none;
           animation: waRadarPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
@@ -160,116 +149,65 @@ const FloatingActions = () => {
 
         @keyframes waRadarPing {
           0% {
-            transform: scale(0.96);
+            transform: scale(0.95);
             opacity: 0.85;
           }
           70% {
-            transform: scale(1.15, 1.35);
+            transform: scale(1.28);
             opacity: 0;
           }
           100% {
-            transform: scale(1.22, 1.45);
+            transform: scale(1.36);
             opacity: 0;
           }
         }
 
-        /* The Main Pill Button */
-        .whatsapp-group-pill-btn {
+        /* Circular WhatsApp Logo Button */
+        .floating-whatsapp-btn {
           position: relative;
           z-index: 2;
-          display: inline-flex;
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+          display: flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 0.45rem 1.15rem 0.45rem 0.55rem;
-          background: linear-gradient(135deg, #25D366 0%, #159B32 50%, #006B2D 100%);
-          border-radius: 9999px;
+          justify-content: center;
           color: #ffffff;
           text-decoration: none;
-          box-shadow: 0 10px 28px -4px rgba(37, 211, 102, 0.48), 0 4px 12px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-          border: 1.5px solid rgba(255, 255, 255, 0.45);
+          box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45), 0 4px 12px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          border: 2px solid rgba(255, 255, 255, 0.35);
           transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
           cursor: pointer;
-          overflow: hidden;
           user-select: none;
         }
 
-        /* Shimmering Light Beam Across Pill */
-        .whatsapp-group-pill-btn::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 50%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.4) 50%,
-            transparent 100%
-          );
-          transform: skewX(-25deg);
-          animation: waShimmer 3.8s ease-in-out infinite;
-          pointer-events: none;
-        }
-
-        @keyframes waShimmer {
-          0% { left: -100%; }
-          30% { left: 200%; }
-          100% { left: 200%; }
-        }
-
-        .whatsapp-group-pill-btn:hover {
-          transform: translateY(-4px) scale(1.03);
-          box-shadow: 0 16px 36px -4px rgba(37, 211, 102, 0.65), 0 6px 16px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        .floating-whatsapp-btn:hover {
+          transform: scale(1.1) translateY(-2px);
+          box-shadow: 0 12px 28px rgba(37, 211, 102, 0.6), 0 6px 16px rgba(0, 0, 0, 0.22);
           color: #ffffff;
         }
 
-        .whatsapp-group-pill-btn:hover .wa-arrow-container {
-          transform: translateX(4px);
-          background-color: rgba(255, 255, 255, 0.3);
+        .floating-whatsapp-btn:active {
+          transform: scale(0.95);
         }
 
-        .whatsapp-group-pill-btn:active {
-          transform: scale(0.97);
-        }
-
-        /* Icon Holder with Notification Dot */
-        .wa-icon-container {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .wa-icon-circle {
-          width: 42px;
-          height: 42px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(4px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid rgba(255, 255, 255, 0.35);
-          box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3);
-        }
-
+        /* Notification Badge */
         .wa-notification-badge {
           position: absolute;
-          top: -3px;
-          right: -3px;
+          top: -2px;
+          right: -2px;
           background: #FF3B30;
           color: #ffffff;
-          font-size: 0.68rem;
+          font-size: 0.62rem;
           font-weight: 800;
-          min-width: 17px;
-          height: 17px;
+          min-width: 16px;
+          height: 16px;
           border-radius: 999px;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0 4px;
+          padding: 0 3px;
           border: 2px solid #25D366;
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
           animation: waBadgePulse 2s ease-in-out infinite;
@@ -280,73 +218,11 @@ const FloatingActions = () => {
           50% { transform: scale(1.15); }
         }
 
-        /* Text Content */
-        .wa-text-container {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-          line-height: 1.15;
-        }
-
-        .wa-tagline {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.35rem;
-          font-size: 0.66rem;
-          font-weight: 800;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          color: #FFC928;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-          margin-bottom: 0.15rem;
-        }
-
-        .wa-live-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background-color: #A8E600;
-          box-shadow: 0 0 6px #A8E600;
-          display: inline-block;
-          animation: waDotBlink 1.4s ease-in-out infinite;
-        }
-
-        @keyframes waDotBlink {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(0.7); }
-        }
-
-        .wa-headline {
-          font-size: 0.95rem;
-          font-weight: 800;
-          color: #ffffff;
-          letter-spacing: -0.01em;
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-          white-space: nowrap;
-          font-family: var(--font-family);
-        }
-
-        /* Right Arrow Container */
-        .wa-arrow-container {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.18);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #ffffff;
-          flex-shrink: 0;
-          transition: all 0.25s ease;
-          border: 1px solid rgba(255, 255, 255, 0.25);
-        }
-
         /* Responsive Mobile Styles */
         @media (max-width: 768px) {
           .floating-actions-container {
             bottom: calc(4.8rem + env(safe-area-inset-bottom, 0px) + 0.6rem);
-            right: 0.75rem;
+            right: 0.85rem;
             gap: 0.5rem;
           }
 
@@ -354,38 +230,15 @@ const FloatingActions = () => {
             display: none !important; /* Mobile bottom bar already has Call button */
           }
 
-          .whatsapp-group-pill-btn {
-            padding: 0.38rem 0.9rem 0.38rem 0.45rem;
-            gap: 0.55rem;
-            box-shadow: 0 8px 22px rgba(37, 211, 102, 0.42);
+          .floating-whatsapp-btn {
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.42);
           }
 
-          .wa-icon-circle {
-            width: 36px;
-            height: 36px;
-          }
-
-          .wa-tagline {
-            font-size: 0.6rem;
-            margin-bottom: 0.1rem;
-          }
-
-          .wa-headline {
-            font-size: 0.84rem;
-          }
-
-          .wa-arrow-container {
-            width: 24px;
-            height: 24px;
-          }
-        }
-
-        @media (max-width: 380px) {
-          .wa-tagline {
-            display: none;
-          }
-          .wa-headline {
-            font-size: 0.8rem;
+          .floating-whatsapp-btn svg {
+            width: 27px;
+            height: 27px;
           }
         }
       `}</style>
