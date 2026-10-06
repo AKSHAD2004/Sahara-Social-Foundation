@@ -101,21 +101,27 @@ function initCollection(collectionName, defaultData) {
   }
 }
 
+export const initialDataMap = {
+  users: initialUsers,
+  customers: initialCustomers,
+  leads: initialLeads,
+  followups: initialFollowups,
+  orders: initialOrders,
+  products: initialProducts,
+  commissionSlabs: initialCommissionSlabs,
+  commissionTransactions: initialCommissionTransactions,
+  commissionPayouts: initialPayouts,
+  supportTickets: initialSupportTickets,
+  auditLogs: initialAuditLogs,
+  settings: initialSettings,
+  notifications: []
+};
+
 // Initialize all data stores
 export function initDatabase() {
-  initCollection('users', initialUsers);
-  initCollection('customers', initialCustomers);
-  initCollection('leads', initialLeads);
-  initCollection('followups', initialFollowups);
-  initCollection('orders', initialOrders);
-  initCollection('products', initialProducts);
-  initCollection('commissionSlabs', initialCommissionSlabs);
-  initCollection('commissionTransactions', initialCommissionTransactions);
-  initCollection('commissionPayouts', initialPayouts);
-  initCollection('supportTickets', initialSupportTickets);
-  initCollection('auditLogs', initialAuditLogs);
-  initCollection('settings', initialSettings);
-  initCollection('notifications', []);
+  COLLECTIONS.forEach((col) => {
+    initCollection(col, initialDataMap[col] || []);
+  });
 
   // Connect Firestore real-time synchronization if configured (deferred after window load so browser tab finishes loading immediately)
   if (isFirebaseConfigured && firestoreDb) {
@@ -152,20 +158,51 @@ function setupFirestoreRealtimeSync() {
           if (snap.exists()) {
             state.settings = snap.data();
             saveCollection('settings', false);
+          } else {
+            // Settings doc not yet created in Cloud Firestore; upload default settings
+            const currentSettings = state.settings || initialSettings;
+            state.settings = currentSettings;
+            saveCollection('settings', false);
+            setDoc(settingsDocRef, { ...currentSettings, syncedAt: new Date().toISOString() }, { merge: true }).catch((err) => {
+              console.warn('Firestore auto-seed settings note:', err.message);
+            });
           }
         }, (err) => console.warn(`Firestore sync note for ${colName}:`, err.message));
       } else {
         const colRef = collection(firestoreDb, colName);
         firestoreUnsubscribers[colName] = onSnapshot(colRef, (snapshot) => {
           const remoteDocs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-          // If remote collection is empty for core catalogs, seed with initial catalog
-          if (remoteDocs.length === 0 && (colName === 'products' || colName === 'commissionSlabs' || colName === 'users')) {
-            if (!state[colName] || state[colName].length === 0) {
-              const defaults = colName === 'products' ? initialProducts : (colName === 'commissionSlabs' ? initialCommissionSlabs : initialUsers);
-              state[colName] = defaults;
-              saveCollection(colName, true);
+
+          if (remoteDocs.length === 0) {
+            // Check if explicitly cleared by admin action
+            const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
+            if (wasPurged) {
+              state[colName] = [];
+              saveCollection(colName, false);
+              return;
+            }
+
+            // Remote collection in Cloud Firestore is empty!
+            // NEVER wipe local or seed data with empty array!
+            const localItems = (Array.isArray(state[colName]) && state[colName].length > 0)
+              ? state[colName]
+              : (initialDataMap[colName] || []);
+
+            if (localItems.length > 0) {
+              state[colName] = localItems;
+              saveCollection(colName, false);
+
+              // Auto-seed to Cloud Firestore in the background so Firestore now contains the records
+              localItems.forEach((item) => {
+                const docId = String(item.id || `${colName}_${Date.now()}_${Math.floor(Math.random() * 1000)}`);
+                const docRef = doc(firestoreDb, colName, docId);
+                setDoc(docRef, { ...item, id: docId, syncedAt: new Date().toISOString() }, { merge: true }).catch((err) => {
+                  console.warn(`Firestore auto-seed doc note (${colName}/${docId}):`, err.message);
+                });
+              });
             }
           } else {
+            // Remote Firestore collection has documents: synchronize them
             state[colName] = remoteDocs;
             saveCollection(colName, false);
           }
@@ -334,7 +371,7 @@ export const dbService = {
     if (isFirebaseConfigured && firestoreDb) {
       try {
         const docRef = doc(firestoreDb, collectionName, id);
-        await updateDoc(docRef, updatedItem);
+        await setDoc(docRef, updatedItem, { merge: true });
       } catch (err) {
         console.warn(`Firestore Cloud update note (${collectionName}):`, err.message);
       }
@@ -683,6 +720,10 @@ export const dbService = {
 
   // Clear all operational CRM records (customers, leads, orders, transactions, payouts, tickets, logs)
   async clearAllOperationalData() {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('crm_explicitly_purged', 'true');
+    }
+
     const operationalCols = [
       'customers',
       'leads',
@@ -731,18 +772,22 @@ export const dbService = {
       throw new Error('Firebase credentials are not configured in .env. Please configure VITE_FIREBASE_PROJECT_ID.');
     }
 
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('crm_explicitly_purged');
+    }
+
     const dataMap = {
       users: (state.users && state.users.length > 0) ? state.users : initialUsers,
-      customers: state.customers || [],
-      leads: state.leads || [],
-      followups: state.followups || [],
-      orders: state.orders || [],
+      customers: (state.customers && state.customers.length > 0) ? state.customers : initialCustomers,
+      leads: (state.leads && state.leads.length > 0) ? state.leads : initialLeads,
+      followups: (state.followups && state.followups.length > 0) ? state.followups : initialFollowups,
+      orders: (state.orders && state.orders.length > 0) ? state.orders : initialOrders,
       products: (state.products && state.products.length > 0) ? state.products : initialProducts,
       commissionSlabs: (state.commissionSlabs && state.commissionSlabs.length > 0) ? state.commissionSlabs : initialCommissionSlabs,
-      commissionTransactions: state.commissionTransactions || [],
-      commissionPayouts: state.commissionPayouts || [],
-      supportTickets: state.supportTickets || [],
-      auditLogs: state.auditLogs || []
+      commissionTransactions: (state.commissionTransactions && state.commissionTransactions.length > 0) ? state.commissionTransactions : initialCommissionTransactions,
+      commissionPayouts: (state.commissionPayouts && state.commissionPayouts.length > 0) ? state.commissionPayouts : initialPayouts,
+      supportTickets: (state.supportTickets && state.supportTickets.length > 0) ? state.supportTickets : initialSupportTickets,
+      auditLogs: (state.auditLogs && state.auditLogs.length > 0) ? state.auditLogs : initialAuditLogs
     };
 
     let count = 0;
