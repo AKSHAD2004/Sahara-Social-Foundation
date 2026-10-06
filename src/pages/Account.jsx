@@ -197,7 +197,7 @@ const Account = () => {
   };
 
   // Existing Customer Login
-  const handleExistingCustomerLogin = (e) => {
+  const handleExistingCustomerLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
 
@@ -230,7 +230,7 @@ const Account = () => {
         pincode: foundCustomer.pincode || ''
       };
       loginCustomer(userPayload);
-      dbService.saveCustomerProfile(userPayload);
+      await dbService.saveCustomerProfile(userPayload);
     } else {
       // Check if user has past orders with this phone
       const allOrders = dbService.getAll('orders') || [];
@@ -251,7 +251,7 @@ const Account = () => {
           source: 'Website Buyer'
         };
         loginCustomer(userPayload);
-        dbService.saveCustomerProfile(userPayload);
+        await dbService.saveCustomerProfile(userPayload);
       } else {
         // Direct seamless login with mobile number - create new customer profile & store on Firebase!
         const userPayload = {
@@ -269,7 +269,7 @@ const Account = () => {
           source: 'Website Mobile Direct'
         };
         loginCustomer(userPayload);
-        dbService.saveCustomerProfile(userPayload);
+        await dbService.saveCustomerProfile(userPayload);
       }
     }
   };

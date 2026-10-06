@@ -40,14 +40,14 @@ const Contact = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
       const activeRef = localStorage.getItem('sahara_active_ref') || '';
       const users = dbService.getAll('users');
       const matchingAffiliate = users.find((u) => u.referralCode && u.referralCode.toUpperCase() === activeRef.toUpperCase());
 
-      dbService.add('leads', {
+      await dbService.add('leads', {
         leadId: `LEAD-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`,
         customerName: formData.name,
         mobile: formData.phone,

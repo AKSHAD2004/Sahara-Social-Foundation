@@ -36,7 +36,7 @@ const CustomerAuthModal = () => {
 
   if (!isCustomerAuthModalOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -128,7 +128,7 @@ const CustomerAuthModal = () => {
 
       // Log in the customer and synchronize profile with Cloud Firestore
       loginCustomer(customerPayload);
-      dbService.saveCustomerProfile(customerPayload);
+      await dbService.saveCustomerProfile(customerPayload);
     } catch (err) {
       console.error(err);
       setError(language === 'mr' ? 'लॉगिन करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.' : 'Login failed. Please try again.');

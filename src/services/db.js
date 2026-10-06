@@ -53,6 +53,29 @@ export const COLLECTIONS = [
   'notifications'
 ];
 
+// Recursively clean object/array to ensure no undefined values are sent to Cloud Firestore
+export function sanitizeForFirestore(data) {
+  if (data === undefined) {
+    return null;
+  }
+  if (data === null) {
+    return null;
+  }
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeForFirestore(item));
+  }
+  if (typeof data === 'object' && !(data instanceof Date)) {
+    const cleaned = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined && typeof value !== 'function') {
+        cleaned[key] = sanitizeForFirestore(value);
+      }
+    }
+    return cleaned;
+  }
+  return data;
+}
+
 // Initialize collection cache
 function initCollection(collectionName, defaultData) {
   try {
@@ -163,7 +186,7 @@ function setupFirestoreRealtimeSync() {
             const currentSettings = state.settings || initialSettings;
             state.settings = currentSettings;
             saveCollection('settings', false);
-            setDoc(settingsDocRef, { ...currentSettings, syncedAt: new Date().toISOString() }, { merge: true }).catch((err) => {
+            setDoc(settingsDocRef, sanitizeForFirestore({ ...currentSettings, syncedAt: new Date().toISOString() }), { merge: true }).catch((err) => {
               console.warn('Firestore auto-seed settings note:', err.message);
             });
           }
@@ -196,7 +219,8 @@ function setupFirestoreRealtimeSync() {
               localItems.forEach((item) => {
                 const docId = String(item.id || `${colName}_${Date.now()}_${Math.floor(Math.random() * 1000)}`);
                 const docRef = doc(firestoreDb, colName, docId);
-                setDoc(docRef, { ...item, id: docId, syncedAt: new Date().toISOString() }, { merge: true }).catch((err) => {
+                const cleanItem = sanitizeForFirestore({ ...item, id: docId, syncedAt: new Date().toISOString() });
+                setDoc(docRef, cleanItem, { merge: true }).catch((err) => {
                   console.warn(`Firestore auto-seed doc note (${colName}/${docId}):`, err.message);
                 });
               });
@@ -291,8 +315,10 @@ export const dbService = {
     // Sync to Cloud Firestore if connected
     if (isFirebaseConfigured && firestoreDb) {
       try {
-        const docRef = doc(firestoreDb, collectionName, newItem.id);
-        await setDoc(docRef, newItem, { merge: true });
+        const docRef = doc(firestoreDb, collectionName, String(newItem.id));
+        const cleanItem = sanitizeForFirestore(newItem);
+        await setDoc(docRef, cleanItem, { merge: true });
+        console.log(`[Firestore Sync] Created document ${collectionName}/${newItem.id}`);
       } catch (err) {
         console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
       }
@@ -333,7 +359,9 @@ export const dbService = {
       if (isFirebaseConfigured && firestoreDb) {
         try {
           const docRef = doc(firestoreDb, 'settings', 'company_settings');
-          await setDoc(docRef, state.settings, { merge: true });
+          const cleanSettings = sanitizeForFirestore(state.settings);
+          await setDoc(docRef, cleanSettings, { merge: true });
+          console.log('[Firestore Sync] Updated company_settings');
         } catch (err) {
           console.warn('Firestore Settings update note:', err.message);
         }
@@ -353,9 +381,18 @@ export const dbService = {
     }
 
     const items = state[collectionName] || [];
-    const index = items.findIndex((i) => i.id === id);
+    const index = items.findIndex((i) => String(i.id) === String(id));
     if (index === -1) {
-      throw new Error(`Record ${id} not found in ${collectionName}`);
+      if (isFirebaseConfigured && firestoreDb) {
+        try {
+          const docRef = doc(firestoreDb, collectionName, String(id));
+          const cleanUpdates = sanitizeForFirestore({ ...updates, id, updatedAt: new Date().toISOString() });
+          await setDoc(docRef, cleanUpdates, { merge: true });
+        } catch (err) {
+          console.warn(`Firestore Cloud update note (${collectionName}):`, err.message);
+        }
+      }
+      return updates;
     }
 
     const oldItem = { ...items[index] };
@@ -370,8 +407,10 @@ export const dbService = {
 
     if (isFirebaseConfigured && firestoreDb) {
       try {
-        const docRef = doc(firestoreDb, collectionName, id);
-        await setDoc(docRef, updatedItem, { merge: true });
+        const docRef = doc(firestoreDb, collectionName, String(id));
+        const cleanItem = sanitizeForFirestore(updatedItem);
+        await setDoc(docRef, cleanItem, { merge: true });
+        console.log(`[Firestore Sync] Updated document ${collectionName}/${id}`);
       } catch (err) {
         console.warn(`Firestore Cloud update note (${collectionName}):`, err.message);
       }
@@ -414,17 +453,17 @@ export const dbService = {
   // Delete item (with simultaneous Cloud Firestore deletion)
   async delete(collectionName, id, currentUser = null) {
     const items = state[collectionName] || [];
-    const itemToDelete = items.find((i) => i.id === id);
+    const itemToDelete = items.find((i) => String(i.id) === String(id));
 
-    state[collectionName] = items.filter((i) => i.id !== id);
+    state[collectionName] = items.filter((i) => String(i.id) !== String(id));
     saveCollection(collectionName);
 
     // Delete directly from Firebase Cloud Firestore
     if (isFirebaseConfigured && firestoreDb) {
       try {
-        const docRef = doc(firestoreDb, collectionName, id);
+        const docRef = doc(firestoreDb, collectionName, String(id));
         await deleteDoc(docRef);
-        console.log(`[Firestore] Deleted document ${collectionName}/${id}`);
+        console.log(`[Firestore Sync] Deleted document ${collectionName}/${id}`);
       } catch (err) {
         console.warn(`[Firestore] Delete error (${collectionName}/${id}):`, err.message);
       }
@@ -457,7 +496,7 @@ export const dbService = {
         // Fetch existing remote docs to remove deleted items from Firestore
         const colRef = collection(firestoreDb, collectionName);
         const existingRemoteSnap = await getDocs(colRef);
-        const currentItemIds = new Set(items.map((i) => i.id));
+        const currentItemIds = new Set(items.map((i) => String(i.id)));
 
         const batch = writeBatch(firestoreDb);
 
@@ -470,12 +509,14 @@ export const dbService = {
 
         // Set or update current items
         items.forEach((item) => {
-          const docId = item.id || `item_${Date.now()}_${Math.random()}`;
+          const docId = String(item.id || `item_${Date.now()}_${Math.random()}`);
           const docRef = doc(firestoreDb, collectionName, docId);
-          batch.set(docRef, { ...item, id: docId, updatedAt: new Date().toISOString() }, { merge: true });
+          const cleanItem = sanitizeForFirestore({ ...item, id: docId, updatedAt: new Date().toISOString() });
+          batch.set(docRef, cleanItem, { merge: true });
         });
 
         await batch.commit();
+        console.log(`[Firestore Sync] Batch synced collection ${collectionName} (${items.length} records)`);
       } catch (err) {
         console.warn(`Firestore batch update note (${collectionName}):`, err.message);
       }
@@ -539,9 +580,10 @@ export const dbService = {
     // Direct Cloud Firestore write guarantee
     if (isFirebaseConfigured && firestoreDb) {
       try {
-        const docRef = doc(firestoreDb, 'customers', payload.id);
-        await setDoc(docRef, { ...payload, syncedToFirebase: true }, { merge: true });
-        console.log(`[Firebase] Profile successfully stored on Cloud Firestore: customers/${payload.id}`);
+        const docRef = doc(firestoreDb, 'customers', String(payload.id));
+        const cleanPayload = sanitizeForFirestore({ ...payload, syncedToFirebase: true });
+        await setDoc(docRef, cleanPayload, { merge: true });
+        console.log(`[Firestore Sync] Profile stored on Cloud Firestore: customers/${payload.id}`);
       } catch (err) {
         console.warn(`[Firebase] Firestore customer profile write note:`, err.message);
       }
@@ -684,6 +726,15 @@ export const dbService = {
     if (!state.auditLogs) state.auditLogs = [];
     state.auditLogs.unshift(log);
     saveCollection('auditLogs');
+
+    if (isFirebaseConfigured && firestoreDb) {
+      try {
+        const docRef = doc(firestoreDb, 'auditLogs', String(log.id));
+        setDoc(docRef, sanitizeForFirestore(log), { merge: true }).catch((err) => {
+          console.warn('Firestore logAudit note:', err.message);
+        });
+      } catch (e) {}
+    }
   },
 
   // Notification Helper
@@ -701,6 +752,15 @@ export const dbService = {
     if (!state.notifications) state.notifications = [];
     state.notifications.unshift(notif);
     saveCollection('notifications');
+
+    if (isFirebaseConfigured && firestoreDb) {
+      try {
+        const docRef = doc(firestoreDb, 'notifications', String(notif.id));
+        setDoc(docRef, sanitizeForFirestore(notif), { merge: true }).catch((err) => {
+          console.warn('Firestore addNotification note:', err.message);
+        });
+      } catch (e) {}
+    }
   },
 
   // Mark all notifications read
@@ -708,6 +768,13 @@ export const dbService = {
     if (state.notifications) {
       state.notifications.forEach((n) => (n.read = true));
       saveCollection('notifications');
+
+      if (isFirebaseConfigured && firestoreDb) {
+        state.notifications.forEach((n) => {
+          const docRef = doc(firestoreDb, 'notifications', String(n.id));
+          setDoc(docRef, { read: true }, { merge: true }).catch(() => {});
+        });
+      }
     }
   },
 

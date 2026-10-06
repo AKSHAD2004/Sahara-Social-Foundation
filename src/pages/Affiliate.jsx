@@ -28,13 +28,13 @@ const Affiliate = () => {
   const [submitted, setSubmitted] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     if (regData.name && regData.phone) {
       const code = `SAHARA-${regData.name.split(' ')[0].toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
       setGeneratedCode(code);
 
-      dbService.add('users', {
+      await dbService.add('users', {
         name: regData.name,
         phone: regData.phone,
         email: regData.email || `${regData.phone}@saharaaffiliate.com`,

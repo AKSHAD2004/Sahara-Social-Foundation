@@ -118,7 +118,7 @@ const Checkout = () => {
     return true;
   };
 
-  const completeOrderPlacement = (orderId, paymentDetails = {}) => {
+  const completeOrderPlacement = async (orderId, paymentDetails = {}) => {
     const activeRefCode = localStorage.getItem('sahara_active_ref') || '';
     const users = dbService.getAll('users');
     const matchingAffiliate = users.find((u) => u.referralCode && u.referralCode.toUpperCase() === activeRefCode.toUpperCase());
@@ -145,7 +145,7 @@ const Checkout = () => {
       notes: formData.healthNotes ? `Health Notes: ${formData.healthNotes}` : 'Website Checkout Order'
     };
 
-    dbService.saveCustomerProfile(customerPayload);
+    await dbService.saveCustomerProfile(customerPayload);
 
     // 2. Format products for CRM
     const productsList = cartItems.map((item) => ({
@@ -161,7 +161,7 @@ const Checkout = () => {
     const balanceDue = paymentDetails.balanceDue ?? (isCodOrder ? Math.max(0, grandTotal - advancePaid) : 0);
     const isPaidOnlineFull = !isCodOrder;
 
-    // 3. Create Order in CRM
+    // 3. Create Order in CRM & Firebase
     const crmOrder = {
       orderId,
       customerId: custId,
@@ -193,7 +193,7 @@ const Checkout = () => {
       gatewayResponse: paymentDetails || null
     };
 
-    dbService.add('orders', crmOrder);
+    await dbService.add('orders', crmOrder);
 
     // 4. Add CRM Notification
     dbService.addNotification({
