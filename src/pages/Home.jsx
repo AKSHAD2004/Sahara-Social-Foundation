@@ -20,6 +20,7 @@ import ServiceCard from '../components/ServiceCard';
 import ProductCard from '../components/ProductCard';
 import TestimonialCard from '../components/TestimonialCard';
 import HorizontalVideoCard from '../components/HorizontalVideoCard';
+import ResultVideosSection from '../components/ResultVideosSection';
 import ConsultationModal from '../components/ConsultationModal';
 
 import { 
@@ -381,62 +382,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Official Beneficiary & Campaign Videos from samarthkolhapur.com */}
-      <section className="section home-videos-section" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF' }}>
-        <div className="container">
-          <div className="section-header" style={{ marginBottom: '2rem' }}>
-            <div className="section-badge">
-              <Play size={15} />
-              <span>{language === 'mr' ? 'अधिकृत व्हिडिओ निकाल' : 'Official Result Videos'}</span>
-            </div>
-            <h2>
-              {language === 'mr' ? 'सहारा सोशल फाऊंडेशन - प्रत्यक्ष निकाल व्हिडिओ' : 'Official Patient Recovery & Beneficiary Videos'}
-            </h2>
-            <p>
-              {language === 'mr'
-                ? 'samarthkolhapur.com वरील अधिकृत व्हिडिओ: Antox D & T चा प्रत्यक्ष वापर आणि शुगरमुक्ती अभियानाचे अनुभव.'
-                : 'Direct recorded testimonials from samarthkolhapur.com: Antox D & T patient results and Sugar-Free Mission.'}
-            </p>
-          </div>
-
-          {/* Featured Primary Videos Grid (Matching Image 2 from samarthkolhapur.com) */}
-          <div 
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))',
-              gap: '1.75rem',
-              marginBottom: '2rem'
-            }}
-          >
-            {horizontalVideosData.slice(0, 2).map((video) => (
-              <HorizontalVideoCard key={video.id} video={video} />
-            ))}
-          </div>
-
-          {/* "More Videos" Action Button */}
-          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-            <Link 
-              to="/videos" 
-              className="btn btn-primary btn-lg" 
-              style={{ 
-                gap: '0.75rem', 
-                padding: '0.95rem 2.8rem', 
-                borderRadius: '9999px',
-                fontSize: '1.05rem',
-                fontWeight: 700,
-                boxShadow: '0 8px 24px rgba(0, 107, 45, 0.22)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Play size={20} fill="currentColor" />
-              <span>{language === 'mr' ? 'More Videos (अधिक व्हिडिओ पहा)' : 'More Videos'}</span>
-              <ArrowRight size={20} />
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Result Videos Section Adapted Directly from samarthkolhapur.com */}
+      <ResultVideosSection />
 
       {/* Trust & Scientific Ayurvedic Highlights */}
       <TrustSection />

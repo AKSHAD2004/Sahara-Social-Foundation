@@ -138,37 +138,37 @@ const Footer = () => {
               <ul className="footer-links-list">
                 <li>
                   <Link to="/" className="footer-link">
-                    → {language === 'mr' ? 'मुख्यपृष्ठ (Home)' : 'Home'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'मुख्यपृष्ठ' : 'Home'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/about" className="footer-link">
-                    → {language === 'mr' ? 'संस्थेविषयी (About)' : 'About Us'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'संस्थेविषयी' : 'About Us'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/services" className="footer-link">
-                    → {language === 'mr' ? 'आरोग्य सेवा' : 'Services'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'आरोग्य सेवा' : 'Services'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/shop" className="footer-link">
-                    → {language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/photos" className="footer-link">
-                    → {language === 'mr' ? 'छायाचित्रे' : 'Photo Gallery'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'छायाचित्रे' : 'Photo Gallery'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/videos" className="footer-link">
-                    → {language === 'mr' ? 'रुग्णांचे व्हिडिओ' : 'Result Videos'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'निकाल व्हिडिओ' : 'Result Videos'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/study-report" className="footer-link">
-                    → {language === 'mr' ? 'क्लिनिकल रिपोर्ट' : 'Clinical Report'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'क्लिनिकल रिपोर्ट' : 'Clinical Report'}
                   </Link>
                 </li>
               </ul>
@@ -182,32 +182,32 @@ const Footer = () => {
               <ul className="footer-links-list">
                 <li>
                   <Link to="/services" className="footer-link">
-                    • {language === 'mr' ? 'मधुमेह मुक्त भारत' : 'Madhumeh Mukt'}
+                    <span className="link-bullet">• </span>{language === 'mr' ? 'मधुमेह मुक्त भारत' : 'Madhumeh Mukt'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/services" className="footer-link">
-                    • {language === 'mr' ? 'व्यसनमुक्त भारत' : 'Vyasanmukt'}
+                    <span className="link-bullet">• </span>{language === 'mr' ? 'व्यसनमुक्त भारत' : 'Vyasanmukt'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/account" className="footer-link">
-                    • {language === 'mr' ? 'माझे खाते' : 'My Account'}
+                    <span className="link-bullet">• </span>{language === 'mr' ? 'माझे खाते' : 'My Account'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/affiliate" className="footer-link">
-                    • {language === 'mr' ? 'समाज सेवक' : 'Affiliate'}
+                    <span className="link-bullet">• </span>{language === 'mr' ? 'समाज सेवक' : 'Affiliate'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/privacy-policy" className="footer-link">
-                    • {language === 'mr' ? 'गोपनीयता' : 'Privacy'}
+                    <span className="link-bullet">• </span>{language === 'mr' ? 'गोपनीयता' : 'Privacy'}
                   </Link>
                 </li>
                 <li>
                   <Link to="/refund-policy" className="footer-link">
-                    • {language === 'mr' ? 'परतावा' : 'Refunds'}
+                    <span className="link-bullet">• </span>{language === 'mr' ? 'परतावा' : 'Refunds'}
                   </Link>
                 </li>
               </ul>
@@ -220,36 +220,59 @@ const Footer = () => {
               {language === 'mr' ? 'कार्यालय संपर्क' : 'Contact Us'}
             </h4>
             
-            <div className="footer-contact-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.84rem' }}>
+            <div className="footer-contact-list">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem' }}>
                 <MapPin size={17} style={{ color: '#34d399', flexShrink: 0, marginTop: '2px' }} />
-                <span>
+                <span className="desktop-only-address">
                   {language === 'mr' ? organizationInfo.contact.address.fullAddressMr : organizationInfo.contact.address.fullAddressEn}
+                </span>
+                <span className="mobile-only-address">
+                  {language === 'mr' ? 'शाहूपुरी, कोल्हापूर – ४१६००१' : 'Shahupuri, Kolhapur – 416001'}
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                <Phone size={17} style={{ color: '#34d399', flexShrink: 0 }} />
-                <div>
-                  <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#ffffff', fontWeight: 700 }}>
-                    {organizationInfo.contact.primaryPhone}
-                  </a>
-                  <span style={{ margin: '0 0.4rem', opacity: 0.6 }}>/</span>
-                  <a href={`tel:${organizationInfo.contact.secondaryPhone}`} style={{ color: '#ffffff', fontWeight: 700 }}>
-                    {organizationInfo.contact.secondaryPhone}
+              {/* Desktop Contact Details */}
+              <div className="desktop-contact-items">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.65rem' }}>
+                  <Phone size={17} style={{ color: '#34d399', flexShrink: 0 }} />
+                  <div>
+                    <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#ffffff', fontWeight: 700 }}>
+                      {organizationInfo.contact.primaryPhone}
+                    </a>
+                    <span style={{ margin: '0 0.4rem', opacity: 0.6 }}>/</span>
+                    <a href={`tel:${organizationInfo.contact.secondaryPhone}`} style={{ color: '#ffffff', fontWeight: 700 }}>
+                      {organizationInfo.contact.secondaryPhone}
+                    </a>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <WhatsAppIcon size={17} color="#34d399" />
+                  <a
+                    href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#ffffff', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    WhatsApp: +91 {organizationInfo.contact.primaryPhone}
                   </a>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                <WhatsAppIcon size={17} color="#34d399" />
+              {/* Mobile Quick Action Buttons (Simple, clean tap targets) */}
+              <div className="mobile-contact-actions">
+                <a href={`tel:${organizationInfo.contact.primaryPhone}`} className="mobile-footer-action-btn btn-call">
+                  <Phone size={13} />
+                  <span>{organizationInfo.contact.primaryPhone}</span>
+                </a>
                 <a
                   href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#ffffff', fontWeight: 600, textDecoration: 'underline' }}
+                  className="mobile-footer-action-btn btn-wa"
                 >
-                  WhatsApp: +91 {organizationInfo.contact.primaryPhone}
+                  <WhatsAppIcon size={14} color="#ffffff" />
+                  <span>WhatsApp</span>
                 </a>
               </div>
 
@@ -399,118 +422,199 @@ const Footer = () => {
           line-height: 1.4;
         }
 
+        .mobile-only-address {
+          display: none;
+        }
+
+        .mobile-contact-actions {
+          display: none;
+        }
+
+        .desktop-only-address {
+          display: inline;
+        }
+
+        .desktop-contact-items {
+          display: block;
+        }
+
         /* =======================================================
            COMPACT FOOTER FOR MOBILE DEVICES (< 768px)
-           Significantly reduces vertical space and scrolling
+           Dramatically reduces vertical height and simplifies layout
            ======================================================= */
         @media (max-width: 768px) {
           .site-footer {
-            padding-top: 1.25rem !important;
-            padding-bottom: 1.25rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 5.5rem !important; /* Clean clearance above fixed MobileBottomBar */
+            border-top-width: 3px !important;
           }
 
+          /* Hide bulky notice boxes and long paragraphs on mobile */
           .footer-notice-box {
-            margin-bottom: 1rem !important;
-            padding: 0.6rem 0.8rem !important;
-            gap: 0.5rem !important;
-            border-radius: 10px !important;
-          }
-
-          .footer-notice-icon-box {
-            padding: 0.25rem !important;
-          }
-
-          .footer-notice-title {
-            font-size: 0.82rem !important;
-            margin-bottom: 0.15rem !important;
-          }
-
-          .footer-notice-text {
-            font-size: 0.76rem !important;
-            line-height: 1.35 !important;
-          }
-
-          .footer-main-grid {
-            margin-bottom: 1rem !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 1rem !important;
-          }
-
-          .footer-brand-header {
-            margin-bottom: 0.45rem !important;
+            display: none !important;
           }
 
           .footer-brand-desc {
-            font-size: 0.78rem !important;
-            line-height: 1.42 !important;
-            margin-bottom: 0.65rem !important;
-          }
-
-          .footer-social-row {
-            margin-bottom: 0.65rem !important;
-            gap: 0.45rem !important;
-          }
-
-          .footer-social-btn {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 8px !important;
+            display: none !important;
           }
 
           .footer-assoc-center {
-            font-size: 0.74rem !important;
-            line-height: 1.35 !important;
-          }
-
-          /* Two-column side-by-side links on mobile (halves link height!) */
-          .footer-links-wrapper {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            gap: 0.75rem 1rem !important;
-            width: 100% !important;
-          }
-
-          .footer-col-title {
-            font-size: 0.84rem !important;
-            margin-bottom: 0.35rem !important;
-            padding-bottom: 0.15rem !important;
-          }
-
-          .footer-links-list {
-            gap: 0.28rem !important;
-            font-size: 0.76rem !important;
-          }
-
-          .footer-contact-list {
-            gap: 0.4rem !important;
-            font-size: 0.76rem !important;
+            display: none !important;
           }
 
           .footer-visiting-note {
-            padding: 0.35rem 0.6rem !important;
-            font-size: 0.7rem !important;
-            border-radius: 6px !important;
+            display: none !important;
           }
 
-          .footer-bottom-bar {
-            padding-top: 0.65rem !important;
-            font-size: 0.7rem !important;
+          .link-bullet {
+            display: none !important;
+          }
+
+          .desktop-only-address {
+            display: none !important;
+          }
+
+          .desktop-contact-items {
+            display: none !important;
+          }
+
+          .mobile-only-address {
+            display: inline !important;
+            font-size: 0.76rem !important;
+            color: #d1fae5 !important;
+          }
+
+          /* Simple, clean brand header */
+          .footer-main-grid {
+            margin-bottom: 0.65rem !important;
+            display: flex !important;
             flex-direction: column !important;
-            text-align: center !important;
+            gap: 0.65rem !important;
+          }
+
+          .footer-brand-header {
+            margin-bottom: 0.25rem !important;
+            gap: 0.5rem !important;
+          }
+
+          .footer-brand-header h3 {
+            font-size: 0.92rem !important;
+          }
+
+          .footer-brand-header span {
+            font-size: 0.7rem !important;
+          }
+
+          .footer-social-row {
+            margin-bottom: 0.15rem !important;
             gap: 0.4rem !important;
           }
 
-          .footer-bottom-links {
-            gap: 0.75rem !important;
+          .footer-social-btn {
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 6px !important;
+          }
+
+          /* Compact 2-column side-by-side links grid */
+          .footer-links-wrapper {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem 0.85rem !important;
+            width: 100% !important;
+            padding: 0.45rem 0 !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+          }
+
+          .footer-col-title {
+            font-size: 0.78rem !important;
+            font-weight: 700 !important;
+            color: #FFC928 !important;
+            margin-bottom: 0.25rem !important;
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
+          }
+
+          .footer-links-list {
+            gap: 0.18rem !important;
+            font-size: 0.72rem !important;
+          }
+
+          .footer-link {
+            color: #a7f3d0 !important;
+            padding: 1px 0 !important;
+          }
+
+          /* Compact contact section */
+          .footer-contact-col {
+            padding-top: 0.15rem !important;
+          }
+
+          .footer-contact-col .footer-col-title {
+            display: none !important;
+          }
+
+          .footer-contact-list {
+            gap: 0.35rem !important;
+          }
+
+          /* Clean 2-button tap action bar on mobile */
+          .mobile-contact-actions {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.45rem !important;
+            margin-top: 0.35rem !important;
+          }
+
+          .mobile-footer-action-btn {
+            padding: 0.42rem 0.6rem !important;
+            border-radius: 8px !important;
+            font-size: 0.74rem !important;
+            font-weight: 700 !important;
+            display: flex !important;
+            align-items: center !important;
             justify-content: center !important;
+            gap: 0.35rem !important;
+            text-decoration: none !important;
+            box-sizing: border-box !important;
+          }
+
+          .mobile-footer-action-btn.btn-call {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          }
+
+          .mobile-footer-action-btn.btn-wa {
+            background: #159B32 !important;
+            color: #ffffff !important;
+            border: 1px solid #34d399 !important;
+          }
+
+          /* Sleek bottom copyright and legal */
+          .footer-bottom-bar {
+            padding-top: 0.45rem !important;
+            font-size: 0.65rem !important;
+            flex-direction: column !important;
+            text-align: center !important;
+            gap: 0.3rem !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+          }
+
+          .footer-bottom-links {
+            gap: 0.6rem !important;
+            justify-content: center !important;
+            font-size: 0.65rem !important;
           }
 
           .footer-medical-disclaimer {
-            margin-top: 0.45rem !important;
-            padding-top: 0.35rem !important;
-            font-size: 0.65rem !important;
-            line-height: 1.32 !important;
+            margin-top: 0.3rem !important;
+            padding-top: 0.25rem !important;
+            font-size: 0.6rem !important;
+            line-height: 1.28 !important;
+            opacity: 0.8 !important;
+            border-top: none !important;
           }
         }
       `}</style>

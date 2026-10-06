@@ -135,10 +135,11 @@ const HorizontalVideoCard = ({ video }) => {
         <video
           ref={videoRef}
           src={`${video.videoUrl}#t=0.1`}
-          preload="metadata"
+          preload="auto"
           playsInline
           controls
           onLoadedMetadata={handleLoadedMetadata}
+          onLoadedData={handleLoadedMetadata}
           style={{
             width: '100%',
             height: '100%',
