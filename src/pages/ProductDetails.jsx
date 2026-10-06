@@ -40,7 +40,21 @@ const ProductDetails = () => {
   const [editSuccessMsg, setEditSuccessMsg] = useState('');
   const [productsList, setProductsList] = useState(() => {
     const fromDb = dbService.getAll('products');
-    return (Array.isArray(fromDb) && fromDb.length > 0) ? fromDb : productsData;
+    const base = productsData;
+    if (Array.isArray(fromDb) && fromDb.length > 0) {
+      const dbMap = new Map(fromDb.map((p) => [String(p.id), p]));
+      const merged = base.map((p) => {
+        const custom = dbMap.get(String(p.id)) || fromDb.find((f) => f.sku && f.sku === p.sku);
+        return custom ? { ...p, ...custom } : p;
+      });
+      fromDb.forEach((p) => {
+        if (!base.some((b) => String(b.id) === String(p.id) || (b.sku && b.sku === p.sku))) {
+          merged.push(p);
+        }
+      });
+      return merged;
+    }
+    return base;
   });
 
   useEffect(() => {
@@ -50,7 +64,18 @@ const ProductDetails = () => {
   useEffect(() => {
     const unsub = dbService.subscribe('products', (dbProducts) => {
       if (Array.isArray(dbProducts) && dbProducts.length > 0) {
-        setProductsList(dbProducts);
+        const base = productsData;
+        const dbMap = new Map(dbProducts.map((p) => [String(p.id), p]));
+        const merged = base.map((p) => {
+          const custom = dbMap.get(String(p.id)) || dbProducts.find((f) => f.sku && f.sku === p.sku);
+          return custom ? { ...p, ...custom } : p;
+        });
+        dbProducts.forEach((p) => {
+          if (!base.some((b) => String(b.id) === String(p.id) || (b.sku && b.sku === p.sku))) {
+            merged.push(p);
+          }
+        });
+        setProductsList(merged);
       }
     });
     return unsub;

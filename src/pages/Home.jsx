@@ -35,6 +35,7 @@ import {
   faqsData
 } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
+import { dbService } from '../services/db';
 
 // 9. Testimonials Smooth Auto-sliding Carousel Component
 const TestimonialsCarousel = () => {
@@ -343,6 +344,33 @@ const GalleryStaggeredPreview = () => {
 const Home = () => {
   const { language } = useLanguage();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState(() => {
+    const fromDb = dbService.getAll('products');
+    const base = productsData;
+    if (Array.isArray(fromDb) && fromDb.length > 0) {
+      const dbMap = new Map(fromDb.map((p) => [String(p.id), p]));
+      return base.map((p) => {
+        const custom = dbMap.get(String(p.id)) || fromDb.find((f) => f.sku && f.sku === p.sku);
+        return custom ? { ...p, ...custom } : p;
+      });
+    }
+    return base;
+  });
+
+  useEffect(() => {
+    const unsub = dbService.subscribe('products', (dbProducts) => {
+      if (Array.isArray(dbProducts) && dbProducts.length > 0) {
+        const base = productsData;
+        const dbMap = new Map(dbProducts.map((p) => [String(p.id), p]));
+        const merged = base.map((p) => {
+          const custom = dbMap.get(String(p.id)) || dbProducts.find((f) => f.sku && f.sku === p.sku);
+          return custom ? { ...p, ...custom } : p;
+        });
+        setFeaturedProducts(merged);
+      }
+    });
+    return unsub;
+  }, []);
 
   return (
     <div className="home-page">
@@ -368,7 +396,7 @@ const Home = () => {
           </div>
 
           <div className="products-grid" style={{ marginBottom: '2.5rem' }}>
-            {productsData.slice(0, 9).map((product) => (
+            {featuredProducts.slice(0, 9).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

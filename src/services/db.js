@@ -85,23 +85,28 @@ function initCollection(collectionName, defaultData) {
       const parsed = JSON.parse(stored);
       // For products collection, ensure all official products exist with updated official pricing (3200 for combos, 1600 for singles)
       if (collectionName === 'products' && Array.isArray(defaultData)) {
-        const defaultMap = new Map(defaultData.map((p) => [p.id, p]));
         const existingList = Array.isArray(parsed) ? parsed : [];
         const merged = defaultData.map((defProd) => {
-          const found = existingList.find((p) => p.id === defProd.id);
+          const found = existingList.find((p) => p.id === defProd.id || (p.sku && p.sku === defProd.sku));
           if (found) {
-            // Keep stock or custom description if present, but always enforce updated official pricing and names
             return {
+              ...defProd,
               ...found,
-              name: defProd.name,
-              price: defProd.price,
-              sellingPrice: defProd.sellingPrice,
-              mrp: defProd.mrp,
-              isCombo: defProd.isCombo,
-              image: defProd.image || found.image
+              name: found.name || defProd.name,
+              price: Number(found.price !== undefined ? found.price : defProd.price),
+              sellingPrice: Number(found.sellingPrice !== undefined ? found.sellingPrice : (found.price || defProd.sellingPrice)),
+              mrp: Number(found.mrp !== undefined ? found.mrp : defProd.mrp),
+              isCombo: defProd.isCombo !== undefined ? defProd.isCombo : found.isCombo,
+              image: found.image || defProd.image
             };
           }
           return defProd;
+        });
+        // Also keep any extra custom products from existingList
+        existingList.forEach((p) => {
+          if (!defaultData.some((dp) => dp.id === p.id || (dp.sku && dp.sku === p.sku))) {
+            merged.push(p);
+          }
         });
         state[collectionName] = merged;
         localStorage.setItem(key, JSON.stringify(merged));
@@ -196,7 +201,86 @@ function setupFirestoreRealtimeSync() {
         firestoreUnsubscribers[colName] = onSnapshot(colRef, (snapshot) => {
           const remoteDocs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-          if (remoteDocs.length === 0) {
+          if (colName === 'products') {
+            // Core catalog guarantee: ALL official products must ALWAYS be present, never disappear!
+            const defaultProds = initialProducts;
+            const remoteMap = new Map(remoteDocs.map((p) => [String(p.id), p]));
+
+            // Overlay remote updates onto initial catalog
+            const fullCatalog = defaultProds.map((defP) => {
+              const remote = remoteMap.get(String(defP.id)) || remoteDocs.find((r) => r.sku && r.sku === defP.sku);
+              if (remote) {
+                return {
+                  ...defP,
+                  ...remote,
+                  id: defP.id,
+                  price: Number(remote.price !== undefined ? remote.price : defP.price),
+                  sellingPrice: Number(remote.sellingPrice !== undefined ? remote.sellingPrice : (remote.price || defP.sellingPrice)),
+                  mrp: Number(remote.mrp !== undefined ? remote.mrp : defP.mrp),
+                  stock: remote.stock !== undefined ? Number(remote.stock) : defP.stock,
+                  image: remote.image || defP.image
+                };
+              }
+              return defP;
+            });
+
+            // Append any additional custom products added in Firestore
+            remoteDocs.forEach((r) => {
+              if (!defaultProds.some((dp) => String(dp.id) === String(r.id) || (dp.sku && dp.sku === r.sku))) {
+                fullCatalog.push(r);
+              }
+            });
+
+            state.products = fullCatalog;
+            saveCollection('products', false);
+
+            // Auto-upload any missing catalog products to Cloud Firestore so Firestore is complete
+            if (remoteDocs.length < fullCatalog.length) {
+              fullCatalog.forEach((p) => {
+                if (!remoteMap.has(String(p.id))) {
+                  const docRef = doc(firestoreDb, 'products', String(p.id));
+                  const cleanP = sanitizeForFirestore({ ...p, id: p.id, syncedAt: new Date().toISOString() });
+                  setDoc(docRef, cleanP, { merge: true }).catch((err) => {
+                    console.warn(`Firestore auto-seed missing product (${p.id}):`, err.message);
+                  });
+                }
+              });
+            }
+          } else if (colName === 'commissionSlabs') {
+            const defaultSlabs = initialCommissionSlabs;
+            const remoteMap = new Map(remoteDocs.map((s) => [String(s.id), s]));
+            const fullSlabs = defaultSlabs.map((defS) => remoteMap.get(String(defS.id)) || defS);
+            remoteDocs.forEach((r) => {
+              if (!defaultSlabs.some((ds) => String(ds.id) === String(r.id))) fullSlabs.push(r);
+            });
+            state.commissionSlabs = fullSlabs;
+            saveCollection('commissionSlabs', false);
+            if (remoteDocs.length < fullSlabs.length) {
+              fullSlabs.forEach((s) => {
+                if (!remoteMap.has(String(s.id))) {
+                  const docRef = doc(firestoreDb, 'commissionSlabs', String(s.id));
+                  setDoc(docRef, sanitizeForFirestore(s), { merge: true }).catch(() => {});
+                }
+              });
+            }
+          } else if (colName === 'users') {
+            const defaultUsers = initialUsers;
+            const remoteMap = new Map(remoteDocs.map((u) => [String(u.id), u]));
+            const fullUsers = defaultUsers.map((defU) => remoteMap.get(String(defU.id)) || defU);
+            remoteDocs.forEach((r) => {
+              if (!defaultUsers.some((du) => String(du.id) === String(r.id))) fullUsers.push(r);
+            });
+            state.users = fullUsers;
+            saveCollection('users', false);
+            if (remoteDocs.length < fullUsers.length) {
+              fullUsers.forEach((u) => {
+                if (!remoteMap.has(String(u.id))) {
+                  const docRef = doc(firestoreDb, 'users', String(u.id));
+                  setDoc(docRef, sanitizeForFirestore(u), { merge: true }).catch(() => {});
+                }
+              });
+            }
+          } else if (remoteDocs.length === 0) {
             // Check if explicitly cleared by admin action
             const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
             if (wasPurged) {

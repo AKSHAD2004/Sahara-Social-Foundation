@@ -57,7 +57,21 @@ const Account = () => {
   // Products catalog & edit management
   const [products, setProducts] = useState(() => {
     const fromDb = dbService.getAll('products');
-    return (Array.isArray(fromDb) && fromDb.length > 0) ? fromDb : productsData;
+    const base = productsData;
+    if (Array.isArray(fromDb) && fromDb.length > 0) {
+      const dbMap = new Map(fromDb.map((p) => [String(p.id), p]));
+      const merged = base.map((p) => {
+        const custom = dbMap.get(String(p.id)) || fromDb.find((f) => f.sku && f.sku === p.sku);
+        return custom ? { ...p, ...custom } : p;
+      });
+      fromDb.forEach((p) => {
+        if (!base.some((b) => String(b.id) === String(p.id) || (b.sku && b.sku === p.sku))) {
+          merged.push(p);
+        }
+      });
+      return merged;
+    }
+    return base;
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [showEditProductModal, setShowEditProductModal] = useState(false);
@@ -76,7 +90,18 @@ const Account = () => {
   useEffect(() => {
     const unsub = dbService.subscribe('products', (prods) => {
       if (Array.isArray(prods) && prods.length > 0) {
-        setProducts(prods);
+        const base = productsData;
+        const dbMap = new Map(prods.map((p) => [String(p.id), p]));
+        const merged = base.map((p) => {
+          const custom = dbMap.get(String(p.id)) || prods.find((f) => f.sku && f.sku === p.sku);
+          return custom ? { ...p, ...custom } : p;
+        });
+        prods.forEach((p) => {
+          if (!base.some((b) => String(b.id) === String(p.id) || (b.sku && b.sku === p.sku))) {
+            merged.push(p);
+          }
+        });
+        setProducts(merged);
       }
     });
     return unsub;
