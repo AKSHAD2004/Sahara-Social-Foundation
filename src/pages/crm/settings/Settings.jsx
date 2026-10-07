@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Settings as SettingsIcon, Save, RefreshCw, CheckCircle2, 
   Building, Phone, Globe, Shield, Percent, AlertTriangle, 
-  Cloud, Database, HardDrive, Check, UploadCloud, Download, Server, Trash2
+  Cloud, Database, HardDrive, Check, UploadCloud, Download, Server, Trash2,
+  CreditCard, Key
 } from 'lucide-react';
 import { dbService, COLLECTIONS } from '../../../services/db';
 import { isFirebaseConfigured, testFirebaseConnection, firebaseConfig } from '../../../services/firebase';
@@ -17,6 +18,9 @@ export default function Settings() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (settings.razorpayKeyId) {
+      localStorage.setItem('sahara_razorpay_key_id', settings.razorpayKeyId.trim());
+    }
     await dbService.update('settings', 'company_settings', settings);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -377,6 +381,37 @@ export default function Settings() {
                   value={settings.payoutDayOfMonth || 30}
                   onChange={(e) => setSettings({ ...settings, payoutDayOfMonth: Number(e.target.value) })}
                 />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Razorpay Online Payment Gateway Configuration */}
+        <div className="crm-card" style={{ marginBottom: '1.5rem', borderColor: '#bbf7d0', background: '#f8fdf9' }}>
+          <div className="crm-card-header" style={{ borderColor: '#bbf7d0' }}>
+            <h3 className="crm-card-title" style={{ color: '#006B2D' }}>
+              <CreditCard size={18} style={{ color: '#006B2D' }} /> Razorpay Online Gateway Settings
+            </h3>
+          </div>
+          <div className="crm-card-body">
+            <p style={{ fontSize: '0.85rem', color: '#4b5563', margin: '0 0 1.25rem' }}>
+              Configured Razorpay Key ID used for processing customer online payments and COD token advances.
+            </p>
+            <div className="crm-form-grid">
+              <div className="crm-form-group">
+                <label className="crm-form-label">Razorpay Key ID (rzp_test_... or rzp_live_...)</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    className="crm-input"
+                    placeholder="rzp_test_TStMSRZCVUy6Aw"
+                    value={settings.razorpayKeyId || ''}
+                    onChange={(e) => setSettings({ ...settings, razorpayKeyId: e.target.value })}
+                  />
+                </div>
+                <span style={{ fontSize: '0.78rem', color: '#6b7280', display: 'block', marginTop: '0.35rem' }}>
+                  Default active test key: <code>rzp_test_TStMSRZCVUy6Aw</code>. Remember to also add this as <code>VITE_RAZORPAY_KEY_ID</code> in Vercel Environment Variables.
+                </span>
               </div>
             </div>
           </div>

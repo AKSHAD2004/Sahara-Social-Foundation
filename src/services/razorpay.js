@@ -84,7 +84,7 @@ export async function initializeRazorpayPayment({
     currency: 'INR',
     name: 'Sahara Social Foundation',
     description: description || `Nutraceutical Order #${orderId}`,
-    image: '/sahara-logo.jpg',
+    image: typeof window !== 'undefined' ? `${window.location.origin}/sahara-logo.jpg` : 'https://samarthkolhapur.com/sahara-logo.jpg',
     notes: {
       orderId: orderId,
       customerCity: customer.city || '',
