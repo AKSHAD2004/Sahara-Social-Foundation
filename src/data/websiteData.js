@@ -1,5 +1,4 @@
 // Centralized Data Store for Sahara Social Foundation (सहारा सोशल फाऊंडेशन)
-// Source of truth: samarthkolhapur.com
 
 export const organizationInfo = {
   name: "Sahara Social Foundation",
@@ -15,7 +14,7 @@ export const organizationInfo = {
     primaryPhone: "8421154090",
     secondaryPhone: "8421154090",
     whatsappNumber: "918421154090",
-    email: "contact@samarthkolhapur.com",
+    email: "saharasocialfoundation@gmail.com",
     address: {
       shop: "Shop No. B-13, Royal Prestige Commercial Complex",
       shopMr: "शॉप नं. बी-१३, रॉयल प्रेस्टीज व्यापारी संकुल",
