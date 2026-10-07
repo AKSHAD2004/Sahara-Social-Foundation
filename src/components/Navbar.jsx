@@ -526,8 +526,10 @@ const Navbar = () => {
         .theme-header__top-navbar {
           background: linear-gradient(90deg, #04200e 0%, #006B2D 50%, #08481c 100%);
           color: #ffffff;
-          padding: 8px 0 32px;
+          padding: 6px 0 26px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          position: relative;
+          z-index: 10;
           max-height: 80px;
           opacity: 1;
           overflow: hidden;
@@ -684,7 +686,9 @@ const Navbar = () => {
 
         /* 2. Main Header (Floating Island Card - Rock-solid flexible & auto-adjusting) */
         .theme-header__main {
-          margin-top: -24px;
+          position: relative;
+          z-index: 20;
+          margin-top: -18px;
           padding-top: 0;
           padding-bottom: 0;
           transition: margin-top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
@@ -704,15 +708,17 @@ const Navbar = () => {
         .theme-header-card {
           background-color: #ffffff;
           border-radius: 9999px;
-          box-shadow: 0 10px 30px rgba(0, 107, 45, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
-          border: 1px solid #E1E9DF;
+          box-shadow: 0 10px 30px rgba(0, 107, 45, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04);
+          border: 1.5px solid #E1E9DF;
           padding: 8px clamp(12px, 1.6vw, 24px);
-          min-height: clamp(54px, 5.2vw, 68px);
+          min-height: clamp(56px, 5.2vw, 68px);
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: clamp(8px, 1.2vw, 20px);
           width: 100%;
+          position: relative;
+          z-index: 25;
           transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -760,10 +766,10 @@ const Navbar = () => {
         }
 
         .brand-title {
-          font-size: clamp(0.78rem, 1.1vw, 1.10rem);
+          font-size: clamp(0.78rem, 1.1vw, 1.05rem);
           font-weight: 800;
           color: #006B2D;
-          line-height: 1.15;
+          line-height: 1.25;
           text-transform: uppercase;
           letter-spacing: 0.01em;
           white-space: nowrap;

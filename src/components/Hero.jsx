@@ -305,7 +305,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           position: relative;
           background: linear-gradient(180deg, #F3F8F1 0%, #FFFFFF 55%, #EDF6EB 100%);
           color: #17251B;
-          padding: 1.25rem 0 1.5rem 0;
+          padding: clamp(1.25rem, 2.2vw, 1.85rem) 0 1.5rem 0;
           overflow: hidden;
           font-family: var(--font-family);
           border-bottom: 1px solid #E1E9DF;
@@ -331,7 +331,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
         .hero-slideshow-wrapper {
           width: 100%;
           max-width: 1040px;
-          margin: 0 auto 1.15rem auto;
+          margin: 0.25rem auto 1.25rem auto;
           display: flex;
           justify-content: center;
           padding: 0 0.5rem;

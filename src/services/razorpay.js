@@ -40,7 +40,7 @@ export function getRazorpayKeyId() {
   return (
     import.meta.env.VITE_RAZORPAY_KEY_ID ||
     localStorage.getItem('sahara_razorpay_key_id') ||
-    'rzp_test_1DP5mmOlF5G5ag' // Default standard test sandbox key for initial testing
+    'rzp_test_TStMSRZCVUy6Aw' // Your active Razorpay Test Key ID
   );
 }
 
@@ -74,6 +74,9 @@ export async function initializeRazorpayPayment({
 
   const keyId = getRazorpayKeyId();
   const amountInPaise = Math.round(Number(amountInRupees) * 100);
+  const cleanPhone = (customer.phone || customer.mobileNumber || '').replace(/\D/g, '').slice(-10);
+
+  console.log(`[Razorpay Checkout] Opening payment with Key ID: ${keyId}, Amount: ₹${amountInRupees} (${amountInPaise} paise)`);
 
   const options = {
     key: keyId,
@@ -81,7 +84,7 @@ export async function initializeRazorpayPayment({
     currency: 'INR',
     name: 'Sahara Social Foundation',
     description: description || `Nutraceutical Order #${orderId}`,
-    image: '/favicon.ico',
+    image: '/sahara-logo.jpg',
     notes: {
       orderId: orderId,
       customerCity: customer.city || '',
@@ -89,12 +92,12 @@ export async function initializeRazorpayPayment({
     },
     prefill: {
       name: customer.fullName || customer.name || '',
-      contact: customer.phone || customer.mobileNumber || '',
+      contact: cleanPhone || '',
       email: customer.email || ''
     },
     theme: {
-      color: '#065f46',
-      backdrop_color: 'rgba(6, 78, 59, 0.7)'
+      color: '#006B2D',
+      backdrop_color: 'rgba(0, 107, 45, 0.7)'
     },
     modal: {
       ondismiss: () => {
