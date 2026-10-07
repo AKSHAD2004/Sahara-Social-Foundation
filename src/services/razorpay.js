@@ -37,11 +37,20 @@ export function loadRazorpayScript() {
  * Retrieves the configured Razorpay Key ID from Vite env or fallback.
  */
 export function getRazorpayKeyId() {
-  return (
-    import.meta.env.VITE_RAZORPAY_KEY_ID ||
-    localStorage.getItem('sahara_razorpay_key_id') ||
-    'rzp_test_TStMSRZCVUy6Aw' // Your active Razorpay Test Key ID
-  );
+  const envKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
+  const localKey = typeof window !== 'undefined' ? localStorage.getItem('sahara_razorpay_key_id') : null;
+
+  // Clean raw key of accidental quotes, carriage returns, or whitespace
+  const clean = (k) => String(k || '').replace(/['"`\r\n\s]/g, '').trim();
+
+  const resolved = clean(envKey) || clean(localKey) || 'rzp_test_TStMSRZCVUy6Aw';
+
+  // If the env variable on Vercel was holding the old expired dummy key, force active key!
+  if (resolved === 'rzp_test_1DP5mmOlF5G5ag' || !resolved.startsWith('rzp_')) {
+    return 'rzp_test_TStMSRZCVUy6Aw';
+  }
+
+  return resolved;
 }
 
 /**

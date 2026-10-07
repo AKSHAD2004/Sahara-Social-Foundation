@@ -228,14 +228,17 @@ function setupFirestoreRealtimeSync() {
             state.products = fullCatalog;
             saveCollection('products', false);
 
-            // Auto-upload any missing catalog products to Cloud Firestore so Firestore is complete
-            if (remoteDocs.length < fullCatalog.length) {
+            // Auto-upload missing catalog products only if allowed (suppress permission warnings)
+            if (remoteDocs.length < fullCatalog.length && !window.__firestoreSeedDisabled) {
               fullCatalog.forEach((p) => {
                 if (!remoteMap.has(String(p.id))) {
                   const docRef = doc(firestoreDb, 'products', String(p.id));
                   const cleanP = sanitizeForFirestore({ ...p, id: p.id, syncedAt: new Date().toISOString() });
                   setDoc(docRef, cleanP, { merge: true }).catch((err) => {
-                    console.warn(`Firestore auto-seed missing product (${p.id}):`, err.message);
+                    // Suppress permission-denied noise for anonymous visitors
+                    if (err?.code === 'permission-denied' || err?.message?.includes('permissions')) {
+                      window.__firestoreSeedDisabled = true;
+                    }
                   });
                 }
               });
