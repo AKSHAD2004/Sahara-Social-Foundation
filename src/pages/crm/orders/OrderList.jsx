@@ -60,19 +60,25 @@ export default function OrderList() {
     };
   }, []);
 
-  const filteredOrders = orders.filter((o) => {
-    const q = searchTerm.toLowerCase();
-    const matchSearch =
-      !searchTerm ||
-      o.orderId.toLowerCase().includes(q) ||
-      o.customerName.toLowerCase().includes(q) ||
-      (o.customerMobile && o.customerMobile.includes(q));
+  const filteredOrders = orders
+    .filter((o) => {
+      const q = searchTerm.toLowerCase();
+      const matchSearch =
+        !searchTerm ||
+        (o.orderId && o.orderId.toLowerCase().includes(q)) ||
+        (o.customerName && o.customerName.toLowerCase().includes(q)) ||
+        (o.customerMobile && String(o.customerMobile).includes(q));
 
-    const matchOrderStatus = orderStatusFilter === 'ALL' || o.orderStatus === orderStatusFilter;
-    const matchPaymentStatus = paymentStatusFilter === 'ALL' || o.paymentStatus === paymentStatusFilter;
+      const matchOrderStatus = orderStatusFilter === 'ALL' || o.orderStatus === orderStatusFilter;
+      const matchPaymentStatus = paymentStatusFilter === 'ALL' || o.paymentStatus === paymentStatusFilter;
 
-    return matchSearch && matchOrderStatus && matchPaymentStatus;
-  });
+      return matchSearch && matchOrderStatus && matchPaymentStatus;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.orderDate || a.createdAt || 0).getTime();
+      const dateB = new Date(b.orderDate || b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
 
   const handleCreateOrder = async (e) => {
     e.preventDefault();
@@ -82,9 +88,11 @@ export default function OrderList() {
     const prodPrice = prod ? prod.price : 2800;
     const subtotal = prodPrice * Number(newOrderForm.quantity);
     const grandTotal = subtotal;
+    const genOrderId = `ORD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const newOrder = await dbService.add('orders', {
-      orderId: `ORD-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      id: genOrderId,
+      orderId: genOrderId,
       customerId: newOrderForm.customerId || `cust_${Date.now()}`,
       customerName: newOrderForm.customerName,
       customerMobile: newOrderForm.customerMobile,

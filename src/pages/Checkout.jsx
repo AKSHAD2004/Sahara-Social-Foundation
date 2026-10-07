@@ -145,7 +145,11 @@ const Checkout = () => {
       notes: formData.healthNotes ? `Health Notes: ${formData.healthNotes}` : 'Website Checkout Order'
     };
 
-    await dbService.saveCustomerProfile(customerPayload);
+    try {
+      await dbService.saveCustomerProfile(customerPayload);
+    } catch (custErr) {
+      console.warn('Customer profile sync note:', custErr);
+    }
 
     // 2. Format products for CRM
     const productsList = cartItems.map((item) => ({
@@ -163,6 +167,7 @@ const Checkout = () => {
 
     // 3. Create Order in CRM & Firebase
     const crmOrder = {
+      id: orderId,
       orderId,
       customerId: custId,
       customerName: formData.fullName,
@@ -193,17 +198,25 @@ const Checkout = () => {
       gatewayResponse: paymentDetails || null
     };
 
-    await dbService.add('orders', crmOrder);
+    try {
+      await dbService.add('orders', crmOrder);
+    } catch (orderErr) {
+      console.warn('CRM order sync note:', orderErr);
+    }
 
     // 4. Add CRM Notification
-    dbService.addNotification({
-      title: isPaidOnlineFull ? 'New Paid Website Order' : 'New COD Order (₹200 Advance Paid)',
-      message: isPaidOnlineFull
-        ? `Order #${orderId} for ₹${grandTotal} fully paid online by ${formData.fullName}.`
-        : `Order #${orderId} for ₹${grandTotal} (₹${advancePaid} paid via Razorpay, ₹${balanceDue} COD balance) by ${formData.fullName}.`,
-      type: 'order',
-      link: '/crm/orders'
-    });
+    try {
+      dbService.addNotification({
+        title: isPaidOnlineFull ? 'New Paid Website Order' : 'New COD Order (₹200 Advance Paid)',
+        message: isPaidOnlineFull
+          ? `Order #${orderId} for ₹${grandTotal} fully paid online by ${formData.fullName}.`
+          : `Order #${orderId} for ₹${grandTotal} (₹${advancePaid} paid via Razorpay, ₹${balanceDue} COD balance) by ${formData.fullName}.`,
+        type: 'order',
+        link: '/crm/orders'
+      });
+    } catch (notifErr) {
+      console.warn('CRM notification note:', notifErr);
+    }
 
     const orderDetails = {
       orderId,

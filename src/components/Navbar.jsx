@@ -42,10 +42,19 @@ const Navbar = () => {
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          const scrolled = window.scrollY > 20;
-          if (scrolled !== lastScrolled) {
-            lastScrolled = scrolled;
-            setIsScrolled(scrolled);
+          const currentY = window.scrollY || window.pageYOffset || 0;
+          // Hysteresis threshold to completely eliminate jitter / stuck loop:
+          // Activates scrolled mode once past 60px down; only resets when scrolled back up past 20px
+          let nextScrolled = lastScrolled;
+          if (!lastScrolled && currentY > 60) {
+            nextScrolled = true;
+          } else if (lastScrolled && currentY < 20) {
+            nextScrolled = false;
+          }
+
+          if (nextScrolled !== lastScrolled) {
+            lastScrolled = nextScrolled;
+            setIsScrolled(nextScrolled);
           }
           ticking = false;
         });
@@ -247,11 +256,9 @@ const Navbar = () => {
             </div>
           </div>
         </header>
-      </div>
 
-      {/* Mobile Sub-Navbar Moving Announcement Marquee (Hidden on scroll, only shown when at top) */}
-      {!isScrolled && (
-        <div className="mobile-subnav-ticker" aria-label="Announcement ticker">
+        {/* Mobile Sub-Navbar Moving Announcement Marquee (Always mounted, smoothly transitions height on scroll) */}
+        <div className={`mobile-subnav-ticker ${isScrolled ? 'mobile-subnav-ticker--scrolled' : ''}`} aria-label="Announcement ticker">
           <div className="mobile-ticker-track">
             {/* Group 1 */}
             <div className="mobile-ticker-group">
@@ -334,7 +341,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Mobile Slide-Over Menu (Yess Infotech mobile-menu-wrapper & panel) */}
       <div 
@@ -521,12 +528,26 @@ const Navbar = () => {
           color: #ffffff;
           padding: 8px 0 32px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          transition: all 0.25s ease;
+          max-height: 80px;
+          opacity: 1;
+          overflow: hidden;
+          transform: translateY(0);
+          transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.25s ease,
+                      padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: max-height, opacity, transform;
         }
 
-        /* Remove upper green section and ticker when scrolled */
+        /* Smooth collapse of upper green section when scrolled on desktop */
         .theme-header-wrapper--scrolled .theme-header__top-navbar {
-          display: none !important;
+          max-height: 0;
+          opacity: 0;
+          padding-top: 0;
+          padding-bottom: 0;
+          transform: translateY(-100%);
+          border-bottom-color: transparent;
+          pointer-events: none;
         }
 
         .theme-header-wrapper--scrolled .theme-header__main {
@@ -664,7 +685,10 @@ const Navbar = () => {
         /* 2. Main Header (Floating Island Card - Rock-solid flexible & auto-adjusting) */
         .theme-header__main {
           margin-top: -24px;
-          transition: all 0.25s ease;
+          padding-top: 0;
+          padding-bottom: 0;
+          transition: margin-top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                      padding 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           width: 100%;
         }
 
@@ -689,14 +713,16 @@ const Navbar = () => {
           justify-content: space-between;
           gap: clamp(8px, 1.2vw, 20px);
           width: 100%;
-          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        .theme-header-wrapper--scrolled .theme-header-card,
         .theme-header__main--scrolled .theme-header-card {
-          box-shadow: 0 10px 32px rgba(0, 107, 45, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 12px 34px rgba(0, 107, 45, 0.14), 0 3px 10px rgba(0, 0, 0, 0.05);
           background-color: rgba(255, 255, 255, 0.98);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-color: rgba(0, 107, 45, 0.18);
         }
 
         /* Brand Column on Left - Auto-Adjusting & Responsive */
@@ -1003,7 +1029,29 @@ const Navbar = () => {
           position: relative;
           z-index: 10;
           padding: 6px 0;
+          max-height: 48px;
+          opacity: 1;
+          transform: translateY(0);
+          transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                      opacity 0.25s ease,
+                      padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                      margin 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
           touch-action: pan-y;
+          will-change: max-height, opacity, transform;
+        }
+
+        .theme-header-wrapper--scrolled .mobile-subnav-ticker,
+        .mobile-subnav-ticker--scrolled {
+          max-height: 0 !important;
+          opacity: 0 !important;
+          padding-top: 0 !important;
+          padding-bottom: 0 !important;
+          margin-top: 0 !important;
+          border-top-color: transparent !important;
+          border-bottom-color: transparent !important;
+          transform: translateY(-8px);
+          pointer-events: none;
         }
 
         .mobile-ticker-track {

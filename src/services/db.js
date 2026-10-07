@@ -151,16 +151,10 @@ export function initDatabase() {
     initCollection(col, initialDataMap[col] || []);
   });
 
-  // Connect Firestore real-time synchronization if configured (deferred after window load so browser tab finishes loading immediately)
+  // Connect Firestore real-time synchronization immediately if configured
   if (isFirebaseConfigured && firestoreDb) {
     if (typeof window !== 'undefined') {
-      if (document.readyState === 'complete') {
-        setTimeout(setupFirestoreRealtimeSync, 200);
-      } else {
-        window.addEventListener('load', () => {
-          setTimeout(setupFirestoreRealtimeSync, 200);
-        }, { once: true });
-      }
+      setTimeout(setupFirestoreRealtimeSync, 50);
     } else {
       setupFirestoreRealtimeSync();
     }
@@ -311,7 +305,21 @@ function setupFirestoreRealtimeSync() {
             }
           } else {
             // Remote Firestore collection has documents: synchronize them
-            state[colName] = remoteDocs;
+            const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
+            const localItems = Array.isArray(state[colName]) ? state[colName] : [];
+            const mergedDocs = [...remoteDocs];
+
+            // If there are local records not yet present in remoteDocs, preserve and upload them
+            localItems.forEach((localItem) => {
+              const localKey = String(localItem.id || localItem.orderId || '');
+              if (localKey && !remoteMap.has(localKey)) {
+                mergedDocs.unshift(localItem);
+                const docRef = doc(firestoreDb, colName, localKey);
+                setDoc(docRef, sanitizeForFirestore({ ...localItem, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+              }
+            });
+
+            state[colName] = mergedDocs;
             saveCollection(colName, false);
           }
         }, (err) => console.warn(`Firestore sync note for ${colName}:`, err.message));
