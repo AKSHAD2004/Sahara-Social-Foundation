@@ -112,8 +112,8 @@ const Navbar = () => {
                     <ShieldCheck size={14} className="topbar-badge-icon" />
                     <span>
                       {language === 'mr' 
-                        ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ७७४५०६६७०७' 
-                        : 'Diabetes Free India & Vyasan Free India Campaign • Helpline: 7745066707'}
+                        ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ८४२११५४०९०' 
+                        : 'Diabetes Free India & Vyasan Free India Campaign • Helpline: 8421154090'}
                     </span>
                   </span>
                   <span className="topbar-mission-text">
@@ -130,8 +130,8 @@ const Navbar = () => {
                     <ShieldCheck size={14} className="topbar-badge-icon" />
                     <span>
                       {language === 'mr' 
-                        ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ७७४५०६६७०७' 
-                        : 'Diabetes Free India & Vyasan Free India Campaign • Helpline: 7745066707'}
+                        ? 'मधुमेह मुक्त भारत अभियान • व्यसनमुक्त भारत अभियान • मोफत समुपदेशन: ८४२११५४०९०' 
+                        : 'Diabetes Free India & Vyasan Free India Campaign • Helpline: 8421154090'}
                     </span>
                   </span>
                   <span className="topbar-mission-text" aria-hidden="true">
@@ -268,8 +268,8 @@ const Navbar = () => {
                 <Phone size={12} className="mobile-ticker-icon" />
                 <span>
                   {language === 'mr' 
-                    ? 'हेल्पलाइन: ७७४५०६६७०७' 
-                    : 'Helpline: 7745066707'}
+                    ? 'हेल्पलाइन: ८४२११५४०९०' 
+                    : 'Helpline: 8421154090'}
                 </span>
               </a>
               <span className="mobile-ticker-dot">•</span>
@@ -308,8 +308,8 @@ const Navbar = () => {
                 <Phone size={12} className="mobile-ticker-icon" />
                 <span>
                   {language === 'mr' 
-                    ? 'हेल्पलाइन: ७७४५०६६७०७' 
-                    : 'Helpline: 7745066707'}
+                    ? 'हेल्पलाइन: ८४२११५४०९०' 
+                    : 'Helpline: 8421154090'}
                 </span>
               </a>
               <span className="mobile-ticker-dot">•</span>

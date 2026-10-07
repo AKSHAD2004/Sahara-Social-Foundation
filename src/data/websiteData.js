@@ -12,9 +12,9 @@ export const organizationInfo = {
   favicon: "/sahara-logo.jpg",
   
   contact: {
-    primaryPhone: "7745066707",
-    secondaryPhone: "7745066707",
-    whatsappNumber: "917745066707",
+    primaryPhone: "8421154090",
+    secondaryPhone: "8421154090",
+    whatsappNumber: "918421154090",
     email: "contact@samarthkolhapur.com",
     address: {
       shop: "Shop No. B-13, Royal Prestige Commercial Complex",
@@ -31,10 +31,10 @@ export const organizationInfo = {
       fullAddressEn: "Shop No. B-13, Royal Prestige, Near Vardhan Hospital, Near Parikh Pool, Railway Gate-Janata Bazar Road, E-Ward, Shahupuri, Kolhapur – 416001, Maharashtra, India",
       fullAddressMr: "शॉप नं. बी-१३, रॉयल प्रेस्टीज, वर्धन हॉस्पिटल जवळ, परिख पूला जवळ, रेल्वे फाटक - जनता बाजार रोड, ई-वॉर्ड, शाहूपुरी, कोल्हापूर – ४१६००१, महाराष्ट्र"
     },
-    visitingNote: "Note: It is recommended to call 7745066707 before visiting the office.",
-    visitingNoteMr: "महत्त्वाची टीप: कार्यालयात भेट देण्यापूर्वी कृपया ७७४५०६६७०७ या नंबरवर फोन करून यावे.",
-    orderGuidelineNote: "If you have ordered any formula from this website by clicking 'Order Now', please call 7745066707 upon receiving the package for personalized guidance on dosage and dietary regimen (Pathya).",
-    orderGuidelineNoteMr: "तुम्ही जर या वेबसाईट वरून फॉर्म्युला ऑर्डर केला असेल, वरील (Order Now) या बटन वर क्लिक करून, तर फॉर्म्युला मिळाल्यावर ७७४५०६६७०७ या नंबर वर कॉल करा (मार्गदर्शन आणि पथ्याबाबत सविस्तर माहितीसाठी)."
+    visitingNote: "Note: It is recommended to call 8421154090 before visiting the office.",
+    visitingNoteMr: "महत्त्वाची टीप: कार्यालयात भेट देण्यापूर्वी कृपया ८४२११५४०९० या नंबरवर फोन करून यावे.",
+    orderGuidelineNote: "If you have ordered any formula from this website by clicking 'Order Now', please call 8421154090 upon receiving the package for personalized guidance on dosage and dietary regimen (Pathya).",
+    orderGuidelineNoteMr: "तुम्ही जर या वेबसाईट वरून फॉर्म्युला ऑर्डर केला असेल, वरील (Order Now) या बटन वर क्लिक करून, तर फॉर्म्युला मिळाल्यावर ८४२११५४०९० या नंबर वर कॉल करा (मार्गदर्शन आणि पथ्याबाबत सविस्तर माहितीसाठी)."
   },
 
   about: {
@@ -236,15 +236,15 @@ export const productsData = [
     shortDescMr: "स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नियंत्रणात ठेवणारा शुद्ध आयुर्वेदिक फॉर्म्युला (३०० मिली).",
     description: "Specialized Nutraceutical liquid formulation for blood glucose balance and pancreatic beta-cell rejuvenation.",
     descriptionEn: "Nutrifeel ANTOX-D is backed by clinical research and traditional Nutraceutical wisdom. It works at cellular glucose receptors, supports insulin sensitivity, cleanses metabolic pathways, and protects vital organs from diabetic complications.",
-    descriptionMr: "ANTOX-D हे रक्तातील साखर नियंत्रित ठेवण्यासाठी व स्वादुपिंडातील इन्सुलिन निर्मितीला चालना देण्यासाठी सर्वोत्तम आयुर्वेदिक औषध आहे. पार्सल मिळाल्यावर पथ्यासाठी ७७४५०६६७०७ वर कॉल करा.",
+    descriptionMr: "ANTOX-D हे रक्तातील साखर नियंत्रित ठेवण्यासाठी व स्वादुपिंडातील इन्सुलिन निर्मितीला चालना देण्यासाठी सर्वोत्तम आयुर्वेदिक औषध आहे. पार्सल मिळाल्यावर पथ्यासाठी ८४२११५४०९० वर कॉल करा.",
     features: [
       { en: "1 Single Bottle (300 ml Liquid)", mr: "१ बाटली (३०० मिली लिक्विड)" },
       { en: "Natural pancreatic beta-cell rejuvenation", mr: "स्वादुपिंडातील बीटा पेशींचे पुनरुज्जीवन" },
       { en: "Supports healthy HbA1c & fasting sugar levels", mr: "रक्तातील साखर व HbA1c नियंत्रित ठेवण्यास मदत" },
       { en: "Reduces fatigue, frequent thirst and urination", mr: "अशक्तपणा, वारंवार तहान व लघवीची समस्या कमी करते" }
     ],
-    dosageEn: "10-15ml with warm water twice daily before meals. Call 7745066707 for personalized dietary guidelines.",
-    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. पथ्यासाठी ७७४५०६६७०७ वर संपर्क करा."
+    dosageEn: "10-15ml with warm water twice daily before meals. Call 8421154090 for personalized dietary guidelines.",
+    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. पथ्यासाठी ८४२११५४०९० वर संपर्क करा."
   },
 
   // ==========================================
@@ -335,8 +335,8 @@ export const productsData = [
       { en: "100% Herbal, non-habit forming & safe", mr: "१००% नैसर्गिक, सवय न लागणारे व सुरक्षित" },
       { en: "Reduces anxiety and oral addiction reflexes", mr: "मानसिक अस्वस्थता व वारंवार तंबाखू खाण्याची सवय मोडते" }
     ],
-    dosageEn: "Spray 1-2 puffs in the mouth whenever craving arises. Call 7745066707.",
-    dosageMr: "व्यसनाची तलफ येईल तेव्हा तोंडात १-२ स्प्रे मारावेत. संपर्क: ७७४५०६६७०७."
+    dosageEn: "Spray 1-2 puffs in the mouth whenever craving arises. Call 8421154090.",
+    dosageMr: "व्यसनाची तलफ येईल तेव्हा तोंडात १-२ स्प्रे मारावेत. संपर्क: ८४२११५४०९०."
   },
 
   // ==========================================
@@ -382,8 +382,8 @@ export const productsData = [
       { en: "Combats physical exhaustion & boosts stamina", mr: "शारीरिक थकवा घालवून स्टॅमिना वाढवते" },
       { en: "Calms stress and supports nervous resilience", mr: "मानसिक ताण कमी करून चैतन्य टिकवून ठेवते" }
     ],
-    dosageEn: "10-15ml twice daily before meals with lukewarm water. Call 7745066707.",
-    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ७७४५०६६७०७."
+    dosageEn: "10-15ml twice daily before meals with lukewarm water. Call 8421154090.",
+    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ८४२११५४०९०."
   },
 
   // ==========================================
@@ -415,7 +415,7 @@ export const productsData = [
     shortDescMr: "स्वादुपिंडाची कार्यक्षमता वाढवून रक्तातील साखर नियंत्रणात ठेवणारा १ ANTOX-D व १ ANTOX-T चहा कॉम्बो किट.",
     description: "Complete dual-action combo: 1 ANTOX-D liquid bottle + 1 ANTOX-T detox tea box for optimal blood glucose balance.",
     descriptionEn: "ANTOX-D and ANTOX-T dual combo helps improve cellular insulin sensitivity, purifies blood, reduces chronic diabetic fatigue, and promotes natural metabolic wellness.",
-    descriptionMr: "ANTOX-D आणि ANTOX-T किट आयुर्वेदातील निवडक औषधी वनस्पतींपासून तयार केले आहे. पार्सल मिळाल्यावर पथ्यासाठी ७७४५०६६७०७ वर कॉल करा.",
+    descriptionMr: "ANTOX-D आणि ANTOX-T किट आयुर्वेदातील निवडक औषधी वनस्पतींपासून तयार केले आहे. पार्सल मिळाल्यावर पथ्यासाठी ८४२११५४०९० वर कॉल करा.",
     features: [
       { en: "Complete dual-action combo: 1 ANTOX-D (300ml) + 1 ANTOX-T (60 Tea Bags)", mr: "संपूर्ण २ औषधी कॉम्बो: १ ANTOX-D (३०० मिली) + १ ANTOX-T (६० टी बॅग्स)" },
       { en: "Regulates blood glucose & supports insulin sensitivity", mr: "साखर नैसर्गिकरीत्या नियंत्रणात ठेवण्यास मदत" },
@@ -460,8 +460,8 @@ export const productsData = [
       { en: "Comprehensive 60-day deep metabolic support", mr: "६० दिवसांचा संपूर्ण व प्रभावी आयुर्वेदिक कोर्स" },
       { en: "Free telephone diet & regimen guidance on delivery", mr: "पार्सल मिळाल्यावर फोनवर मोफत वैयक्तिक पथ्य मार्गदर्शन" }
     ],
-    dosageEn: "ANTOX-D: 10-15ml twice daily before meals; ANTOX-T: 1 cup morning & evening. Call 7745066707.",
-    dosageMr: "ANTOX-D: जेवणापूर्वी १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप काढा. फोन: ७७४५०६६७०७."
+    dosageEn: "ANTOX-D: 10-15ml twice daily before meals; ANTOX-T: 1 cup morning & evening. Call 8421154090.",
+    dosageMr: "ANTOX-D: जेवणापूर्वी १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप काढा. फोन: ८४२११५४०९०."
   },
 
   // ==========================================
@@ -493,7 +493,7 @@ export const productsData = [
     shortDescMr: "तंबाखू, गुटखा, सिगारेट व दारूची तलफ शांत करणारा हर्बल स्प्रे आणि शरीरातील विषारी घटक बाहेर काढणारा चहा कॉम्बो किट.",
     description: "Dual de-addiction recovery combo: SPRAY-B-AI NICO craving controller + ANTOX-T systemic detox tea to eliminate tobacco & alcohol urges.",
     descriptionEn: "Combines sublingual SPRAY-B-AI NICO for fast neurological craving relief with ANTOX-T herbal tea to flush nicotine and alcohol residues from the bloodstream.",
-    descriptionMr: "जिभेवर स्प्रे मारताच तीव्र तलफ कमी होते आणि हर्बल चहा शरीरातील निकोटीन व विषारी घटक बाहेर काढतो. फोन: ७७४५०६६७०७.",
+    descriptionMr: "जिभेवर स्प्रे मारताच तीव्र तलफ कमी होते आणि हर्बल चहा शरीरातील निकोटीन व विषारी घटक बाहेर काढतो. फोन: ८४२११५४०९०.",
     features: [
       { en: "Dual combo: SPRAY-B-AI NICO spray + ANTOX-T detox tea", mr: "दुहेरी किट: SPRAY-B-AI NICO स्प्रे + ANTOX-T चहा" },
       { en: "Immediate oral & sublingual craving relief", mr: "तोंडात स्प्रे मारताच तलफ शांत होते" },
@@ -569,8 +569,8 @@ export const productsData = [
       { en: "Supports healthy heart muscle function & blood pressure", mr: "हृदयाची कार्यक्षमता व रक्तदाब समतोल" },
       { en: "Flushes toxic buildup from liver & kidneys", mr: "यकृत व किडनीतील घातक विषारी द्रव्ये बाहेर काढणे" }
     ],
-    dosageEn: "As prescribed during personal telephone consultation. Call 7745066707.",
-    dosageMr: "फोनवरील समुपदेशनानुसार घ्यावे. संपर्क: ७७४५०६६७०७."
+    dosageEn: "As prescribed during personal telephone consultation. Call 8421154090.",
+    dosageMr: "फोनवरील समुपदेशनानुसार घ्यावे. संपर्क: ८४२११५४०९०."
   },
   {
     id: "prod_antox_b_acid_combo",
@@ -598,7 +598,7 @@ export const productsData = [
     shortDescMr: "वारंवार होणारे पित्त, छातीत जळजळ, अपचन, पोट फुगणे व पचनाच्या तक्रारींवर मुळापासून आराम देणारा किट.",
     description: "Comprehensive Nutraceutical duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.",
     descriptionEn: "ANTOX-B ACID & ANTOX-T neutralizes stomach acid secretions and cleanses intestinal pathways, providing long-term relief from GERD and indigestion.",
-    descriptionMr: "हे किट आम्लपित्त, जळजळ आणि बद्धकोष्ठतेवर अत्यंत गुणकारी आहे. फोन: ७७४५०६६७०७.",
+    descriptionMr: "हे किट आम्लपित्त, जळजळ आणि बद्धकोष्ठतेवर अत्यंत गुणकारी आहे. फोन: ८४२११५४०९०.",
     features: [
       { en: "Dual digestive combo: ANTOX-B ACID liquid + ANTOX-T detox tea", mr: "दुहेरी किट: ANTOX-B ACID + ANTOX-T चहा" },
       { en: "Neutralizes excess stomach acid & bile distress", mr: "पोटातील अतिरिक्त पित्त शांत करते" },
@@ -674,8 +674,8 @@ export const productsData = [
       { en: "Recharges physical stamina & vitality", mr: "शारीरिक स्टॅमिना व ताकद वाढवते" },
       { en: "100% Herbal & non-toxic formulation", mr: "१००% शुद्ध आयुर्वेदिक व सुरक्षित" }
     ],
-    dosageEn: "As advised by personal health counselor. Call 7745066707.",
-    dosageMr: "समुपदेशकाच्या सल्ल्यानुसार घ्यावे. फोन: ७७४५०६६७०७."
+    dosageEn: "As advised by personal health counselor. Call 8421154090.",
+    dosageMr: "समुपदेशकाच्या सल्ल्यानुसार घ्यावे. फोन: ८४२११५४०९०."
   },
 
   // ==========================================
@@ -805,8 +805,8 @@ export const productsData = [
       { en: "Flushes toxic buildup from liver & kidneys", mr: "यकृत व किडनीतील घातक विषारी द्रव्ये बाहेर काढणे" },
       { en: "Aids in cholesterol and lipid balance", mr: "कोलेस्ट्रॉल व ट्रायग्लिसराईड्स नियंत्रणात मदत" }
     ],
-    dosageEn: "10-15ml with water twice daily after meals. Call 7745066707.",
-    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ७७४५०६६७०७."
+    dosageEn: "10-15ml with water twice daily after meals. Call 8421154090.",
+    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ८४२११५४०९०."
   },
   {
     id: "prod_antox_b_acid",
@@ -846,8 +846,8 @@ export const productsData = [
       { en: "Supports healthy digestion & reduces nausea", mr: "पचनक्रिया सुधारते व मळमळ थांबवते" },
       { en: "Calms stomach lining and promotes gut balance", mr: "पोटातील अल्सर व जळजळ शांत करते" }
     ],
-    dosageEn: "10-15ml with water after meals twice daily. Call 7745066707.",
-    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ७७४५०६६७०७."
+    dosageEn: "10-15ml with water after meals twice daily. Call 8421154090.",
+    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ८४२११५४०९०."
   },
   {
     id: "prod_antox_amrut_51",
@@ -889,8 +889,8 @@ export const productsData = [
       { en: "Strengthens whole-body immune defenses", mr: "रोगप्रतिकारक शक्ती मजबूत करून संसर्गापासून रक्षण" },
       { en: "Natural cellular detoxification & anti-aging support", mr: "शरीरातील पेशींची नैसर्गिक स्वच्छता व कायाकल्प" }
     ],
-    dosageEn: "15ml twice daily before meals with lukewarm water. Call 7745066707.",
-    dosageMr: "जेवणापूर्वी १५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ७७४५०६६७०७."
+    dosageEn: "15ml twice daily before meals with lukewarm water. Call 8421154090.",
+    dosageMr: "जेवणापूर्वी १५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ८४२११५४०९०."
   }
 ];
 
@@ -1496,7 +1496,7 @@ When you order formulas, request counseling, or submit contact forms, we collect
 2. Use of Information:
 We use your information exclusively to:
 - Process and ship your formula orders.
-- Provide personalized telephone consultation regarding dosage and dietary regimen (Pathya) via 7745066707.
+- Provide personalized telephone consultation regarding dosage and dietary regimen (Pathya) via 8421154090.
 - Communicate campaign updates, health camp announcements, and de-addiction drives.
 
 3. Protection of Medical & Personal Data:
@@ -1504,7 +1504,7 @@ We never sell, rent, or trade your personal or health information to third-party
 
 4. Contact for Privacy Inquiries:
 For questions regarding your data, contact us at:
-Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur – 416001. Phone: 7745066707.`,
+Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur – 416001. Phone: 8421154090.`,
     contentMr: `सहारा सोशल फाऊंडेशन (samarthkolhapur.com) आपल्या सर्व रुग्ण, हितचिंतक आणि ग्राहकांच्या वैयक्तिक माहितीच्या सुरक्षिततेचा आदर करते.
 
 १. गोळा केली जाणारी माहिती:
@@ -1512,14 +1512,14 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
 
 २. माहितीचा वापर:
 - ऑर्डर केलेले पार्सल सुरक्षित पाठवण्यासाठी.
-- ७७४५०६६७०७ द्वारे औषधाचे प्रमाण व पथ्याबाबत फोनवर मार्गदर्शन करण्यासाठी.
+- ८४२११५४०९० द्वारे औषधाचे प्रमाण व पथ्याबाबत फोनवर मार्गदर्शन करण्यासाठी.
 - आरोग्य शिबिरे व जनजागृती मोहिमांची माहिती देण्यासाठी.
 
 ३. माहितीची गोपनीयता:
 आपली कोणतीही वैयक्तिक किंवा वैद्यकीय माहिती कोणत्याही तिसऱ्या पक्षाला विकली जात नाही. ती पूर्णपणे सुरक्षित व गोपनीय ठेवली जाते.
 
 ४. संपर्क:
-गोपनीयतेबाबत काही शंका असल्यास संपर्क: सहारा सोशल फाऊंडेशन, रॉयल प्रेस्टीज, शाहूपुरी, कोल्हापूर - ४१६००१. फोन: ७७४५०६६७०७.`
+गोपनीयतेबाबत काही शंका असल्यास संपर्क: सहारा सोशल फाऊंडेशन, रॉयल प्रेस्टीज, शाहूपुरी, कोल्हापूर - ४१६००१. फोन: ८४२११५४०९०.`
   },
 
   refundPolicy: {
@@ -1530,7 +1530,7 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
 
 1. Returns Eligibility:
 - Returns are accepted if you receive a damaged, leaked, or wrong product package during transit.
-- Please report any damage within 48 hours of delivery by calling 7745066707 or sending parcel opening photos on WhatsApp (7745066707).
+- Please report any damage within 48 hours of delivery by calling 8421154090 or sending parcel opening photos on WhatsApp (8421154090).
 - Products must be unopened with the original security seal intact.
 
 2. Refund Process:
@@ -1538,14 +1538,14 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
 - In case of replacement, a fresh package is dispatched immediately free of extra shipping charges.
 
 3. Cancellations:
-- You may cancel an order before dispatch by calling our helpline 7745066707.
+- You may cancel an order before dispatch by calling our helpline 8421154090.
 
-For assistance with orders, returns, or guidance, contact our customer support at 7745066707.`,
+For assistance with orders, returns, or guidance, contact our customer support at 8421154090.`,
     contentMr: `सहारा सोशल फाऊंडेशनच्या वतीने आम्ही आपणास शुद्ध व सीलबंद आयुर्वेदिक उत्पादने पोहोचवण्यासाठी कटिबद्ध आहोत.
 
 १. पार्सल परत करण्याचे नियम:
 - कुरिअर प्रवासात बाटली फुटल्यास किंवा चुकीचे पार्सल आल्यास बदलून दिले जाईल.
-- पार्सल मिळाल्यापासून ४८ तासांच्या आत ७७४५०६६७०७ या नंबरवर संपर्क करून किंवा व्हॉट्सअ‍ॅपवर फोटो पाठवून कळवावे.
+- पार्सल मिळाल्यापासून ४८ तासांच्या आत ८४२११५४०९० या नंबरवर संपर्क करून किंवा व्हॉट्सअ‍ॅपवर फोटो पाठवून कळवावे.
 - उत्पादनाचे मूळ सील सुरक्षित असावे.
 
 २. परतावा (Refund):
@@ -1553,9 +1553,9 @@ For assistance with orders, returns, or guidance, contact our customer support a
 - बदली पार्सल हवे असल्यास कोणतेही अतिरिक्त शुल्क न घेता नवीन पार्सल पाठवले जाते.
 
 ३. ऑर्डर रद्द करणे:
-- पार्सल रवाना होण्यापूर्वी आपण ७७४५०६६७०७ वर फोन करून ऑर्डर रद्द करू शकता.
+- पार्सल रवाना होण्यापूर्वी आपण ८४२११५४०९० वर फोन करून ऑर्डर रद्द करू शकता.
 
-कोणत्याही मदतीसाठी संपर्क साधा: ७७४५०६६७०७.`
+कोणत्याही मदतीसाठी संपर्क साधा: ८४२११५४०९०.`
   }
 };
 

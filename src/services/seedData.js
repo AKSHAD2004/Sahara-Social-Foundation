@@ -7,7 +7,7 @@ export const initialUsers = [
     name: 'Dr. Sharad Patil (Super Admin)',
     email: 'admin@samarthkolhapur.com',
     role: 'super_admin',
-    phone: '9423827429',
+    phone: '8421154090',
     avatar: null,
     department: 'Executive Management',
     status: 'active'
@@ -28,8 +28,8 @@ export const initialSettings = {
   tagline: 'मधुमेहमुक्त व व्यसनमुक्त भारत अभियान',
   registrationNo: 'MAH/582/2014/KOP',
   email: 'info@samarthkolhapur.com',
-  phone: '+91 77450 66707',
-  whatsappNumber: '+91 77450 66707',
+  phone: '+91 84211 54090',
+  whatsappNumber: '+91 84211 54090',
   address: 'Samarth Health Care & Research Center, Opp. CPR Hospital, Kolhapur, Maharashtra 416002',
   currency: 'INR',
   commissionCalculationType: 'flat', // 'flat' or 'progressive'

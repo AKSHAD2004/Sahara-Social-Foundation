@@ -543,7 +543,7 @@ const Home = () => {
           <p style={{ fontSize: 'clamp(0.95rem, 1vw + 0.5rem, 1.1rem)', color: '#d6fae0', lineHeight: 1.6, marginBottom: '1.75rem' }}>
             {language === 'mr'
               ? 'सहारा सोशल फाऊंडेशनच्या तज्ज्ञ समुपदेशकांकडून मोफत फोन मार्गदर्शन मिळवण्यासाठी आताच संपर्क साधा किंवा फॉर्म्युला मागवा.'
-              : 'Contact our helpline at 7745066707 or explore our authentic Nutraceutical kits.'}
+              : 'Contact our helpline at 8421154090 or explore our authentic Nutraceutical kits.'}
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
@@ -557,7 +557,7 @@ const Home = () => {
               className="btn btn-call btn-lg"
             >
               <Phone size={18} />
-              <span>{language === 'mr' ? 'कॉल: ७७४५०६६७०७' : 'Call 7745066707'}</span>
+              <span>{language === 'mr' ? 'कॉल: ८४२११५४०९०' : 'Call 8421154090'}</span>
             </a>
 
             <button

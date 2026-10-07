@@ -309,8 +309,8 @@ const Checkout = () => {
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'
-            ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा मदतीसाठी ७७४५०६६७०७ वर संपर्क करा.'
-            : 'Online payment error. Please try again or call 7745066707.'
+            ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा मदतीसाठी ८४२११५४०९० वर संपर्क करा.'
+            : 'Online payment error. Please try again or call 8421154090.'
         );
       }
     });
@@ -906,8 +906,8 @@ const Checkout = () => {
 
                 <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#5F6B61', lineHeight: 1.4 }}>
                   {language === 'mr'
-                    ? 'ऑर्डरनंतर २४ तासांत पार्सल रवाना केले जाईल. काही अडचण असल्यास ७७४५०६६७०७ वर संपर्क करा.'
-                    : 'Dispatched within 24 hours. For questions call 7745066707.'}
+                    ? 'ऑर्डरनंतर २४ तासांत पार्सल रवाना केले जाईल. काही अडचण असल्यास ८४२११५४०९० वर संपर्क करा.'
+                    : 'Dispatched within 24 hours. For questions call 8421154090.'}
                 </div>
               </div>
             </div>

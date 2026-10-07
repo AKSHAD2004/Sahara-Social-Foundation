@@ -23,8 +23,8 @@ const TrustSection = () => {
       icon: <PhoneCall size={26} style={{ color: '#159B32' }} />,
       titleEn: "Dedicated Regimen Helpline",
       titleMr: "थेट फोनवर आहार व पथ्य मार्गदर्शन",
-      descEn: "Call 7745066707 upon receiving your formula for detailed dosage and dietary advice tailored for you.",
-      descMr: "फॉर्म्युला मिळाल्यानंतर ७७४५०६६७०७ वर कॉल करून आपल्या प्रकृतीनुसार औषध घेण्याची पद्धत व पथ्य समजून घ्या."
+      descEn: "Call 8421154090 upon receiving your formula for detailed dosage and dietary advice tailored for you.",
+      descMr: "फॉर्म्युला मिळाल्यानंतर ८४२११५४०९० वर कॉल करून आपल्या प्रकृतीनुसार औषध घेण्याची पद्धत व पथ्य समजून घ्या."
     },
     {
       icon: <Users size={26} style={{ color: '#785300' }} />,

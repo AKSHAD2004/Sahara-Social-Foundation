@@ -34,8 +34,8 @@ const FloatingActions = () => {
           target="_blank"
           rel="noopener noreferrer"
           className="floating-whatsapp-btn"
-          title={language === 'mr' ? 'व्हॉट्सअ‍ॅप ग्रुप जॉईन करा' : 'Join our WhatsApp Group'}
-          aria-label="Join our WhatsApp Group"
+          title={language === 'mr' ? 'ग्रुप जॉईन करा' : 'Join Group'}
+          aria-label="Join Group"
         >
           <WhatsAppIcon size={30} color="#ffffff" animated={true} />
           
@@ -46,7 +46,7 @@ const FloatingActions = () => {
 
           {/* Desktop Hover Tooltip */}
           <span className="floating-action-tooltip">
-            {language === 'mr' ? 'व्हॉट्सअ‍ॅप ग्रुप जॉईन करा' : 'Join WhatsApp Group'}
+            {language === 'mr' ? 'ग्रुप जॉईन करा' : 'Join Group'}
           </span>
         </a>
       </div>

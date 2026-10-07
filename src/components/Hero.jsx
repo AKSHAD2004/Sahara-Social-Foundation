@@ -292,7 +292,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
                 className="btn btn-call hero-sub-cta"
               >
                 <Phone size={18} />
-                <span>{language === 'mr' ? 'कॉल करा: ७७४५०६६७०७' : 'Call: 7745066707'}</span>
+                <span>{language === 'mr' ? 'कॉल करा: ८४२११५४०९०' : 'Call: 8421154090'}</span>
               </a>
             </div>
           </div>
