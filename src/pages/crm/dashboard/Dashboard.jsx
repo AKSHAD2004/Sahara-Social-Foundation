@@ -282,6 +282,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      </div>
+
       {/* Live Website & CRM Orders Feed */}
       <div className="crm-card" style={{ marginBottom: '1.5rem', borderTop: '3px solid #006B2D' }}>
         <div className="crm-card-header" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
