@@ -251,7 +251,7 @@ export default function Dashboard() {
       </div>
 
       {/* Analytics & Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+      <div className="crm-dashboard-grid-2col">
         {/* Sales Trend Bar Chart */}
         <div className="crm-card" style={{ margin: 0 }}>
           <div className="crm-card-header">
@@ -479,7 +479,7 @@ export default function Dashboard() {
       </div>
 
       {/* Today's Follow-ups & Recent Customers Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem' }}>
+      <div className="crm-dashboard-grid-split">
         {/* Follow-ups List */}
         <div className="crm-card" style={{ margin: 0 }}>
           <div className="crm-card-header">

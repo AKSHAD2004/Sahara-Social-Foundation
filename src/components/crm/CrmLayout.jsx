@@ -18,6 +18,14 @@ export default function CrmLayout() {
         onCloseMobile={() => setMobileOpen(false)}
       />
 
+      {mobileOpen && (
+        <div 
+          className="crm-mobile-backdrop" 
+          onClick={() => setMobileOpen(false)}
+          aria-label="Close Sidebar"
+        />
+      )}
+
       <div className={`crm-main-wrap ${collapsed ? 'sidebar-collapsed' : ''}`}>
         <CrmHeader onToggleMobile={() => setMobileOpen(!mobileOpen)} />
         <main className="crm-content">
