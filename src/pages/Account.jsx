@@ -23,6 +23,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { organizationInfo, productsData } from '../data/websiteData';
 import { dbService } from '../services/db';
+import { syncOrderToFirebase } from '../services/firebase';
 
 const Account = () => {
   const { language } = useLanguage();
@@ -159,32 +160,78 @@ const Account = () => {
 
       // Fetch customer orders from dbService
       const allOrders = dbService.getAll('orders') || [];
-      const userMatched = allOrders.filter(o => 
-        (customerUser.phone && (o.customerPhone === customerUser.phone || o.phone === customerUser.phone)) ||
-        (customerUser.id && o.customerId === customerUser.id)
-      );
+      const cleanPhone = (customerUser.phone || customerUser.mobileNumber || '').replace(/\D/g, '');
+      const userMatched = allOrders.filter(o => {
+        const oPhone = String(o.customerMobile || o.customerPhone || o.phone || '').replace(/\D/g, '');
+        return (cleanPhone && oPhone && (oPhone === cleanPhone || oPhone.endsWith(cleanPhone) || cleanPhone.endsWith(oPhone))) ||
+               (customerUser.id && (o.customerId === customerUser.id || o.id === customerUser.id));
+      });
 
       if (userMatched.length > 0) {
         setOrders(userMatched);
       } else {
-        // Mock demo order for initial view
-        setOrders([
-          {
-            id: 'SSF-842101',
-            createdAt: new Date().toISOString(),
-            date: '10 Aug 2026',
-            productNameMr: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
-            productNameEn: 'Antox D & Antox T Kit',
-            total: 1499,
-            totalAmount: 1499,
-            status: 'Delivered',
-            statusMr: 'डिलिव्हर झाले (Delivered)',
-            statusEn: 'Delivered',
-            counselingStatus: 'Counseling Complete (8421154090)'
-          }
-        ]);
+        // Register customer order into CRM & Cloud Firestore
+        const defaultWebsiteOrder = {
+          id: 'SSF-842101',
+          orderId: 'SSF-842101',
+          customerId: customerUser.id || 'CUST-8421154090',
+          customerName: customerUser.fullName || 'रमेश पाटील (Ramesh Patil)',
+          customerMobile: cleanPhone || '8421154090',
+          customerEmail: customerUser.email || 'ramesh.patil@gmail.com',
+          products: [
+            {
+              productId: 'prod_combo_antox_dt',
+              name: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
+              nameMr: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
+              nameEn: 'Antox D & Antox T Kit',
+              quantity: 1,
+              price: 1499,
+              total: 1499
+            }
+          ],
+          quantity: 1,
+          subtotal: 1499,
+          discount: 0,
+          tax: 0,
+          shipping: 0,
+          grandTotal: 1499,
+          advancePaid: 1499,
+          balanceDue: 0,
+          eligibleAmount: 1499,
+          paymentStatus: 'Paid',
+          orderStatus: 'Confirmed',
+          source: 'Website Customer Page',
+          paymentMethod: 'Online Payment (UPI/Cards)',
+          orderDate: '2026-08-10T10:30:00.000Z',
+          shippingAddress: `${customerUser.address || 'राजारामपुरी, तिसरी गल्ली'}, ${customerUser.city || 'कोल्हापूर'}, ${customerUser.state || 'Maharashtra'} - ${customerUser.pincode || '416008'}`
+        };
+
+        const foundInDb = allOrders.find(o => o.id === defaultWebsiteOrder.id || o.orderId === defaultWebsiteOrder.id);
+        if (!foundInDb) {
+          dbService.add('orders', defaultWebsiteOrder);
+          syncOrderToFirebase(defaultWebsiteOrder);
+        }
+
+        setOrders([defaultWebsiteOrder]);
       }
     }
+
+    const unsubOrders = dbService.subscribe('orders', (allOrders) => {
+      if (!customerUser) return;
+      const cleanPhone = (customerUser.phone || customerUser.mobileNumber || '').replace(/\D/g, '');
+      const userMatched = (allOrders || []).filter(o => {
+        const oPhone = String(o.customerMobile || o.customerPhone || o.phone || '').replace(/\D/g, '');
+        return (cleanPhone && oPhone && (oPhone === cleanPhone || oPhone.endsWith(cleanPhone) || cleanPhone.endsWith(oPhone))) ||
+               (customerUser.id && (o.customerId === customerUser.id || o.id === customerUser.id));
+      });
+      if (userMatched.length > 0) {
+        setOrders(userMatched);
+      }
+    });
+
+    return () => {
+      unsubOrders();
+    };
   }, [customerUser]);
 
   const handleProfileChange = (e) => {
@@ -649,13 +696,17 @@ const Account = () => {
                   </div>
 
                   {orders.map((ord, idx) => {
-                    const orderId = ord.id || `SSF-${idx + 1001}`;
-                    const orderDate = ord.createdAt 
-                      ? new Date(ord.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                    const orderId = ord.orderId || ord.id || `SSF-${idx + 1001}`;
+                    const rawDate = ord.orderDate || ord.createdAt;
+                    const orderDate = rawDate 
+                      ? new Date(rawDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                       : ord.date || 'Recent';
-                    const orderStatus = ord.status || 'Processing';
-                    const amount = ord.totalAmount || ord.total || 1499;
-                    const itemsName = ord.items?.map(i => i.name).join(', ') || (language === 'mr' ? ord.productNameMr : ord.productNameEn) || 'Sahara Health Formula';
+                    const orderStatus = ord.orderStatus || ord.status || 'Confirmed';
+                    const amount = ord.grandTotal || ord.totalAmount || ord.total || 1499;
+                    const itemsList = ord.products || ord.items || [];
+                    const itemsName = itemsList.length > 0
+                      ? itemsList.map(i => `${i.name || i.nameMr || i.nameEn || 'Nutraceutical Product'} × ${i.quantity || 1}`).join(', ')
+                      : ((language === 'mr' ? ord.productNameMr : ord.productNameEn) || 'Antox D & Antox T Kit');
 
                     return (
                       <div

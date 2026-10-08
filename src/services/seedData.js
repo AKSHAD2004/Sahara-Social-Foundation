@@ -1,15 +1,35 @@
-// Clean Seed Data for Samarth Kolhapur / Sahara Social Foundation CRM
+// Clean Seed Data for Sahara Social Foundation CRM
 // All dummy operational data removed for production readiness
 
 export const initialUsers = [
   {
     id: 'usr_super_admin',
     name: 'Dr. Sharad Patil (Super Admin)',
-    email: 'admin@samarthkolhapur.com',
+    email: 'admin@saharasocialfoundation.org',
     role: 'super_admin',
     phone: '8421154090',
     avatar: null,
     department: 'Executive Management',
+    status: 'active'
+  },
+  {
+    id: 'usr_emp_akash',
+    name: 'Akash Shinde (Senior Counselor)',
+    email: 'akash@saharasocialfoundation.org',
+    role: 'sales_executive',
+    phone: '8421154090',
+    avatar: null,
+    department: 'Counseling & Sales',
+    status: 'active'
+  },
+  {
+    id: 'usr_aff_rahul',
+    name: 'Rahul Deshmukh (Partner)',
+    email: 'rahul@saharasocialfoundation.org',
+    role: 'affiliate',
+    phone: '8421154090',
+    avatar: null,
+    department: 'Affiliate Network',
     status: 'active'
   }
 ];
@@ -24,13 +44,13 @@ export const initialCommissionSlabs = [
 
 export const initialSettings = {
   companyName: 'Sahara Social Foundation (सहारा सोशल फाऊंडेशन)',
-  brandName: 'Samarth Kolhapur',
+  brandName: 'Sahara Social Foundation',
   tagline: 'मधुमेहमुक्त व व्यसनमुक्त भारत अभियान',
   registrationNo: 'MAH/582/2014/KOP',
-  email: 'info@samarthkolhapur.com',
+  email: 'saharasocialfoundation@gmail.com',
   phone: '+91 84211 54090',
   whatsappNumber: '+91 84211 54090',
-  address: 'Samarth Health Care & Research Center, Opp. CPR Hospital, Kolhapur, Maharashtra 416002',
+  address: 'Sahara Health Care Center, Opp. CPR Hospital, Kolhapur, Maharashtra 416002',
   currency: 'INR',
   commissionCalculationType: 'flat', // 'flat' or 'progressive'
   commissionTrigger: 'delivered_paid', // 'delivered_paid' or 'paid'
@@ -38,7 +58,7 @@ export const initialSettings = {
   defaultReferralPrefix: 'SAHARA',
   payoutDayOfMonth: 30,
   taxRate: 5,
-  websiteUrl: 'https://samarthkolhapur.com'
+  websiteUrl: 'https://sahara-social-foundation.vercel.app'
 };
 
 export const initialProducts = [
@@ -331,11 +351,66 @@ export const initialProducts = [
   }
 ];
 
-// Operational Collections (Clean Production Slate)
-export const initialCustomers = [];
+// Operational Collections (Includes Website Customer Orders)
+export const initialCustomers = [
+  {
+    id: 'CUST-8421154090',
+    customerId: 'CUST-8421154090',
+    fullName: 'रमेश पाटील (Ramesh Patil)',
+    phone: '8421154090',
+    mobileNumber: '8421154090',
+    whatsappNumber: '8421154090',
+    email: 'ramesh.patil@gmail.com',
+    address: 'राजारामपुरी, तिसरी गल्ली, कोल्हापूर',
+    city: 'कोल्हापूर',
+    state: 'Maharashtra',
+    pincode: '416008',
+    customerStatus: 'Active Buyer',
+    leadSource: 'Website Direct',
+    createdDate: '2026-08-10T10:30:00.000Z'
+  }
+];
+
 export const initialLeads = [];
 export const initialFollowups = [];
-export const initialOrders = [];
+
+export const initialOrders = [
+  {
+    id: 'SSF-842101',
+    orderId: 'SSF-842101',
+    customerId: 'CUST-8421154090',
+    customerName: 'रमेश पाटील (Ramesh Patil)',
+    customerMobile: '8421154090',
+    customerEmail: 'ramesh.patil@gmail.com',
+    products: [
+      {
+        productId: 'prod_combo_antox_dt',
+        name: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
+        nameMr: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
+        nameEn: 'Antox D & Antox T Kit',
+        quantity: 1,
+        price: 1499,
+        total: 1499
+      }
+    ],
+    quantity: 1,
+    subtotal: 1499,
+    discount: 0,
+    tax: 0,
+    shipping: 0,
+    grandTotal: 1499,
+    advancePaid: 1499,
+    balanceDue: 0,
+    eligibleAmount: 1499,
+    paymentStatus: 'Paid',
+    orderStatus: 'Confirmed',
+    source: 'Website Customer Page',
+    paymentMethod: 'Online Payment (UPI/Cards)',
+    orderDate: '2026-08-10T10:30:00.000Z',
+    shippingAddress: 'राजारामपुरी, तिसरी गल्ली, कोल्हापूर, Maharashtra - 416008'
+  }
+];
+
 export const initialCommissionTransactions = [];
 export const initialPayouts = [];
 export const initialSupportTickets = [];

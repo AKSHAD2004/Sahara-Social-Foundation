@@ -60,13 +60,15 @@ export default function CustomerList() {
     const q = searchTerm.toLowerCase();
     const matchSearch =
       !searchTerm ||
-      c.fullName.toLowerCase().includes(q) ||
-      c.mobileNumber.includes(q) ||
-      c.customerId.toLowerCase().includes(q) ||
-      c.city.toLowerCase().includes(q);
+      (c.fullName && c.fullName.toLowerCase().includes(q)) ||
+      (c.mobileNumber && String(c.mobileNumber).includes(q)) ||
+      (c.phone && String(c.phone).includes(q)) ||
+      ((c.customerId || c.id) && String(c.customerId || c.id).toLowerCase().includes(q)) ||
+      (c.city && c.city.toLowerCase().includes(q));
 
     const matchStatus = statusFilter === 'ALL' || c.customerStatus === statusFilter;
-    const matchSource = sourceFilter === 'ALL' || c.leadSource === sourceFilter;
+    const matchSource = sourceFilter === 'ALL' || 
+      (sourceFilter === 'Website' ? (c.leadSource && c.leadSource.toLowerCase().includes('website')) : (c.leadSource === sourceFilter));
 
     return matchSearch && matchStatus && matchSource;
   });
@@ -308,14 +310,14 @@ export default function CustomerList() {
                 filteredCustomers.map((customer) => (
                   <tr key={customer.id}>
                     <td>
-                      <strong>{customer.customerId}</strong>
+                      <strong>{customer.customerId || customer.id}</strong>
                     </td>
                     <td>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{customer.fullName}</div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{customer.gender || 'Patient'}</div>
                     </td>
                     <td>
-                      <div>{formatPhone(customer.mobileNumber)}</div>
+                      <div>{formatPhone(customer.mobileNumber || customer.phone)}</div>
                       {customer.email && (
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{customer.email}</div>
                       )}

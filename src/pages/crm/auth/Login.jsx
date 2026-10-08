@@ -75,7 +75,7 @@ export default function Login() {
             Sahara Social Foundation
           </h2>
           <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>
-            Samarth Kolhapur CRM & Sales Management Portal
+            Sahara Social Foundation CRM & Operations Portal
           </div>
         </div>
 
@@ -101,7 +101,7 @@ export default function Login() {
                 type="email" 
                 className="crm-input" 
                 required 
-                placeholder="name@samarthkolhapur.com"
+                placeholder="admin@saharasocialfoundation.org"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

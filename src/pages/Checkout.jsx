@@ -17,6 +17,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { organizationInfo } from '../data/websiteData';
 import { dbService } from '../services/db';
+import { syncOrderToFirebase } from '../services/firebase';
 import { initializeRazorpayPayment } from '../services/razorpay';
 
 const Checkout = () => {
@@ -60,10 +61,12 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const COD_MIN_ADVANCE = 200;
-  const isCod = formData.paymentMethod === 'cod';
-  const codAdvanceAmount = Math.min(COD_MIN_ADVANCE, grandTotal);
-  const codBalanceDue = Math.max(0, grandTotal - codAdvanceAmount);
-  const payableNow = isCod ? codAdvanceAmount : grandTotal;
+  const isCodToken = formData.paymentMethod === 'cod_advance';
+  const isCodStandard = formData.paymentMethod === 'cod';
+  const isOnline = formData.paymentMethod === 'razorpay';
+  const codAdvanceAmount = isCodToken ? Math.min(COD_MIN_ADVANCE, grandTotal) : 0;
+  const codBalanceDue = isCodToken ? Math.max(0, grandTotal - codAdvanceAmount) : (isCodStandard ? grandTotal : 0);
+  const payableNow = isOnline ? grandTotal : codAdvanceAmount;
 
   if (cartItems.length === 0) {
     return (
@@ -154,16 +157,18 @@ const Checkout = () => {
     // 2. Format products for CRM
     const productsList = cartItems.map((item) => ({
       productId: item.id || `prod_${Date.now()}`,
-      name: item.title || item.name || 'Nutraceutical Wellness Product',
+      name: item.nameMr || item.nameEn || item.name || item.title || 'Nutraceutical Wellness Product',
+      nameMr: item.nameMr || '',
+      nameEn: item.nameEn || '',
       quantity: Number(item.quantity || 1),
       price: Number(item.price || 0),
       total: Number(item.price || 0) * Number(item.quantity || 1)
     }));
 
-    const isCodOrder = paymentDetails.isCod ?? (formData.paymentMethod === 'cod');
-    const advancePaid = paymentDetails.advancePaid ?? (isCodOrder ? Math.min(COD_MIN_ADVANCE, grandTotal) : grandTotal);
-    const balanceDue = paymentDetails.balanceDue ?? (isCodOrder ? Math.max(0, grandTotal - advancePaid) : 0);
-    const isPaidOnlineFull = !isCodOrder;
+    const isCodOrder = paymentDetails.isCod ?? (formData.paymentMethod === 'cod' || formData.paymentMethod === 'cod_advance');
+    const advancePaid = paymentDetails.advancePaid ?? (formData.paymentMethod === 'cod_advance' ? Math.min(COD_MIN_ADVANCE, grandTotal) : (formData.paymentMethod === 'cod' ? 0 : grandTotal));
+    const balanceDue = paymentDetails.balanceDue ?? Math.max(0, grandTotal - advancePaid);
+    const isPaidOnlineFull = !isCodOrder || (advancePaid >= grandTotal);
 
     // 3. Create Order in CRM & Firebase
     const crmOrder = {
@@ -172,6 +177,7 @@ const Checkout = () => {
       customerId: custId,
       customerName: formData.fullName,
       customerMobile: formData.phone,
+      customerEmail: formData.email || '',
       products: productsList,
       quantity: cartItems.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0),
       subtotal,
@@ -182,8 +188,9 @@ const Checkout = () => {
       advancePaid,
       balanceDue,
       eligibleAmount: grandTotal,
-      paymentStatus: isPaidOnlineFull ? 'Paid' : 'Partially Paid',
+      paymentStatus: isPaidOnlineFull ? 'Paid' : (advancePaid > 0 ? 'Partially Paid' : 'Pending'),
       orderStatus: 'Confirmed',
+      source: 'Website Checkout',
       assignedEmployee: 'usr_emp_akash',
       assignedAffiliate: matchingAffiliate ? matchingAffiliate.id : '',
       affiliateName: matchingAffiliate ? matchingAffiliate.name : '',
@@ -192,25 +199,32 @@ const Checkout = () => {
       deliveredDate: null,
       shippingAddress: `${formData.address}, ${formData.landmark ? formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`,
       paymentMethod: isCodOrder 
-        ? `Cash on Delivery (₹${advancePaid} Advance Paid via Razorpay)` 
+        ? (advancePaid > 0 ? `Cash on Delivery (₹${advancePaid} Advance Paid)` : 'Cash on Delivery (Pay on Delivery)')
         : 'Razorpay Online (UPI/Cards/NetBanking)',
-      transactionId: paymentDetails.paymentId || paymentDetails.razorpay_payment_id || null,
-      gatewayResponse: paymentDetails || null
+      transactionId: paymentDetails.paymentId || paymentDetails.razorpay_payment_id || null
     };
 
+    // Save to CRM Local Reactive Store
     try {
       await dbService.add('orders', crmOrder);
     } catch (orderErr) {
       console.warn('CRM order sync note:', orderErr);
     }
 
+    // Direct Cloud Firestore Sync Guarantee
+    try {
+      await syncOrderToFirebase(crmOrder);
+    } catch (fbErr) {
+      console.warn('Direct Firebase Cloud order sync note:', fbErr);
+    }
+
     // 4. Add CRM Notification
     try {
       dbService.addNotification({
-        title: isPaidOnlineFull ? 'New Paid Website Order' : 'New COD Order (₹200 Advance Paid)',
+        title: isPaidOnlineFull ? 'नवीन ऑनलाईन ऑर्डर!' : (advancePaid > 0 ? 'नवीन COD ऑर्डर (ॲडव्हान्स प्राप्त)' : 'नवीन COD ऑर्डर!'),
         message: isPaidOnlineFull
-          ? `Order #${orderId} for ₹${grandTotal} fully paid online by ${formData.fullName}.`
-          : `Order #${orderId} for ₹${grandTotal} (₹${advancePaid} paid via Razorpay, ₹${balanceDue} COD balance) by ${formData.fullName}.`,
+          ? `ऑर्डर #${orderId} - ₹${grandTotal} पूर्ण भरणा (${formData.fullName}).`
+          : `ऑर्डर #${orderId} - ₹${grandTotal} (${formData.fullName}) - पार्सल डिलिव्हरीच्या वेळी देय.`,
         type: 'order',
         link: '/crm/orders'
       });
@@ -266,21 +280,31 @@ const Checkout = () => {
     e.preventDefault();
     if (!validate()) return;
 
-    // Direct buy without forcing login: just fill necessary information
     setIsSubmitting(true);
     setPaymentNotice('');
 
     const orderId = 'ORD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-    const amountToPayNow = isCod ? codAdvanceAmount : grandTotal;
-    const remainingCodBalance = isCod ? codBalanceDue : 0;
 
-    // Invoke Razorpay:
-    // If Online: Pay Full Grand Total
-    // If COD: Pay Minimum Advance of ₹200 (or grandTotal if lower)
+    // 1. If standard Cash on Delivery selected: Place immediately without online payment barrier
+    if (formData.paymentMethod === 'cod') {
+      completeOrderPlacement(orderId, {
+        isCod: true,
+        advancePaid: 0,
+        balanceDue: grandTotal,
+        paymentStatus: 'Pending',
+        paymentMethod: 'Cash on Delivery (Pay on Delivery)'
+      });
+      return;
+    }
+
+    // 2. If Razorpay Online or COD Advance selected: Launch Razorpay
+    const amountToPayNow = isCodToken ? codAdvanceAmount : grandTotal;
+    const remainingCodBalance = isCodToken ? codBalanceDue : 0;
+
     initializeRazorpayPayment({
       amountInRupees: amountToPayNow,
       orderId: orderId,
-      description: isCod
+      description: isCodToken
         ? `COD Advance Booking Token (₹${amountToPayNow}) - Order #${orderId}`
         : `Full Online Payment (₹${amountToPayNow}) - Order #${orderId}`,
       customer: {
@@ -292,38 +316,34 @@ const Checkout = () => {
       },
       notes: {
         healthNotes: formData.healthNotes || 'Direct Checkout',
-        paymentType: isCod ? 'COD_ADVANCE_TOKEN' : 'FULL_ONLINE_PAYMENT',
+        paymentType: isCodToken ? 'COD_ADVANCE_TOKEN' : 'FULL_ONLINE_PAYMENT',
         advanceAmount: amountToPayNow,
         balanceDueOnDelivery: remainingCodBalance
       },
       onSuccess: (paymentResponse) => {
         completeOrderPlacement(orderId, {
           ...paymentResponse,
-          status: isCod ? 'Partially Paid' : 'Paid',
+          status: isCodToken ? 'Partially Paid' : 'Paid',
           paymentId: paymentResponse.razorpay_payment_id || paymentResponse.paymentId,
           advancePaid: amountToPayNow,
           balanceDue: remainingCodBalance,
-          isCod
+          isCod: isCodToken
         });
       },
       onDismiss: () => {
         setIsSubmitting(false);
         setPaymentNotice(
-          isCod
-            ? (language === 'mr'
-                ? 'कॅश ऑन डिलिव्हरी (COD) ऑर्डर निश्चित करण्यासाठी किमान ₹२०० ॲडव्हान्स आवश्यक आहे. कृपया पुन्हा प्रयत्न करा.'
-                : 'A minimum advance payment of ₹200 via Razorpay is required to confirm COD order. Please complete payment.')
-            : (language === 'mr'
-                ? 'पेमेंट रद्द करण्यात आले. आपण पुन्हा प्रयत्न करू शकता.'
-                : 'Payment window was closed. You can retry payment.')
+          language === 'mr'
+            ? 'पेमेंट विंडो बंद झाली. आपण पार्सल आल्यावर रोख (Cash on Delivery) द्वारे देखील ऑर्डर नोंदवू शकता.'
+            : 'Payment window was closed. You can also confirm your order using Cash on Delivery.'
         );
       },
       onError: (err) => {
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'
-            ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा मदतीसाठी ८४२११५४०९० वर संपर्क करा.'
-            : 'Online payment error. Please try again or call 8421154090.'
+            ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. आपण खालील पर्यायाने थेट "कॅश ऑन डिलिव्हरी" द्वारे ऑर्डर नोंदवू शकता.'
+            : 'Online payment error. You can proceed with Cash on Delivery instead.'
         );
       }
     });
@@ -356,18 +376,52 @@ const Checkout = () => {
         {paymentNotice && (
           <div style={{
             backgroundColor: '#fff9e6',
-            border: '1px solid #FFC928',
+            border: '1.5px solid #FFC928',
             color: '#785300',
-            padding: '0.85rem 1rem',
-            borderRadius: '12px',
+            padding: '1rem 1.25rem',
+            borderRadius: '16px',
             marginBottom: '1.25rem',
-            fontSize: '0.88rem',
+            fontSize: '0.92rem',
             display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
+            flexDirection: 'column',
+            gap: '0.75rem',
+            boxShadow: '0 4px 15px rgba(255, 201, 40, 0.15)'
           }}>
-            <AlertCircle size={18} style={{ flexShrink: 0, color: '#b38600' }} />
-            <span>{paymentNotice}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <AlertCircle size={20} style={{ flexShrink: 0, color: '#b38600' }} />
+              <span style={{ fontWeight: 600 }}>{paymentNotice}</span>
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={() => {
+                  const orderId = 'ORD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+                  completeOrderPlacement(orderId, {
+                    isCod: true,
+                    advancePaid: 0,
+                    balanceDue: grandTotal,
+                    paymentStatus: 'Pending',
+                    paymentMethod: 'Cash on Delivery (Pay on Delivery)'
+                  });
+                }}
+                className="btn btn-sm"
+                style={{
+                  backgroundColor: '#006B2D',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  padding: '0.55rem 1.15rem',
+                  borderRadius: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                <span>{language === 'mr' ? '✓ पार्सल आल्यावर रोख द्या (COD ने त्वरित ऑर्डर नोंदवा)' : '✓ Confirm Order via Cash on Delivery Now'}</span>
+              </button>
+            </div>
           </div>
         )}
 
@@ -679,8 +733,47 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {/* Option 1: Razorpay Online Payment */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  {/* Option 1: Full Cash on Delivery (Pay upon delivery) */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.85rem',
+                    padding: '1.15rem',
+                    borderRadius: '16px',
+                    border: '2px solid',
+                    borderColor: formData.paymentMethod === 'cod' ? '#006B2D' : '#E1E9DF',
+                    backgroundColor: formData.paymentMethod === 'cod' ? '#e2faea' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: formData.paymentMethod === 'cod' ? '0 4px 12px rgba(0, 107, 45, 0.08)' : 'none'
+                  }}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={formData.paymentMethod === 'cod'}
+                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      style={{ accentColor: '#006B2D', width: '18px', height: '18px', marginTop: '3px', flexShrink: 0 }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.35rem' }}>
+                        <div style={{ fontWeight: 800, color: '#006B2D', fontSize: '0.98rem' }}>
+                          {language === 'mr' ? 'कॅश ऑन डिलिव्हरी (पार्सल हातात आल्यावर रोख द्या)' : 'Cash on Delivery (Pay in Cash on Delivery)'}
+                        </div>
+                        <span style={{ fontSize: '0.8rem', backgroundColor: '#006B2D', color: '#ffffff', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 800 }}>
+                          {language === 'mr' ? 'थेट ऑर्डर - ₹० ॲडव्हान्स' : 'Instant Order - ₹0 Advance'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.3rem', lineHeight: 1.45 }}>
+                        {language === 'mr' 
+                          ? `आता कोणतेही ऑनलाईन पेमेंट करण्याची गरज नाही. संपूर्ण रक्कम ₹${grandTotal} पार्सल कुरिअर बॉयच्या हातातून मिळाल्यानंतर रोख द्या.` 
+                          : `No upfront online payment required. Pay full ₹${grandTotal} in cash to the delivery courier person when your package arrives.`}
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* Option 2: Razorpay Online Payment */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -689,7 +782,7 @@ const Checkout = () => {
                     borderRadius: '16px',
                     border: '2px solid',
                     borderColor: formData.paymentMethod === 'razorpay' ? '#006B2D' : '#E1E9DF',
-                    backgroundColor: formData.paymentMethod === 'razorpay' ? '#e2faea' : '#ffffff',
+                    backgroundColor: formData.paymentMethod === 'razorpay' ? '#f0fdf4' : '#ffffff',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                     boxShadow: formData.paymentMethod === 'razorpay' ? '0 4px 12px rgba(0, 107, 45, 0.08)' : 'none'
@@ -707,19 +800,19 @@ const Checkout = () => {
                         <div style={{ fontWeight: 800, color: '#006B2D', fontSize: '0.98rem' }}>
                           {language === 'mr' ? 'ऑनलाईन पेमेंट (Razorpay - संपूर्ण रक्कम)' : 'Online Payment (Razorpay - Full Amount)'}
                         </div>
-                        <span style={{ fontSize: '0.8rem', backgroundColor: '#006B2D', color: '#ffffff', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 800 }}>
-                          {language === 'mr' ? `एकूण रक्कम: ₹${grandTotal}` : `Grand Total: ₹${grandTotal}`}
+                        <span style={{ fontSize: '0.8rem', backgroundColor: '#15803d', color: '#ffffff', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 800 }}>
+                          {language === 'mr' ? `₹${grandTotal} ऑनलाईन` : `₹${grandTotal} Online`}
                         </span>
                       </div>
                       <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.3rem', lineHeight: 1.45 }}>
                         {language === 'mr' 
-                          ? `UPI (Google Pay, PhonePe, Paytm), कार्ड किंवा नेटबँकिंग द्वारे त्वरित संपूर्ण ₹${grandTotal} भरा. डिलिव्हरीच्या वेळी काहीही देय नाही.` 
+                          ? `UPI (Google Pay, PhonePe, Paytm), ATM कार्ड किंवा नेटबँकिंग द्वारे त्वरित संपूर्ण ₹${grandTotal} भरा. पार्सल डिलिव्हरीच्या वेळी काहीही देय नाही.` 
                           : `Pay full ₹${grandTotal} instantly via UPI, Cards, NetBanking. Zero payment upon delivery.`}
                       </div>
                     </div>
                   </label>
 
-                  {/* Option 2: COD with ₹200 Advance */}
+                  {/* Option 3: COD with ₹200 Advance Booking Token */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -727,33 +820,33 @@ const Checkout = () => {
                     padding: '1.15rem',
                     borderRadius: '16px',
                     border: '2px solid',
-                    borderColor: formData.paymentMethod === 'cod' ? '#006B2D' : '#E1E9DF',
-                    backgroundColor: formData.paymentMethod === 'cod' ? '#fefce8' : '#ffffff',
+                    borderColor: formData.paymentMethod === 'cod_advance' ? '#006B2D' : '#E1E9DF',
+                    backgroundColor: formData.paymentMethod === 'cod_advance' ? '#fefce8' : '#ffffff',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    boxShadow: formData.paymentMethod === 'cod' ? '0 4px 12px rgba(234, 179, 8, 0.12)' : 'none'
+                    boxShadow: formData.paymentMethod === 'cod_advance' ? '0 4px 12px rgba(234, 179, 8, 0.12)' : 'none'
                   }}>
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="cod"
-                      checked={formData.paymentMethod === 'cod'}
+                      value="cod_advance"
+                      checked={formData.paymentMethod === 'cod_advance'}
                       onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                       style={{ accentColor: '#006B2D', width: '18px', height: '18px', marginTop: '3px', flexShrink: 0 }}
                     />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.35rem' }}>
-                        <div style={{ fontWeight: 800, color: formData.paymentMethod === 'cod' ? '#854d0e' : '#17251B', fontSize: '0.98rem' }}>
-                          {language === 'mr' ? 'कॅश ऑन डिलिव्हरी (COD - किमान ₹२०० ॲडव्हान्स)' : 'Cash on Delivery (COD - Min. ₹200 Advance)'}
+                        <div style={{ fontWeight: 800, color: formData.paymentMethod === 'cod_advance' ? '#854d0e' : '#17251B', fontSize: '0.98rem' }}>
+                          {language === 'mr' ? 'COD + ₹२०० टोकन ॲडव्हान्स (बाकी रक्कम डिलिव्हरीला)' : 'COD + ₹200 Token Advance (Balance on Delivery)'}
                         </div>
                         <span style={{ fontSize: '0.8rem', backgroundColor: '#eab308', color: '#78350f', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 800 }}>
-                          {language === 'mr' ? 'किमान ॲडव्हान्स: ₹२००' : 'Min. Advance: ₹200'}
+                          {language === 'mr' ? 'टोकन: ₹२००' : 'Token: ₹200'}
                         </span>
                       </div>
                       <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.3rem', lineHeight: 1.45 }}>
                         {language === 'mr' 
-                          ? `ऑर्डर निश्चित करण्यासाठी किमान ₹२०० ॲडव्हान्स Razorpay द्वारे भरावे लागतील. उर्वरित रक्कम (₹${codBalanceDue}) पार्सल हातात आल्यावर रोख द्या.` 
-                          : `Pay a minimum advance of ₹200 via Razorpay to confirm booking. Pay remaining ₹${codBalanceDue} in cash upon delivery.`}
+                          ? `ऑर्डर निश्चित करण्यासाठी ₹२०० ॲडव्हान्स Razorpay ने भरा. उर्वरित ₹${Math.max(0, grandTotal - 200)} पार्सल हातात आल्यावर रोख द्या.` 
+                          : `Pay ₹200 advance via Razorpay now. Pay remaining ₹${Math.max(0, grandTotal - 200)} in cash upon delivery.`}
                       </div>
                     </div>
                   </label>
@@ -899,17 +992,26 @@ const Checkout = () => {
                     padding: '0.85rem 1rem'
                   }}
                 >
-                  {formData.paymentMethod === 'razorpay' ? <Zap size={18} /> : <CreditCard size={18} />}
+                  {formData.paymentMethod === 'razorpay' ? <Zap size={18} /> : (formData.paymentMethod === 'cod_advance' ? <CreditCard size={18} /> : <CheckCircle2 size={18} />)}
                   <span>
                     {isSubmitting
-                      ? (language === 'mr' ? 'पेमेंट विंडो उघडत आहे...' : 'Launching Payment Window...')
+                      ? (language === 'mr' ? 'ऑर्डर नोंदवली जात आहे...' : 'Processing Order...')
                       : formData.paymentMethod === 'razorpay'
                       ? (language === 'mr' ? `Razorpay ने ऑनलाईन भरा (₹${grandTotal})` : `Pay with Razorpay (₹${grandTotal})`)
-                      : (language === 'mr' ? `₹२०० ॲडव्हान्स भरा व COD कन्फर्म करा` : `Pay ₹200 Advance & Confirm COD`)}
+                      : formData.paymentMethod === 'cod_advance'
+                      ? (language === 'mr' ? `₹२०० ॲडव्हान्स भरा व COD कन्फर्म करा` : `Pay ₹200 Advance & Confirm COD`)
+                      : (language === 'mr' ? `✓ थेट ऑर्डर कन्फर्म करा (पार्सल आल्यावर ₹${grandTotal} द्या)` : `✓ Confirm Order (Pay ₹${grandTotal} on Delivery)`)}
                   </span>
                 </button>
 
                 {formData.paymentMethod === 'cod' && (
+                  <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#006B2D', marginBottom: '0.75rem', fontWeight: 700 }}>
+                    {language === 'mr'
+                      ? `✓ कोणतीही आगाऊ रक्कम नाही. डिलिव्हरीच्या वेळी ₹${grandTotal} रोख द्या.`
+                      : `✓ Zero advance needed. Pay ₹${grandTotal} in cash upon parcel delivery.`}
+                  </div>
+                )}
+                {formData.paymentMethod === 'cod_advance' && (
                   <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#854d0e', marginBottom: '0.75rem', fontWeight: 600 }}>
                     {language === 'mr'
                       ? `(उर्वरित ₹${codBalanceDue} पार्सल हातात आल्यावर रोख द्या)`

@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
+  signInAnonymously,
   signOut as fbSignOut, 
   sendPasswordResetEmail,
   onAuthStateChanged 
@@ -65,6 +66,13 @@ try {
   db = getFirestore(app);
   storage = getStorage(app);
   googleProvider = new GoogleAuthProvider();
+
+  // Auto-authenticate guest/mobile visitors for uninterrupted Firestore access
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      ensureFirebaseAuth().catch(() => {});
+    }, 50);
+  }
 } catch (error) {
   console.warn('Firebase initialized in offline/demo mode:', error.message);
 }
@@ -154,6 +162,69 @@ export async function syncProfileToFirebase(profile) {
   return { success: true, id: profileId, data: payload, note: 'Cached locally' };
 }
 
+/**
+ * Ensures anonymous authentication so guest visitors placing orders have valid Firestore write rights.
+ */
+export async function ensureFirebaseAuth() {
+  if (isFirebaseConfigured && auth && !auth.currentUser) {
+    try {
+      await signInAnonymously(auth);
+      console.log('[Firebase Auth] Guest visitor anonymously authenticated for live data access.');
+    } catch (err) {
+      console.warn('[Firebase Auth] Anonymous sign-in notice (optional):', err.message);
+    }
+  }
+}
+
+/**
+ * Directly writes an order document to Cloud Firestore in the 'orders' collection.
+ * 
+ * @param {Object} order - Full order object
+ * @returns {Promise<{success: boolean, id: string, message?: string}>}
+ */
+export async function syncOrderToFirebase(order) {
+  if (!order) return { success: false, message: 'No order data provided' };
+
+  const orderId = String(order.id || order.orderId || `ORD-${Date.now()}`);
+  const payload = {
+    ...order,
+    id: orderId,
+    orderId: orderId,
+    firebaseUpdatedAt: serverTimestamp(),
+    syncedAt: new Date().toISOString()
+  };
+
+  if (isFirebaseConfigured && db) {
+    try {
+      await ensureFirebaseAuth();
+      const docRef = doc(db, 'orders', orderId);
+      await setDoc(docRef, payload, { merge: true });
+      console.log(`[Firebase Cloud] Order successfully stored on Firestore: orders/${orderId}`);
+      return { success: true, id: orderId, data: payload };
+    } catch (err) {
+      console.warn(`[Firebase Cloud] Order sync notice (${orderId}):`, err.message);
+      return { success: false, error: err.message, data: payload };
+    }
+  }
+
+  return { success: true, id: orderId, data: payload, note: 'Cached locally' };
+}
+
+/**
+ * Direct query to retrieve all active orders from Cloud Firestore.
+ */
+export async function fetchOrdersFromFirebase() {
+  if (!isFirebaseConfigured || !db) return [];
+  try {
+    const colRef = collection(db, 'orders');
+    const snapshot = await getDocs(colRef);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.warn('[Firebase Cloud] Error fetching orders directly from Firestore:', err.message);
+    return [];
+  }
+}
+
 export { 
   app, 
   auth, 
@@ -164,6 +235,7 @@ export {
   // Auth methods
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInAnonymously,
   fbSignOut,
   sendPasswordResetEmail,
   onAuthStateChanged,

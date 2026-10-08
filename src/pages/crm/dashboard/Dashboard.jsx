@@ -1,9 +1,10 @@
-// CRM Master Dashboard for Samarth Kolhapur
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Users, Target, ShoppingBag, CreditCard, Award, 
   Clock, LifeBuoy, TrendingUp, UserPlus, PhoneCall, 
-  MessageSquare, CheckCircle2, ArrowUpRight, Plus, ExternalLink 
+  MessageSquare, CheckCircle2, ArrowUpRight, Plus, ExternalLink,
+  RefreshCw, Globe, PackageCheck, AlertCircle, Eye, Phone
 } from 'lucide-react';
 import { formatCurrency, formatDate, formatPhone, getStatusBadgeClass } from '../../../utils/formatters';
 import { dbService } from '../../../services/db';
@@ -19,6 +20,8 @@ export default function Dashboard() {
   const [commissionTx, setCommissionTx] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncNotice, setSyncNotice] = useState('');
 
   // Quick Action Modal states
   const [showAddLead, setShowAddLead] = useState(false);
@@ -32,6 +35,25 @@ export default function Dashboard() {
     notes: ''
   });
 
+  const handleRefreshLiveOrders = async () => {
+    setIsSyncing(true);
+    setSyncNotice('');
+    try {
+      const refreshedOrders = await dbService.refreshFromFirebase('orders');
+      if (Array.isArray(refreshedOrders) && refreshedOrders.length > 0) {
+        setOrders(refreshedOrders);
+      }
+      await dbService.refreshFromFirebase('customers');
+      await dbService.refreshFromFirebase('leads');
+      setSyncNotice('✓ All orders and customer records live-synced from Cloud Firestore!');
+      setTimeout(() => setSyncNotice(''), 4500);
+    } catch (e) {
+      setSyncNotice('Sync note: ' + e.message);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   useEffect(() => {
     const unsubCust = dbService.subscribe('customers', setCustomers);
     const unsubLeads = dbService.subscribe('leads', setLeads);
@@ -40,7 +62,22 @@ export default function Dashboard() {
     const unsubTx = dbService.subscribe('commissionTransactions', setCommissionTx);
     const unsubTkt = dbService.subscribe('supportTickets', setTickets);
 
+    // Initial fresh pull from Cloud Firestore
+    dbService.refreshFromFirebase('orders').then((res) => {
+      if (Array.isArray(res) && res.length > 0) setOrders(res);
+    }).catch(() => {});
+
+    // Uninterrupted mobile device sync heartbeat (every 15 seconds)
+    const mobileSyncTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        dbService.refreshFromFirebase('orders').then((res) => {
+          if (Array.isArray(res) && res.length > 0) setOrders(res);
+        }).catch(() => {});
+      }
+    }, 15000);
+
     return () => {
+      clearInterval(mobileSyncTimer);
       unsubCust();
       unsubLeads();
       unsubOrders();
@@ -170,7 +207,9 @@ export default function Dashboard() {
           <div>
             <div className="crm-stat-label">Monthly Sales</div>
             <div className="crm-stat-value">{formatCurrency(monthlySales)}</div>
-            <div className="crm-stat-subtext">{totalOrders} total orders</div>
+            <div className="crm-stat-subtext">
+              {totalOrders} total ({orders.filter(o => String(o.source || '').toLowerCase().includes('website') || String(o.id || o.orderId || '').startsWith('ORD-') || String(o.id || o.orderId || '').startsWith('SSF-')).length} from website)
+            </div>
           </div>
           <div className="crm-stat-icon-wrap success">
             <ShoppingBag size={24} />
@@ -242,6 +281,198 @@ export default function Dashboard() {
               <ConversionFunnel />
             </div>
           </div>
+        </div>
+      {/* Live Website & CRM Orders Feed */}
+      <div className="crm-card" style={{ marginBottom: '1.5rem', borderTop: '3px solid #006B2D' }}>
+        <div className="crm-card-header" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <h3 className="crm-card-title" style={{ color: '#006B2D', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ShoppingBag size={20} style={{ color: '#006B2D' }} /> Live Website & CRM Orders
+            </h3>
+            <span style={{ 
+              backgroundColor: '#e6f4ea', 
+              color: '#006B2D', 
+              fontSize: '0.76rem', 
+              fontWeight: 700, 
+              padding: '0.2rem 0.55rem', 
+              borderRadius: '999px',
+              border: '1px solid #b7e1cd'
+            }}>
+              {orders.length} Total ({orders.filter((o) => o.source === 'Website Checkout' || (o.paymentMethod && o.paymentMethod.includes('Razorpay')) || (o.orderId && o.orderId.startsWith('ORD-'))).length} from Website)
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            {syncNotice && (
+              <span style={{ fontSize: '0.78rem', color: '#006B2D', fontWeight: 600, animation: 'fadeIn 0.3s' }}>
+                {syncNotice}
+              </span>
+            )}
+            <button
+              type="button"
+              className="crm-btn crm-btn-secondary crm-btn-sm"
+              onClick={handleRefreshLiveOrders}
+              disabled={isSyncing}
+              title="Sync live orders from Firebase Cloud Firestore"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <RefreshCw size={13} className={isSyncing ? 'spin-anim' : ''} />
+              <span>{isSyncing ? 'Syncing Cloud...' : 'Live Sync'}</span>
+            </button>
+            <Link to="/crm/orders" className="crm-btn crm-btn-primary crm-btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span>Order Management</span>
+              <ArrowUpRight size={14} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="crm-card-body" style={{ padding: 0 }}>
+          {orders.length === 0 ? (
+            <div style={{ padding: '3rem 1.5rem', textAlign: 'center', color: '#64748b' }}>
+              <ShoppingBag size={36} style={{ color: '#cbd5e1', marginBottom: '0.75rem' }} />
+              <div style={{ fontWeight: 600, fontSize: '1rem', color: '#334155' }}>No Orders Recorded Yet</div>
+              <p style={{ fontSize: '0.85rem', maxWidth: '420px', margin: '0.4rem auto 0', color: '#64748b' }}>
+                When customers purchase from the website checkout, their order data automatically syncs to Firebase Cloud and appears here in real-time across all mobile and desktop devices.
+              </p>
+            </div>
+          ) : (
+            <div className="crm-table-wrapper">
+              <table className="crm-table">
+                <thead>
+                  <tr>
+                    <th>Order & Channel</th>
+                    <th>Customer Details</th>
+                    <th>Ordered Products</th>
+                    <th>Amount & Payment</th>
+                    <th>Payment Status</th>
+                    <th>Order Status</th>
+                    <th>Date / Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.slice(0, 6).map((order) => {
+                    const isWebsite = order.source === 'Website Checkout' || (order.paymentMethod && order.paymentMethod.includes('Razorpay')) || (order.orderId && order.orderId.startsWith('ORD-'));
+                    const isPaidFull = order.paymentStatus === 'Paid';
+                    const isPartiallyPaid = order.paymentStatus === 'Partially Paid';
+                    const cleanPhone = (order.customerMobile || '').replace(/\D/g, '').slice(-10);
+
+                    return (
+                      <tr key={order.id || order.orderId} style={{ transition: 'background-color 0.2s' }}>
+                        <td>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                            <strong style={{ color: '#0f172a', fontSize: '0.88rem' }}>
+                              #{order.orderId || order.id}
+                            </strong>
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              color: isWebsite ? (isPaidFull ? '#006B2D' : '#b45309') : '#475569',
+                              backgroundColor: isWebsite ? (isPaidFull ? '#e6f4ea' : '#fef3c7') : '#f1f5f9',
+                              padding: '0.15rem 0.45rem',
+                              borderRadius: '4px',
+                              width: 'fit-content'
+                            }}>
+                              <Globe size={11} />
+                              {isWebsite ? (isPaidFull ? 'Website Online' : 'Website COD') : 'CRM Direct'}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td>
+                          <div>
+                            <strong style={{ fontSize: '0.88rem', color: '#1e293b' }}>
+                              {order.customerName || 'Customer'}
+                            </strong>
+                            {cleanPhone && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
+                                <a 
+                                  href={`tel:${cleanPhone}`} 
+                                  style={{ fontSize: '0.78rem', color: '#006B2D', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                                >
+                                  <Phone size={11} />
+                                  {cleanPhone}
+                                </a>
+                                <a
+                                  href={`https://wa.me/91${cleanPhone}?text=${encodeURIComponent(`Namaste ${order.customerName || ''} ji, regarding your Sahara Social Foundation Order #${order.orderId}...`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{ color: '#25D366' }}
+                                  title="WhatsApp Customer"
+                                >
+                                  <MessageSquare size={12} />
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        <td>
+                          <div style={{ fontSize: '0.82rem', maxWidth: '220px' }}>
+                            {Array.isArray(order.products) && order.products.length > 0 ? (
+                              order.products.map((p, idx) => (
+                                <div key={idx} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  • {p.name || 'Product'} <span style={{ fontWeight: 700, color: '#006B2D' }}>× {p.quantity || 1}</span>
+                                </div>
+                              ))
+                            ) : (
+                              <span style={{ color: '#64748b' }}>Nutraceutical Order</span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td>
+                          <div>
+                            <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>
+                              {formatCurrency(order.grandTotal || 0)}
+                            </strong>
+                            {Number(order.advancePaid || 0) > 0 && Number(order.balanceDue || 0) > 0 && (
+                              <div style={{ fontSize: '0.74rem', color: '#b45309', fontWeight: 600 }}>
+                                ₹{order.advancePaid} Paid • ₹{order.balanceDue} Due
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        <td>
+                          <span className={`badge ${getStatusBadgeClass(order.paymentStatus || 'Pending')}`}>
+                            {order.paymentStatus || 'Pending'}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span className={`badge ${getStatusBadgeClass(order.orderStatus || 'Confirmed')}`}>
+                            {order.orderStatus || 'Confirmed'}
+                          </span>
+                        </td>
+
+                        <td>
+                          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                            {formatDate(order.orderDate || order.createdAt || new Date())}
+                          </div>
+                        </td>
+
+                        <td>
+                          <Link 
+                            to="/crm/orders" 
+                            className="crm-btn crm-btn-secondary crm-btn-sm"
+                            style={{ padding: '0.25rem 0.55rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                            title="View order details"
+                          >
+                            <Eye size={12} />
+                            <span>Details</span>
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
 

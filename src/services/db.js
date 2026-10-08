@@ -26,7 +26,9 @@ import {
   onSnapshot,
   getDocs,
   writeBatch,
-  serverTimestamp 
+  serverTimestamp,
+  ensureFirebaseAuth,
+  syncOrderToFirebase
 } from './firebase';
 import { buildCommissionTransactions, buildCommissionReversal, isOrderCommissionEligible } from './commissionEngine';
 
@@ -114,6 +116,59 @@ function initCollection(collectionName, defaultData) {
         const mergedSettings = { ...parsed, phone: defaultData.phone, whatsappNumber: defaultData.whatsappNumber };
         state[collectionName] = mergedSettings;
         localStorage.setItem(key, JSON.stringify(mergedSettings));
+      } else if (collectionName === 'orders' && Array.isArray(defaultData)) {
+        const existingOrders = Array.isArray(parsed) ? parsed : [];
+        const orderMap = new Map(existingOrders.map((o) => [String(o.id || o.orderId), o]));
+
+        // Ensure default website orders (e.g. SSF-842101) are always present
+        defaultData.forEach((defOrd) => {
+          const ordKey = String(defOrd.id || defOrd.orderId);
+          if (!orderMap.has(ordKey)) {
+            existingOrders.push(defOrd);
+            orderMap.set(ordKey, defOrd);
+          }
+        });
+
+        // Also recover any order placed via website checkout in ssf_last_order
+        try {
+          const lastOrderRaw = localStorage.getItem('ssf_last_order');
+          if (lastOrderRaw) {
+            const lastOrd = JSON.parse(lastOrderRaw);
+            const lKey = String(lastOrd.id || lastOrd.orderId);
+            if (lKey && !orderMap.has(lKey)) {
+              existingOrders.unshift({
+                ...lastOrd,
+                id: lKey,
+                orderId: lKey,
+                source: 'Website Checkout',
+                orderStatus: lastOrd.status || 'Confirmed'
+              });
+              orderMap.set(lKey, true);
+            }
+          }
+        } catch (e) {}
+
+        // Sort newest first
+        existingOrders.sort((a, b) => {
+          const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+          const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+          return dateB - dateA;
+        });
+
+        state[collectionName] = existingOrders;
+        localStorage.setItem(key, JSON.stringify(existingOrders));
+      } else if (collectionName === 'customers' && Array.isArray(defaultData)) {
+        const existingCustomers = Array.isArray(parsed) ? parsed : [];
+        const custMap = new Map(existingCustomers.map((c) => [String(c.id || c.customerId || c.mobileNumber || c.phone), c]));
+        defaultData.forEach((defCust) => {
+          const custKey = String(defCust.id || defCust.customerId || defCust.mobileNumber || defCust.phone);
+          if (!custMap.has(custKey)) {
+            existingCustomers.push(defCust);
+            custMap.set(custKey, defCust);
+          }
+        });
+        state[collectionName] = existingCustomers;
+        localStorage.setItem(key, JSON.stringify(existingCustomers));
       } else if (Array.isArray(parsed) && parsed.length === 0 && Array.isArray(defaultData) && defaultData.length > 0) {
         state[collectionName] = defaultData;
         localStorage.setItem(key, JSON.stringify(defaultData));
@@ -153,6 +208,7 @@ export function initDatabase() {
 
   // Connect Firestore real-time synchronization immediately if configured
   if (isFirebaseConfigured && firestoreDb) {
+    ensureFirebaseAuth().catch(() => {});
     if (typeof window !== 'undefined') {
       setTimeout(setupFirestoreRealtimeSync, 50);
     } else {
@@ -302,7 +358,9 @@ function setupFirestoreRealtimeSync() {
                 const docRef = doc(firestoreDb, colName, docId);
                 const cleanItem = sanitizeForFirestore({ ...item, id: docId, syncedAt: new Date().toISOString() });
                 setDoc(docRef, cleanItem, { merge: true }).catch((err) => {
-                  console.warn(`Firestore auto-seed doc note (${colName}/${docId}):`, err.message);
+                  if (err?.code !== 'permission-denied' && !err?.message?.includes('permissions')) {
+                    console.warn(`Firestore auto-seed doc note (${colName}/${docId}):`, err.message);
+                  }
                 });
               });
             }
@@ -322,6 +380,15 @@ function setupFirestoreRealtimeSync() {
               }
             });
 
+            // Ensure orders and leads are always sorted newest first
+            if (colName === 'orders' || colName === 'leads' || colName === 'notifications') {
+              mergedDocs.sort((a, b) => {
+                const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+                const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+                return dateB - dateA;
+              });
+            }
+
             state[colName] = mergedDocs;
             saveCollection(colName, false);
           }
@@ -335,6 +402,42 @@ function setupFirestoreRealtimeSync() {
 
 // Run initial boot
 initDatabase();
+
+// Cross-tab, mobile resume, and real-time synchronization
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (event) => {
+    if (event.key && event.key.startsWith(STORAGE_PREFIX)) {
+      const colName = event.key.replace(STORAGE_PREFIX, '');
+      try {
+        if (event.newValue) {
+          const parsed = JSON.parse(event.newValue);
+          state[colName] = parsed;
+          emitChange(colName);
+        }
+      } catch (err) {
+        console.warn('Cross-tab storage sync note:', err);
+      }
+    }
+  });
+
+  // Mobile device resume & tab focus auto-sync guarantee
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      if (typeof dbService !== 'undefined' && dbService.refreshFromFirebase) {
+        dbService.refreshFromFirebase('orders').catch(() => {});
+        dbService.refreshFromFirebase('leads').catch(() => {});
+        dbService.refreshFromFirebase('customers').catch(() => {});
+      }
+    }
+  });
+
+  // Background heartbeat every 20 seconds for uninterrupted mobile sync
+  setInterval(() => {
+    if (document.visibilityState === 'visible' && typeof dbService !== 'undefined' && dbService.refreshFromFirebase) {
+      dbService.refreshFromFirebase('orders').catch(() => {});
+    }
+  }, 20000);
+}
 
 function saveCollection(collectionName, syncToCloud = true) {
   try {
@@ -410,9 +513,13 @@ export const dbService = {
     // Sync to Cloud Firestore if connected
     if (isFirebaseConfigured && firestoreDb) {
       try {
-        const docRef = doc(firestoreDb, collectionName, String(newItem.id));
-        const cleanItem = sanitizeForFirestore(newItem);
-        await setDoc(docRef, cleanItem, { merge: true });
+        if (collectionName === 'orders') {
+          await syncOrderToFirebase(newItem);
+        } else {
+          const docRef = doc(firestoreDb, collectionName, String(newItem.id));
+          const cleanItem = sanitizeForFirestore(newItem);
+          await setDoc(docRef, cleanItem, { merge: true });
+        }
         console.log(`[Firestore Sync] Created document ${collectionName}/${newItem.id}`);
       } catch (err) {
         console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
@@ -973,5 +1080,47 @@ export const dbService = {
     count++;
 
     return { success: true, seededCount: count };
+  },
+
+  /**
+   * Manually fetch latest collection data from Cloud Firestore and sync local store
+   */
+  async refreshFromFirebase(collectionName = 'orders') {
+    if (!isFirebaseConfigured || !firestoreDb) {
+      return state[collectionName] || [];
+    }
+    try {
+      const colRef = collection(firestoreDb, collectionName);
+      const snap = await getDocs(colRef);
+      const remoteDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      if (remoteDocs.length > 0) {
+        const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
+        const localItems = Array.isArray(state[collectionName]) ? state[collectionName] : [];
+        const merged = [...remoteDocs];
+
+        localItems.forEach((local) => {
+          const key = String(local.id || local.orderId || '');
+          if (key && !remoteMap.has(key)) {
+            merged.push(local);
+          }
+        });
+
+        if (collectionName === 'orders' || collectionName === 'leads' || collectionName === 'notifications') {
+          merged.sort((a, b) => {
+            const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+            const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+            return dateB - dateA;
+          });
+        }
+
+        state[collectionName] = merged;
+        saveCollection(collectionName, false);
+        return merged;
+      }
+    } catch (err) {
+      console.warn(`Manual refresh note for ${collectionName}:`, err.message);
+    }
+    return state[collectionName] || [];
   }
 };

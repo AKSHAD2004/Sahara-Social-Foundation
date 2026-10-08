@@ -1,4 +1,4 @@
-// Complete Order Management Module for Samarth Kolhapur CRM
+// Complete Order Management Module for Sahara Social Foundation CRM
 import React, { useState, useEffect } from 'react';
 import { 
   ShoppingBag, Plus, Search, Filter, Eye, Truck, 
@@ -18,6 +18,9 @@ export default function OrderList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('ALL');
+  const [sourceFilter, setSourceFilter] = useState('ALL');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncNotice, setSyncNotice] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -35,8 +38,45 @@ export default function OrderList() {
     shippingAddress: ''
   });
 
+  const handleRefreshFirebase = async () => {
+    setIsSyncing(true);
+    setSyncNotice('');
+    try {
+      const refreshed = await dbService.refreshFromFirebase('orders');
+      if (Array.isArray(refreshed) && refreshed.length > 0) {
+        setOrders(refreshed);
+        setSyncNotice(`✓ Synced ${refreshed.length} orders live from Cloud Firestore!`);
+      } else {
+        setSyncNotice(`✓ Firebase connected. Orders are up to date.`);
+      }
+      setTimeout(() => setSyncNotice(''), 4500);
+    } catch (e) {
+      setSyncNotice('Sync note: ' + e.message);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   useEffect(() => {
-    const unsubOrders = dbService.subscribe('orders', setOrders);
+    // Initial fetch from Cloud Firestore
+    dbService.refreshFromFirebase('orders').then((refreshed) => {
+      if (Array.isArray(refreshed) && refreshed.length > 0) {
+        setOrders(refreshed);
+      }
+    }).catch(() => {});
+
+    // Active subscription to reactive store
+    const unsubOrders = dbService.subscribe('orders', (currentOrders) => {
+      if (Array.isArray(currentOrders) && currentOrders.length > 0) {
+        setOrders(currentOrders);
+      } else {
+        const fromDb = dbService.getAll('orders');
+        if (Array.isArray(fromDb) && fromDb.length > 0) {
+          setOrders(fromDb);
+        }
+      }
+    });
+
     const unsubCust = dbService.subscribe('customers', setCustomers);
     const unsubProd = dbService.subscribe('products', setProducts);
     const unsubUsers = dbService.subscribe('users', (users) => {
@@ -52,13 +92,44 @@ export default function OrderList() {
       }
     });
 
+    // Mobile background sync heartbeat (polls every 15s) and visibility handler for mobile browsers
+    const heartbeatTimer = setInterval(() => {
+      dbService.refreshFromFirebase('orders').then((refreshed) => {
+        if (Array.isArray(refreshed) && refreshed.length > 0) {
+          setOrders(refreshed);
+        }
+      }).catch(() => {});
+    }, 15000);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        dbService.refreshFromFirebase('orders').then((refreshed) => {
+          if (Array.isArray(refreshed) && refreshed.length > 0) {
+            setOrders(refreshed);
+          }
+        }).catch(() => {});
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+
     return () => {
       unsubOrders();
       unsubCust();
       unsubProd();
       unsubUsers();
+      clearInterval(heartbeatTimer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
     };
   }, []);
+
+  const isWebsiteOrder = (o) => {
+    const src = String(o.source || '').toLowerCase();
+    const idStr = String(o.id || o.orderId || '');
+    return src.includes('website') || idStr.startsWith('ORD-') || idStr.startsWith('SSF-');
+  };
 
   const filteredOrders = orders
     .filter((o) => {
@@ -67,18 +138,26 @@ export default function OrderList() {
         !searchTerm ||
         (o.orderId && o.orderId.toLowerCase().includes(q)) ||
         (o.customerName && o.customerName.toLowerCase().includes(q)) ||
-        (o.customerMobile && String(o.customerMobile).includes(q));
+        (o.customerMobile && String(o.customerMobile).includes(q)) ||
+        (o.customerPhone && String(o.customerPhone).includes(q)) ||
+        (o.phone && String(o.phone).includes(q));
 
       const matchOrderStatus = orderStatusFilter === 'ALL' || o.orderStatus === orderStatusFilter;
       const matchPaymentStatus = paymentStatusFilter === 'ALL' || o.paymentStatus === paymentStatusFilter;
+      const isWeb = isWebsiteOrder(o);
+      const matchSource = sourceFilter === 'ALL' || (sourceFilter === 'WEBSITE' ? isWeb : !isWeb);
 
-      return matchSearch && matchOrderStatus && matchPaymentStatus;
+      return matchSearch && matchOrderStatus && matchPaymentStatus && matchSource;
     })
     .sort((a, b) => {
-      const dateA = new Date(a.orderDate || a.createdAt || 0).getTime();
-      const dateB = new Date(b.orderDate || b.createdAt || 0).getTime();
+      const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+      const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
       return dateB - dateA;
     });
+
+  const websiteOrdersCount = orders.filter((o) => isWebsiteOrder(o)).length;
+  const totalRevenue = orders.filter((o) => o.paymentStatus === 'Paid').reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
+  const pendingDeliveryCount = orders.filter((o) => o.orderStatus !== 'Delivered' && o.orderStatus !== 'Cancelled').length;
 
   const handleCreateOrder = async (e) => {
     e.preventDefault();
@@ -185,15 +264,70 @@ export default function OrderList() {
             <ShoppingBag size={24} style={{ color: '#1b4d3e' }} /> Order Management
           </h1>
           <div className="crm-page-subtitle">
-            Synchronized orders from website and phone consultations ({orders.length} total orders)
+            Synchronized orders from website and phone consultations ({orders.length} total orders, {websiteOrdersCount} from website)
           </div>
         </div>
 
         <div className="crm-header-btn-group">
+          <button 
+            className="crm-btn crm-btn-secondary"
+            onClick={handleRefreshFirebase}
+            disabled={isSyncing}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}
+            title="Fetch latest orders live from Cloud Firestore"
+          >
+            <RotateCcw size={15} style={{ animation: isSyncing ? 'spin 1s linear infinite' : 'none' }} />
+            <span>{isSyncing ? 'Syncing...' : 'Sync Firebase'}</span>
+          </button>
           <ExportButton data={filteredOrders} columns={csvColumns} filename="Sahara_Orders" />
           <button className="crm-btn crm-btn-primary" onClick={() => setShowAddModal(true)}>
             <Plus size={16} /> Create Order
           </button>
+        </div>
+      </div>
+
+      {syncNotice && (
+        <div style={{
+          backgroundColor: '#e2faea',
+          border: '1.5px solid #159B32',
+          color: '#006B2D',
+          padding: '0.65rem 1.15rem',
+          borderRadius: '12px',
+          marginBottom: '1.25rem',
+          fontSize: '0.88rem',
+          fontWeight: 700,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          boxShadow: '0 2px 8px rgba(0,107,45,0.08)'
+        }}>
+          <CheckCircle2 size={18} />
+          <span>{syncNotice}</span>
+        </div>
+      )}
+
+      {/* Top Summary Metrics */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '1rem',
+        marginBottom: '1.25rem'
+      }}>
+        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #1b4d3e' }}>
+          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Total Orders</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginTop: '0.2rem' }}>{orders.length}</div>
+        </div>
+        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #006B2D' }}>
+          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>🌐 Website Online Orders</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#006B2D', marginTop: '0.2rem' }}>{websiteOrdersCount}</div>
+        </div>
+        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #16a34a' }}>
+          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Paid Order Volume</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a', marginTop: '0.2rem' }}>{formatCurrency(totalRevenue)}</div>
+        </div>
+        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #eab308' }}>
+          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Active / Pending Delivery</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#854d0e', marginTop: '0.2rem' }}>{pendingDeliveryCount}</div>
         </div>
       </div>
 
@@ -211,6 +345,16 @@ export default function OrderList() {
           </div>
 
           <div className="crm-toolbar-filters">
+            <select
+              className="crm-select"
+              value={sourceFilter}
+              onChange={(e) => setSourceFilter(e.target.value)}
+            >
+              <option value="ALL">All Order Channels</option>
+              <option value="WEBSITE">🌐 Website Online Orders</option>
+              <option value="OFFLINE">📞 Direct / Phone Orders</option>
+            </select>
+
             <select
               className="crm-select"
               value={orderStatusFilter}
@@ -265,16 +409,32 @@ export default function OrderList() {
                 filteredOrders.map((order) => (
                   <tr key={order.id}>
                     <td>
-                      <strong>{order.orderId}</strong>
+                      <div style={{ fontWeight: 700, color: '#1e293b' }}>{order.orderId}</div>
+                      {isWebsiteOrder(order) && (
+                        <span style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center',
+                          gap: '0.2rem',
+                          fontSize: '0.68rem', 
+                          backgroundColor: '#e2faea', 
+                          color: '#006B2D', 
+                          padding: '0.15rem 0.45rem', 
+                          borderRadius: '4px', 
+                          fontWeight: 700, 
+                          marginTop: '0.25rem' 
+                        }}>
+                          🌐 Website Order
+                        </span>
+                      )}
                     </td>
                     <td>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{order.customerName}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{order.customerMobile}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{order.customerMobile || order.customerPhone || order.phone}</div>
                     </td>
                     <td style={{ maxWidth: '240px' }}>
-                      {order.products?.map((p, idx) => (
+                      {(order.products || order.items || []).map((p, idx) => (
                         <div key={idx} style={{ fontSize: '0.82rem' }}>
-                          • {p.name} × {p.quantity}
+                          • {p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Product'} × {p.quantity || 1}
                         </div>
                       ))}
                     </td>
@@ -382,12 +542,12 @@ export default function OrderList() {
                 </tr>
               </thead>
               <tbody>
-                {selectedOrder.products?.map((p, idx) => (
+                {(selectedOrder.products || selectedOrder.items || []).map((p, idx) => (
                   <tr key={idx}>
-                    <td>{p.name}</td>
-                    <td>{formatCurrency(p.price)}</td>
-                    <td>{p.quantity}</td>
-                    <td><strong>{formatCurrency(p.total || p.price * p.quantity)}</strong></td>
+                    <td>{p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Product'}</td>
+                    <td>{formatCurrency(p.price || 0)}</td>
+                    <td>{p.quantity || 1}</td>
+                    <td><strong>{formatCurrency(p.total || ((p.price || 0) * (p.quantity || 1)))}</strong></td>
                   </tr>
                 ))}
               </tbody>
