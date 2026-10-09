@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -22,6 +22,7 @@ import TestimonialCard from '../components/TestimonialCard';
 import HorizontalVideoCard from '../components/HorizontalVideoCard';
 import ResultVideosSection from '../components/ResultVideosSection';
 import ConsultationModal from '../components/ConsultationModal';
+import CustomerReviewsSection from '../components/CustomerReviewsSection';
 
 import { 
   organizationInfo, 
@@ -31,7 +32,6 @@ import {
   horizontalVideosData,
   resultVideos, 
   testimonialsData, 
-  galleryPhotos, 
   faqsData
 } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
@@ -216,131 +216,6 @@ const TestimonialsCarousel = () => {
   );
 };
 
-// 8. Gallery Staggered Reveal Component (0ms, 100ms, 200ms scale 0.95 -> 1, opacity 0 -> 1)
-const GalleryStaggeredPreview = () => {
-  const { language } = useLanguage();
-  const [inView, setInView] = useState(false);
-  const galleryRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (galleryRef.current) observer.observe(galleryRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section ref={galleryRef} className={`section-sm gallery-section ${inView ? 'gallery-in-view' : ''}`} style={{ backgroundColor: '#ffffff', borderTop: '1px solid #E1E9DF' }}>
-      <div className="container">
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          marginBottom: '2rem',
-          flexWrap: 'wrap',
-          gap: '1rem'
-        }}>
-          <div>
-            <div className="section-badge">
-              <Sparkles size={14} />
-              <span>{language === 'mr' ? 'छायाचित्रे' : 'Photo Gallery'}</span>
-            </div>
-            <h2 style={{ fontSize: 'clamp(1.4rem, 2.5vw, 1.85rem)', color: '#006B2D', margin: 0 }}>
-              {language === 'mr' ? 'संस्थेचे आरोग्य उपक्रम व शिबिरे' : 'Health Camps & Field Activities'}
-            </h2>
-          </div>
-
-          <Link to="/photos" className="btn btn-outline btn-sm">
-            <span>{language === 'mr' ? 'सर्व फोटो पहा' : 'View Full Gallery'}</span>
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        <div className="grid-3 gallery-stagger-grid">
-          {galleryPhotos.slice(0, 3).map((photo, index) => (
-            <div
-              key={photo.id}
-              className={`gallery-reveal-card gallery-delay-${index + 1}`}
-              style={{
-                borderRadius: '16px',
-                overflow: 'hidden',
-                position: 'relative',
-                height: '240px',
-                boxShadow: '0 4px 15px rgba(0, 107, 45, 0.08)',
-                backgroundColor: '#04200e'
-              }}
-            >
-              <img
-                src={photo.image}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = photo.fallback;
-                }}
-                alt={photo.titleMr || photo.titleEn}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
-                className="gallery-zoom-img"
-              />
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to top, rgba(4,32,14,0.9) 0%, transparent 60%)'
-              }} />
-              <div style={{
-                position: 'absolute',
-                bottom: '1rem',
-                left: '1rem',
-                right: '1rem',
-                color: '#ffffff',
-                fontSize: '0.9rem',
-                fontWeight: 700
-              }}>
-                {language === 'mr' ? photo.titleMr : photo.titleEn}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <style>{`
-        .gallery-reveal-card {
-          opacity: 0;
-          transform: scale(0.95);
-          transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .gallery-in-view .gallery-delay-1 {
-          opacity: 1;
-          transform: scale(1);
-          transition-delay: 0ms;
-        }
-
-        .gallery-in-view .gallery-delay-2 {
-          opacity: 1;
-          transform: scale(1);
-          transition-delay: 100ms;
-        }
-
-        .gallery-in-view .gallery-delay-3 {
-          opacity: 1;
-          transform: scale(1);
-          transition-delay: 200ms;
-        }
-
-        .gallery-reveal-card:hover .gallery-zoom-img {
-          transform: scale(1.06);
-        }
-      `}</style>
-    </section>
-  );
-};
-
 const Home = () => {
   const { language } = useLanguage();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
@@ -489,8 +364,12 @@ const Home = () => {
       {/* 9. Testimonials / Reviews Smooth Auto-Sliding Carousel Section */}
       <TestimonialsCarousel />
 
-      {/* 8. Gallery Staggered Reveal Preview */}
-      <GalleryStaggeredPreview />
+      {/* Customer Reviews & Feedback Section (Matching Screenshot) */}
+      <section className="section" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #E1E9DF', padding: '3.5rem 0' }}>
+        <div className="container">
+          <CustomerReviewsSection onOrderNow={() => setIsConsultationOpen(true)} />
+        </div>
+      </section>
 
       {/* Frequently Asked Questions */}
       <section className="section-sm" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF' }}>

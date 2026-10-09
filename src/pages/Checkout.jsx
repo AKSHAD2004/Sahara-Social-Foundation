@@ -334,16 +334,16 @@ const Checkout = () => {
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'
-            ? 'पेमेंट विंडो बंद झाली. आपण पार्सल आल्यावर रोख (Cash on Delivery) द्वारे देखील ऑर्डर नोंदवू शकता.'
-            : 'Payment window was closed. You can also confirm your order using Cash on Delivery.'
+            ? 'पेमेंट प्रक्रिया पूर्ण झाली नाही. कृपया पुन्हा प्रयत्न करा किंवा COD + ₹२०० टोकन ॲडव्हान्स पर्याय निवडा.'
+            : 'Payment was not completed. Please try again or select the COD + ₹200 Token Advance option.'
         );
       },
       onError: (err) => {
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'
-            ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. आपण खालील पर्यायाने थेट "कॅश ऑन डिलिव्हरी" द्वारे ऑर्डर नोंदवू शकता.'
-            : 'Online payment error. You can proceed with Cash on Delivery instead.'
+            ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा टोकन ॲडव्हान्स पर्याय निवडा.'
+            : 'Online payment error. Please try again or select the Token Advance option.'
         );
       }
     });
@@ -383,45 +383,12 @@ const Checkout = () => {
             marginBottom: '1.25rem',
             fontSize: '0.92rem',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '0.75rem',
+            alignItems: 'center',
+            gap: '0.6rem',
             boxShadow: '0 4px 15px rgba(255, 201, 40, 0.15)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <AlertCircle size={20} style={{ flexShrink: 0, color: '#b38600' }} />
-              <span style={{ fontWeight: 600 }}>{paymentNotice}</span>
-            </div>
-            <div>
-              <button
-                type="button"
-                onClick={() => {
-                  const orderId = 'ORD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
-                  completeOrderPlacement(orderId, {
-                    isCod: true,
-                    advancePaid: 0,
-                    balanceDue: grandTotal,
-                    paymentStatus: 'Pending',
-                    paymentMethod: 'Cash on Delivery (Pay on Delivery)'
-                  });
-                }}
-                className="btn btn-sm"
-                style={{
-                  backgroundColor: '#006B2D',
-                  color: '#ffffff',
-                  fontWeight: 700,
-                  fontSize: '0.85rem',
-                  padding: '0.55rem 1.15rem',
-                  borderRadius: '10px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem'
-                }}
-              >
-                <span>{language === 'mr' ? '✓ पार्सल आल्यावर रोख द्या (COD ने त्वरित ऑर्डर नोंदवा)' : '✓ Confirm Order via Cash on Delivery Now'}</span>
-              </button>
-            </div>
+            <AlertCircle size={20} style={{ flexShrink: 0, color: '#b38600' }} />
+            <span style={{ fontWeight: 600 }}>{paymentNotice}</span>
           </div>
         )}
 
@@ -565,12 +532,12 @@ const Checkout = () => {
 
                   <div className="form-group">
                     <label className="form-label">
-                      {language === 'mr' ? 'ईमेल (पावतीसाठी)' : 'Email (For Bill)'}
+                      {language === 'mr' ? 'ईमेल (पावतीसाठी - ऐच्छिक)' : 'Email (For Bill - Optional)'}
                     </label>
                     <input
                       type="email"
                       className="form-input"
-                      placeholder="user@example.com"
+                      placeholder={language === 'mr' ? 'user@example.com (ऐच्छिक)' : 'user@example.com (Optional)'}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
@@ -734,46 +701,7 @@ const Checkout = () => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  {/* Option 1: Full Cash on Delivery (Pay upon delivery) */}
-                  <label style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '0.85rem',
-                    padding: '1.15rem',
-                    borderRadius: '16px',
-                    border: '2px solid',
-                    borderColor: formData.paymentMethod === 'cod' ? '#006B2D' : '#E1E9DF',
-                    backgroundColor: formData.paymentMethod === 'cod' ? '#e2faea' : '#ffffff',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: formData.paymentMethod === 'cod' ? '0 4px 12px rgba(0, 107, 45, 0.08)' : 'none'
-                  }}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={formData.paymentMethod === 'cod'}
-                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                      style={{ accentColor: '#006B2D', width: '18px', height: '18px', marginTop: '3px', flexShrink: 0 }}
-                    />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.35rem' }}>
-                        <div style={{ fontWeight: 800, color: '#006B2D', fontSize: '0.98rem' }}>
-                          {language === 'mr' ? 'कॅश ऑन डिलिव्हरी (पार्सल हातात आल्यावर रोख द्या)' : 'Cash on Delivery (Pay in Cash on Delivery)'}
-                        </div>
-                        <span style={{ fontSize: '0.8rem', backgroundColor: '#006B2D', color: '#ffffff', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 800 }}>
-                          {language === 'mr' ? 'थेट ऑर्डर - ₹० ॲडव्हान्स' : 'Instant Order - ₹0 Advance'}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.3rem', lineHeight: 1.45 }}>
-                        {language === 'mr' 
-                          ? `आता कोणतेही ऑनलाईन पेमेंट करण्याची गरज नाही. संपूर्ण रक्कम ₹${grandTotal} पार्सल कुरिअर बॉयच्या हातातून मिळाल्यानंतर रोख द्या.` 
-                          : `No upfront online payment required. Pay full ₹${grandTotal} in cash to the delivery courier person when your package arrives.`}
-                      </div>
-                    </div>
-                  </label>
-
-                  {/* Option 2: Razorpay Online Payment */}
+                  {/* Option 1: Razorpay Online Payment */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'flex-start',

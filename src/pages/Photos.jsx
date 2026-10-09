@@ -1,16 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, Image as ImageIcon, X, ZoomIn, Eye, Phone } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import { galleryPhotos, organizationInfo, socialLinks } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
+import { dbService } from '../services/db';
 
 const Photos = () => {
   const { language } = useLanguage();
+  const [photos, setPhotos] = useState(() => {
+    try {
+      const stored = dbService.getAll('galleryPhotos');
+      if (Array.isArray(stored) && stored.length > 0) return stored;
+    } catch (e) {}
+    return galleryPhotos;
+  });
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [activePhoto, setActivePhoto] = useState(null);
 
+  useEffect(() => {
+    // Proactively pull latest photos from Cloud Firestore
+    dbService.refreshFromFirebase('galleryPhotos').catch(() => {});
+
+    const unsub = dbService.subscribe('galleryPhotos', (newPhotos) => {
+      if (Array.isArray(newPhotos) && newPhotos.length > 0) {
+        setPhotos(newPhotos);
+      } else {
+        setPhotos(galleryPhotos);
+      }
+    });
+    return unsub;
+  }, []);
+
   const categories = [
-    { id: 'All', nameEn: 'All Photos (24)', nameMr: 'सर्व फोटो (२४)' },
+    { id: 'All', nameEn: `All Photos (${photos.length})`, nameMr: `सर्व फोटो (${photos.length})` },
     { id: 'Campaigns', nameEn: 'Campaigns & Banners', nameMr: 'अभियान व पोस्टर्स' },
     { id: 'Camps', nameEn: 'Health Camps', nameMr: 'आरोग्य शिबिरे' },
     { id: 'Counseling', nameEn: 'Patient Guidance', nameMr: 'समुपदेशन कक्ष' },
@@ -19,8 +41,8 @@ const Photos = () => {
   ];
 
   const filteredPhotos = selectedCategory === 'All'
-    ? galleryPhotos
-    : galleryPhotos.filter((p) => p.category === selectedCategory);
+    ? photos
+    : photos.filter((p) => p.category === selectedCategory);
 
   return (
     <div className="photos-page">

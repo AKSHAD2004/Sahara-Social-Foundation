@@ -102,7 +102,7 @@ export async function initializeRazorpayPayment({
     prefill: {
       name: customer.fullName || customer.name || '',
       contact: cleanPhone || '',
-      email: customer.email || ''
+      email: customer.email?.trim() || `${cleanPhone || 'customer'}@saharasocial.org`
     },
     theme: {
       color: '#006B2D',

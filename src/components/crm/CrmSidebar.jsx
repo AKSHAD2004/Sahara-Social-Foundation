@@ -1,13 +1,13 @@
-// CRM Admin Sidebar with collapsible subitems and responsive menu
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Target, Calendar, ShoppingBag, 
   Package, Handshake, Percent, CreditCard, LifeBuoy, 
   BarChart3, Bell, UserCheck, Settings, ChevronDown, 
-  ChevronRight, FileText, ChevronLeft, Award, Sparkles, ExternalLink
+  ChevronRight, FileText, ChevronLeft, Award, Sparkles, ExternalLink, Sliders, Camera, Video, MessageSquareQuote
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { dbService } from '../../services/db';
 import MissionLogoBadge from '../MissionLogoBadge';
 import UserAvatar from './UserAvatar';
 
@@ -17,6 +17,25 @@ export default function CrmSidebar({ collapsed, onToggleCollapse, mobileOpen, on
   const [commissionOpen, setCommissionOpen] = useState(
     location.pathname.startsWith('/crm/commission')
   );
+
+  const [pendingReviewsCount, setPendingReviewsCount] = useState(() => {
+    try {
+      const revs = dbService.getAll('reviews');
+      return Array.isArray(revs) ? revs.filter((r) => r.status === 'pending' || r.isApproved === false).length : 0;
+    } catch (e) {
+      return 0;
+    }
+  });
+
+  useEffect(() => {
+    const unsub = dbService.subscribe('reviews', (items) => {
+      if (Array.isArray(items)) {
+        const count = items.filter((r) => r.status === 'pending' || r.isApproved === false).length;
+        setPendingReviewsCount(count);
+      }
+    });
+    return unsub;
+  }, []);
 
   return (
     <aside className={`crm-sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
@@ -102,6 +121,43 @@ export default function CrmSidebar({ collapsed, onToggleCollapse, mobileOpen, on
             <NavLink to="/crm/products" className="crm-nav-link" onClick={onCloseMobile}>
               <Package size={18} />
               {!collapsed && <span>Products</span>}
+            </NavLink>
+
+            <NavLink to="/crm/banners" className="crm-nav-link" onClick={onCloseMobile}>
+              <Sliders size={18} />
+              {!collapsed && <span>Hero Slideshow</span>}
+            </NavLink>
+
+            <NavLink to="/crm/gallery" className="crm-nav-link" onClick={onCloseMobile}>
+              <Camera size={18} />
+              {!collapsed && <span>Photo Gallery</span>}
+            </NavLink>
+
+            <NavLink to="/crm/videos" className="crm-nav-link" onClick={onCloseMobile}>
+              <Video size={18} />
+              {!collapsed && <span>Video Gallery</span>}
+            </NavLink>
+
+            <NavLink to="/crm/reviews" className="crm-nav-link" onClick={onCloseMobile}>
+              <MessageSquareQuote size={18} />
+              {!collapsed && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  <span>Customer Reviews</span>
+                  {pendingReviewsCount > 0 && (
+                    <span style={{
+                      backgroundColor: '#d97706',
+                      color: '#ffffff',
+                      borderRadius: '10px',
+                      padding: '0.1rem 0.45rem',
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      lineHeight: 1.2
+                    }}>
+                      {pendingReviewsCount}
+                    </span>
+                  )}
+                </div>
+              )}
             </NavLink>
 
             <NavLink to="/crm/affiliates" className="crm-nav-link" onClick={onCloseMobile}>

@@ -1,17 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Sparkles, Phone, Video as VideoIcon, CheckCircle2 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import VideoCard from '../components/VideoCard';
 import HorizontalVideoCard from '../components/HorizontalVideoCard';
 import { resultVideos, horizontalVideosData, organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
+import { dbService } from '../services/db';
 
 const Videos = () => {
   const { language } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  const [videos, setVideos] = useState(() => {
+    try {
+      const stored = dbService.getAll('videos');
+      if (Array.isArray(stored) && stored.length > 0) return stored;
+    } catch (e) {}
+    return horizontalVideosData;
+  });
+
+  useEffect(() => {
+    // Proactively pull latest videos from Cloud Firestore
+    dbService.refreshFromFirebase('videos').catch(() => {});
+
+    const unsub = dbService.subscribe('videos', (newVideos) => {
+      if (Array.isArray(newVideos) && newVideos.length > 0) {
+        setVideos(newVideos);
+      } else {
+        setVideos(horizontalVideosData);
+      }
+    });
+    return unsub;
+  }, []);
+
   const categories = [
-    { id: 'All', nameEn: 'All Videos', nameMr: 'सर्व व्हिडिओ' },
+    { id: 'All', nameEn: `All Videos (${videos.length})`, nameMr: `सर्व व्हिडिओ (${videos.length})` },
     { id: 'Diabetes', nameEn: 'Diabetes (मधुमेह)', nameMr: 'मधुमेह मुक्ती' },
     { id: 'Addiction', nameEn: 'De-Addiction (व्यसनमुक्ती)', nameMr: 'व्यसनमुक्त भारत' },
     { id: 'Bones', nameEn: 'Joint Pain (सांधेदुखी)', nameMr: 'सांधेदुखी व हाडे' },
@@ -21,8 +44,8 @@ const Videos = () => {
   ];
 
   const filteredHorizontalVideos = selectedCategory === 'All'
-    ? horizontalVideosData
-    : horizontalVideosData.filter((v) => v.category === selectedCategory);
+    ? videos
+    : videos.filter((v) => v.category === selectedCategory);
 
   const filteredReels = selectedCategory === 'All'
     ? resultVideos

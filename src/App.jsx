@@ -44,6 +44,10 @@ import LeadList from './pages/crm/leads/LeadList';
 import FollowupList from './pages/crm/followups/FollowupList';
 import OrderList from './pages/crm/orders/OrderList';
 import ProductList from './pages/crm/products/ProductList';
+import HeroSlideList from './pages/crm/banners/HeroSlideList';
+import GalleryManager from './pages/crm/gallery/GalleryManager';
+import VideoManager from './pages/crm/videos/VideoManager';
+import ReviewManager from './pages/crm/reviews/ReviewManager';
 import AffiliateList from './pages/crm/affiliates/AffiliateList';
 import AffiliatePortal from './pages/crm/affiliates/AffiliatePortal';
 import CommissionDashboard from './pages/crm/commission/CommissionDashboard';
@@ -176,6 +180,14 @@ function App() {
                 <Route path="followups" element={<FollowupList />} />
                 <Route path="orders" element={<OrderList />} />
                 <Route path="products" element={<ProductList />} />
+                <Route path="banners" element={<HeroSlideList />} />
+                <Route path="slides" element={<HeroSlideList />} />
+                <Route path="gallery" element={<GalleryManager />} />
+                <Route path="photos-manager" element={<GalleryManager />} />
+                <Route path="videos" element={<VideoManager />} />
+                <Route path="videos-manager" element={<VideoManager />} />
+                <Route path="reviews" element={<ReviewManager />} />
+                <Route path="reviews-manager" element={<ReviewManager />} />
                 <Route path="affiliates" element={<AffiliateList />} />
                 <Route path="affiliate-portal" element={<AffiliatePortal />} />
                 

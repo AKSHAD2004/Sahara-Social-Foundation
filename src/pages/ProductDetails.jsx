@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
+import CustomerReviewsSection from '../components/CustomerReviewsSection';
 import { productsData, organizationInfo } from '../data/websiteData';
 import { dbService } from '../services/db';
 import { useLanguage } from '../context/LanguageContext';
@@ -600,6 +601,14 @@ const ProductDetails = () => {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Customer Reviews & Feedback Section (Matching Screenshot) */}
+        <div style={{ marginTop: '3rem', borderTop: '1px solid #E1E9DF', paddingTop: '2rem' }}>
+          <CustomerReviewsSection 
+            productId={product.id}
+            onOrderNow={handleOrderNow}
+          />
         </div>
       </div>
 

@@ -1,20 +1,39 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, ArrowRight, Sparkles, ChevronDown, ChevronUp, ArrowDown } from 'lucide-react';
 import { horizontalVideosData } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
+import { dbService } from '../services/db';
 
 const ResultVideosSection = () => {
   const { language } = useLanguage();
   const [showAllVideos, setShowAllVideos] = useState(false);
   const sectionRef = useRef(null);
 
-  // Exact videos from samarthkolhapur.com homepage:
-  // Top 4 shown by default matching media_1791263516313.png
-  // Remaining 4 revealed when user clicks "More Videos"
+  const [videos, setVideos] = useState(() => {
+    try {
+      const stored = dbService.getAll('videos');
+      if (Array.isArray(stored) && stored.length > 0) return stored;
+    } catch (e) {}
+    return horizontalVideosData;
+  });
+
+  useEffect(() => {
+    dbService.refreshFromFirebase('videos').catch(() => {});
+    const unsub = dbService.subscribe('videos', (newVideos) => {
+      if (Array.isArray(newVideos) && newVideos.length > 0) {
+        setVideos(newVideos);
+      } else {
+        setVideos(horizontalVideosData);
+      }
+    });
+    return unsub;
+  }, []);
+
+  // Top 4 shown by default, remaining revealed when user clicks "More Videos"
   const visibleVideos = showAllVideos
-    ? horizontalVideosData.slice(0, 8)
-    : horizontalVideosData.slice(0, 4);
+    ? videos.slice(0, 8)
+    : videos.slice(0, 4);
 
   // Global mutual pause: ensures only ONE video can play at a time across the entire page
   const handlePlay = (e) => {
@@ -239,10 +258,11 @@ const ResultVideosSection = () => {
 
         {/* Action Buttons: "More Videos" toggle + Link to Full Video Gallery + Easy Scroll Down */}
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-          <button 
-            type="button"
-            onClick={handleToggleVideos}
-            className="btn btn-more-videos"
+          {videos.length > 4 && (
+            <button 
+              type="button"
+              onClick={handleToggleVideos}
+              className="btn btn-more-videos"
             style={{ 
               backgroundColor: '#006B2D',
               color: '#ffffff',
@@ -283,8 +303,9 @@ const ResultVideosSection = () => {
               </>
             )}
           </button>
+        )}
 
-          <Link 
+        <Link 
             to="/videos" 
             style={{ 
               backgroundColor: '#F3F8F1',

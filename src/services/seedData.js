@@ -1,5 +1,6 @@
 // Clean Seed Data for Sahara Social Foundation CRM
 // All dummy operational data removed for production readiness
+import { galleryPhotos, horizontalVideosData } from '../data/websiteData';
 
 export const initialUsers = [
   {
@@ -415,3 +416,243 @@ export const initialCommissionTransactions = [];
 export const initialPayouts = [];
 export const initialSupportTickets = [];
 export const initialAuditLogs = [];
+
+export const initialHeroSlides = [
+  {
+    id: 'slide_1',
+    image: '/slide-antox-d.jpg',
+    fallback: '/hero-slide-1.jpg',
+    pillText: 'Antox D + Antox T',
+    badgeEn: 'Antox D + Antox T • Diabetes Care',
+    badgeMr: 'मधुमेहमुक्त भारत अभियान • Antox D + Antox T',
+    titleEn: 'Nutrifeel Antox D & Antox T Herbal Formula',
+    titleMr: 'मधुमेहामुळे होणाऱ्या समस्यांमध्ये दिलासा देण्यासाठी लाभदायक',
+    displayOrder: 1,
+    status: 'active'
+  },
+  {
+    id: 'slide_2',
+    image: '/slide-vyasanmukt.jpg',
+    fallback: '/slide-vyasanmukt.jpg',
+    pillText: 'Antox B-AL-NICO SPRAY + Antox T',
+    badgeEn: 'Addiction-Free Campaign • Antox B-AL-NICO + Antox T',
+    badgeMr: 'व्यसनमुक्त भारत अभियान • Antox B-AL-NICO + Antox T',
+    titleEn: 'Herbal Spray & Tea for Tobacco & Alcohol De-addiction',
+    titleMr: 'कोणत्याही प्रकारचे व्यसन सोडवण्यासाठी अत्यंत फायदेशीर',
+    displayOrder: 2,
+    status: 'active'
+  },
+  {
+    id: 'slide_3',
+    image: '/slide-rogmukt-hlk.jpg',
+    fallback: '/slide-rogmukt-hlk.jpg',
+    pillText: 'Antox HLK + Antox T',
+    badgeEn: 'Disease-Free Campaign • Heart, Liver & Kidney Care',
+    badgeMr: 'रोगमुक्त भारत अभियान • Antox HLK + Antox T',
+    titleEn: 'Arjun & Methi Nutraceutical Formulation for Vital Organs',
+    titleMr: 'हार्ट, लिव्हर आणि किडनी संरक्षणासाठी व आरोग्यासाठी फायदेशीर',
+    displayOrder: 3,
+    status: 'active'
+  },
+  {
+    id: 'slide_4',
+    image: '/slide-vednamukt.jpg',
+    fallback: '/slide-vednamukt.jpg',
+    pillText: 'Antox PN Powder + Oil',
+    badgeEn: 'Pain-Free Campaign • Joint, Bone & Spine Care',
+    badgeMr: 'वेदनामुक्त भारत अभियान • Antox PN Powder + Oil',
+    titleEn: 'Marine Collagen & Herbal Oil for Joint and Back Relief',
+    titleMr: 'सर्व प्रकारच्या सांधेदुखी व मणक्याच्या त्रासापासून आराम मिळवण्यात फायदेशीर',
+    displayOrder: 4,
+    status: 'active'
+  },
+  {
+    id: 'slide_5',
+    image: '/slide-rogmukt-bacid.jpg',
+    fallback: '/slide-rogmukt-bacid.jpg',
+    pillText: 'Antox B-Acid + Antox T',
+    badgeEn: 'Disease-Free Campaign • Acidity & Digestion Care',
+    badgeMr: 'रोगमुक्त भारत अभियान • Antox B-Acid + Antox T',
+    titleEn: 'Electro-Homeopathic & Herbal Formula for Hyperacidity Relief',
+    titleMr: 'ॲसिडिटी (आम्लपित्त) व पचन विकार नियंत्रित करण्यासाठी लाभदायक',
+    displayOrder: 5,
+    status: 'active'
+  },
+  {
+    id: 'slide_6',
+    image: '/slide-rogmukt-antox-x.jpg',
+    fallback: '/slide-rogmukt-antox-x.jpg',
+    pillText: 'Antox X + Antox T',
+    badgeEn: 'Disease-Free Campaign • Vitality & Men Strength',
+    badgeMr: 'रोगमुक्त भारत अभियान • Antox X + Antox T',
+    titleEn: 'Safed Musali & Botanical Extracts for Energy & Vitality',
+    titleMr: 'पुरुषांच्या लैंगिक समस्या व अशक्तपणा दूर करण्यासाठी लाभदायक',
+    displayOrder: 6,
+    status: 'active'
+  },
+  {
+    id: 'slide_7',
+    image: '/slide-antox-amrut.jpg',
+    fallback: '/hero-slide-2.jpg',
+    pillText: 'Antox Amrut 51 + Antox T',
+    badgeEn: 'Pre-Clinically Tested • Sharir Shuddhi Panchakarma',
+    badgeMr: 'शरीरशुद्धी पंचकर्म • Antox Amrut 51 + Antox T',
+    titleEn: 'Detoxification & Essential Nutrition for Complete Body Health',
+    titleMr: 'शरीरशुद्धी + पोषक तत्व = आरोग्यदायी निरोगी शरीर',
+    displayOrder: 7,
+    status: 'active'
+  }
+];
+
+export const initialGalleryPhotos = galleryPhotos;
+export const initialVideos = horizontalVideosData;
+
+export const initialReviews = [
+  {
+    id: 'rev-01',
+    rating: 5,
+    name: 'Gary Miller',
+    date: 'October 3, 2026',
+    status: 'approved',
+    isApproved: true,
+    review: 'bannersI am not offering SEO or Pay Per Click Advertising services.\n\nThis is something entirely different.\n\nLet me demonstrate how it works and you’ll be pleasantly surprised by the results.\n\nSimply send us your desired keywords or fill online quote form on our website, and I’ll send you minimum traffic amount that ... Show more'
+  },
+  {
+    id: 'rev-02',
+    rating: 5,
+    name: 'Sukumar',
+    date: 'December 13, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'जबरदस्त फॉर्म्युला आहे शुगर साठी'
+  },
+  {
+    id: 'rev-03',
+    rating: 5,
+    name: 'दिनकर नलवडे (Dinkar Nalvade)',
+    date: 'December 13, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'माझी शुगर लेव्हल आता पूर्णपणे नियंत्रणात आहे. Antox D आणि T ने खूप चांगला परिणाम मिळाला. धन्यवाद सहारा सोशल फाऊंडेशन!'
+  },
+  {
+    id: 'rev-04',
+    rating: 5,
+    name: 'सौ. वंदना मोरे (Vandana More)',
+    date: 'December 10, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: '१० वर्षांचे तंबाखूचे व्यसन Antox B-AL-NICO स्प्रे मुळे बंद झाले. घरात पुन्हा आनंदाचे वातावरण निर्माण झाले आहे.'
+  },
+  {
+    id: 'rev-05',
+    rating: 5,
+    name: 'दिलीपराव कुलकर्णी (Diliprao Kulkarni)',
+    date: 'November 28, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'गुडघेदुखी आणि सांधेदुखीवर Antox PN पावडर अत्यंत प्रभावी ठरली. आता विनासायास चालता येते.'
+  },
+  {
+    id: 'rev-06',
+    rating: 5,
+    name: 'सचिन गायकवाड (Sachin Gaikwad)',
+    date: 'November 15, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'पित्त, छातीतील जळजळ आणि अपचनावर Antox-B Acid ने तात्काळ आराम दिला. १ आठवड्यात गुण आला.'
+  },
+  {
+    id: 'rev-07',
+    rating: 5,
+    name: 'महेश पाटील (Mahesh Patil)',
+    date: 'October 22, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'खूप उत्तम आयुर्वेदिक औषधे आहेत. फोनवर समुपदेशकांनी आहाराचे पथ्य व्यवस्थित समजावून सांगितले.'
+  },
+  {
+    id: 'rev-08',
+    rating: 5,
+    name: 'Ramesh Shinde',
+    date: 'October 18, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'Fasting sugar dropped from 220 to 110 after 40 days course. Best natural ayurvedic formula.'
+  },
+  {
+    id: 'rev-09',
+    rating: 5,
+    name: 'अशोक देसाई (Ashok Desai)',
+    date: 'September 30, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'पार्सल वेळेवर मिळाले आणि पॅकिंग खूप सुरक्षित होते. औषधाचा गुण अप्रतिम आहे.'
+  },
+  {
+    id: 'rev-10',
+    rating: 5,
+    name: 'सुरेश कांबळे (Suresh Kamble)',
+    date: 'September 14, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'Antox-HLK घेतल्यापासून रक्तदाब आणि कोलेस्टेरॉल नियंत्रणात आले आहे. अत्यंत विश्वासार्ह संस्था.'
+  },
+  {
+    id: 'rev-11',
+    rating: 5,
+    name: 'Sunita Joshi',
+    date: 'August 29, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'Very effective products. The doctors and counseling staff guide you personally over phone call.'
+  },
+  {
+    id: 'rev-12',
+    rating: 5,
+    name: 'आनंदराव मोहिते (Anandrao Mohite)',
+    date: 'August 12, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'व्यसनमुक्ती स्प्रे खूप चांगला आहे, कोणतीही जबरदस्ती न करता व्यसन सुटले.'
+  },
+  {
+    id: 'rev-13',
+    rating: 5,
+    name: 'Dr. P. K. Sawant',
+    date: 'July 25, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'Sugar control is 100% genuine with Antox D and T tea. Highly recommend to everyone.'
+  },
+  {
+    id: 'rev-14',
+    rating: 5,
+    name: 'प्रभाकर खोत (Prabhakar Khot)',
+    date: 'July 10, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'सांध्यांमधील कटकट आवाज आणि सूज Antox PN ऑईलने कमी झाली.'
+  },
+  {
+    id: 'rev-15',
+    rating: 5,
+    name: 'Vikas Bhosale',
+    date: 'June 22, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'Original genuine formulas. Prompt delivery in Kolhapur district.'
+  },
+  {
+    id: 'rev-16',
+    rating: 5,
+    name: 'तानाजी चव्हाण (Tanaji Chavan)',
+    date: 'June 05, 2025',
+    status: 'approved',
+    isApproved: true,
+    review: 'सहारा सोशल फाऊंडेशनचे काम समाजोपयोगी आहे. औषधांनी आम्हाला नवा विश्वास दिला.'
+  }
+];
+
+
+

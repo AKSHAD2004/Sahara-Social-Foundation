@@ -8,12 +8,16 @@ import {
   initialFollowups, 
   initialOrders, 
   initialProducts, 
+  initialHeroSlides,
+  initialGalleryPhotos,
+  initialVideos,
   initialCommissionSlabs, 
   initialCommissionTransactions, 
   initialPayouts, 
   initialSupportTickets, 
   initialAuditLogs, 
-  initialSettings 
+  initialSettings,
+  initialReviews
 } from './seedData';
 import { 
   isFirebaseConfigured, 
@@ -46,6 +50,10 @@ export const COLLECTIONS = [
   'followups',
   'orders',
   'products',
+  'heroSlides',
+  'galleryPhotos',
+  'videos',
+  'reviews',
   'commissionSlabs',
   'commissionTransactions',
   'commissionPayouts',
@@ -191,6 +199,10 @@ export const initialDataMap = {
   followups: initialFollowups,
   orders: initialOrders,
   products: initialProducts,
+  heroSlides: initialHeroSlides,
+  galleryPhotos: initialGalleryPhotos,
+  videos: initialVideos,
+  reviews: initialReviews,
   commissionSlabs: initialCommissionSlabs,
   commissionTransactions: initialCommissionTransactions,
   commissionPayouts: initialPayouts,
@@ -396,6 +408,8 @@ function setupFirestoreRealtimeSync() {
                 const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
                 return dateB - dateA;
               });
+            } else if (colName === 'heroSlides') {
+              mergedDocs.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
             }
 
             state[colName] = mergedDocs;

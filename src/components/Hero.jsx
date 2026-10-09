@@ -8,6 +8,7 @@ import {
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
+import { dbService } from '../services/db';
 
 // Configurable Hero Slideshow Images
 // Replace or add your custom image paths here when ready
@@ -109,10 +110,51 @@ export const formatNumberByLanguage = (num, lang) => {
 const Hero = ({ onOpenConsultation, customSlides = null }) => {
   const { language } = useLanguage();
 
-  // Slideshow state
-  const slides = customSlides && customSlides.length > 0 ? customSlides : heroSlidesData;
+  // Dynamic slideshow state from CRM dbService / Firestore
+  const [slides, setSlides] = useState(() => {
+    if (customSlides && customSlides.length > 0) return customSlides;
+    try {
+      const stored = dbService.getAll('heroSlides');
+      const active = Array.isArray(stored) ? stored.filter((s) => s.status !== 'inactive') : [];
+      if (active.length > 0) {
+        return active.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
+      }
+    } catch (e) {}
+    return heroSlidesData;
+  });
+
+  useEffect(() => {
+    if (customSlides && customSlides.length > 0) {
+      setSlides(customSlides);
+      return;
+    }
+
+    // Proactively pull latest slides from Cloud Firestore
+    dbService.refreshFromFirebase('heroSlides').catch(() => {});
+
+    const unsub = dbService.subscribe('heroSlides', (newSlides) => {
+      if (Array.isArray(newSlides) && newSlides.length > 0) {
+        const active = newSlides.filter((s) => s.status !== 'inactive');
+        if (active.length > 0) {
+          active.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
+          setSlides(active);
+          return;
+        }
+      }
+      setSlides(heroSlidesData);
+    });
+    return unsub;
+  }, [customSlides]);
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const timerRef = useRef(null);
+
+  // Ensure currentSlide is within bounds if slides change
+  useEffect(() => {
+    if (currentSlide >= slides.length && slides.length > 0) {
+      setCurrentSlide(0);
+    }
+  }, [slides.length, currentSlide]);
 
   // Unstoppable auto-advance timer: smoothly moves forward every 4.5 seconds
   const resetTimer = useCallback(() => {
@@ -177,29 +219,6 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
                         }
                       }}
                     />
-
-                    {/* Official Clean Product Pill Overlay - Completely eliminates Gemini AI Watermark */}
-                    {slide.id === 2 ? (
-                      <div className="hero-slide-overlay-card slide-card-2 notranslate" translate="no" aria-hidden="true">
-                        <span className="overlay-pill-line1">Antox B-AL-NICO SPRAY</span>
-                        <span className="overlay-pill-plus">+</span>
-                        <span className="overlay-pill-line2">Antox T</span>
-                      </div>
-                    ) : slide.id === 4 ? (
-                      <div className="hero-slide-overlay-vednamukt notranslate" translate="no" aria-hidden="true">
-                        <div className="overlay-pill-red">
-                          <span>Skin • Bone • Joint</span>
-                        </div>
-                        <div className="overlay-pill-green">
-                          <span className="overlay-pill-bold">Antox PN</span>
-                          <span className="overlay-pill-sub">Powder + Oil</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className={`hero-slide-overlay-pill slide-pill-${slide.id} notranslate`} translate="no" aria-hidden="true">
-                        <span>{slide.pillText}</span>
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -382,142 +401,6 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           object-position: center;
           display: block;
           border-radius: 15px;
-        }
-
-        /* =======================================================
-           CLEAN HERO SLIDE BADGE OVERLAYS (Removes Gemini AI Watermark)
-           ======================================================= */
-        .hero-slide-overlay-pill {
-          position: absolute;
-          bottom: 5.6%;
-          right: 3.2%;
-          background: linear-gradient(180deg, #1f8242 0%, #135d2d 100%);
-          color: #ffffff;
-          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
-          font-weight: 800;
-          font-size: clamp(0.55rem, 2.2cqw, 1.35rem);
-          letter-spacing: 0.02em;
-          padding: clamp(3px, 0.9cqw, 13px) clamp(12px, 3.2cqw, 38px);
-          min-height: clamp(22px, 8.5cqw, 56px);
-          border-radius: 9999px;
-          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
-          box-shadow: 
-            0 8px 22px rgba(0, 0, 0, 0.45), 
-            0 2px 6px rgba(0, 107, 45, 0.4),
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          white-space: nowrap;
-          pointer-events: none;
-          z-index: 4;
-          line-height: 1;
-        }
-
-        /* Slide 2: Multi-line Card for Addiction Spray + Tea */
-        .hero-slide-overlay-card.slide-card-2 {
-          position: absolute;
-          bottom: 4.5%;
-          right: 3.2%;
-          background: linear-gradient(180deg, #1e7d3f 0%, #12582a 100%);
-          color: #ffffff;
-          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
-          font-weight: 800;
-          border-radius: clamp(10px, 2.5cqw, 24px);
-          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
-          box-shadow: 
-            0 8px 22px rgba(0, 0, 0, 0.45), 
-            0 2px 6px rgba(0, 107, 45, 0.4),
-            inset 0 1px 1.5px rgba(255, 255, 255, 0.5);
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-          padding: clamp(4px, 1.2cqw, 15px) clamp(10px, 2.6cqw, 32px);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          pointer-events: none;
-          z-index: 4;
-          line-height: 1.2;
-        }
-
-        .slide-card-2 .overlay-pill-line1 {
-          font-size: clamp(0.52rem, 1.9cqw, 1.2rem);
-          white-space: nowrap;
-        }
-
-        .slide-card-2 .overlay-pill-plus {
-          font-size: clamp(0.58rem, 2.2cqw, 1.3rem);
-          margin: 1px 0;
-          line-height: 1;
-        }
-
-        .slide-card-2 .overlay-pill-line2 {
-          font-size: clamp(0.52rem, 1.9cqw, 1.2rem);
-          white-space: nowrap;
-        }
-
-        /* Slide 4: Pain relief card (Skin • Bone • Joint + Antox PN Powder + Oil) */
-        .hero-slide-overlay-vednamukt {
-          position: absolute;
-          bottom: 1.2%;
-          right: 1.2%;
-          width: 58cqw;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: clamp(4px, 1.1cqw, 12px);
-          pointer-events: none;
-          z-index: 4;
-        }
-
-        .hero-slide-overlay-vednamukt .overlay-pill-red {
-          background: #e60050;
-          color: #ffffff;
-          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
-          font-weight: 800;
-          font-size: clamp(0.6rem, 2.4cqw, 1.45rem);
-          padding: clamp(3px, 0.9cqw, 12px) clamp(14px, 3cqw, 36px);
-          border-radius: 9999px;
-          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-          white-space: nowrap;
-          text-align: center;
-          width: 82%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .hero-slide-overlay-vednamukt .overlay-pill-green {
-          background: linear-gradient(180deg, #1f8242 0%, #135d2d 100%);
-          color: #ffffff;
-          font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
-          font-weight: 800;
-          padding: clamp(4px, 1cqw, 14px) clamp(12px, 2.5cqw, 30px);
-          border-radius: clamp(10px, 2.2cqw, 22px);
-          border: clamp(1.5px, 0.3cqw, 3px) solid rgba(255, 255, 255, 0.95);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          line-height: 1.25;
-          margin-right: 47%;
-        }
-
-        .hero-slide-overlay-vednamukt .overlay-pill-bold {
-          font-size: clamp(0.55rem, 2.1cqw, 1.3rem);
-          white-space: nowrap;
-        }
-
-        .hero-slide-overlay-vednamukt .overlay-pill-sub {
-          font-size: clamp(0.52rem, 1.9cqw, 1.2rem);
-          white-space: nowrap;
         }
 
         /* Slide Counter Pill */
