@@ -187,15 +187,29 @@ export async function syncProfileToFirebase(profile) {
   return { success: true, id: profileId, data: payload, note: 'Cached locally' };
 }
 
+let anonymousAuthAttempted = false;
+let anonymousAuthDisabled = false;
+
 /**
- * Ensures anonymous authentication so guest visitors placing orders have valid Firestore write rights.
+ * Ensures anonymous authentication so guest visitors have valid Firestore credentials if enabled.
+ * If anonymous auth is not configured in Firebase Console, cleanly skips further attempts.
  */
 export async function ensureFirebaseAuth() {
-  if (isFirebaseConfigured && auth && !auth.currentUser) {
-    try {
-      await signInAnonymously(auth);
-      console.log('[Firebase Auth] Guest visitor anonymously authenticated for live data access.');
-    } catch (err) {
+  if (anonymousAuthDisabled || !isFirebaseConfigured || !auth || auth.currentUser) {
+    return;
+  }
+  if (anonymousAuthAttempted) {
+    return;
+  }
+  anonymousAuthAttempted = true;
+
+  try {
+    await signInAnonymously(auth);
+    console.log('[Firebase Auth] Guest visitor anonymously authenticated for live data access.');
+  } catch (err) {
+    // If anonymous auth is not turned on in Firebase Console, disable permanently to prevent 400 errors
+    anonymousAuthDisabled = true;
+    if (err?.code !== 'auth/configuration-not-found' && err?.code !== 'auth/admin-restricted-operation') {
       console.warn('[Firebase Auth] Anonymous sign-in notice (optional):', err.message);
     }
   }

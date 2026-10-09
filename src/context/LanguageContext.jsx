@@ -18,9 +18,26 @@ export const applyGoogleTranslate = (langCode) => {
   try {
     const targetCode = langCode || 'en';
     
-    // If GTranslate floating widget is active, trigger it directly
-    if (typeof window.doGTranslate === 'function') {
-      window.doGTranslate('en|' + targetCode);
+    // If resetting to default English and no foreign translation active, skip
+    if (targetCode === 'en' && (!document.cookie.includes('googtrans') || document.cookie.includes('googtrans=/en/en'))) {
+      return;
+    }
+
+    // Helper to safely invoke GTranslate when its internal __GT library is ready
+    const tryGTranslate = () => {
+      if (typeof window.doGTranslate === 'function') {
+        try {
+          window.doGTranslate('en|' + targetCode);
+          return true;
+        } catch (e) {
+          // GTranslate float.js is still loading its internal script bundle (__GT)
+          return false;
+        }
+      }
+      return false;
+    };
+
+    if (tryGTranslate()) {
       return;
     }
 
@@ -41,23 +58,22 @@ export const applyGoogleTranslate = (langCode) => {
     // Direct trigger for Google Translate select element if present
     let attempts = 0;
     const triggerCombo = () => {
-      if (typeof window.doGTranslate === 'function') {
-        window.doGTranslate('en|' + targetCode);
+      if (tryGTranslate()) {
         return;
       }
       const select = document.querySelector('.goog-te-combo');
       if (select) {
         select.value = targetCode;
         select.dispatchEvent(new Event('change', { bubbles: true }));
-      } else if (attempts < 15) {
+      } else if (attempts < 10) {
         attempts++;
-        setTimeout(triggerCombo, 200);
+        setTimeout(triggerCombo, 300);
       }
     };
 
     triggerCombo();
   } catch (err) {
-    console.warn('Google Translate trigger error:', err);
+    // Suppress translation bootstrap notice
   }
 };
 

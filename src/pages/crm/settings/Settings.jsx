@@ -211,6 +211,45 @@ export default function Settings() {
             </button>
           </div>
 
+          {/* Firestore Security Rules helper box */}
+          <div style={{
+            marginTop: '1.25rem',
+            backgroundColor: '#fffbeb',
+            border: '1px solid #fef3c7',
+            borderRadius: '10px',
+            padding: '1rem',
+            fontSize: '0.85rem'
+          }}>
+            <div style={{ fontWeight: 700, color: '#92400e', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Shield size={16} /> Important: Cloud Firestore Security Rules Configuration
+            </div>
+            <div style={{ color: '#78350f', lineHeight: 1.5, marginBottom: '0.5rem' }}>
+              If writes or synchronization notes show <em>"Missing or insufficient permissions"</em>, set and publish this rule in 
+              <a href="https://console.firebase.google.com/project/sahara-social-foundation/firestore/rules" target="_blank" rel="noreferrer" style={{ color: '#b45309', fontWeight: 700, marginLeft: '5px', textDecoration: 'underline' }}>
+                Firebase Console &gt; Firestore Database &gt; Rules
+              </a>:
+            </div>
+            <pre style={{
+              background: '#1e293b',
+              color: '#f8fafc',
+              padding: '0.75rem 1rem',
+              borderRadius: '6px',
+              fontSize: '0.8rem',
+              margin: '0.5rem 0',
+              overflowX: 'auto',
+              userSelect: 'all'
+            }}>
+{`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}`}
+            </pre>
+          </div>
+
           {/* Connection Test Result */}
           {fbStatus.result && (
             <div style={{

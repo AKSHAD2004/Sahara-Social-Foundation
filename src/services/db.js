@@ -246,6 +246,22 @@ export function initDatabase() {
   }, 400);
 }
 
+let permissionWarningDispatched = false;
+
+function handleFirestorePermissionError(source, colName, err) {
+  if (err?.code === 'permission-denied' || err?.message?.includes('permissions') || err?.message?.includes('Missing or insufficient')) {
+    if (!permissionWarningDispatched) {
+      permissionWarningDispatched = true;
+      console.warn('[Cloud Firestore Permission Notice] Database security rules currently restrict read/write access. The system is operating safely in local reactive mode. To sync live across all devices, open Firebase Console > Firestore Database > Rules and publish: allow read, write: if true;');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: colName, source } }));
+      }
+    }
+  } else {
+    console.warn(`Firestore note for ${colName}:`, err?.message || err);
+  }
+}
+
 // Setup live listeners to Cloud Firestore
 function setupFirestoreRealtimeSync() {
   COLLECTIONS.forEach((colName) => {
@@ -264,10 +280,10 @@ function setupFirestoreRealtimeSync() {
             state.settings = currentSettings;
             saveCollection('settings', false);
             setDoc(settingsDocRef, sanitizeForFirestore({ ...currentSettings, syncedAt: new Date().toISOString() }), { merge: true }).catch((err) => {
-              console.warn('Firestore auto-seed settings note:', err.message);
+              handleFirestorePermissionError('auto-seed-settings', 'settings', err);
             });
           }
-        }, (err) => console.warn(`Firestore sync note for ${colName}:`, err.message));
+        }, (err) => handleFirestorePermissionError('sync-settings', colName, err));
       } else {
         const colRef = collection(firestoreDb, colName);
         firestoreUnsubscribers[colName] = onSnapshot(colRef, (snapshot) => {
@@ -419,10 +435,7 @@ function setupFirestoreRealtimeSync() {
             saveCollection(colName, false);
           }
         }, (err) => {
-          console.warn(`Firestore sync note for ${colName}:`, err.message);
-          if (err?.code === 'permission-denied') {
-            window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: colName } }));
-          }
+          handleFirestorePermissionError('sync', colName, err);
         });
       }
     } catch (err) {
@@ -1257,10 +1270,7 @@ export const dbService = {
         return localItems;
       }
     } catch (err) {
-      console.warn(`Manual refresh note for ${collectionName}:`, err.message);
-      if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName } }));
-      }
+      handleFirestorePermissionError('refresh', collectionName, err);
     }
     return state[collectionName] || [];
   }
