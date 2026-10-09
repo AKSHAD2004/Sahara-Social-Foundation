@@ -7,6 +7,7 @@ import {
 import { formatCurrency } from '../../../utils/formatters';
 import { dbService } from '../../../services/db';
 import { initialProducts } from '../../../services/seedData';
+import { getComboItems } from '../../../utils/comboHelper';
 import CrmModal from '../../../components/crm/CrmModal';
 
 export default function ProductList() {
@@ -211,15 +212,29 @@ export default function ProductList() {
                   <tr key={prod.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <img
-                          src={prod.image || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100'}
-                          alt={prod.name}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100';
-                          }}
-                          style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }}
-                        />
+                        {(() => {
+                          const combo = getComboItems(prod);
+                          if (combo && combo.length >= 2) {
+                            return (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', width: '56px', height: '42px', padding: '2px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', flexShrink: 0 }}>
+                                <img src={combo[0].image} alt="" style={{ width: '46%', height: '100%', objectFit: 'contain' }} />
+                                <span style={{ fontSize: '10px', fontWeight: 800, color: '#006B2D' }}>+</span>
+                                <img src={combo[1].image} alt="" style={{ width: '46%', height: '100%', objectFit: 'contain' }} />
+                              </div>
+                            );
+                          }
+                          return (
+                            <img
+                              src={prod.image || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100'}
+                              alt={prod.name}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100';
+                              }}
+                              style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'contain', border: '1px solid #e2e8f0', flexShrink: 0 }}
+                            />
+                          );
+                        })()}
                         <div>
                           <strong style={{ color: '#1e293b' }}>{prod.name}</strong>
                           <div style={{ fontSize: '0.75rem', color: '#64748b', maxWidth: '320px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

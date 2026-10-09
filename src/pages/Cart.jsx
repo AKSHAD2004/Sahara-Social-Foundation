@@ -11,6 +11,7 @@ import {
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { organizationInfo } from '../data/websiteData';
+import { getComboItems } from '../utils/comboHelper';
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, subtotal, deliveryCharges, grandTotal } = useCart();
@@ -89,24 +90,50 @@ const Cart = () => {
                     alignItems: 'center'
                   }}
                 >
-                  <img
-                    src={item.image}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = item.fallbackImage;
-                    }}
-                    alt={item.nameMr || item.nameEn}
-                    style={{
-                      width: '74px',
-                      height: '74px',
-                      borderRadius: '12px',
-                      objectFit: 'contain',
-                      backgroundColor: '#F3F8F1',
-                      flexShrink: 0,
-                      padding: '0.25rem',
-                      border: '1px solid #E1E9DF'
-                    }}
-                  />
+                  {(() => {
+                    const combo = getComboItems(item);
+                    if (combo && combo.length >= 2) {
+                      return (
+                        <div style={{
+                          width: '74px',
+                          height: '74px',
+                          borderRadius: '12px',
+                          backgroundColor: '#F3F8F1',
+                          padding: '0.2rem',
+                          border: '1px solid #E1E9DF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '2px',
+                          flexShrink: 0
+                        }}>
+                          <img src={combo[0].image} alt="" style={{ width: '46%', height: '100%', objectFit: 'contain' }} />
+                          <span style={{ fontSize: '11px', fontWeight: 800, color: '#006B2D' }}>+</span>
+                          <img src={combo[1].image} alt="" style={{ width: '46%', height: '100%', objectFit: 'contain' }} />
+                        </div>
+                      );
+                    }
+                    return (
+                      <img
+                        src={item.image}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = item.fallbackImage;
+                        }}
+                        alt={item.nameMr || item.nameEn}
+                        style={{
+                          width: '74px',
+                          height: '74px',
+                          borderRadius: '12px',
+                          objectFit: 'contain',
+                          backgroundColor: '#F3F8F1',
+                          flexShrink: 0,
+                          padding: '0.25rem',
+                          border: '1px solid #E1E9DF'
+                        }}
+                      />
+                    );
+                  })()}
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <Link to={`/shop/${item.id}`}>

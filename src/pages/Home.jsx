@@ -270,13 +270,13 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="products-grid home-featured-grid" style={{ marginBottom: '2.5rem' }}>
+          <div className="home-featured-grid" style={{ marginBottom: '2.5rem' }}>
             {featuredProducts.slice(0, 4).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <Link 
               to="/shop" 
               className="btn btn-primary btn-lg"
@@ -284,26 +284,37 @@ const Home = () => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.65rem',
-                padding: '0.85rem 2.25rem',
+                padding: '0.9rem 2.5rem',
                 borderRadius: '50px',
-                fontSize: '1rem',
-                fontWeight: 600,
-                boxShadow: '0 4px 16px rgba(0, 107, 45, 0.22)',
+                fontSize: '1.02rem',
+                fontWeight: 700,
+                boxShadow: '0 6px 20px rgba(0, 107, 45, 0.25)',
                 transition: 'all 0.25s ease'
               }}
             >
-              <ShoppingBag size={18} />
+              <ShoppingBag size={20} />
               <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा (Explore All Products)' : 'Explore All Products'}</span>
-              <ArrowRight size={18} />
+              <ArrowRight size={20} />
             </Link>
           </div>
         </div>
 
         <style>{`
-          @media (min-width: 1025px) {
+          .home-featured-grid {
+            display: grid !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 1.25rem !important;
+          }
+          @media (max-width: 1024px) {
             .home-featured-grid {
-              grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-              gap: 1.25rem !important;
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 1rem !important;
+            }
+          }
+          @media (max-width: 480px) {
+            .home-featured-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 0.65rem !important;
             }
           }
         `}</style>

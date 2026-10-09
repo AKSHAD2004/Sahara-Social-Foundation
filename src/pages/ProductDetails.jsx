@@ -11,7 +11,8 @@ import {
   RotateCcw,
   Edit,
   Save,
-  X
+  X,
+  Sparkles
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import CustomerReviewsSection from '../components/CustomerReviewsSection';
@@ -20,6 +21,7 @@ import { dbService } from '../services/db';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { getComboItems } from '../utils/comboHelper';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -123,6 +125,8 @@ const ProductDetails = () => {
     badgeMr: rawProduct.badgeMr || staticMeta.badgeMr || 'अधिकृत'
   };
 
+  const comboItems = getComboItems(product);
+
   const handleAddToCart = () => {
     addToCart(product, quantity);
   };
@@ -216,15 +220,105 @@ const ProductDetails = () => {
               justifyContent: 'center',
               padding: '1.25rem'
             }}>
-              <img
-                src={selectedImage || product.image}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = product.fallbackImage;
-                }}
-                alt={product.nameMr || product.nameEn}
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
+              {comboItems && comboItems.length >= 2 && (!selectedImage || selectedImage === 'combo') ? (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '100%',
+                  gap: '10px',
+                  padding: '10px',
+                  position: 'relative'
+                }}>
+                  {/* Left product */}
+                  <div style={{ flex: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                    <img
+                      src={comboItems[0].image}
+                      alt={comboItems[0].name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        if (comboItems[0].fallback) e.target.src = comboItems[0].fallback;
+                      }}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                    {comboItems[0].count && comboItems[0].count > 1 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '4px',
+                        left: '4px',
+                        backgroundColor: '#006B2D',
+                        color: '#ffffff',
+                        fontSize: '0.78rem',
+                        fontWeight: 800,
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                      }}>
+                        {comboItems[0].count}x
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Central Plus Badge */}
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#E8F5E9',
+                    border: '2px solid #81C784',
+                    color: '#006B2D',
+                    fontSize: '1.2rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 2px 8px rgba(0, 107, 45, 0.15)'
+                  }}>
+                    +
+                  </div>
+
+                  {/* Right product */}
+                  <div style={{ flex: 1, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                    <img
+                      src={comboItems[1].image}
+                      alt={comboItems[1].name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        if (comboItems[1].fallback) e.target.src = comboItems[1].fallback;
+                      }}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                    {comboItems[1].count && comboItems[1].count > 1 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        backgroundColor: '#006B2D',
+                        color: '#ffffff',
+                        fontSize: '0.78rem',
+                        fontWeight: 800,
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                      }}>
+                        {comboItems[1].count}x
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <img
+                  src={selectedImage || product.image}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = product.fallbackImage;
+                  }}
+                  alt={product.nameMr || product.nameEn}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
+              )}
               {product.badgeEn && (
                 <div style={{
                   position: 'absolute',
@@ -236,15 +330,83 @@ const ProductDetails = () => {
                   borderRadius: '6px',
                   fontSize: '0.74rem',
                   fontWeight: 700,
-                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.25)'
+                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.25)',
+                  zIndex: 3
                 }}>
                   {language === 'mr' ? product.badgeMr : product.badgeEn}
                 </div>
               )}
             </div>
 
-            {/* Gallery Thumbnails Strip (from Nutrifeel) */}
-            {product.gallery && product.gallery.length > 0 && (
+            {/* Gallery Thumbnails Strip */}
+            {comboItems && comboItems.length >= 2 ? (
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedImage('combo')}
+                  style={{
+                    border: (!selectedImage || selectedImage === 'combo') ? '2px solid #006B2D' : '1px solid #E1E9DF',
+                    borderRadius: '8px',
+                    padding: '3px 6px',
+                    backgroundColor: '#ffffff',
+                    cursor: 'pointer',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    color: '#006B2D',
+                    flexShrink: 0
+                  }}
+                  title="Combo View"
+                >
+                  <img src={comboItems[0].image} alt="" style={{ height: '42px', width: '22px', objectFit: 'contain' }} />
+                  <span style={{ fontWeight: 800 }}>+</span>
+                  <img src={comboItems[1].image} alt="" style={{ height: '42px', width: '22px', objectFit: 'contain' }} />
+                </button>
+                {comboItems.map((item, idx) => (
+                  <button
+                    key={`combo-thumb-${idx}`}
+                    type="button"
+                    onClick={() => setSelectedImage(item.image)}
+                    style={{
+                      border: selectedImage === item.image ? '2px solid #006B2D' : '1px solid #E1E9DF',
+                      borderRadius: '8px',
+                      padding: '3px',
+                      backgroundColor: '#ffffff',
+                      cursor: 'pointer',
+                      width: '60px',
+                      height: '60px',
+                      flexShrink: 0
+                    }}
+                    title={item.name}
+                  >
+                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  </button>
+                ))}
+                {product.gallery && product.gallery.map((gImg, idx) => (
+                  <button
+                    key={`gal-${idx}`}
+                    type="button"
+                    onClick={() => setSelectedImage(gImg)}
+                    style={{
+                      border: selectedImage === gImg ? '2px solid #006B2D' : '1px solid #E1E9DF',
+                      borderRadius: '8px',
+                      padding: '3px',
+                      backgroundColor: '#ffffff',
+                      cursor: 'pointer',
+                      width: '60px',
+                      height: '60px',
+                      flexShrink: 0
+                    }}
+                    title={`Slide ${idx + 1}`}
+                  >
+                    <img src={gImg} alt={`Slide ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+                  </button>
+                ))}
+              </div>
+            ) : product.gallery && product.gallery.length > 0 ? (
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
                 <button
                   type="button"
@@ -284,7 +446,7 @@ const ProductDetails = () => {
                   </button>
                 ))}
               </div>
-            )}
+            ) : null}
 
             {product.nutrifeelUrl && (
               <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
@@ -442,6 +604,45 @@ const ProductDetails = () => {
             <p style={{ fontSize: '0.95rem', color: '#172033', lineHeight: 1.65, marginBottom: '1.35rem' }}>
               {language === 'mr' ? product.descriptionMr : product.descriptionEn}
             </p>
+
+            {/* Combo Kit Contents (if combo product) */}
+            {comboItems && comboItems.length >= 2 && (
+              <div style={{
+                backgroundColor: '#F0FDF4',
+                border: '1.5px solid #BBF7D0',
+                borderRadius: '12px',
+                padding: '0.9rem 1.1rem',
+                marginBottom: '1.35rem'
+              }}>
+                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#166534', marginBottom: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Sparkles size={16} />
+                  <span>{language === 'mr' ? 'या कॉम्बो किटमध्ये समाविष्ट उत्पादने:' : 'Combo Kit Includes:'}</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.65rem' }}>
+                  {comboItems.map((item, idx) => (
+                    <div key={idx} style={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #DCFCE7',
+                      borderRadius: '8px',
+                      padding: '0.5rem 0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.65rem'
+                    }}>
+                      <img src={item.image} alt={item.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                      <div>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#14532D' }}>
+                          {language === 'mr' ? (item.nameMr || item.name) : item.name}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#15803D', fontWeight: 600 }}>
+                          {item.count > 1 ? `${item.count} Units Included` : '1 Unit Included'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Quantity Selector & Action Buttons */}
             <div className="product-actions-row" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '1.35rem', flexWrap: 'wrap' }}>

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
+import { getComboItems } from '../utils/comboHelper';
 
 const ProductCard = ({ product }) => {
   const { language } = useLanguage();
@@ -18,6 +19,7 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  const comboItems = getComboItems(product);
   const effectivePrice = product.price || product.sellingPrice;
 
   const handleOrderNow = () => {
@@ -63,20 +65,137 @@ const ProductCard = ({ product }) => {
       >
         <Link 
           to={`/shop/${product.id}`}
-          style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}
         >
-          <img
-            src={product.image}
-            loading="lazy"
-            decoding="async"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = product.fallbackImage;
-            }}
-            alt={product.nameMr || product.nameEn}
-            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            className="product-card-img"
-          />
+          {comboItems && comboItems.length >= 2 ? (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              height: '100%',
+              gap: '6px',
+              padding: '2px',
+              position: 'relative'
+            }}>
+              {/* Product 1 */}
+              <div style={{
+                flex: 1,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                minWidth: 0
+              }}>
+                <img
+                  src={comboItems[0].image}
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    if (comboItems[0].fallback) e.target.src = comboItems[0].fallback;
+                  }}
+                  alt={comboItems[0].name}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  className="product-card-img"
+                />
+                {comboItems[0].count && comboItems[0].count > 1 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '2px',
+                    left: '2px',
+                    backgroundColor: '#006B2D',
+                    color: '#ffffff',
+                    fontSize: '0.66rem',
+                    fontWeight: 800,
+                    padding: '1px 5px',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.18)',
+                    zIndex: 2,
+                    lineHeight: '1.2'
+                  }}>
+                    {comboItems[0].count}x
+                  </span>
+                )}
+              </div>
+
+              {/* Central Plus Badge */}
+              <div style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                backgroundColor: '#E8F5E9',
+                border: '1.5px solid #81C784',
+                color: '#006B2D',
+                fontSize: '0.88rem',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                zIndex: 2,
+                boxShadow: '0 2px 4px rgba(0, 107, 45, 0.12)'
+              }}>
+                +
+              </div>
+
+              {/* Product 2 */}
+              <div style={{
+                flex: 1,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                minWidth: 0
+              }}>
+                <img
+                  src={comboItems[1].image}
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    if (comboItems[1].fallback) e.target.src = comboItems[1].fallback;
+                  }}
+                  alt={comboItems[1].name}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  className="product-card-img"
+                />
+                {comboItems[1].count && comboItems[1].count > 1 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '2px',
+                    right: '2px',
+                    backgroundColor: '#006B2D',
+                    color: '#ffffff',
+                    fontSize: '0.66rem',
+                    fontWeight: 800,
+                    padding: '1px 5px',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.18)',
+                    zIndex: 2,
+                    lineHeight: '1.2'
+                  }}>
+                    {comboItems[1].count}x
+                  </span>
+                )}
+              </div>
+            </div>
+          ) : (
+            <img
+              src={product.image}
+              loading="lazy"
+              decoding="async"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = product.fallbackImage;
+              }}
+              alt={product.nameMr || product.nameEn}
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              className="product-card-img"
+            />
+          )}
         </Link>
       </div>
 

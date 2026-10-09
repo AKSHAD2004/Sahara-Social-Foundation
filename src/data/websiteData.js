@@ -406,7 +406,20 @@ export const productsData = [
     reviewsCount: 142,
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
-    fallbackImage: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg",
+    fallbackImage: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    comboImages: [
+      "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png"
+    ],
+    comboItems: [
+      { name: "1 ANTOX-D (300ml)", nameMr: "१ ANTOX-D (३०० मिली)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg" },
+      { name: "1 ANTOX-T (60 Tea Bags)", nameMr: "१ ANTOX-T (६० टी बॅग्स)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/antoxt.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+      "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg"
+    ],
     inStock: true,
     badgeEn: "Bestseller Combo",
     badgeMr: "लोकप्रिय कॉम्बो पॅक",
@@ -445,7 +458,20 @@ export const productsData = [
     reviewsCount: 189,
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
-    fallbackImage: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg",
+    fallbackImage: "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+    comboImages: [
+      "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png"
+    ],
+    comboItems: [
+      { name: "2 ANTOX-D (300ml each)", nameMr: "२ बाटल्या ANTOX-D (प्रत्येकी ३०० मिली)", count: 2, image: "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg" },
+      { name: "1 ANTOX-T (60 Tea Bags)", nameMr: "१ ANTOX-T (६० टी बॅग्स)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/antoxt.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+      "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg"
+    ],
     inStock: true,
     badgeEn: "Mega Saver Combo",
     badgeMr: "मेगा सेव्हर किट",

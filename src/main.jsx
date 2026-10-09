@@ -45,6 +45,14 @@ function initFavicon() {
 
 initFavicon();
 
+// Clean up any stale Firebase Auth Identity Toolkit iframes from DOM
+if (typeof document !== 'undefined') {
+  try {
+    const staleIframes = document.querySelectorAll('iframe[src*="identitytoolkit"], iframe[src*="auth/iframe"]');
+    staleIframes.forEach((el) => el.remove());
+  } catch (e) {}
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />

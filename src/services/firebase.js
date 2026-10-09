@@ -61,10 +61,20 @@ try {
     app = getApp();
   }
 
-  auth = getAuth(app);
+  // Only initialize Firebase Auth if explicitly enabled in environment variables.
+  // This prevents Firebase Auth from injecting an identitytoolkit iframe that fires
+  // 400 Bad Request (CONFIGURATION_NOT_FOUND) when Firebase Auth is not active in console.
+  if (import.meta.env.VITE_ENABLE_FIREBASE_AUTH === 'true') {
+    try {
+      auth = getAuth(app);
+      googleProvider = new GoogleAuthProvider();
+    } catch (authErr) {
+      console.warn('Firebase Auth disabled:', authErr.message);
+    }
+  }
+
   db = getFirestore(app);
   storage = getStorage(app);
-  googleProvider = new GoogleAuthProvider();
 } catch (error) {
   console.warn('Firebase initialized in offline/demo mode:', error.message);
 }

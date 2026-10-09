@@ -149,6 +149,15 @@ export const initialProducts = [
     commissionEligible: true,
     commissionType: 'standard',
     image: 'https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png',
+    fallbackImage: 'https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg',
+    comboImages: [
+      'https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png',
+      'https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png'
+    ],
+    comboItems: [
+      { name: '1 ANTOX-D (300ml)', count: 1, image: 'https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png', fallback: 'https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg' },
+      { name: '1 ANTOX-T (60 Tea Bags)', count: 1, image: 'https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png', fallback: 'https://nutrifeel.org/wp-content/uploads/antoxt.jpeg' }
+    ],
     description: 'Complete dual-action combo: 1 ANTOX-D liquid bottle + 1 ANTOX-T detox tea for optimal blood glucose balance.',
     status: 'active'
   },
@@ -167,6 +176,15 @@ export const initialProducts = [
     commissionEligible: true,
     commissionType: 'standard',
     image: 'https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png',
+    fallbackImage: 'https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg',
+    comboImages: [
+      'https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png',
+      'https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png'
+    ],
+    comboItems: [
+      { name: '2 ANTOX-D (300ml each)', count: 2, image: 'https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png', fallback: 'https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg' },
+      { name: '1 ANTOX-T (60 Tea Bags)', count: 1, image: 'https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png', fallback: 'https://nutrifeel.org/wp-content/uploads/antoxt.jpeg' }
+    ],
     description: 'Complete intensive 60-day regimen: 2 ANTOX-D liquid bottles + 1 ANTOX-T detox tea box for long-term blood glucose regulation.',
     status: 'active'
   },

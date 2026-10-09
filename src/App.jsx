@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 
 // Public Layout Components
 import Navbar from './components/Navbar';
@@ -106,40 +106,7 @@ function PublicLayout() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
       <main style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/about-us" element={<About />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/shop/:id" element={<ProductDetails />} />
-          <Route path="/nutrifeel-product" element={<Shop />} />
-          <Route path="/nutrifeel-products" element={<Shop />} />
-          <Route path="/products" element={<Shop />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          <Route path="/photos" element={<Photos />} />
-          <Route path="/videos" element={<Videos />} />
-          <Route path="/video" element={<Videos />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/contact-us" element={<Contact />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/my-account" element={<Account />} />
-          <Route path="/affiliate" element={<Affiliate />} />
-          <Route path="/affiliates" element={<Affiliate />} />
-          <Route path="/affiliate-registration" element={<Affiliate />} />
-          <Route path="/affiliate/register" element={<Affiliate />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/refund-policy" element={<RefundPolicy />} />
-          <Route path="/refund_returns" element={<RefundPolicy />} />
-          <Route path="/study-report" element={<StudyReport />} />
-          <Route path="/clinical-report" element={<StudyReport />} />
-          <Route path="/clinical-reports" element={<StudyReport />} />
-          <Route path="/report" element={<StudyReport />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Outlet />
       </main>
       <Footer />
       <FloatingActions />
@@ -159,7 +126,7 @@ function App() {
     <LanguageProvider>
       <CartProvider>
         <AuthProvider>
-          <Router>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AppTracker />
             <Routes>
               {/* CRM Public Login */}
@@ -208,7 +175,40 @@ function App() {
               </Route>
 
               {/* Public Website Routes */}
-              <Route path="/*" element={<PublicLayout />} />
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/about-us" element={<About />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/shop/:id" element={<ProductDetails />} />
+                <Route path="/nutrifeel-product" element={<Shop />} />
+                <Route path="/nutrifeel-products" element={<Shop />} />
+                <Route path="/products" element={<Shop />} />
+                <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                <Route path="/photos" element={<Photos />} />
+                <Route path="/videos" element={<Videos />} />
+                <Route path="/video" element={<Videos />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/contact-us" element={<Contact />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/my-account" element={<Account />} />
+                <Route path="/affiliate" element={<Affiliate />} />
+                <Route path="/affiliates" element={<Affiliate />} />
+                <Route path="/affiliate-registration" element={<Affiliate />} />
+                <Route path="/affiliate/register" element={<Affiliate />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/refund-policy" element={<RefundPolicy />} />
+                <Route path="/refund_returns" element={<RefundPolicy />} />
+                <Route path="/study-report" element={<StudyReport />} />
+                <Route path="/clinical-report" element={<StudyReport />} />
+                <Route path="/clinical-reports" element={<StudyReport />} />
+                <Route path="/report" element={<StudyReport />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
             </Routes>
           </Router>
         </AuthProvider>

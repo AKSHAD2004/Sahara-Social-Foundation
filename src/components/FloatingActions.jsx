@@ -1,6 +1,5 @@
 import React from 'react';
-import { Phone } from 'lucide-react';
-import WhatsAppIcon from './WhatsAppIcon';
+import { Phone, Users } from 'lucide-react';
 import { organizationInfo, socialLinks } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -23,33 +22,18 @@ const FloatingActions = () => {
         </span>
       </a>
 
-      {/* Floating WhatsApp Logo Button (Logo Only, Clean & Simple) */}
-      <div className="whatsapp-float-wrapper">
-        {/* Pulsing Radar Ring Halos */}
-        <div className="wa-radar-ring" aria-hidden="true" />
-        <div className="wa-radar-ring delay" aria-hidden="true" />
-
-        <a
-          href={groupUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="floating-whatsapp-btn"
-          title={language === 'mr' ? 'ग्रुप जॉईन करा' : 'Join Group'}
-          aria-label="Join Group"
-        >
-          <WhatsAppIcon size={30} color="#ffffff" animated={true} />
-          
-          {/* Subtle notification badge */}
-          <span className="wa-notification-badge" title="Active Community">
-            1
-          </span>
-
-          {/* Desktop Hover Tooltip */}
-          <span className="floating-action-tooltip">
-            {language === 'mr' ? 'ग्रुप जॉईन करा' : 'Join Group'}
-          </span>
-        </a>
-      </div>
+      {/* Floating Join Group Button */}
+      <a
+        href={groupUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="floating-join-group-btn"
+        title={language === 'mr' ? 'ग्रुप जॉईन करा' : 'Join Group'}
+        aria-label="Join Group"
+      >
+        <Users size={18} />
+        <span>{language === 'mr' ? 'ग्रुप जॉईन करा' : 'Join Group'}</span>
+      </a>
 
       <style>{`
         .floating-actions-container {
@@ -87,7 +71,6 @@ const FloatingActions = () => {
           box-shadow: 0 8px 18px rgba(0, 107, 45, 0.45);
         }
 
-        /* Tooltip shared by both buttons */
         .floating-action-tooltip {
           position: absolute;
           right: 52px;
@@ -107,115 +90,42 @@ const FloatingActions = () => {
           font-family: var(--font-family);
         }
 
-        .floating-call-btn:hover .floating-action-tooltip,
-        .floating-whatsapp-btn:hover .floating-action-tooltip {
+        .floating-call-btn:hover .floating-action-tooltip {
           opacity: 1;
           visibility: visible;
           transform: translateX(0);
         }
 
-        /* WhatsApp Floating Wrapper */
-        .whatsapp-float-wrapper {
+        /* Floating Join Group Button */
+        .floating-join-group-btn {
           position: relative;
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          justify-content: center;
-          animation: waFloatBreathing 3.6s ease-in-out infinite;
-        }
-
-        @keyframes waFloatBreathing {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-4px);
-          }
-        }
-
-        /* Radar Pulse Waves */
-        .wa-radar-ring {
-          position: absolute;
-          inset: -4px;
-          border-radius: 50%;
-          border: 2px solid rgba(37, 211, 102, 0.65);
-          pointer-events: none;
-          animation: waRadarPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-          z-index: 1;
-        }
-
-        .wa-radar-ring.delay {
-          animation-delay: 1.2s;
-        }
-
-        @keyframes waRadarPing {
-          0% {
-            transform: scale(0.95);
-            opacity: 0.85;
-          }
-          70% {
-            transform: scale(1.28);
-            opacity: 0;
-          }
-          100% {
-            transform: scale(1.36);
-            opacity: 0;
-          }
-        }
-
-        /* Circular WhatsApp Logo Button */
-        .floating-whatsapp-btn {
-          position: relative;
-          z-index: 2;
-          width: 52px;
-          height: 52px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.7rem 1.25rem;
+          border-radius: 50px;
+          background: linear-gradient(135deg, #006B2D 0%, #15803d 100%);
           color: #ffffff;
+          font-weight: 700;
+          font-size: 0.9rem;
           text-decoration: none;
-          box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45), 0 4px 12px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-          border: 2px solid rgba(255, 255, 255, 0.35);
-          transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+          box-shadow: 0 6px 20px rgba(0, 107, 45, 0.38), 0 2px 6px rgba(0, 0, 0, 0.12);
+          border: 1.5px solid rgba(255, 255, 255, 0.35);
+          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
           cursor: pointer;
+          white-space: nowrap;
           user-select: none;
         }
 
-        .floating-whatsapp-btn:hover {
-          transform: scale(1.1) translateY(-2px);
-          box-shadow: 0 12px 28px rgba(37, 211, 102, 0.6), 0 6px 16px rgba(0, 0, 0, 0.22);
+        .floating-join-group-btn:hover {
+          transform: scale(1.05) translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 107, 45, 0.48), 0 4px 10px rgba(0, 0, 0, 0.16);
           color: #ffffff;
+          background: linear-gradient(135deg, #08481c 0%, #166534 100%);
         }
 
-        .floating-whatsapp-btn:active {
-          transform: scale(0.95);
-        }
-
-        /* Notification Badge */
-        .wa-notification-badge {
-          position: absolute;
-          top: -2px;
-          right: -2px;
-          background: #FF3B30;
-          color: #ffffff;
-          font-size: 0.62rem;
-          font-weight: 800;
-          min-width: 16px;
-          height: 16px;
-          border-radius: 999px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0 3px;
-          border: 2px solid #25D366;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-          animation: waBadgePulse 2s ease-in-out infinite;
-        }
-
-        @keyframes waBadgePulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.15); }
+        .floating-join-group-btn:active {
+          transform: scale(0.97);
         }
 
         /* Responsive Mobile Styles */
@@ -230,15 +140,10 @@ const FloatingActions = () => {
             display: none !important; /* Mobile bottom bar already has Call button */
           }
 
-          .floating-whatsapp-btn {
-            width: 48px;
-            height: 48px;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.42);
-          }
-
-          .floating-whatsapp-btn svg {
-            width: 27px;
-            height: 27px;
+          .floating-join-group-btn {
+            padding: 0.55rem 1rem;
+            font-size: 0.82rem;
+            box-shadow: 0 4px 14px rgba(0, 107, 45, 0.35);
           }
         }
       `}</style>
