@@ -5,7 +5,6 @@ import {
   GoogleAuthProvider, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  signInAnonymously,
   signOut as fbSignOut, 
   sendPasswordResetEmail,
   onAuthStateChanged 
@@ -66,13 +65,6 @@ try {
   db = getFirestore(app);
   storage = getStorage(app);
   googleProvider = new GoogleAuthProvider();
-
-  // Auto-authenticate guest/mobile visitors for uninterrupted Firestore access
-  if (typeof window !== 'undefined') {
-    setTimeout(() => {
-      ensureFirebaseAuth().catch(() => {});
-    }, 50);
-  }
 } catch (error) {
   console.warn('Firebase initialized in offline/demo mode:', error.message);
 }
@@ -187,32 +179,12 @@ export async function syncProfileToFirebase(profile) {
   return { success: true, id: profileId, data: payload, note: 'Cached locally' };
 }
 
-let anonymousAuthAttempted = false;
-let anonymousAuthDisabled = false;
-
 /**
- * Ensures anonymous authentication so guest visitors have valid Firestore credentials if enabled.
- * If anonymous auth is not configured in Firebase Console, cleanly skips further attempts.
+ * Safe authentication handler: Public CRM and website operations connect directly
+ * to Cloud Firestore. Avoids attempting anonymous auth to prevent 400 network errors.
  */
 export async function ensureFirebaseAuth() {
-  if (anonymousAuthDisabled || !isFirebaseConfigured || !auth || auth.currentUser) {
-    return;
-  }
-  if (anonymousAuthAttempted) {
-    return;
-  }
-  anonymousAuthAttempted = true;
-
-  try {
-    await signInAnonymously(auth);
-    console.log('[Firebase Auth] Guest visitor anonymously authenticated for live data access.');
-  } catch (err) {
-    // If anonymous auth is not turned on in Firebase Console, disable permanently to prevent 400 errors
-    anonymousAuthDisabled = true;
-    if (err?.code !== 'auth/configuration-not-found' && err?.code !== 'auth/admin-restricted-operation') {
-      console.warn('[Firebase Auth] Anonymous sign-in notice (optional):', err.message);
-    }
-  }
+  return Promise.resolve();
 }
 
 /**
@@ -288,7 +260,6 @@ export {
   // Auth methods
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInAnonymously,
   fbSignOut,
   sendPasswordResetEmail,
   onAuthStateChanged,
