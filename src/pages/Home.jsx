@@ -10,11 +10,7 @@ import {
   Sparkles, 
   Calendar,
   ChevronLeft,
-  ChevronRight,
-  Eye,
-  EyeOff,
-  ChevronDown,
-  ChevronUp
+  ChevronRight
 } from 'lucide-react';
 import Hero from '../components/Hero';
 import TrustSection from '../components/TrustSection';
@@ -223,7 +219,6 @@ const TestimonialsCarousel = () => {
 const Home = () => {
   const { language } = useLanguage();
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
-  const [showProducts, setShowProducts] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState(() => {
     const fromDb = dbService.getAll('products');
     const base = productsData;
@@ -257,10 +252,10 @@ const Home = () => {
       {/* Hero Section */}
       <Hero onOpenConsultation={() => setIsConsultationOpen(true)} />
 
-      {/* Product / Shop Section (Hidden by default, revealed via Explore button) */}
-      <section className="section home-products-section" style={{ backgroundColor: '#ffffff', paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
+      {/* Product / Shop Section (Moved Upside First) */}
+      <section className="section home-products-section" style={{ backgroundColor: '#ffffff', paddingTop: '2.5rem' }}>
         <div className="container">
-          <div className="section-header" style={{ marginBottom: showProducts ? '2rem' : '1.5rem' }}>
+          <div className="section-header">
             <div className="section-badge">
               <ShoppingBag size={15} />
               <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}</span>
@@ -275,86 +270,43 @@ const Home = () => {
             </p>
           </div>
 
-          {!showProducts ? (
-            /* Compact Explore Button Trigger - Hides all products until clicked */
-            <div style={{ textAlign: 'center', marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={() => setShowProducts(true)}
-                className="btn btn-primary btn-lg"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  boxShadow: '0 4px 16px rgba(0, 107, 45, 0.28)',
-                  padding: '0.9rem 2rem',
-                  fontSize: '1.05rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                <Eye size={20} />
-                <span>{language === 'mr' ? 'उत्पादने पहा (Explore Products)' : 'Explore Products'}</span>
-                <ChevronDown size={18} />
-              </button>
+          <div className="products-grid home-featured-grid" style={{ marginBottom: '2.5rem' }}>
+            {featuredProducts.slice(0, 4).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
 
-              <Link
-                to="/shop"
-                className="btn btn-secondary btn-lg"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  border: '1.5px solid #006B2D',
-                  color: '#006B2D',
-                  padding: '0.9rem 1.75rem',
-                  fontSize: '1.05rem',
-                  fontWeight: 600
-                }}
-              >
-                <ShoppingBag size={18} />
-                <span>{language === 'mr' ? 'सर्व उत्पादने शॉप (Open Shop)' : 'Open Shop'}</span>
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-          ) : (
-            /* Revealed Product Grid */
-            <>
-              <div className="products-grid" style={{ marginBottom: '2.5rem', animation: 'fadeIn 0.35s ease-in-out' }}>
-                {featuredProducts.slice(0, 9).map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-
-              <div style={{ textAlign: 'center', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowProducts(false)}
-                  className="btn btn-secondary"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    borderColor: '#cbd5e1',
-                    color: '#64748b',
-                    padding: '0.75rem 1.5rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <EyeOff size={16} />
-                  <span>{language === 'mr' ? 'उत्पादने लपवा (Hide Products)' : 'Hide Products'}</span>
-                  <ChevronUp size={16} />
-                </button>
-
-                <Link to="/shop" className="btn btn-primary btn-lg" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                  <ShoppingBag size={18} />
-                  <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा' : 'Explore All Products'}</span>
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-            </>
-          )}
+          <div style={{ textAlign: 'center' }}>
+            <Link 
+              to="/shop" 
+              className="btn btn-primary btn-lg"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.65rem',
+                padding: '0.85rem 2.25rem',
+                borderRadius: '50px',
+                fontSize: '1rem',
+                fontWeight: 600,
+                boxShadow: '0 4px 16px rgba(0, 107, 45, 0.22)',
+                transition: 'all 0.25s ease'
+              }}
+            >
+              <ShoppingBag size={18} />
+              <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा (Explore All Products)' : 'Explore All Products'}</span>
+              <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
+
+        <style>{`
+          @media (min-width: 1025px) {
+            .home-featured-grid {
+              grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+              gap: 1.25rem !important;
+            }
+          }
+        `}</style>
       </section>
 
       {/* Result Videos Section Adapted Directly from samarthkolhapur.com */}
