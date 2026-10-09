@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate, getStatusBadgeClass } from '../../../utils/formatters';
 import { dbService } from '../../../services/db';
+import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot } from '../../../services/firebase';
 import CrmModal from '../../../components/crm/CrmModal';
 import ExportButton from '../../../components/crm/ExportButton';
 
@@ -58,14 +59,37 @@ export default function OrderList() {
   };
 
   useEffect(() => {
-    // Initial fetch from Cloud Firestore
+    // Initial fetch from Cloud Firestore with auto-upload of any pending local orders
     dbService.refreshFromFirebase('orders').then((refreshed) => {
       if (Array.isArray(refreshed) && refreshed.length > 0) {
         setOrders(refreshed);
       }
     }).catch(() => {});
 
-    // Active subscription to reactive store
+    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device sync
+    let unsubFirestoreOrders = () => {};
+    if (isFirebaseConfigured && firestoreDb) {
+      try {
+        const colRef = collection(firestoreDb, 'orders');
+        unsubFirestoreOrders = onSnapshot(colRef, (snapshot) => {
+          const liveOrders = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+          if (liveOrders.length > 0) {
+            liveOrders.sort((a, b) => {
+              const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+              const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+              return dateB - dateA;
+            });
+            setOrders(liveOrders);
+          }
+        }, (err) => {
+          console.warn('Direct Firestore orders listener note:', err.message);
+        });
+      } catch (err) {
+        console.warn('Direct Firestore listener setup note:', err.message);
+      }
+    }
+
+    // Active subscription to reactive store as fallback & local store sync
     const unsubOrders = dbService.subscribe('orders', (currentOrders) => {
       if (Array.isArray(currentOrders) && currentOrders.length > 0) {
         setOrders(currentOrders);
@@ -115,6 +139,7 @@ export default function OrderList() {
     window.addEventListener('focus', handleVisibility);
 
     return () => {
+      unsubFirestoreOrders();
       unsubOrders();
       unsubCust();
       unsubProd();

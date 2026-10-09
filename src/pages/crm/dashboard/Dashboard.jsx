@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDate, formatPhone, getStatusBadgeClass } from '../../../utils/formatters';
 import { dbService } from '../../../services/db';
+import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot } from '../../../services/firebase';
 import { SalesBarChart, LeadSourceDonut, ConversionFunnel } from '../../../components/crm/Charts';
 import Customer360Modal from '../../../components/crm/Customer360Modal';
 import CrmModal from '../../../components/crm/CrmModal';
@@ -62,6 +63,27 @@ export default function Dashboard() {
     const unsubTx = dbService.subscribe('commissionTransactions', setCommissionTx);
     const unsubTkt = dbService.subscribe('supportTickets', setTickets);
 
+    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device orders
+    let unsubFirestoreOrders = () => {};
+    if (isFirebaseConfigured && firestoreDb) {
+      try {
+        const colRef = collection(firestoreDb, 'orders');
+        unsubFirestoreOrders = onSnapshot(colRef, (snapshot) => {
+          const liveOrders = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+          if (liveOrders.length > 0) {
+            liveOrders.sort((a, b) => {
+              const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+              const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+              return dateB - dateA;
+            });
+            setOrders(liveOrders);
+          }
+        }, (err) => console.warn('Direct Firestore orders listener note:', err.message));
+      } catch (err) {
+        console.warn('Direct Firestore orders setup note:', err.message);
+      }
+    }
+
     // Initial fresh pull from Cloud Firestore
     dbService.refreshFromFirebase('orders').then((res) => {
       if (Array.isArray(res) && res.length > 0) setOrders(res);
@@ -77,6 +99,7 @@ export default function Dashboard() {
     }, 15000);
 
     return () => {
+      unsubFirestoreOrders();
       clearInterval(mobileSyncTimer);
       unsubCust();
       unsubLeads();

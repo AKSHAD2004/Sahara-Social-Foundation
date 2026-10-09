@@ -222,6 +222,15 @@ export function initDatabase() {
       dbService.syncAllOrderCommissions();
     } catch (e) {}
   }, 300);
+
+  // Auto-upload any local orders (from this device) to Cloud Firestore so all other devices see them
+  setTimeout(() => {
+    try {
+      if (typeof window !== 'undefined' && isFirebaseConfigured && firestoreDb) {
+        dbService.refreshFromFirebase('orders').catch(() => {});
+      }
+    } catch (e) {}
+  }, 500);
 }
 
 // Setup live listeners to Cloud Firestore
@@ -1090,21 +1099,31 @@ export const dbService = {
       return state[collectionName] || [];
     }
     try {
+      await ensureFirebaseAuth().catch(() => {});
       const colRef = collection(firestoreDb, collectionName);
       const snap = await getDocs(colRef);
       const remoteDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const localItems = Array.isArray(state[collectionName]) ? state[collectionName] : [];
 
       if (remoteDocs.length > 0) {
         const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
-        const localItems = Array.isArray(state[collectionName]) ? state[collectionName] : [];
         const merged = [...remoteDocs];
 
-        localItems.forEach((local) => {
+        // If local device has orders not yet present in Firestore (placed from this device), upload them immediately
+        for (const local of localItems) {
           const key = String(local.id || local.orderId || '');
           if (key && !remoteMap.has(key)) {
-            merged.push(local);
+            merged.unshift(local);
+            try {
+              const docRef = doc(firestoreDb, collectionName, key);
+              const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
+              await setDoc(docRef, cleanDoc, { merge: true });
+              console.log(`[Firestore live sync] Auto-uploaded local ${collectionName}/${key} to Firestore!`);
+            } catch (err) {
+              console.warn(`[Firestore live sync] Error uploading ${key}:`, err.message);
+            }
           }
-        });
+        }
 
         if (collectionName === 'orders' || collectionName === 'leads' || collectionName === 'notifications') {
           merged.sort((a, b) => {
@@ -1117,6 +1136,19 @@ export const dbService = {
         state[collectionName] = merged;
         saveCollection(collectionName, false);
         return merged;
+      } else if (localItems.length > 0) {
+        // Remote Firestore is empty, seed local records up to Firestore
+        for (const local of localItems) {
+          const key = String(local.id || local.orderId || '');
+          if (key) {
+            try {
+              const docRef = doc(firestoreDb, collectionName, key);
+              const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
+              await setDoc(docRef, cleanDoc, { merge: true });
+            } catch (e) {}
+          }
+        }
+        return localItems;
       }
     } catch (err) {
       console.warn(`Manual refresh note for ${collectionName}:`, err.message);

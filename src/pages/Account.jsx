@@ -158,75 +158,42 @@ const Account = () => {
         pincode: customerUser.pincode || ''
       });
 
-      // Fetch customer orders from dbService
-      const allOrders = dbService.getAll('orders') || [];
+      // Fetch customer orders live from Firebase and dbService
       const cleanPhone = (customerUser.phone || customerUser.mobileNumber || '').replace(/\D/g, '');
-      const userMatched = allOrders.filter(o => {
-        const oPhone = String(o.customerMobile || o.customerPhone || o.phone || '').replace(/\D/g, '');
-        return (cleanPhone && oPhone && (oPhone === cleanPhone || oPhone.endsWith(cleanPhone) || cleanPhone.endsWith(oPhone))) ||
-               (customerUser.id && (o.customerId === customerUser.id || o.id === customerUser.id));
-      });
+      
+      const filterCustomerOrders = (orderList) => {
+        return (orderList || []).filter((o) => {
+          const oPhone = String(o.customerMobile || o.customerPhone || o.phone || '').replace(/\D/g, '');
+          const matchPhone = cleanPhone && oPhone && (oPhone === cleanPhone || oPhone.endsWith(cleanPhone) || cleanPhone.endsWith(oPhone));
+          const matchCustId = customerUser.id && (o.customerId === customerUser.id || o.id === customerUser.id);
+          return matchPhone || matchCustId;
+        });
+      };
 
-      if (userMatched.length > 0) {
-        setOrders(userMatched);
-      } else {
-        // Register customer order into CRM & Cloud Firestore
-        const defaultWebsiteOrder = {
-          id: 'SSF-842101',
-          orderId: 'SSF-842101',
-          customerId: customerUser.id || 'CUST-8421154090',
-          customerName: customerUser.fullName || 'रमेश पाटील (Ramesh Patil)',
-          customerMobile: cleanPhone || '8421154090',
-          customerEmail: customerUser.email || 'ramesh.patil@gmail.com',
-          products: [
-            {
-              productId: 'prod_combo_antox_dt',
-              name: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
-              nameMr: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
-              nameEn: 'Antox D & Antox T Kit',
-              quantity: 1,
-              price: 1499,
-              total: 1499
-            }
-          ],
-          quantity: 1,
-          subtotal: 1499,
-          discount: 0,
-          tax: 0,
-          shipping: 0,
-          grandTotal: 1499,
-          advancePaid: 1499,
-          balanceDue: 0,
-          eligibleAmount: 1499,
-          paymentStatus: 'Paid',
-          orderStatus: 'Confirmed',
-          source: 'Website Customer Page',
-          paymentMethod: 'Online Payment (UPI/Cards)',
-          orderDate: '2026-08-10T10:30:00.000Z',
-          shippingAddress: `${customerUser.address || 'राजारामपुरी, तिसरी गल्ली'}, ${customerUser.city || 'कोल्हापूर'}, ${customerUser.state || 'Maharashtra'} - ${customerUser.pincode || '416008'}`
-        };
-
-        const foundInDb = allOrders.find(o => o.id === defaultWebsiteOrder.id || o.orderId === defaultWebsiteOrder.id);
-        if (!foundInDb) {
-          dbService.add('orders', defaultWebsiteOrder);
-          syncOrderToFirebase(defaultWebsiteOrder);
-        }
-
-        setOrders([defaultWebsiteOrder]);
+      // 1. Initial local lookup
+      const currentOrders = dbService.getAll('orders') || [];
+      const localMatches = filterCustomerOrders(currentOrders);
+      if (localMatches.length > 0) {
+        setOrders(localMatches);
       }
+
+      // 2. Fetch fresh from Cloud Firestore across any device
+      dbService.refreshFromFirebase('orders').then((refreshed) => {
+        const remoteMatches = filterCustomerOrders(refreshed);
+        setOrders(remoteMatches);
+      }).catch(() => {});
     }
 
     const unsubOrders = dbService.subscribe('orders', (allOrders) => {
       if (!customerUser) return;
       const cleanPhone = (customerUser.phone || customerUser.mobileNumber || '').replace(/\D/g, '');
-      const userMatched = (allOrders || []).filter(o => {
+      const userMatched = (allOrders || []).filter((o) => {
         const oPhone = String(o.customerMobile || o.customerPhone || o.phone || '').replace(/\D/g, '');
-        return (cleanPhone && oPhone && (oPhone === cleanPhone || oPhone.endsWith(cleanPhone) || cleanPhone.endsWith(oPhone))) ||
-               (customerUser.id && (o.customerId === customerUser.id || o.id === customerUser.id));
+        const matchPhone = cleanPhone && oPhone && (oPhone === cleanPhone || oPhone.endsWith(cleanPhone) || cleanPhone.endsWith(oPhone));
+        const matchCustId = customerUser.id && (o.customerId === customerUser.id || o.id === customerUser.id);
+        return matchPhone || matchCustId;
       });
-      if (userMatched.length > 0) {
-        setOrders(userMatched);
-      }
+      setOrders(userMatched);
     });
 
     return () => {
@@ -695,64 +662,81 @@ const Account = () => {
                     </span>
                   </div>
 
-                  {orders.map((ord, idx) => {
-                    const orderId = ord.orderId || ord.id || `SSF-${idx + 1001}`;
-                    const rawDate = ord.orderDate || ord.createdAt;
-                    const orderDate = rawDate 
-                      ? new Date(rawDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                      : ord.date || 'Recent';
-                    const orderStatus = ord.orderStatus || ord.status || 'Confirmed';
-                    const amount = ord.grandTotal || ord.totalAmount || ord.total || 1499;
-                    const itemsList = ord.products || ord.items || [];
-                    const itemsName = itemsList.length > 0
-                      ? itemsList.map(i => `${i.name || i.nameMr || i.nameEn || 'Nutraceutical Product'} × ${i.quantity || 1}`).join(', ')
-                      : ((language === 'mr' ? ord.productNameMr : ord.productNameEn) || 'Antox D & Antox T Kit');
-
-                    return (
-                      <div
-                        key={orderId}
-                        style={{
-                          border: '1px solid #E1E9DF',
-                          borderRadius: '14px',
-                          padding: '1.25rem',
-                          marginBottom: '1rem',
-                          backgroundColor: '#F3F8F1'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                          <div>
-                            <span style={{ fontWeight: 700, color: '#006B2D', fontSize: '1rem' }}>{orderId}</span>
-                            <span style={{ color: '#5F6B61', fontSize: '0.82rem', marginLeft: '0.75rem' }}>{orderDate}</span>
-                          </div>
-                          <span style={{
-                            backgroundColor: orderStatus.toLowerCase().includes('deliver') ? '#e2faea' : '#fff9e6',
-                            color: orderStatus.toLowerCase().includes('deliver') ? '#006B2D' : '#785300',
-                            border: '1px solid',
-                            borderColor: orderStatus.toLowerCase().includes('deliver') ? '#b8eec8' : '#ffe899',
-                            fontSize: '0.78rem',
-                            fontWeight: 700,
-                            padding: '0.25rem 0.65rem',
-                            borderRadius: '6px'
-                          }}>
-                            {language === 'mr' && ord.statusMr ? ord.statusMr : orderStatus}
-                          </span>
-                        </div>
-
-                        <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#17251B', marginBottom: '0.35rem' }}>
-                          {itemsName}
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed #E1E9DF' }}>
-                          <span style={{ fontSize: '0.85rem', color: '#159B32', fontWeight: 600 }}>
-                            {ord.counselingStatus || (language === 'mr' ? 'तज्ज्ञ मार्गदर्शन सक्रिय (८४२११५४०९०)' : 'Free Expert Guidance (8421154090)')}
-                          </span>
-                          <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#006B2D' }}>
-                            ₹{amount}
-                          </span>
-                        </div>
+                  {orders.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2.5rem 1rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
+                      <ShoppingBag size={42} style={{ color: '#94a3b8', margin: '0 auto 0.75rem' }} />
+                      <div style={{ fontWeight: 700, color: '#334155', fontSize: '1.05rem', marginBottom: '0.35rem' }}>
+                        {language === 'mr' ? 'अद्याप कोणतीही ऑर्डर नोंदवलेली नाही' : 'No orders found for this account'}
                       </div>
-                    );
-                  })}
+                      <p style={{ color: '#64748b', fontSize: '0.88rem', maxWidth: '380px', margin: '0 auto 1.25rem' }}>
+                        {language === 'mr' 
+                          ? 'आपण ऑर्डर नोंदवल्यानंतर तिचे सर्व तपशील व ट्रॅकिंग येथे थेट दिसेल.'
+                          : 'Once you place an order on our store, your order details and delivery status will appear here.'}
+                      </p>
+                      <a href="/shop" className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}>
+                        <span>{language === 'mr' ? 'उत्पादने पहा (Shop Products)' : 'Browse Products'}</span>
+                      </a>
+                    </div>
+                  ) : (
+                    orders.map((ord, idx) => {
+                      const orderId = ord.orderId || ord.id || `SSF-${idx + 1001}`;
+                      const rawDate = ord.orderDate || ord.createdAt;
+                      const orderDate = rawDate 
+                        ? new Date(rawDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : ord.date || 'Recent';
+                      const orderStatus = ord.orderStatus || ord.status || 'Confirmed';
+                      const amount = ord.grandTotal || ord.totalAmount || ord.total || 1499;
+                      const itemsList = ord.products || ord.items || [];
+                      const itemsName = itemsList.length > 0
+                        ? itemsList.map(i => `${i.name || i.nameMr || i.nameEn || 'Nutraceutical Product'} × ${i.quantity || 1}`).join(', ')
+                        : ((language === 'mr' ? ord.productNameMr : ord.productNameEn) || 'Antox D & Antox T Kit');
+
+                      return (
+                        <div
+                          key={orderId}
+                          style={{
+                            border: '1px solid #E1E9DF',
+                            borderRadius: '14px',
+                            padding: '1.25rem',
+                            marginBottom: '1rem',
+                            backgroundColor: '#F3F8F1'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <div>
+                              <span style={{ fontWeight: 700, color: '#006B2D', fontSize: '1rem' }}>{orderId}</span>
+                              <span style={{ color: '#5F6B61', fontSize: '0.82rem', marginLeft: '0.75rem' }}>{orderDate}</span>
+                            </div>
+                            <span style={{
+                              backgroundColor: orderStatus.toLowerCase().includes('deliver') ? '#e2faea' : '#fff9e6',
+                              color: orderStatus.toLowerCase().includes('deliver') ? '#006B2D' : '#785300',
+                              border: '1px solid',
+                              borderColor: orderStatus.toLowerCase().includes('deliver') ? '#b8eec8' : '#ffe899',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '6px'
+                            }}>
+                              {language === 'mr' && ord.statusMr ? ord.statusMr : orderStatus}
+                            </span>
+                          </div>
+
+                          <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#17251B', marginBottom: '0.35rem' }}>
+                            {itemsName}
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed #E1E9DF' }}>
+                            <span style={{ fontSize: '0.85rem', color: '#159B32', fontWeight: 600 }}>
+                              {ord.counselingStatus || (language === 'mr' ? 'तज्ज्ञ मार्गदर्शन सक्रिय (८४२११५४०९०)' : 'Free Expert Guidance (8421154090)')}
+                            </span>
+                            <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#006B2D' }}>
+                              ₹{amount}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
 
                   <div style={{
                     backgroundColor: '#fff9e6',

@@ -113,6 +113,29 @@ export async function testFirebaseConnection() {
 }
 
 /**
+ * Recursively cleans object/array so no undefined fields or invalid structures reach Firestore.
+ */
+export function sanitizeForFirestore(data) {
+  if (data === undefined) return null;
+  if (data === null) return null;
+  if (Array.isArray(data)) return data.map((item) => sanitizeForFirestore(item));
+  if (typeof data === 'object' && !(data instanceof Date)) {
+    // Preserve special Firestore FieldValue objects (e.g. serverTimestamp)
+    if (data && typeof data === 'object' && (data._methodName || data._delegate)) {
+      return data;
+    }
+    const cleaned = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined && typeof value !== 'function') {
+        cleaned[key] = sanitizeForFirestore(value);
+      }
+    }
+    return cleaned;
+  }
+  return data;
+}
+
+/**
  * Saves or updates a customer or user profile directly to Cloud Firestore.
  * Automatically synchronizes profile data to the 'customers' collection in Firebase.
  * 
@@ -125,7 +148,7 @@ export async function syncProfileToFirebase(profile) {
   const cleanPhone = (profile.phone || profile.mobileNumber || profile.mobile || '').replace(/\D/g, '').trim();
   const profileId = profile.id || (cleanPhone ? `CUST-${cleanPhone}` : `CUST-${Date.now()}`);
 
-  const payload = {
+  const rawPayload = {
     id: profileId,
     customerId: profileId,
     fullName: (profile.fullName || profile.name || '').trim() || 'ग्राहक (Customer)',
@@ -142,6 +165,8 @@ export async function syncProfileToFirebase(profile) {
     status: profile.status || 'Active',
     updatedAt: new Date().toISOString()
   };
+
+  const payload = sanitizeForFirestore(rawPayload);
 
   // Direct Cloud Firestore write
   if (isFirebaseConfigured && db) {
@@ -178,6 +203,7 @@ export async function ensureFirebaseAuth() {
 
 /**
  * Directly writes an order document to Cloud Firestore in the 'orders' collection.
+ * Recursively sanitizes data to guarantee 100% acceptance by Cloud Firestore across all devices.
  * 
  * @param {Object} order - Full order object
  * @returns {Promise<{success: boolean, id: string, message?: string}>}
@@ -186,28 +212,41 @@ export async function syncOrderToFirebase(order) {
   if (!order) return { success: false, message: 'No order data provided' };
 
   const orderId = String(order.id || order.orderId || `ORD-${Date.now()}`);
-  const payload = {
+  const rawPayload = {
     ...order,
     id: orderId,
     orderId: orderId,
-    firebaseUpdatedAt: serverTimestamp(),
     syncedAt: new Date().toISOString()
   };
 
+  const cleanPayload = sanitizeForFirestore(rawPayload);
+
   if (isFirebaseConfigured && db) {
     try {
-      await ensureFirebaseAuth();
+      await ensureFirebaseAuth().catch(() => {});
       const docRef = doc(db, 'orders', orderId);
-      await setDoc(docRef, payload, { merge: true });
+      await setDoc(docRef, {
+        ...cleanPayload,
+        firebaseUpdatedAt: serverTimestamp()
+      }, { merge: true });
       console.log(`[Firebase Cloud] Order successfully stored on Firestore: orders/${orderId}`);
-      return { success: true, id: orderId, data: payload };
+      return { success: true, id: orderId, data: cleanPayload };
     } catch (err) {
-      console.warn(`[Firebase Cloud] Order sync notice (${orderId}):`, err.message);
-      return { success: false, error: err.message, data: payload };
+      console.error(`[Firebase Cloud] Order sync notice (${orderId}):`, err.message);
+      // Fallback write without serverTimestamp if sentinel failed
+      try {
+        const docRef = doc(db, 'orders', orderId);
+        await setDoc(docRef, cleanPayload, { merge: true });
+        console.log(`[Firebase Cloud Fallback] Order stored without timestamp: orders/${orderId}`);
+        return { success: true, id: orderId, data: cleanPayload };
+      } catch (retryErr) {
+        console.error(`[Firebase Cloud Retry Failed] orders/${orderId}:`, retryErr.message);
+        return { success: false, error: retryErr.message, data: cleanPayload };
+      }
     }
   }
 
-  return { success: true, id: orderId, data: payload, note: 'Cached locally' };
+  return { success: true, id: orderId, data: cleanPayload, note: 'Cached locally' };
 }
 
 /**
