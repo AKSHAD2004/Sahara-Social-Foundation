@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { dbService } from '../../../services/db';
 import { initialVideos } from '../../../services/seedData';
+import { compressImage } from '../../../utils/imageCompressor';
 import CrmModal from '../../../components/crm/CrmModal';
 
 export default function VideoManager() {
@@ -48,7 +49,6 @@ export default function VideoManager() {
 
     const unsub = dbService.subscribe('videos', (items) => {
       if (!items || items.length === 0) {
-        dbService.setCollection('videos', initialVideos);
         setVideos(initialVideos);
       } else {
         setVideos(items);
@@ -100,24 +100,20 @@ export default function VideoManager() {
     setShowModal(true);
   };
 
-  // Upload local thumbnail image as Base64 data URL
-  const handleThumbnailUpload = (e) => {
+  // Upload local thumbnail image with compression for fast Cloud Firestore sync
+  const handleThumbnailUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Thumbnail image size exceeds 2MB. Please select an optimized photo.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
+    try {
+      const compressed = await compressImage(file, 800, 600, 0.78);
       setFormData((prev) => ({
         ...prev,
-        thumbnail: reader.result
+        thumbnail: compressed
       }));
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      alert('Error processing thumbnail: ' + err.message);
+    }
   };
 
   // Upload local video file as Base64 data URL (for clips < 2MB)

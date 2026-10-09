@@ -30,7 +30,6 @@ export default function ReviewManager() {
 
     const unsub = dbService.subscribe('reviews', (items) => {
       if (!items || items.length === 0) {
-        dbService.setCollection('reviews', initialReviews);
         setReviews(initialReviews);
       } else {
         setReviews(items);

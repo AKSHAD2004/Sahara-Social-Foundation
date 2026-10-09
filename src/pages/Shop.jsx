@@ -34,6 +34,8 @@ const Shop = () => {
   });
 
   useEffect(() => {
+    dbService.refreshFromFirebase('products').catch(() => {});
+
     const unsub = dbService.subscribe('products', (dbProducts) => {
       if (Array.isArray(dbProducts) && dbProducts.length > 0) {
         const base = productsData;

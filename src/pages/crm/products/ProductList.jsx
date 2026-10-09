@@ -33,23 +33,14 @@ export default function ProductList() {
   });
 
   useEffect(() => {
+    // Proactively pull latest products from Cloud Firestore
+    dbService.refreshFromFirebase('products').catch(() => {});
+
     const unsub = dbService.subscribe('products', (prods) => {
-      const validIds = new Set(initialProducts.map((p) => p.id));
       if (!prods || prods.length === 0) {
-        // Automatically populate with initial official products if empty
-        dbService.setCollection('products', initialProducts);
         setProducts(initialProducts);
       } else {
-        const filtered = prods.filter((p) => validIds.has(p.id));
-        const currentIds = new Set(filtered.map((p) => p.id));
-        const missingProducts = initialProducts.filter((p) => !currentIds.has(p.id));
-        if (missingProducts.length > 0 || filtered.length !== prods.length) {
-          const merged = [...filtered, ...missingProducts];
-          dbService.setCollection('products', merged);
-          setProducts(merged);
-        } else {
-          setProducts(filtered);
-        }
+        setProducts(prods);
       }
     });
     return unsub;

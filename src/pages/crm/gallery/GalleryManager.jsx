@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { dbService } from '../../../services/db';
 import { initialGalleryPhotos } from '../../../services/seedData';
+import { compressImage } from '../../../utils/imageCompressor';
 import CrmModal from '../../../components/crm/CrmModal';
 
 export default function GalleryManager() {
@@ -41,7 +42,6 @@ export default function GalleryManager() {
 
     const unsub = dbService.subscribe('galleryPhotos', (items) => {
       if (!items || items.length === 0) {
-        dbService.setCollection('galleryPhotos', initialGalleryPhotos);
         setPhotos(initialGalleryPhotos);
       } else {
         setPhotos(items);
@@ -79,24 +79,20 @@ export default function GalleryManager() {
     setShowModal(true);
   };
 
-  // Convert local file upload to Base64 data URL
-  const handleFileUpload = (e) => {
+  // Convert local file upload to compressed data URL for instant Cloud Firestore sync
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 3 * 1024 * 1024) {
-      alert('Photo size exceeds 3MB. Please choose an optimized photo or enter an image URL.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
+    try {
+      const compressed = await compressImage(file, 1200, 900, 0.78);
       setFormData((prev) => ({
         ...prev,
-        image: reader.result
+        image: compressed
       }));
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      alert('Error processing image: ' + err.message);
+    }
   };
 
   const handleSave = async (e) => {

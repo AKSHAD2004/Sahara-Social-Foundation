@@ -24,6 +24,7 @@ import {
   db as firestoreDb,
   collection,
   doc,
+  getDoc,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -235,14 +236,14 @@ export function initDatabase() {
     } catch (e) {}
   }, 300);
 
-  // Auto-upload any local orders (from this device) to Cloud Firestore so all other devices see them
+  // Proactively fetch all major collections from Cloud Firestore so this device immediately reflects changes made on any other device
   setTimeout(() => {
     try {
       if (typeof window !== 'undefined' && isFirebaseConfigured && firestoreDb) {
-        dbService.refreshFromFirebase('orders').catch(() => {});
+        dbService.refreshAllFromFirebase().catch(() => {});
       }
     } catch (e) {}
-  }, 500);
+  }, 400);
 }
 
 // Setup live listeners to Cloud Firestore
@@ -386,22 +387,24 @@ function setupFirestoreRealtimeSync() {
               });
             }
           } else {
-            // Remote Firestore collection has documents: synchronize them
+            // Remote Cloud Firestore has authoritative documents: synchronize them
             const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
             const localItems = Array.isArray(state[colName]) ? state[colName] : [];
             const mergedDocs = [...remoteDocs];
 
-            // If there are local records not yet present in remoteDocs, preserve and upload them
-            localItems.forEach((localItem) => {
-              const localKey = String(localItem.id || localItem.orderId || '');
-              if (localKey && !remoteMap.has(localKey)) {
-                mergedDocs.unshift(localItem);
-                const docRef = doc(firestoreDb, colName, localKey);
-                setDoc(docRef, sanitizeForFirestore({ ...localItem, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-              }
-            });
+            // Only preserve and upload local orders placed directly from this device while offline
+            if (colName === 'orders') {
+              localItems.forEach((localItem) => {
+                const localKey = String(localItem.id || localItem.orderId || '');
+                if (localKey && !remoteMap.has(localKey) && (localItem.source === 'Website Checkout' || localItem.orderStatus === 'Confirmed')) {
+                  mergedDocs.unshift(localItem);
+                  const docRef = doc(firestoreDb, colName, localKey);
+                  setDoc(docRef, sanitizeForFirestore({ ...localItem, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+                }
+              });
+            }
 
-            // Ensure orders and leads are always sorted newest first
+            // Ensure orders, leads, and notifications are sorted newest first
             if (colName === 'orders' || colName === 'leads' || colName === 'notifications') {
               mergedDocs.sort((a, b) => {
                 const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
@@ -415,7 +418,12 @@ function setupFirestoreRealtimeSync() {
             state[colName] = mergedDocs;
             saveCollection(colName, false);
           }
-        }, (err) => console.warn(`Firestore sync note for ${colName}:`, err.message));
+        }, (err) => {
+          console.warn(`Firestore sync note for ${colName}:`, err.message);
+          if (err?.code === 'permission-denied') {
+            window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: colName } }));
+          }
+        });
       }
     } catch (err) {
       console.warn(`Firestore sync registration failed for ${colName}:`, err.message);
@@ -443,23 +451,25 @@ if (typeof window !== 'undefined') {
     }
   });
 
-  // Mobile device resume & tab focus auto-sync guarantee
+  // Mobile device resume & tab focus auto-sync guarantee across all devices
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-      if (typeof dbService !== 'undefined' && dbService.refreshFromFirebase) {
-        dbService.refreshFromFirebase('orders').catch(() => {});
-        dbService.refreshFromFirebase('leads').catch(() => {});
-        dbService.refreshFromFirebase('customers').catch(() => {});
+      if (typeof dbService !== 'undefined' && dbService.refreshAllFromFirebase) {
+        dbService.refreshAllFromFirebase().catch(() => {});
       }
     }
   });
 
-  // Background heartbeat every 20 seconds for uninterrupted mobile sync
+  // Background heartbeat every 25 seconds to pull remote modifications seamlessly
   setInterval(() => {
     if (document.visibilityState === 'visible' && typeof dbService !== 'undefined' && dbService.refreshFromFirebase) {
       dbService.refreshFromFirebase('orders').catch(() => {});
+      dbService.refreshFromFirebase('heroSlides').catch(() => {});
+      dbService.refreshFromFirebase('reviews').catch(() => {});
+      dbService.refreshFromFirebase('galleryPhotos').catch(() => {});
+      dbService.refreshFromFirebase('videos').catch(() => {});
     }
-  }, 20000);
+  }, 25000);
 }
 
 function saveCollection(collectionName, syncToCloud = true) {
@@ -536,6 +546,7 @@ export const dbService = {
     // Sync to Cloud Firestore if connected
     if (isFirebaseConfigured && firestoreDb) {
       try {
+        await ensureFirebaseAuth().catch(() => {});
         const docId = String(newItem.id || newItem.orderId);
         const docRef = doc(firestoreDb, collectionName, docId);
         const cleanItem = sanitizeForFirestore({
@@ -552,6 +563,9 @@ export const dbService = {
         console.log(`[Firestore Sync] Created document ${collectionName}/${docId}`);
       } catch (err) {
         console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
+        if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'add' } }));
+        }
       }
     }
 
@@ -589,12 +603,16 @@ export const dbService = {
 
       if (isFirebaseConfigured && firestoreDb) {
         try {
+          await ensureFirebaseAuth().catch(() => {});
           const docRef = doc(firestoreDb, 'settings', 'company_settings');
           const cleanSettings = sanitizeForFirestore(state.settings);
           await setDoc(docRef, cleanSettings, { merge: true });
           console.log('[Firestore Sync] Updated company_settings');
         } catch (err) {
           console.warn('Firestore Settings update note:', err.message);
+          if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: 'settings', operation: 'update' } }));
+          }
         }
       }
 
@@ -616,11 +634,15 @@ export const dbService = {
     if (index === -1) {
       if (isFirebaseConfigured && firestoreDb) {
         try {
+          await ensureFirebaseAuth().catch(() => {});
           const docRef = doc(firestoreDb, collectionName, String(id));
           const cleanUpdates = sanitizeForFirestore({ ...updates, id, updatedAt: new Date().toISOString() });
           await setDoc(docRef, cleanUpdates, { merge: true });
         } catch (err) {
           console.warn(`Firestore Cloud update note (${collectionName}):`, err.message);
+          if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'update' } }));
+          }
         }
       }
       return updates;
@@ -638,12 +660,16 @@ export const dbService = {
 
     if (isFirebaseConfigured && firestoreDb) {
       try {
+        await ensureFirebaseAuth().catch(() => {});
         const docRef = doc(firestoreDb, collectionName, String(id));
         const cleanItem = sanitizeForFirestore(updatedItem);
         await setDoc(docRef, cleanItem, { merge: true });
         console.log(`[Firestore Sync] Updated document ${collectionName}/${id}`);
       } catch (err) {
         console.warn(`Firestore Cloud update note (${collectionName}):`, err.message);
+        if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'update' } }));
+        }
       }
     }
 
@@ -692,11 +718,15 @@ export const dbService = {
     // Delete directly from Firebase Cloud Firestore
     if (isFirebaseConfigured && firestoreDb) {
       try {
+        await ensureFirebaseAuth().catch(() => {});
         const docRef = doc(firestoreDb, collectionName, String(id));
         await deleteDoc(docRef);
         console.log(`[Firestore Sync] Deleted document ${collectionName}/${id}`);
       } catch (err) {
         console.warn(`[Firestore] Delete error (${collectionName}/${id}):`, err.message);
+        if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'delete' } }));
+        }
       }
     }
 
@@ -724,6 +754,7 @@ export const dbService = {
 
     if (isFirebaseConfigured && firestoreDb && Array.isArray(items)) {
       try {
+        await ensureFirebaseAuth().catch(() => {});
         // Fetch existing remote docs to remove deleted items from Firestore
         const colRef = collection(firestoreDb, collectionName);
         const existingRemoteSnap = await getDocs(colRef);
@@ -750,6 +781,9 @@ export const dbService = {
         console.log(`[Firestore Sync] Batch synced collection ${collectionName} (${items.length} records)`);
       } catch (err) {
         console.warn(`Firestore batch update note (${collectionName}):`, err.message);
+        if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'setCollection' } }));
+        }
       }
     }
 
@@ -1112,6 +1146,32 @@ export const dbService = {
   },
 
   /**
+   * Proactively refresh all primary collections from Cloud Firestore across all devices
+   */
+  async refreshAllFromFirebase() {
+    const collectionsToRefresh = [
+      'orders',
+      'heroSlides',
+      'galleryPhotos',
+      'videos',
+      'reviews',
+      'products',
+      'customers',
+      'leads',
+      'settings'
+    ];
+    const results = {};
+    for (const col of collectionsToRefresh) {
+      try {
+        results[col] = await this.refreshFromFirebase(col);
+      } catch (e) {
+        results[col] = null;
+      }
+    }
+    return results;
+  },
+
+  /**
    * Manually fetch latest collection data from Cloud Firestore and sync local store
    */
   async refreshFromFirebase(collectionName = 'orders') {
@@ -1120,6 +1180,19 @@ export const dbService = {
     }
     try {
       await ensureFirebaseAuth().catch(() => {});
+
+      // Special handling for singleton 'settings' document
+      if (collectionName === 'settings') {
+        const settingsDocRef = doc(firestoreDb, 'settings', 'company_settings');
+        const snap = await getDoc(settingsDocRef);
+        if (snap.exists()) {
+          state.settings = snap.data();
+          saveCollection('settings', false);
+          return state.settings;
+        }
+        return state.settings || initialSettings;
+      }
+
       const colRef = collection(firestoreDb, collectionName);
       const snap = await getDocs(colRef);
       const remoteDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -1129,49 +1202,65 @@ export const dbService = {
         const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
         const merged = [...remoteDocs];
 
-        // If local device has orders not yet present in Firestore (placed from this device), upload them immediately
-        for (const local of localItems) {
-          const key = String(local.id || local.orderId || '');
-          if (key && !remoteMap.has(key)) {
-            merged.unshift(local);
-            try {
-              const docRef = doc(firestoreDb, collectionName, key);
-              const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
-              await setDoc(docRef, cleanDoc, { merge: true });
-              console.log(`[Firestore live sync] Auto-uploaded local ${collectionName}/${key} to Firestore!`);
-            } catch (err) {
-              console.warn(`[Firestore live sync] Error uploading ${key}:`, err.message);
+        // ONLY for orders placed offline on this device: preserve and upload them
+        if (collectionName === 'orders') {
+          for (const local of localItems) {
+            const key = String(local.id || local.orderId || '');
+            if (key && !remoteMap.has(key) && (local.source === 'Website Checkout' || local.orderStatus === 'Confirmed')) {
+              merged.unshift(local);
+              try {
+                const docRef = doc(firestoreDb, collectionName, key);
+                const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
+                await setDoc(docRef, cleanDoc, { merge: true });
+                console.log(`[Firestore live sync] Auto-uploaded local ${collectionName}/${key} to Firestore!`);
+              } catch (err) {
+                console.warn(`[Firestore live sync] Error uploading ${key}:`, err.message);
+              }
             }
           }
         }
 
-        if (collectionName === 'orders' || collectionName === 'leads' || collectionName === 'notifications') {
+        // Sort collection items properly
+        if (collectionName === 'orders' || collectionName === 'leads' || collectionName === 'notifications' || collectionName === 'reviews') {
           merged.sort((a, b) => {
             const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
             const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
             return dateB - dateA;
           });
+        } else if (collectionName === 'heroSlides') {
+          merged.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
         }
 
         state[collectionName] = merged;
         saveCollection(collectionName, false);
         return merged;
       } else if (localItems.length > 0) {
-        // Remote Firestore is empty, seed local records up to Firestore
-        for (const local of localItems) {
-          const key = String(local.id || local.orderId || '');
-          if (key) {
-            try {
-              const docRef = doc(firestoreDb, collectionName, key);
-              const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
-              await setDoc(docRef, cleanDoc, { merge: true });
-            } catch (e) {}
+        // Remote Firestore collection is empty - only seed if not explicitly purged or disabled
+        const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
+        if (!wasPurged && !window.__firestoreSeedDisabled) {
+          for (const local of localItems) {
+            const key = String(local.id || local.orderId || '');
+            if (key) {
+              try {
+                const docRef = doc(firestoreDb, collectionName, key);
+                const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
+                await setDoc(docRef, cleanDoc, { merge: true });
+              } catch (e) {
+                if (e?.code === 'permission-denied') {
+                  window.__firestoreSeedDisabled = true;
+                  break;
+                }
+              }
+            }
           }
         }
         return localItems;
       }
     } catch (err) {
       console.warn(`Manual refresh note for ${collectionName}:`, err.message);
+      if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName } }));
+      }
     }
     return state[collectionName] || [];
   }

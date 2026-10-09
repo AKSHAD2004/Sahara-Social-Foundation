@@ -15,13 +15,38 @@ export default function CrmHeader({ onToggleMobile }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
+  const [permissionError, setPermissionError] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
 
   useEffect(() => {
     const unsub = dbService.subscribe('notifications', (notifs) => {
       setNotifications(notifs || []);
     });
-    return unsub;
+
+    const onPermError = () => {
+      setPermissionError(true);
+    };
+    window.addEventListener('firestore-permission-error', onPermError);
+
+    return () => {
+      if (typeof unsub === 'function') unsub();
+      window.removeEventListener('firestore-permission-error', onPermError);
+    };
   }, []);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    try {
+      await dbService.refreshAllFromFirebase();
+      setSyncSuccess(true);
+      setTimeout(() => setSyncSuccess(false), 3000);
+    } catch (err) {
+      console.error('Manual sync note:', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -65,14 +90,45 @@ export default function CrmHeader({ onToggleMobile }) {
   };
 
   return (
-    <header className="crm-header">
-      {/* Mobile Hamburger + Global Search */}
-      <div className="crm-header-left">
-        <button 
-          className="crm-sidebar-toggle" 
-          style={{ display: 'flex' }}
-          onClick={onToggleMobile}
-          title="Toggle Mobile Menu"
+    <>
+      {permissionError && (
+        <div style={{
+          background: '#fef2f2',
+          borderBottom: '1px solid #fecaca',
+          color: '#991b1b',
+          padding: '0.65rem 1.25rem',
+          fontSize: '0.82rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          width: '100%',
+          boxSizing: 'border-box',
+          zIndex: 1100
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '1.1rem' }}>⚠️</span>
+            <span>
+              <strong>Firestore Permission Notice:</strong> Changes may only save to this device because Firebase rules rejected the write. 
+              In <strong>Firebase Console &gt; Firestore Database &gt; Rules</strong>, set: <code>allow read, write: if true;</code> and click <strong>Publish</strong>.
+            </span>
+          </div>
+          <button 
+            onClick={() => setPermissionError(false)}
+            style={{ background: 'none', border: 'none', color: '#991b1b', fontWeight: 'bold', cursor: 'pointer', padding: '2px 8px', fontSize: '0.9rem' }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      <header className="crm-header">
+        {/* Mobile Hamburger + Global Search */}
+        <div className="crm-header-left">
+          <button 
+            className="crm-sidebar-toggle" 
+            style={{ display: 'flex' }}
+            onClick={onToggleMobile}
+            title="Toggle Mobile Menu"
         >
           <Menu size={20} />
         </button>
@@ -193,6 +249,32 @@ export default function CrmHeader({ onToggleMobile }) {
           </select>
         </div>
 
+        {/* Real-time Cloud Sync Trigger across all devices */}
+        <button 
+          className="crm-icon-btn" 
+          onClick={handleManualSync}
+          disabled={isSyncing}
+          title="Click to instantly sync data across all devices from Cloud Firestore"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '0.4rem 0.75rem',
+            width: 'auto',
+            borderRadius: '8px',
+            background: syncSuccess ? '#ecfdf5' : '#f8fafc',
+            color: syncSuccess ? '#059669' : '#334155',
+            border: syncSuccess ? '1px solid #a7f3d0' : '1px solid #cbd5e1',
+            fontWeight: 600,
+            fontSize: '0.75rem',
+            cursor: isSyncing ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <RefreshCw size={13} style={{ animation: isSyncing ? 'spin 1s linear infinite' : 'none' }} />
+          <span>{isSyncing ? 'Syncing...' : syncSuccess ? 'Synced ✓' : 'Cloud Sync'}</span>
+        </button>
+
         {/* Notifications Icon with Popup */}
         <div style={{ position: 'relative' }}>
           <button 
@@ -260,5 +342,12 @@ export default function CrmHeader({ onToggleMobile }) {
         </button>
       </div>
     </header>
+    <style>{`
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    `}</style>
+  </>
   );
 }

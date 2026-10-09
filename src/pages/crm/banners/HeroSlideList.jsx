@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { dbService } from '../../../services/db';
 import { initialHeroSlides } from '../../../services/seedData';
+import { compressImage } from '../../../utils/imageCompressor';
 import CrmModal from '../../../components/crm/CrmModal';
 
 export default function HeroSlideList() {
@@ -36,7 +37,6 @@ export default function HeroSlideList() {
 
     const unsub = dbService.subscribe('heroSlides', (items) => {
       if (!items || items.length === 0) {
-        dbService.setCollection('heroSlides', initialHeroSlides);
         setSlides(initialHeroSlides);
       } else {
         const sorted = [...items].sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
@@ -83,24 +83,20 @@ export default function HeroSlideList() {
     setShowModal(true);
   };
 
-  // Handle local file upload and convert to base64 data URL
-  const handleFileUpload = (e) => {
+  // Handle local file upload and automatically compress for Cloud Firestore sync
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Photo size exceeds 2MB. Please select an optimized image or provide an image URL.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
+    try {
+      const compressed = await compressImage(file, 1400, 800, 0.78);
       setFormData((prev) => ({
         ...prev,
-        image: reader.result
+        image: compressed
       }));
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      alert('Error processing image: ' + err.message);
+    }
   };
 
   const handleSave = async (e) => {
