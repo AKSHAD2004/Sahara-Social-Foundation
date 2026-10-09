@@ -522,14 +522,20 @@ export const dbService = {
     // Sync to Cloud Firestore if connected
     if (isFirebaseConfigured && firestoreDb) {
       try {
+        const docId = String(newItem.id || newItem.orderId);
+        const docRef = doc(firestoreDb, collectionName, docId);
+        const cleanItem = sanitizeForFirestore({
+          ...newItem,
+          id: docId,
+          orderId: newItem.orderId || docId,
+          syncedAt: new Date().toISOString()
+        });
+        await setDoc(docRef, cleanItem, { merge: true });
+
         if (collectionName === 'orders') {
-          await syncOrderToFirebase(newItem);
-        } else {
-          const docRef = doc(firestoreDb, collectionName, String(newItem.id));
-          const cleanItem = sanitizeForFirestore(newItem);
-          await setDoc(docRef, cleanItem, { merge: true });
+          await syncOrderToFirebase(cleanItem).catch(() => {});
         }
-        console.log(`[Firestore Sync] Created document ${collectionName}/${newItem.id}`);
+        console.log(`[Firestore Sync] Created document ${collectionName}/${docId}`);
       } catch (err) {
         console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
       }
