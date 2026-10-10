@@ -38,6 +38,41 @@ import {
 import { buildCommissionTransactions, buildCommissionReversal, isOrderCommissionEligible } from './commissionEngine';
 
 const STORAGE_PREFIX = 'sahara_crm_prod_';
+const DELETED_STORAGE_PREFIX = 'sahara_crm_deleted_';
+
+export function getDeletedSet(collectionName) {
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(DELETED_STORAGE_PREFIX + collectionName) : null;
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch (e) {
+    return new Set();
+  }
+}
+
+export function recordDeletedId(collectionName, ...ids) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    const set = getDeletedSet(collectionName);
+    ids.filter(Boolean).forEach((id) => set.add(String(id)));
+    localStorage.setItem(DELETED_STORAGE_PREFIX + collectionName, JSON.stringify([...set]));
+  } catch (e) {}
+}
+
+export function isItemDeleted(collectionName, itemOrId) {
+  if (!itemOrId) return false;
+  const set = getDeletedSet(collectionName);
+  if (typeof itemOrId === 'string' || typeof itemOrId === 'number') {
+    return set.has(String(itemOrId));
+  }
+  const id = itemOrId.id ? String(itemOrId.id) : null;
+  const orderId = itemOrId.orderId ? String(itemOrId.orderId) : null;
+  const customerId = itemOrId.customerId ? String(itemOrId.customerId) : null;
+  const leadId = itemOrId.leadId ? String(itemOrId.leadId) : null;
+  return (id && set.has(id)) || 
+         (orderId && set.has(orderId)) || 
+         (customerId && set.has(customerId)) || 
+         (leadId && set.has(leadId));
+}
 
 // In-memory state and listeners
 const state = {};
@@ -91,9 +126,21 @@ export function sanitizeForFirestore(data) {
 function initCollection(collectionName, defaultData) {
   try {
     const key = STORAGE_PREFIX + collectionName;
+    const deletedSet = getDeletedSet(collectionName);
     const stored = localStorage.getItem(key);
     if (stored) {
-      const parsed = JSON.parse(stored);
+      let parsed = JSON.parse(stored);
+      // Filter out any previously deleted items from parsed
+      if (Array.isArray(parsed)) {
+        parsed = parsed.filter((item) => {
+          const idKey = String(item.id || '');
+          const orderKey = String(item.orderId || '');
+          const custKey = String(item.customerId || '');
+          const leadKey = String(item.leadId || '');
+          return !deletedSet.has(idKey) && (!orderKey || !deletedSet.has(orderKey)) && (!custKey || !deletedSet.has(custKey)) && (!leadKey || !deletedSet.has(leadKey));
+        });
+      }
+
       // For products collection, ensure all official products exist with updated official pricing (3200 for combos, 1600 for singles)
       if (collectionName === 'products' && Array.isArray(defaultData)) {
         const existingList = Array.isArray(parsed) ? parsed : [];
@@ -129,22 +176,24 @@ function initCollection(collectionName, defaultData) {
         const existingOrders = Array.isArray(parsed) ? parsed : [];
         const orderMap = new Map(existingOrders.map((o) => [String(o.id || o.orderId), o]));
 
-        // Ensure default website orders (e.g. SSF-842101) are always present
+        // Ensure default website orders are present ONLY IF NOT deleted
         defaultData.forEach((defOrd) => {
           const ordKey = String(defOrd.id || defOrd.orderId);
-          if (!orderMap.has(ordKey)) {
+          if (!orderMap.has(ordKey) && !deletedSet.has(ordKey)) {
             existingOrders.push(defOrd);
             orderMap.set(ordKey, defOrd);
           }
         });
 
-        // Also recover any order placed via website checkout in ssf_last_order
+        // Also recover any order placed via website checkout in ssf_last_order ONLY IF NOT deleted
         try {
           const lastOrderRaw = localStorage.getItem('ssf_last_order');
           if (lastOrderRaw) {
             const lastOrd = JSON.parse(lastOrderRaw);
-            const lKey = String(lastOrd.id || lastOrd.orderId);
-            if (lKey && !orderMap.has(lKey)) {
+            const lKey = String(lastOrd.id || lastOrd.orderId || '');
+            if (deletedSet.has(lKey) || deletedSet.has(String(lastOrd.id)) || deletedSet.has(String(lastOrd.orderId))) {
+              localStorage.removeItem('ssf_last_order');
+            } else if (lKey && !orderMap.has(lKey)) {
               existingOrders.unshift({
                 ...lastOrd,
                 id: lKey,
@@ -171,22 +220,28 @@ function initCollection(collectionName, defaultData) {
         const custMap = new Map(existingCustomers.map((c) => [String(c.id || c.customerId || c.mobileNumber || c.phone), c]));
         defaultData.forEach((defCust) => {
           const custKey = String(defCust.id || defCust.customerId || defCust.mobileNumber || defCust.phone);
-          if (!custMap.has(custKey)) {
+          const custId = String(defCust.id || '');
+          const customerId = String(defCust.customerId || '');
+          if (!custMap.has(custKey) && !deletedSet.has(custId) && !deletedSet.has(customerId)) {
             existingCustomers.push(defCust);
             custMap.set(custKey, defCust);
           }
         });
         state[collectionName] = existingCustomers;
         localStorage.setItem(key, JSON.stringify(existingCustomers));
-      } else if (Array.isArray(parsed) && parsed.length === 0 && Array.isArray(defaultData) && defaultData.length > 0) {
-        state[collectionName] = defaultData;
-        localStorage.setItem(key, JSON.stringify(defaultData));
       } else {
         state[collectionName] = parsed;
       }
     } else {
-      state[collectionName] = defaultData;
-      localStorage.setItem(key, JSON.stringify(defaultData));
+      const activeDefault = Array.isArray(defaultData)
+        ? defaultData.filter((item) => {
+            const idKey = String(item.id || '');
+            const orderKey = String(item.orderId || '');
+            return !deletedSet.has(idKey) && (!orderKey || !deletedSet.has(orderKey));
+          })
+        : defaultData;
+      state[collectionName] = activeDefault;
+      localStorage.setItem(key, JSON.stringify(activeDefault));
     }
   } catch (e) {
     state[collectionName] = defaultData;
@@ -380,17 +435,22 @@ function setupFirestoreRealtimeSync() {
               return;
             }
 
-            // Remote collection in Cloud Firestore is empty!
-            // NEVER wipe local or seed data with empty array!
-            const localItems = (Array.isArray(state[colName]) && state[colName].length > 0)
+            const deletedSet = getDeletedSet(colName);
+            const localItems = ((Array.isArray(state[colName]) && state[colName].length > 0)
               ? state[colName]
-              : (initialDataMap[colName] || []);
+              : (initialDataMap[colName] || [])).filter((item) => {
+                const iId = String(item.id || '');
+                const iOrd = String(item.orderId || '');
+                const iCust = String(item.customerId || '');
+                const iLead = String(item.leadId || '');
+                return !deletedSet.has(iId) && (!iOrd || !deletedSet.has(iOrd)) && (!iCust || !deletedSet.has(iCust)) && (!iLead || !deletedSet.has(iLead));
+              });
 
             if (localItems.length > 0) {
               state[colName] = localItems;
               saveCollection(colName, false);
 
-              // Auto-seed to Cloud Firestore in the background so Firestore now contains the records
+              // Auto-seed to Cloud Firestore in the background only for active non-deleted items
               localItems.forEach((item) => {
                 const docId = String(item.id || `${colName}_${Date.now()}_${Math.floor(Math.random() * 1000)}`);
                 const docRef = doc(firestoreDb, colName, docId);
@@ -401,18 +461,44 @@ function setupFirestoreRealtimeSync() {
                   }
                 });
               });
+            } else {
+              state[colName] = [];
+              saveCollection(colName, false);
             }
           } else {
-            // Remote Cloud Firestore has authoritative documents: synchronize them
-            const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
-            const localItems = Array.isArray(state[colName]) ? state[colName] : [];
-            const mergedDocs = [...remoteDocs];
+            // Remote Cloud Firestore has documents: purge any deleted ones and synchronize
+            const deletedSet = getDeletedSet(colName);
+            const activeRemoteDocs = [];
+            for (const rDoc of remoteDocs) {
+              const rId = String(rDoc.id || '');
+              const rOrd = String(rDoc.orderId || '');
+              const rCust = String(rDoc.customerId || '');
+              const rLead = String(rDoc.leadId || '');
+              if (deletedSet.has(rId) || (rOrd && deletedSet.has(rOrd)) || (rCust && deletedSet.has(rCust)) || (rLead && deletedSet.has(rLead))) {
+                // Permanently clean from Cloud Firestore if found remotely
+                const dRef = doc(firestoreDb, colName, rDoc.id);
+                deleteDoc(dRef).catch(() => {});
+              } else {
+                activeRemoteDocs.push(rDoc);
+              }
+            }
 
-            // Only preserve and upload local orders placed directly from this device while offline
+            const remoteMap = new Map(activeRemoteDocs.map((d) => [String(d.id || d.orderId), d]));
+            const localItems = Array.isArray(state[colName]) ? state[colName] : [];
+            const mergedDocs = [...activeRemoteDocs];
+
+            // Only preserve and upload local orders placed directly from this device while offline (NEVER deleted!)
             if (colName === 'orders') {
               localItems.forEach((localItem) => {
                 const localKey = String(localItem.id || localItem.orderId || '');
-                if (localKey && !remoteMap.has(localKey) && (localItem.source === 'Website Checkout' || localItem.orderStatus === 'Confirmed')) {
+                const localOrderId = String(localItem.orderId || '');
+                if (
+                  localKey &&
+                  !deletedSet.has(localKey) &&
+                  (!localOrderId || !deletedSet.has(localOrderId)) &&
+                  !remoteMap.has(localKey) &&
+                  (localItem.source === 'Website Checkout' || localItem.orderStatus === 'Confirmed')
+                ) {
                   mergedDocs.unshift(localItem);
                   const docRef = doc(firestoreDb, colName, localKey);
                   setDoc(docRef, sanitizeForFirestore({ ...localItem, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
@@ -720,21 +806,71 @@ export const dbService = {
     return updatedItem;
   },
 
-  // Delete item (with simultaneous Cloud Firestore deletion)
+  // Delete item (with simultaneous Cloud Firestore deletion & permanent blacklist)
   async delete(collectionName, id, currentUser = null) {
     const items = state[collectionName] || [];
-    const itemToDelete = items.find((i) => String(i.id) === String(id));
+    const targetIdStr = String(id);
 
-    state[collectionName] = items.filter((i) => String(i.id) !== String(id));
+    // Find the item to delete (by id, orderId, customerId, leadId)
+    const itemToDelete = items.find((i) => 
+      String(i.id) === targetIdStr || 
+      (i.orderId && String(i.orderId) === targetIdStr) ||
+      (i.customerId && String(i.customerId) === targetIdStr) ||
+      (i.leadId && String(i.leadId) === targetIdStr)
+    );
+
+    const idToDelete = itemToDelete?.id ? String(itemToDelete.id) : targetIdStr;
+    const orderIdToDelete = itemToDelete?.orderId ? String(itemToDelete.orderId) : (collectionName === 'orders' ? targetIdStr : null);
+    const customerIdToDelete = itemToDelete?.customerId ? String(itemToDelete.customerId) : null;
+    const leadIdToDelete = itemToDelete?.leadId ? String(itemToDelete.leadId) : null;
+
+    // Permanently record in persistent deleted registry so it can NEVER be resurrected
+    recordDeletedId(collectionName, idToDelete, targetIdStr, orderIdToDelete, customerIdToDelete, leadIdToDelete);
+
+    // If order was in ssf_last_order, clear it immediately
+    if (collectionName === 'orders' && typeof localStorage !== 'undefined') {
+      try {
+        const lastRaw = localStorage.getItem('ssf_last_order');
+        if (lastRaw) {
+          const parsedLast = JSON.parse(lastRaw);
+          const pId = String(parsedLast.id || parsedLast.orderId || '');
+          if (pId === idToDelete || pId === targetIdStr || (orderIdToDelete && pId === orderIdToDelete)) {
+            localStorage.removeItem('ssf_last_order');
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Filter out completely from in-memory state
+    state[collectionName] = items.filter((i) => {
+      const iId = String(i.id || '');
+      const iOrd = String(i.orderId || '');
+      const iCust = String(i.customerId || '');
+      const iLead = String(i.leadId || '');
+      return (
+        iId !== idToDelete &&
+        iId !== targetIdStr &&
+        (!orderIdToDelete || iOrd !== orderIdToDelete) &&
+        (!customerIdToDelete || iCust !== customerIdToDelete) &&
+        (!leadIdToDelete || iLead !== leadIdToDelete)
+      );
+    });
     saveCollection(collectionName);
 
     // Delete directly from Firebase Cloud Firestore
     if (isFirebaseConfigured && firestoreDb) {
       try {
         await ensureFirebaseAuth().catch(() => {});
-        const docRef = doc(firestoreDb, collectionName, String(id));
-        await deleteDoc(docRef);
-        console.log(`[Firestore Sync] Deleted document ${collectionName}/${id}`);
+        const keysToDelete = new Set([targetIdStr, idToDelete, orderIdToDelete, customerIdToDelete, leadIdToDelete].filter(Boolean));
+        for (const k of keysToDelete) {
+          try {
+            const docRef = doc(firestoreDb, collectionName, String(k));
+            await deleteDoc(docRef);
+            console.log(`[Firestore Sync] Permanently deleted document ${collectionName}/${k}`);
+          } catch (delErr) {
+            // Key might not exist in remote DB, ignore
+          }
+        }
       } catch (err) {
         console.warn(`[Firestore] Delete error (${collectionName}/${id}):`, err.message);
         if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
@@ -751,7 +887,7 @@ export const dbService = {
         action: `DELETE_${collectionName.toUpperCase()}`,
         module: collectionName,
         recordId: id,
-        description: `Deleted ${collectionName.slice(0, -1)} #${id} (${itemToDelete?.name || itemToDelete?.fullName || itemToDelete?.customerName || itemToDelete?.title || ''})`,
+        description: `Permanently deleted ${collectionName.slice(0, -1)} #${id} (${itemToDelete?.name || itemToDelete?.fullName || itemToDelete?.customerName || itemToDelete?.title || ''})`,
         oldValue: JSON.stringify(itemToDelete || {}),
         newValue: null
       });
@@ -1208,18 +1344,48 @@ export const dbService = {
 
       const colRef = collection(firestoreDb, collectionName);
       const snap = await getDocs(colRef);
-      const remoteDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      const localItems = Array.isArray(state[collectionName]) ? state[collectionName] : [];
+      const rawRemoteDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const deletedSet = getDeletedSet(collectionName);
+
+      // Filter out and purge any remotely returned docs that were marked as deleted
+      const remoteDocs = [];
+      for (const rDoc of rawRemoteDocs) {
+        const rId = String(rDoc.id || '');
+        const rOrd = String(rDoc.orderId || '');
+        const rCust = String(rDoc.customerId || '');
+        const rLead = String(rDoc.leadId || '');
+        if (deletedSet.has(rId) || (rOrd && deletedSet.has(rOrd)) || (rCust && deletedSet.has(rCust)) || (rLead && deletedSet.has(rLead))) {
+          const dRef = doc(firestoreDb, collectionName, rDoc.id);
+          deleteDoc(dRef).catch(() => {});
+        } else {
+          remoteDocs.push(rDoc);
+        }
+      }
+
+      const localItems = (Array.isArray(state[collectionName]) ? state[collectionName] : []).filter((item) => {
+        const iId = String(item.id || '');
+        const iOrd = String(item.orderId || '');
+        const iCust = String(item.customerId || '');
+        const iLead = String(item.leadId || '');
+        return !deletedSet.has(iId) && (!iOrd || !deletedSet.has(iOrd)) && (!iCust || !deletedSet.has(iCust)) && (!iLead || !deletedSet.has(iLead));
+      });
 
       if (remoteDocs.length > 0) {
         const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
         const merged = [...remoteDocs];
 
-        // ONLY for orders placed offline on this device: preserve and upload them
+        // ONLY for orders placed offline on this device: preserve and upload them (NEVER deleted!)
         if (collectionName === 'orders') {
           for (const local of localItems) {
             const key = String(local.id || local.orderId || '');
-            if (key && !remoteMap.has(key) && (local.source === 'Website Checkout' || local.orderStatus === 'Confirmed')) {
+            const ordKey = String(local.orderId || '');
+            if (
+              key &&
+              !deletedSet.has(key) &&
+              (!ordKey || !deletedSet.has(ordKey)) &&
+              !remoteMap.has(key) &&
+              (local.source === 'Website Checkout' || local.orderStatus === 'Confirmed')
+            ) {
               merged.unshift(local);
               try {
                 const docRef = doc(firestoreDb, collectionName, key);
@@ -1248,12 +1414,13 @@ export const dbService = {
         saveCollection(collectionName, false);
         return merged;
       } else if (localItems.length > 0) {
-        // Remote Firestore collection is empty - only seed if not explicitly purged or disabled
+        // Remote Firestore collection is empty - only seed active non-deleted items
         const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
         if (!wasPurged && !window.__firestoreSeedDisabled) {
           for (const local of localItems) {
             const key = String(local.id || local.orderId || '');
-            if (key) {
+            const ordKey = String(local.orderId || '');
+            if (key && !deletedSet.has(key) && (!ordKey || !deletedSet.has(ordKey))) {
               try {
                 const docRef = doc(firestoreDb, collectionName, key);
                 const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
@@ -1267,7 +1434,13 @@ export const dbService = {
             }
           }
         }
+        state[collectionName] = localItems;
+        saveCollection(collectionName, false);
         return localItems;
+      } else {
+        state[collectionName] = [];
+        saveCollection(collectionName, false);
+        return [];
       }
     } catch (err) {
       handleFirestorePermissionError('refresh', collectionName, err);

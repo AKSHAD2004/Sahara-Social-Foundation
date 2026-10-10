@@ -1074,3 +1074,159 @@ body {
   transform: scale(1.1);
   background-color: #159B32 !important;
 }
+
+/* ==========================================================================
+   Photos Gallery Grid & 2-Column Mobile Layout
+   ========================================================================== */
+.photos-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.75rem;
+}
+
+.photo-card-item {
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  height: 300px;
+  box-shadow: 0 6px 20px rgba(0, 107, 45, 0.06);
+  cursor: pointer;
+  background-color: #04200e;
+  border: 1px solid #E1E9DF;
+}
+
+.photo-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.photo-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(4, 32, 14, 0.95) 0%, rgba(4, 32, 14, 0.3) 50%, transparent 80%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.25rem;
+}
+
+.photo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.photo-badge {
+  background-color: #006B2D;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.photo-enlarge-badge {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+}
+
+.photo-card-title {
+  font-size: 1rem;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.35;
+  font-family: var(--font-heading);
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .photos-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .photos-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+  }
+
+  .photo-card-item {
+    height: 220px !important;
+    border-radius: 14px !important;
+  }
+
+  .photo-card-overlay {
+    padding: 0.65rem !important;
+  }
+
+  .photo-badge {
+    font-size: 0.62rem !important;
+    padding: 0.15rem 0.45rem !important;
+  }
+
+  .photo-enlarge-badge {
+    font-size: 0.62rem !important;
+    padding: 0.15rem 0.35rem !important;
+  }
+
+  .photo-card-title {
+    font-size: 0.78rem !important;
+    line-height: 1.25 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .photos-filter-chips {
+    margin-bottom: 1.25rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .photos-camp-callout {
+    margin-top: 1.5rem !important;
+    padding: 1.25rem 1rem !important;
+    border-radius: 14px !important;
+  }
+
+  .photos-camp-callout h3 {
+    font-size: 1.2rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .photos-camp-callout p {
+    font-size: 0.82rem !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .photos-gallery-grid {
+    gap: 0.5rem !important;
+  }
+
+  .photo-card-item {
+    height: 190px !important;
+    border-radius: 12px !important;
+  }
+
+  .photo-card-overlay {
+    padding: 0.5rem !important;
+  }
+
+  .photo-card-title {
+    font-size: 0.72rem !important;
+  }
+}

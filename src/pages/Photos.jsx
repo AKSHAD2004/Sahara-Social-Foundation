@@ -100,23 +100,13 @@ const Photos = () => {
             })}
           </div>
 
-          {/* Photos Grid */}
-          <div className="grid-3" style={{ gap: '1.75rem' }}>
+          {/* Photos Grid - 3 cols on desktop, 2 cols on mobile view */}
+          <div className="photos-gallery-grid">
             {filteredPhotos.map((photo) => (
               <div
                 key={photo.id}
                 onClick={() => setActivePhoto(photo)}
-                style={{
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                  position: 'relative',
-                  height: '300px',
-                  boxShadow: '0 6px 20px rgba(0, 107, 45, 0.06)',
-                  cursor: 'pointer',
-                  backgroundColor: '#04200e',
-                  border: '1px solid #E1E9DF'
-                }}
-                className="card"
+                className="card photo-card-item"
               >
                 <img
                   src={photo.image}
@@ -125,57 +115,22 @@ const Photos = () => {
                     e.target.src = photo.fallback;
                   }}
                   alt={photo.titleMr || photo.titleEn}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    transition: 'transform 0.4s ease'
-                  }}
+                  className="photo-card-img"
                 />
 
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(to top, rgba(4, 32, 14, 0.95) 0%, rgba(4, 32, 14, 0.3) 50%, transparent 80%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  padding: '1.25rem'
-                }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '0.4rem'
-                  }}>
-                    <span style={{
-                      backgroundColor: '#006B2D',
-                      color: '#ffffff',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      padding: '0.2rem 0.6rem',
-                      borderRadius: '9999px',
-                      textTransform: 'uppercase'
-                    }}>
+                <div className="photo-card-overlay">
+                  <div className="photo-card-header">
+                    <span className="photo-badge">
                       {photo.category}
                     </span>
 
-                    <span style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                      color: '#ffffff',
-                      padding: '0.2rem 0.4rem',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.2rem',
-                      fontSize: '0.72rem'
-                    }}>
+                    <span className="photo-enlarge-badge">
                       <ZoomIn size={12} />
                       <span>{language === 'mr' ? 'मोठा करा' : 'Enlarge'}</span>
                     </span>
                   </div>
 
-                  <h3 style={{ fontSize: '1rem', color: '#ffffff', fontWeight: 700, lineHeight: 1.35, fontFamily: 'var(--font-heading)' }}>
+                  <h3 className="photo-card-title">
                     {language === 'mr' ? photo.titleMr : photo.titleEn}
                   </h3>
                 </div>
@@ -226,28 +181,6 @@ const Photos = () => {
           </div>
         </div>
       </section>
-
-      <style>{`
-        @media (max-width: 640px) {
-          .photos-filter-chips {
-            margin-bottom: 1.25rem !important;
-            gap: 0.4rem !important;
-          }
-          .photos-camp-callout {
-            margin-top: 1.5rem !important;
-            padding: 1.25rem 1rem !important;
-            border-radius: 14px !important;
-          }
-          .photos-camp-callout h3 {
-            font-size: 1.2rem !important;
-            margin-bottom: 0.35rem !important;
-          }
-          .photos-camp-callout p {
-            font-size: 0.82rem !important;
-            margin-bottom: 1rem !important;
-          }
-        }
-      `}</style>
 
       {/* Lightbox Modal */}
       {activePhoto && (

@@ -214,8 +214,10 @@ export default function LeadList() {
   // Confirm Delete
   const handleConfirmDelete = async () => {
     if (!deletingLead) return;
-    await dbService.delete('leads', deletingLead.id);
+    const leadIdToDelete = deletingLead.id;
+    setLeads((prev) => prev.filter((l) => l.id !== leadIdToDelete && l.leadId !== deletingLead.leadId));
     setDeletingLead(null);
+    await dbService.delete('leads', leadIdToDelete);
   };
 
   // Convert to Customer

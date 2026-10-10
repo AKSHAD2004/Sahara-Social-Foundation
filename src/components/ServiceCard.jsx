@@ -30,8 +30,11 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
   const { language } = useLanguage();
   const IconComponent = iconMap[service.iconName] || Activity;
 
+  const productPath = service.productUrl || '/shop';
+
   return (
-    <div
+    <Link
+      to={productPath}
       style={{
         backgroundColor: '#ffffff',
         borderRadius: '16px',
@@ -39,7 +42,9 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
         border: '1px solid #E1E9DF',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative'
+        position: 'relative',
+        textDecoration: 'none',
+        color: 'inherit'
       }}
       className="card service-card-animated"
     >
@@ -81,8 +86,7 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
           <span style={{ fontSize: '0.78rem', color: '#006B2D', fontWeight: 600 }}>
             {service.popularProduct}
           </span>
-          <Link
-            to="/shop"
+          <span
             style={{
               fontSize: '0.82rem',
               fontWeight: 700,
@@ -94,7 +98,7 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
           >
             <span>{language === 'mr' ? 'पहा' : 'View'}</span>
             <ArrowRight size={14} />
-          </Link>
+          </span>
         </div>
       )}
 
@@ -126,7 +130,7 @@ const ServiceCard = ({ service, onOpenConsultation }) => {
           }
         }
       `}</style>
-    </div>
+    </Link>
   );
 };
 

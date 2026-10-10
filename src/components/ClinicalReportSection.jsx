@@ -19,36 +19,8 @@ import ClinicalStudyReportModal from './ClinicalStudyReportModal';
 export const clinicalReportsData = [
   {
     srNo: 1,
-    title: 'Antox - D International Clinical Trial Test Report',
-    titleMr: 'Antox - D आंतरराष्ट्रीय क्लिनिकल चाचणी चाचणी अहवाल (CTRI)',
-    type: 'Govt. Registry',
-    status: 'Verified & Registered',
-    actionTextEn: 'CTRI GOVT. WEBSITE REPORT',
-    actionTextMr: 'CTRI शासकीय संकेतस्थळ अहवाल',
-    actionUrl: 'https://ctri.nic.in/Clinicaltrials/pmaindet2.php?EncHid=MTQxMTA0&Enc=&userName=',
-    isExternal: true,
-    fileType: 'link',
-    descriptionEn: 'Official registration with the Clinical Trials Registry - India (CTRI), Indian Council of Medical Research (ICMR).',
-    descriptionMr: 'क्लिनिकल ट्रायल्स रजिस्ट्री - इंडिया (CTRI), ICMR भारत सरकार अंतर्गत अधिकृत नोंदणीकृत चाचणी अहवाल.'
-  },
-  {
-    srNo: 2,
-    title: 'Antox - D Conclusion Report',
-    titleMr: 'Antox - D निष्कर्ष अहवाल (Conclusion Report)',
-    type: 'Scientific Study',
-    status: 'Completed',
-    actionTextEn: 'View Report',
-    actionTextMr: 'अहवाल पहा (PDF)',
-    actionUrl: 'https://nutrifeel.org/wp-content/uploads/Interim_Report_IMPROVA_18.04.26.pdf',
-    isExternal: true,
-    fileType: 'pdf',
-    descriptionEn: 'Scientific interim and conclusion efficacy study report demonstrating therapeutic outcomes for metabolic and diabetes support.',
-    descriptionMr: 'स्वादुपिंड कार्यक्षमता व साखर नियंत्रणाबाबत वैज्ञानिक निष्कर्ष व अंतरिम संशोधन अहवाल.'
-  },
-  {
-    srNo: 3,
-    title: 'Antox - D Total Detail Report',
-    titleMr: 'Antox - D संपूर्ण सविस्तर अहवाल (Total Detail Report)',
+    title: 'Antox D - Clinical Research Proven Report',
+    titleMr: 'Antox D - क्लिनिकल रिसर्च प्रोव्हेन रिपोर्ट (Clinical Research Proven Report)',
     type: 'Complete Dossier',
     status: 'Official 78-Page Study Report',
     actionTextEn: 'View Report (PDF)',

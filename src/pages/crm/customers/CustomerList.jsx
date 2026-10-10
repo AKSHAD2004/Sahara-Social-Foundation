@@ -199,10 +199,11 @@ export default function CustomerList() {
 
   const handleDeleteCustomer = async (customer) => {
     if (window.confirm(`Are you sure you want to permanently delete customer "${customer.fullName}" (${customer.customerId})? This action cannot be undone.`)) {
-      await dbService.delete('customers', customer.id);
+      setCustomers((prev) => prev.filter((c) => c.id !== customer.id && c.customerId !== customer.customerId));
       if (selectedCustomer?.id === customer.id) {
         setSelectedCustomer(null);
       }
+      await dbService.delete('customers', customer.id);
     }
   };
 

@@ -122,7 +122,8 @@ export const healthCategories = [
     iconName: "Activity",
     descEn: "Support healthy insulin production, blood sugar management, and reduce fatigue naturally.",
     descMr: "रक्तातील साखर नियंत्रित ठेवणे, स्वादुपिंडाचे आरोग्य आणि शारीरिक अशक्तपणा दूर करण्यासाठी मार्गदर्शन.",
-    popularProduct: "Antox D & Antox T"
+    popularProduct: "Antox D & Antox T",
+    productUrl: "/product/prod_antox_d_combo"
   },
   {
     id: "addiction",
@@ -131,7 +132,8 @@ export const healthCategories = [
     iconName: "ShieldAlert",
     descEn: "Effective herbal support to reduce urges for alcohol, tobacco, gutkha and smoking.",
     descMr: "दारू, तंबाखू, गुटखा व सिगारेटची तीव्र तलफ नैसर्गिकरीत्या कमी करणारे आयुर्वेदिक उपाय.",
-    popularProduct: "Antox B-AL-NICO & Antox T"
+    popularProduct: "Antox B-AL-NICO & Antox T",
+    productUrl: "/product/prod_spray_nico_combo"
   },
   {
     id: "heart",
@@ -140,7 +142,8 @@ export const healthCategories = [
     iconName: "HeartPulse",
     descEn: "Promote cardiovascular strength, healthy blood circulation, and cholesterol balance.",
     descMr: "रक्ताभिसरण सुधारणे, कोलेस्ट्रॉल समतोल आणि हृदयाचे स्नायू बळकट ठेवण्यासाठी मार्गदर्शन.",
-    popularProduct: "Antox HLK Kit"
+    popularProduct: "Antox HLK Kit",
+    productUrl: "/product/prod_antox_hlk_combo"
   },
   {
     id: "liver",
@@ -149,7 +152,8 @@ export const healthCategories = [
     iconName: "Sparkles",
     descEn: "Natural liver cleansing, fatty liver support, and metabolic digestive rejuvenation.",
     descMr: "फॅटी लिव्हर, यकृतातील विषारी घटक बाहेर काढणे व पचनशक्ती वृद्धीसाठी आयुर्वेदिक पोषण.",
-    popularProduct: "Antox HLK & Antox C"
+    popularProduct: "Antox HLK & Antox C",
+    productUrl: "/product/prod_antox_hlk"
   },
   {
     id: "kidney",
@@ -158,7 +162,8 @@ export const healthCategories = [
     iconName: "Droplets",
     descEn: "Herbal support for urinary tract wellness, fluid balance, and toxin filtration.",
     descMr: "मूत्रमार्गाचे आरोग्य, पाण्याचे संतुलन आणि शरीरातील टॉक्सिन्स नैसर्गिकरीत्या बाहेर टाकणे.",
-    popularProduct: "Antox HLK Kit"
+    popularProduct: "Antox HLK Kit",
+    productUrl: "/product/prod_antox_hlk_combo"
   },
   {
     id: "bones",
@@ -167,7 +172,8 @@ export const healthCategories = [
     iconName: "Zap",
     descEn: "Relief from arthritis, knee pain, cervical stiffness, and joint mobility issues.",
     descMr: "संधिवात, गुडघेदुखी, कंबरदुखी आणि सांध्यांमधील वंगण टिकवून हालचाल सुलभ करणे.",
-    popularProduct: "Antox PN Powder & PN Oil"
+    popularProduct: "Antox PN Powder & PN Oil",
+    productUrl: "/product/prod_antox_pn_combo"
   },
   {
     id: "acidity",
@@ -176,7 +182,8 @@ export const healthCategories = [
     iconName: "Flame",
     descEn: "Relief from hyperacidity, gas, bloating, constipation, and irregular digestion.",
     descMr: "वारंवार होणारे पित्त, छातीत जळजळ, अपचन, पोट फुगणे व बद्धकोष्ठतेवर मुळापासून उपाय.",
-    popularProduct: "Antox B-Acid & Antox C"
+    popularProduct: "Antox B-Acid & Antox C",
+    productUrl: "/product/prod_antox_b_acid_combo"
   },
   {
     id: "panchakarma",
@@ -185,7 +192,8 @@ export const healthCategories = [
     iconName: "Leaf",
     descEn: "Traditional body purification practices to flush accumulated toxins and restore vitality.",
     descMr: "शरीरातील साचलेले दूषित दोष बाहेर काढून त्रिदोष समतोल राखण्यासाठी शास्त्रीय मार्गदर्शन.",
-    popularProduct: "Antox T Herbal Tea"
+    popularProduct: "Antox T Herbal Tea",
+    productUrl: "/product/prod_antox_t"
   },
   {
     id: "vitality",
@@ -194,7 +202,8 @@ export const healthCategories = [
     iconName: "Smile",
     descEn: "Immunity boosting, daily rejuvenation, and natural stamina enhancement for men & women.",
     descMr: "रोगप्रतिकारक शक्ती वाढवणे, थकवा घालवणे आणि शारीरिक उत्साह टिकवणे.",
-    popularProduct: "Antox X Tonic"
+    popularProduct: "Antox X Tonic",
+    productUrl: "/product/prod_antox_x"
   }
 ];
 

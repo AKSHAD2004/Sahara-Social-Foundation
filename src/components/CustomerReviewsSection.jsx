@@ -1,7 +1,7 @@
 // Customer Reviews Section matching the exact screenshot design
 // Supports interactive rating, review submission, rating breakdown, and live Firestore sync
 import React, { useState, useEffect } from 'react';
-import { Star, ShoppingCart, CheckCircle2 } from 'lucide-react';
+import { Star, ShoppingCart, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { dbService } from '../services/db';
 import { initialReviews } from '../services/seedData';
@@ -31,6 +31,7 @@ export default function CustomerReviewsSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [expandedReviews, setExpandedReviews] = useState({});
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
     // Proactively pull latest reviews from Cloud Firestore
@@ -417,9 +418,9 @@ export default function CustomerReviewsSection({
         </div>
       </div>
 
-      {/* Customer Reviews List (Approved Only) */}
+      {/* Customer Reviews List (Approved Only - 5-6 initial with See More button) */}
       <div className="customer-reviews-list" style={{ display: 'flex', flexDirection: 'column', gap: '2.25rem' }}>
-        {approvedReviews.map((rev) => {
+        {(showAllReviews ? approvedReviews : approvedReviews.slice(0, 5)).map((rev) => {
           const revStar = Math.min(5, Math.max(1, Math.round(Number(rev.rating) || 5)));
           const isExpanded = !!expandedReviews[rev.id];
           const text = rev.review || '';
@@ -490,6 +491,49 @@ export default function CustomerReviewsSection({
           );
         })}
       </div>
+
+      {/* See More / Show Less Reviews Button */}
+      {approvedReviews.length > 5 && (
+        <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
+          <button
+            type="button"
+            onClick={() => setShowAllReviews(!showAllReviews)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              backgroundColor: '#ffffff',
+              color: '#006B2D',
+              border: '2px solid #006B2D',
+              borderRadius: '9999px',
+              padding: '0.65rem 1.75rem',
+              fontSize: '0.92rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0, 107, 45, 0.08)',
+              transition: 'all 0.25s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#006B2D';
+              e.currentTarget.style.color = '#ffffff';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#ffffff';
+              e.currentTarget.style.color = '#006B2D';
+            }}
+          >
+            <span>
+              {showAllReviews
+                ? (language === 'mr' ? 'कमी अभिप्राय दाखवा (Show Less)' : 'Show Fewer Reviews')
+                : (language === 'mr' 
+                    ? `सर्व अभिप्राय पहा (${approvedReviews.length} पैकी उर्वरित)` 
+                    : `See More Reviews (${approvedReviews.length - 5} more)`)}
+            </span>
+            {showAllReviews ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

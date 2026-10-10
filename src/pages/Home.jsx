@@ -271,7 +271,7 @@ const Home = () => {
           </div>
 
           <div className="home-featured-grid" style={{ marginBottom: '2.5rem' }}>
-            {featuredProducts.slice(0, 4).map((product) => (
+            {featuredProducts.slice(0, 6).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -302,7 +302,7 @@ const Home = () => {
         <style>{`
           .home-featured-grid {
             display: grid !important;
-            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
             gap: 1.25rem !important;
           }
           @media (max-width: 1024px) {

@@ -5,7 +5,7 @@ import {
   CreditCard, CheckCircle2, AlertTriangle, ArrowRight, Check, RotateCcw, Trash2 
 } from 'lucide-react';
 import { formatCurrency, formatDate, getStatusBadgeClass } from '../../../utils/formatters';
-import { dbService } from '../../../services/db';
+import { dbService, getDeletedSet } from '../../../services/db';
 import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot } from '../../../services/firebase';
 import CrmModal from '../../../components/crm/CrmModal';
 import ExportButton from '../../../components/crm/ExportButton';
@@ -61,8 +61,9 @@ export default function OrderList() {
   useEffect(() => {
     // Initial fetch from Cloud Firestore with auto-upload of any pending local orders
     dbService.refreshFromFirebase('orders').then((refreshed) => {
-      if (Array.isArray(refreshed) && refreshed.length > 0) {
-        setOrders(refreshed);
+      if (Array.isArray(refreshed)) {
+        const deletedIds = getDeletedSet('orders');
+        setOrders(refreshed.filter((o) => !deletedIds.has(String(o.id || '')) && !deletedIds.has(String(o.orderId || ''))));
       }
     }).catch(() => {});
 
@@ -72,15 +73,17 @@ export default function OrderList() {
       try {
         const colRef = collection(firestoreDb, 'orders');
         unsubFirestoreOrders = onSnapshot(colRef, (snapshot) => {
-          const liveOrders = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-          if (liveOrders.length > 0) {
-            liveOrders.sort((a, b) => {
-              const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
-              const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
-              return dateB - dateA;
-            });
-            setOrders(liveOrders);
-          }
+          const deletedIds = getDeletedSet('orders');
+          const liveOrders = snapshot.docs
+            .map((d) => ({ id: d.id, ...d.data() }))
+            .filter((o) => !deletedIds.has(String(o.id || '')) && !deletedIds.has(String(o.orderId || '')));
+
+          liveOrders.sort((a, b) => {
+            const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+            const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+            return dateB - dateA;
+          });
+          setOrders(liveOrders);
         }, (err) => {
           console.warn('Direct Firestore orders listener note:', err.message);
         });
@@ -91,13 +94,9 @@ export default function OrderList() {
 
     // Active subscription to reactive store as fallback & local store sync
     const unsubOrders = dbService.subscribe('orders', (currentOrders) => {
-      if (Array.isArray(currentOrders) && currentOrders.length > 0) {
-        setOrders(currentOrders);
-      } else {
-        const fromDb = dbService.getAll('orders');
-        if (Array.isArray(fromDb) && fromDb.length > 0) {
-          setOrders(fromDb);
-        }
+      const deletedIds = getDeletedSet('orders');
+      if (Array.isArray(currentOrders)) {
+        setOrders(currentOrders.filter((o) => !deletedIds.has(String(o.id || '')) && !deletedIds.has(String(o.orderId || ''))));
       }
     });
 
@@ -262,11 +261,24 @@ export default function OrderList() {
   };
 
   const handleDeleteOrder = async (order) => {
-    if (window.confirm(`Are you sure you want to permanently delete Order #${order.orderId || order.id} for "${order.customerName}"? This action cannot be undone.`)) {
-      await dbService.delete('orders', order.id);
-      if (selectedOrder?.id === order.id) {
+    const orderTitle = order.orderId || order.id;
+    if (window.confirm(`Are you sure you want to permanently delete Order #${orderTitle} for "${order.customerName}"? This action cannot be undone.`)) {
+      const targetId = order.id || order.orderId;
+      const targetOrderId = order.orderId || order.id;
+
+      // Instantly remove from local component view so UI updates immediately
+      setOrders((prev) => prev.filter((o) => 
+        String(o.id) !== String(targetId) && 
+        String(o.orderId) !== String(targetOrderId) &&
+        String(o.id) !== String(targetOrderId) &&
+        String(o.orderId) !== String(targetId)
+      ));
+
+      if (selectedOrder?.id === order.id || selectedOrder?.orderId === order.orderId) {
         setSelectedOrder(null);
       }
+
+      await dbService.delete('orders', targetId);
     }
   };
 

@@ -88,6 +88,7 @@ export default function FollowupList() {
 
   const handleDeleteFollowup = async (followup) => {
     if (window.confirm(`Are you sure you want to delete the scheduled follow-up for "${followup.customerName}"? This will delete it from Firebase as well.`)) {
+      setFollowups((prev) => prev.filter((f) => f.id !== followup.id));
       await dbService.delete('followups', followup.id);
     }
   };
