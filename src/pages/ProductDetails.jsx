@@ -12,7 +12,9 @@ import {
   Edit,
   Save,
   X,
-  Sparkles
+  Sparkles,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import CustomerReviewsSection from '../components/CustomerReviewsSection';
@@ -172,6 +174,57 @@ const ProductDetails = () => {
     navigate('/checkout');
   };
 
+  // Build product list for next / prev swiping
+  const currentProductIndex = productsList.findIndex(
+    (p) => p.id === product.id || p.sku === product.sku || p.alias === product.id
+  );
+
+  const goToPrevProduct = () => {
+    if (productsList.length <= 1) return;
+    const prevIdx = (currentProductIndex - 1 + productsList.length) % productsList.length;
+    const target = productsList[prevIdx];
+    navigate(`/product/${target.id || target.alias || target.sku}`);
+  };
+
+  const goToNextProduct = () => {
+    if (productsList.length <= 1) return;
+    const nextIdx = (currentProductIndex + 1) % productsList.length;
+    const target = productsList[nextIdx];
+    navigate(`/product/${target.id || target.alias || target.sku}`);
+  };
+
+  // Touch Swipe Gesture State & Handlers
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
+
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      setTouchStartX(e.touches[0].clientX);
+      setTouchEndX(null);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches && e.touches[0]) {
+      setTouchEndX(e.touches[0].clientX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+    const deltaX = touchStartX - touchEndX;
+    const minSwipeDistance = 45; // pixels
+    if (deltaX > minSwipeDistance) {
+      // Swiped Left -> go to Next product
+      goToNextProduct();
+    } else if (deltaX < -minSwipeDistance) {
+      // Swiped Right -> go to Previous product
+      goToPrevProduct();
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
+
   return (
     <div className="product-details-page" style={{ backgroundColor: '#F3F8F1', padding: '2rem 0 4rem 0' }}>
       <div className="container">
@@ -201,25 +254,107 @@ const ProductDetails = () => {
           padding: '2.5rem',
           boxShadow: '0 10px 35px rgba(0, 107, 45, 0.06)',
           display: 'grid',
-          gridTemplateColumns: '1fr 1.2fr',
+          gridTemplateColumns: 'minmax(300px, 400px) 1fr',
           gap: '3rem',
-          marginBottom: '3rem'
+          marginBottom: '3rem',
+          alignItems: 'start'
         }}>
-          {/* Left Column: Image */}
-          <div>
-            <div style={{
-              borderRadius: '18px',
-              overflow: 'hidden',
-              backgroundColor: '#ffffff',
-              border: '1px solid #E1E9DF',
-              aspectRatio: '1 / 1',
-              position: 'relative',
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1.25rem'
-            }}>
+          {/* Left Column: Image with Touch Swipe and Nav Arrows */}
+          <div style={{ width: '100%', maxWidth: '380px', margin: '0 auto' }}>
+            <div 
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              style={{
+                borderRadius: '18px',
+                overflow: 'hidden',
+                backgroundColor: '#ffffff',
+                border: '1px solid #E1E9DF',
+                width: '100%',
+                maxWidth: '380px',
+                height: '360px',
+                position: 'relative',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1.75rem',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)',
+                touchAction: 'pan-y',
+                userSelect: 'none',
+                cursor: 'grab'
+              }}
+              title="Swipe left/right to view other products"
+            >
+              {/* Previous Product Arrow */}
+              {productsList.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToPrevProduct();
+                  }}
+                  aria-label="Previous Product"
+                  style={{
+                    position: 'absolute',
+                    left: '8px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                    border: '1.5px solid #E1E9DF',
+                    color: '#006B2D',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+                    zIndex: 4,
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.92)'; e.currentTarget.style.color = '#006B2D'; }}
+                >
+                  <ChevronLeft size={18} />
+                </button>
+              )}
+
+              {/* Next Product Arrow */}
+              {productsList.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToNextProduct();
+                  }}
+                  aria-label="Next Product"
+                  style={{
+                    position: 'absolute',
+                    right: '8px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                    border: '1.5px solid #E1E9DF',
+                    color: '#006B2D',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+                    zIndex: 4,
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.92)'; e.currentTarget.style.color = '#006B2D'; }}
+                >
+                  <ChevronRight size={18} />
+                </button>
+              )}
               {comboItems && comboItems.length >= 2 && (!selectedImage || selectedImage === 'combo') ? (
                 <div style={{
                   display: 'flex',
@@ -316,7 +451,13 @@ const ProductDetails = () => {
                     e.target.src = product.fallbackImage;
                   }}
                   alt={product.nameMr || product.nameEn}
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain'
+                  }}
                 />
               )}
               {product.badgeEn && (
@@ -337,6 +478,40 @@ const ProductDetails = () => {
                 </div>
               )}
             </div>
+
+            {/* Product Swipe Indicator Dots */}
+            {productsList.length > 1 && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                marginBottom: '1rem'
+              }}>
+                {productsList.map((p, pIdx) => {
+                  const isCurrent = pIdx === currentProductIndex;
+                  return (
+                    <button
+                      key={p.id || pIdx}
+                      type="button"
+                      onClick={() => navigate(`/product/${p.id || p.alias || p.sku}`)}
+                      aria-label={`Go to product ${pIdx + 1}`}
+                      style={{
+                        width: isCurrent ? '22px' : '7px',
+                        height: '7px',
+                        borderRadius: '9999px',
+                        backgroundColor: isCurrent ? '#006B2D' : '#C8D8C3',
+                        border: 'none',
+                        padding: 0,
+                        cursor: 'pointer',
+                        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+                      }}
+                      title={p.nameEn || p.name}
+                    />
+                  );
+                })}
+              </div>
+            )}
 
             {/* Gallery Thumbnails Strip */}
             {comboItems && comboItems.length >= 2 ? (
@@ -805,6 +980,140 @@ const ProductDetails = () => {
             </div>
           </div>
         </div>
+
+        {/* Product Description, Science & Catalogue Gallery Images (Nutrifeel Product Description Images) */}
+        {product.gallery && product.gallery.length > 0 && (
+          <div style={{
+            marginTop: '2.5rem',
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            padding: '2rem',
+            border: '1.5px solid #E1E9DF',
+            boxShadow: '0 6px 24px rgba(0, 107, 45, 0.05)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              marginBottom: '1.5rem',
+              borderBottom: '1px solid #E1E9DF',
+              paddingBottom: '1rem'
+            }}>
+              <div>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  color: '#006B2D',
+                  backgroundColor: '#e2faea',
+                  padding: '0.3rem 0.75rem',
+                  borderRadius: '20px',
+                  marginBottom: '0.4rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em'
+                }}>
+                  <Sparkles size={13} />
+                  <span>{language === 'mr' ? 'सविस्तर उत्पादन माहिती व कॅटलॉग' : 'Detailed Product Description & Catalogue'}</span>
+                </div>
+                <h3 style={{
+                  fontSize: 'clamp(1.2rem, 2.5vw, 1.55rem)',
+                  color: '#006B2D',
+                  fontWeight: 800,
+                  margin: 0,
+                  fontFamily: 'var(--font-heading)'
+                }}>
+                  {language === 'mr' 
+                    ? `${product.nameMr || product.nameEn} — अधिकृत माहिती पत्रक व शास्त्रीय तपशील` 
+                    : `${product.nameEn} — Official Product Guide & Formulation Details`}
+                </h3>
+              </div>
+
+              <div style={{
+                fontSize: '0.82rem',
+                color: '#5F6B61',
+                fontWeight: 600
+              }}>
+                {product.gallery.length} {language === 'mr' ? 'माहिती पत्रके' : 'Pages / Slides'}
+              </div>
+            </div>
+
+            {/* Grid of Product Description / Catalogue Images */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.5rem',
+              alignItems: 'start'
+            }}>
+              {product.gallery.map((imgUrl, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    backgroundColor: '#F8FAF7',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
+                    border: '1px solid #E1E9DF',
+                    boxShadow: '0 3px 12px rgba(0, 0, 0, 0.05)',
+                    transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 10px 24px rgba(0, 107, 45, 0.12)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 3px 12px rgba(0, 0, 0, 0.05)';
+                  }}
+                  onClick={() => setSelectedImage(imgUrl)}
+                >
+                  <div style={{
+                    width: '100%',
+                    backgroundColor: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0.5rem'
+                  }}>
+                    <img
+                      src={imgUrl}
+                      alt={`${product.nameEn} Guide page ${idx + 1}`}
+                      loading="lazy"
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        display: 'block',
+                        borderRadius: '10px',
+                        objectFit: 'contain'
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                  <div style={{
+                    padding: '0.65rem 0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderTop: '1px solid #EAEFE7',
+                    backgroundColor: '#ffffff'
+                  }}>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#006B2D' }}>
+                      {language === 'mr' ? `पत्रक पान #${idx + 1}` : `Page #${idx + 1}`}
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: '#159B32', fontWeight: 600 }}>
+                      {language === 'mr' ? 'मोठे पाहण्यासाठी क्लिक करा' : 'Click to preview'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Customer Reviews & Feedback Section (Matching Screenshot) */}
         <div style={{ marginTop: '3rem', borderTop: '1px solid #E1E9DF', paddingTop: '2rem' }}>

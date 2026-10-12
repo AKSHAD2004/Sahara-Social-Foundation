@@ -214,10 +214,10 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Col 4: Contact & Office with Map */}
+          {/* Col 4: Contact & Office */}
           <div className="footer-contact-col">
             <h4 className="footer-col-title">
-              {language === 'mr' ? 'कार्यालय संपर्क व नकाशा' : 'Office & Location'}
+              {language === 'mr' ? 'कार्यालय संपर्क' : 'Office Contact'}
             </h4>
             
             <div className="footer-contact-list">
@@ -272,41 +272,6 @@ const Footer = () => {
                   <WhatsAppIcon size={14} color="#ffffff" />
                   <span>WhatsApp</span>
                 </a>
-              </div>
-
-              {/* Interactive Google Map in Footer */}
-              <div className="footer-map-card">
-                <div className="footer-map-header">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', overflow: 'hidden' }}>
-                    <MapPin size={13} style={{ color: '#FFC928', flexShrink: 0 }} />
-                    <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      Sahara Social Foundation
-                    </span>
-                  </div>
-                  <a
-                    href="https://maps.app.goo.gl/cd1VciJ3CEZgrmaP6"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="footer-map-link-btn"
-                    title="Open in Google Maps"
-                  >
-                    <span>{language === 'mr' ? 'नकाशा उघडा' : 'Directions'}</span>
-                    <ExternalLink size={11} />
-                  </a>
-                </div>
-
-                <div className="footer-map-iframe-wrap">
-                  <iframe
-                    title="Sahara Social Foundation Satellite Map"
-                    src="https://maps.google.com/maps?ll=16.7009545,74.2418972&q=16.7009962,74.2421467+(Sahara+Social+Foundation+-+Royal+Prestige)&t=k&z=19&ie=UTF8&iwloc=B&output=embed"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </div>
               </div>
 
               <div className="footer-visiting-note" style={{
