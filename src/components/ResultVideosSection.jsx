@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Play, Sparkles, ArrowRight } from 'lucide-react';
 import { horizontalVideosData } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 import { dbService } from '../services/db';
@@ -245,13 +246,11 @@ const ResultVideosSection = () => {
           ))}
         </div>
 
-        {/* Action Buttons: "More Videos" toggle + Link to Full Video Gallery + Easy Scroll Down */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
-          {videos.length > 4 && (
-            <button 
-              type="button"
-              onClick={handleToggleVideos}
-              className="btn btn-more-videos"
+        {/* Redirect directly to dedicated /videos page */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Link 
+            to="/videos"
+            className="btn btn-more-videos"
             style={{ 
               backgroundColor: '#006B2D',
               color: '#ffffff',
@@ -264,7 +263,7 @@ const ResultVideosSection = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.65rem',
-              border: 'none',
+              textDecoration: 'none',
               cursor: 'pointer',
               transition: 'all 0.25s ease'
             }}
@@ -279,21 +278,11 @@ const ResultVideosSection = () => {
               e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 107, 45, 0.28)';
             }}
           >
-            {showAllVideos ? (
-              <>
-                <ChevronUp size={18} />
-                <span>{language === 'mr' ? 'कमी व्हिडिओ दाखवा (Show Less)' : 'Show Less Videos'}</span>
-              </>
-            ) : (
-              <>
-                <Play size={18} fill="currentColor" />
-                <span>{language === 'mr' ? 'More Videos (अधिक व्हिडिओ)' : 'More Videos'}</span>
-                <ChevronDown size={18} />
-              </>
-            )}
-          </button>
-        )}
-      </div>
+            <Play size={18} fill="currentColor" />
+            <span>{language === 'mr' ? 'More Videos (अधिक व्हिडिओ)' : 'More Videos'}</span>
+            <ArrowRight size={18} />
+          </Link>
+        </div>
       </div>
 
       <style>{`

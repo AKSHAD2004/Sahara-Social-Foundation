@@ -10,7 +10,9 @@ import {
   Sparkles, 
   Calendar,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MapPin,
+  ExternalLink
 } from 'lucide-react';
 import Hero from '../components/Hero';
 import TrustSection from '../components/TrustSection';
@@ -336,7 +338,141 @@ const Home = () => {
       {/* About Sahara Social Foundation & Mission/Vision */}
       <AboutSection />
 
-      {/* Major Campaigns Section */}
+      {/* 1. Customer Reviews & Feedback Section (Placed Above Flagship Section as requested) */}
+      <section className="section" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #E1E9DF', padding: '3.5rem 0 2rem 0' }}>
+        <div className="container">
+          <CustomerReviewsSection onOrderNow={() => setIsConsultationOpen(true)} />
+        </div>
+      </section>
+
+      {/* 2. Satellite Map & Full Address Section (Directly Below Customer Reviews) */}
+      <section className="section" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF', padding: '2.5rem 0 3.5rem 0' }}>
+        <div className="container" style={{ maxWidth: '1040px' }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            overflow: 'hidden',
+            border: '1.5px solid #E1E9DF',
+            boxShadow: '0 8px 28px rgba(0, 107, 45, 0.08)'
+          }}>
+            {/* Map Header */}
+            <div style={{
+              padding: '1.15rem 1.5rem',
+              borderBottom: '1px solid #E1E9DF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+              background: 'linear-gradient(135deg, #006B2D, #04200e)',
+              color: '#ffffff'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <MapPin size={22} style={{ color: '#FFC928' }} />
+                <div>
+                  <h3 style={{ fontSize: '1.12rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+                    {language === 'mr' ? 'सहारा सोशल फाऊंडेशन • कार्यालय स्थान' : 'Sahara Social Foundation • Office Location'}
+                  </h3>
+                  <span style={{ fontSize: '0.78rem', color: '#d1fae5' }}>
+                    {language === 'mr' ? 'रॉयल प्रेस्टीज, शाहूपुरी, कोल्हापूर (सॅटेलाईट व्ह्यू)' : 'Royal Prestige, Shahupuri, Kolhapur (Satellite View)'}
+                  </span>
+                </div>
+              </div>
+
+              <a
+                href="https://maps.app.goo.gl/cd1VciJ3CEZgrmaP6"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  backgroundColor: '#FFC928',
+                  color: '#17251B',
+                  padding: '0.55rem 1.15rem',
+                  borderRadius: '50px',
+                  fontSize: '0.86rem',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <span>{language === 'mr' ? 'गुगल मॅपवर उघडा' : 'Open in Google Maps'}</span>
+                <ExternalLink size={14} />
+              </a>
+            </div>
+
+            {/* Satellite Map Iframe */}
+            <div style={{ width: '100%', height: '380px', backgroundColor: '#000000', position: 'relative' }}>
+              <iframe
+                title="Sahara Social Foundation Satellite Location Map"
+                src="https://maps.google.com/maps?ll=16.7009545,74.2418972&q=16.7009962,74.2421467+(Sahara+Social+Foundation+-+Royal+Prestige)&t=k&z=19&ie=UTF8&iwloc=B&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+
+            {/* Full Address Card in Text Format Below the Map */}
+            <div style={{
+              padding: '1.5rem 1.75rem',
+              backgroundColor: '#ffffff',
+              borderTop: '1px solid #E1E9DF',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.5rem',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem' }}>
+                  <MapPin size={18} style={{ color: '#006B2D' }} />
+                  <strong style={{ color: '#006B2D', fontSize: '1rem' }}>
+                    {language === 'mr' ? 'कार्यालयाचा अधिकृत पत्ता:' : 'Official Office Address:'}
+                  </strong>
+                </div>
+                <p style={{
+                  fontSize: '0.94rem',
+                  color: '#17251B',
+                  lineHeight: 1.6,
+                  margin: 0,
+                  fontWeight: 500
+                }}>
+                  {language === 'mr' ? organizationInfo.contact.address.fullAddressMr : organizationInfo.contact.address.fullAddressEn}
+                </p>
+              </div>
+
+              <div style={{
+                backgroundColor: '#F3F8F1',
+                padding: '1rem 1.25rem',
+                borderRadius: '14px',
+                border: '1.5px solid #C8E6C9'
+              }}>
+                <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
+                  {language === 'mr' ? 'थेट फोन मार्गदर्शन व भेट:' : 'Direct Phone Guidance & Visiting:'}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.45rem' }}>
+                  <Phone size={16} style={{ color: '#006B2D' }} />
+                  <a
+                    href={`tel:${organizationInfo.contact.primaryPhone}`}
+                    style={{ fontSize: '1.02rem', fontWeight: 800, color: '#006B2D', textDecoration: 'none' }}
+                  >
+                    +91 {organizationInfo.contact.primaryPhone}
+                  </a>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#5F6B61', lineHeight: 1.45 }}>
+                  {language === 'mr' ? organizationInfo.contact.visitingNoteMr : organizationInfo.contact.visitingNote}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Major Flagship Campaigns Section */}
       <section className="section" style={{ backgroundColor: '#ffffff' }}>
         <div className="container">
           <div className="section-header">
@@ -403,15 +539,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 9. Testimonials / Reviews Smooth Auto-Sliding Carousel Section */}
+      {/* Testimonials Smooth Auto-Sliding Carousel Section */}
       <TestimonialsCarousel />
-
-      {/* Customer Reviews & Feedback Section (Matching Screenshot) */}
-      <section className="section" style={{ backgroundColor: '#ffffff', borderTop: '1px solid #E1E9DF', padding: '3.5rem 0' }}>
-        <div className="container">
-          <CustomerReviewsSection onOrderNow={() => setIsConsultationOpen(true)} />
-        </div>
-      </section>
 
       {/* Frequently Asked Questions */}
       <section className="section-sm" style={{ backgroundColor: '#F3F8F1', borderTop: '1px solid #E1E9DF' }}>
