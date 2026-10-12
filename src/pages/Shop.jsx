@@ -139,10 +139,10 @@ const Shop = () => {
         <div className="container">
           <div className="section-badge">
             <ShoppingBag size={14} />
-            <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}</span>
+            <span>{language === 'mr' ? 'आयुर्वेदिक फॉर्म्युला' : 'Authentic Nutraceuticals'}</span>
           </div>
           <h1>
-            {language === 'mr' ? 'आयुर्वेदिक उत्पादने व फॉर्म्युला' : 'Authentic Nutraceutical Products'}
+            {language === 'mr' ? 'आयुर्वेदिक फॉर्म्युला' : 'Authentic Nutraceuticals'}
           </h1>
           <p>
             {language === 'mr'
