@@ -5,8 +5,8 @@ import {
   CreditCard, CheckCircle2, AlertTriangle, ArrowRight, Check, RotateCcw, Trash2 
 } from 'lucide-react';
 import { formatCurrency, formatDate, getStatusBadgeClass } from '../../../utils/formatters';
-import { dbService, getDeletedSet } from '../../../services/db';
-import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot } from '../../../services/firebase';
+import { dbService, getDeletedSet, isFirestoreQuotaExhausted, handleFirestoreQuotaExceeded } from '../../../services/db';
+import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot, disconnectFirestoreNetwork } from '../../../services/firebase';
 import CrmModal from '../../../components/crm/CrmModal';
 import ExportButton from '../../../components/crm/ExportButton';
 
@@ -43,12 +43,18 @@ export default function OrderList() {
     setIsSyncing(true);
     setSyncNotice('');
     try {
-      const refreshed = await dbService.refreshFromFirebase('orders');
-      if (Array.isArray(refreshed) && refreshed.length > 0) {
-        setOrders(refreshed);
-        setSyncNotice(`✓ Synced ${refreshed.length} orders live from Cloud Firestore!`);
+      if (isFirestoreQuotaExhausted()) {
+        const localOrders = dbService.getCollection('orders');
+        setOrders(localOrders);
+        setSyncNotice('⚡ Local Reactive Cache: Running at top speed (Cloud quota reached for today).');
       } else {
-        setSyncNotice(`✓ Firebase connected. Orders are up to date.`);
+        const refreshed = await dbService.refreshFromFirebase('orders');
+        if (Array.isArray(refreshed) && refreshed.length > 0) {
+          setOrders(refreshed);
+          setSyncNotice(`✓ Synced ${refreshed.length} orders live from Cloud Firestore!`);
+        } else {
+          setSyncNotice(`✓ Firebase connected. Orders are up to date.`);
+        }
       }
       setTimeout(() => setSyncNotice(''), 4500);
     } catch (e) {
@@ -59,17 +65,19 @@ export default function OrderList() {
   };
 
   useEffect(() => {
-    // Initial fetch from Cloud Firestore with auto-upload of any pending local orders
-    dbService.refreshFromFirebase('orders').then((refreshed) => {
-      if (Array.isArray(refreshed)) {
-        const deletedIds = getDeletedSet('orders');
-        setOrders(refreshed.filter((o) => !deletedIds.has(String(o.id || '')) && !deletedIds.has(String(o.orderId || ''))));
-      }
-    }).catch(() => {});
+    // Initial fetch from Cloud Firestore with auto-upload of any pending local orders (only if quota intact)
+    if (!isFirestoreQuotaExhausted()) {
+      dbService.refreshFromFirebase('orders').then((refreshed) => {
+        if (Array.isArray(refreshed)) {
+          const deletedIds = getDeletedSet('orders');
+          setOrders(refreshed.filter((o) => !deletedIds.has(String(o.id || '')) && !deletedIds.has(String(o.orderId || ''))));
+        }
+      }).catch(() => {});
+    }
 
-    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device sync
+    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device sync (only if quota intact)
     let unsubFirestoreOrders = () => {};
-    if (isFirebaseConfigured && firestoreDb) {
+    if (isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
       try {
         const colRef = collection(firestoreDb, 'orders');
         unsubFirestoreOrders = onSnapshot(colRef, (snapshot) => {
@@ -85,7 +93,12 @@ export default function OrderList() {
           });
           setOrders(liveOrders);
         }, (err) => {
-          console.warn('Direct Firestore orders listener note:', err.message);
+          if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded') || err?.message?.includes('resource-exhausted')) {
+            if (typeof unsubFirestoreOrders === 'function') unsubFirestoreOrders();
+            handleFirestoreQuotaExceeded(err);
+          } else {
+            console.warn('Direct Firestore orders listener note:', err.message);
+          }
         });
       } catch (err) {
         console.warn('Direct Firestore listener setup note:', err.message);
@@ -117,15 +130,17 @@ export default function OrderList() {
 
     // Mobile background sync heartbeat (polls every 15s) and visibility handler for mobile browsers
     const heartbeatTimer = setInterval(() => {
-      dbService.refreshFromFirebase('orders').then((refreshed) => {
-        if (Array.isArray(refreshed) && refreshed.length > 0) {
-          setOrders(refreshed);
-        }
-      }).catch(() => {});
+      if (!isFirestoreQuotaExhausted()) {
+        dbService.refreshFromFirebase('orders').then((refreshed) => {
+          if (Array.isArray(refreshed) && refreshed.length > 0) {
+            setOrders(refreshed);
+          }
+        }).catch(() => {});
+      }
     }, 15000);
 
     const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted()) {
         dbService.refreshFromFirebase('orders').then((refreshed) => {
           if (Array.isArray(refreshed) && refreshed.length > 0) {
             setOrders(refreshed);
@@ -543,52 +558,138 @@ export default function OrderList() {
         </div>
       </div>
 
-      {/* View Order Modal */}
+      {/* View Order / Bill Invoice Modal */}
       {selectedOrder && (
         <CrmModal
           isOpen={!!selectedOrder}
           onClose={() => setSelectedOrder(null)}
-          title={`Order Invoice & Summary: ${selectedOrder.orderId}`}
+          title={`Official Bill & Invoice: ${selectedOrder.orderId}`}
+          size="lg"
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '10px' }}>
-            <div>
-              <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Customer</span>
-              <div style={{ fontWeight: 700 }}>{selectedOrder.customerName}</div>
-              <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{selectedOrder.shippingAddress}</div>
-            </div>
-            <div>
-              <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Payment & Mode</span>
-              <div style={{ fontWeight: 700 }}>
-                {selectedOrder.paymentStatus} via {selectedOrder.paymentMethod}
+          <div id="crm-print-invoice-area" style={{ background: '#ffffff', padding: '1.25rem', border: '1px solid #E1E9DF', borderRadius: '12px', marginBottom: '1.25rem' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #006B2D', paddingBottom: '1rem', marginBottom: '1rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#006B2D', margin: 0 }}>
+                  सहारा सोशल फाऊंडेशन, कोल्हापूर
+                </h3>
+                <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.2rem' }}>
+                  Sahara Social Foundation • Reg. No. MAH/582/2014/KOP
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#159B32', fontWeight: 600, marginTop: '0.15rem' }}>
+                  हेल्पलाईन: +91 93700 84701 / +91 93700 84702
+                </div>
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#1b4d3e', fontWeight: 600 }}>
-                Grand Total: {formatCurrency(selectedOrder.grandTotal)}
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  backgroundColor: '#e2faea', 
+                  color: '#006B2D', 
+                  fontSize: '0.85rem', 
+                  fontWeight: 800, 
+                  padding: '0.35rem 0.85rem', 
+                  borderRadius: '6px' 
+                }}>
+                  OFFICIAL TAX INVOICE / बिल
+                </span>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginTop: '0.4rem' }}>
+                  Invoice #: {selectedOrder.orderId}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                  Date: {selectedOrder.orderDate ? new Date(selectedOrder.orderDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                </div>
               </div>
             </div>
-          </div>
 
-          <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem', fontWeight: 700 }}>Items Ordered:</h4>
-          <div className="crm-table-wrapper" style={{ marginBottom: '1.5rem' }}>
-            <table className="crm-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(selectedOrder.products || selectedOrder.items || []).map((p, idx) => (
-                  <tr key={idx}>
-                    <td>{p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Product'}</td>
-                    <td>{formatCurrency(p.price || 0)}</td>
-                    <td>{p.quantity || 1}</td>
-                    <td><strong>{formatCurrency(p.total || ((p.price || 0) * (p.quantity || 1)))}</strong></td>
+            {/* Bill Details Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.25rem', background: '#F8FAFC', padding: '1rem', borderRadius: '8px' }}>
+              <div>
+                <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Billed To (ग्राहक):</span>
+                <div style={{ fontWeight: 700, color: '#17251B', fontSize: '0.95rem', marginTop: '0.15rem' }}>{selectedOrder.customerName}</div>
+                <div style={{ fontSize: '0.82rem', color: '#475569', marginTop: '0.15rem' }}>
+                  {selectedOrder.shippingAddress || 'Address on file'}
+                </div>
+                <div style={{ fontSize: '0.82rem', color: '#006B2D', fontWeight: 600, marginTop: '0.2rem' }}>
+                  Mobile: {selectedOrder.customerMobile || selectedOrder.customerPhone || selectedOrder.phone || 'N/A'}
+                </div>
+                {selectedOrder.customerEmail && (
+                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Email: {selectedOrder.customerEmail}</div>
+                )}
+              </div>
+
+              <div>
+                <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Payment & Order Summary:</span>
+                <div style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  <strong>Payment Mode:</strong> {selectedOrder.paymentMethod || 'Online'}
+                </div>
+                <div style={{ fontSize: '0.85rem', marginTop: '0.15rem' }}>
+                  <strong>Payment Status:</strong>{' '}
+                  <span style={{
+                    color: selectedOrder.paymentStatus === 'Paid' ? '#159B32' : '#d97706',
+                    fontWeight: 800
+                  }}>
+                    {selectedOrder.paymentStatus === 'Paid' ? 'Paid (पूर्ण भरणा ✓)' : selectedOrder.paymentStatus}
+                  </span>
+                </div>
+                {selectedOrder.transactionId && (
+                  <div style={{ fontSize: '0.78rem', color: '#006B2D', fontWeight: 600, marginTop: '0.15rem' }}>
+                    Txn ID: {selectedOrder.transactionId}
+                  </div>
+                )}
+                <div style={{ fontSize: '0.85rem', marginTop: '0.15rem' }}>
+                  <strong>Order Status:</strong> {selectedOrder.orderStatus}
+                </div>
+              </div>
+            </div>
+
+            {/* Itemized Table */}
+            <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.88rem', fontWeight: 700, color: '#17251B' }}>Items Billed:</h4>
+            <div className="crm-table-wrapper" style={{ marginBottom: '1rem' }}>
+              <table className="crm-table" style={{ width: '100%' }}>
+                <thead>
+                  <tr style={{ background: '#f1f5f9' }}>
+                    <th style={{ textAlign: 'left' }}>Item / Description</th>
+                    <th style={{ textAlign: 'center' }}>Qty</th>
+                    <th style={{ textAlign: 'right' }}>Unit Rate</th>
+                    <th style={{ textAlign: 'right' }}>Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {(selectedOrder.products || selectedOrder.items || []).map((p, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <strong>{p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Wellness Product'}</strong>
+                      </td>
+                      <td style={{ textAlign: 'center' }}>{p.quantity || 1}</td>
+                      <td style={{ textAlign: 'right' }}>{formatCurrency(p.price || 0)}</td>
+                      <td style={{ textAlign: 'right' }}><strong>{formatCurrency(p.total || ((p.price || 0) * (p.quantity || 1)))}</strong></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Calculations Total Box */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+              <div style={{ minWidth: '240px', background: '#F8FAFC', padding: '0.85rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
+                  <span style={{ color: '#64748b' }}>Subtotal:</span>
+                  <span>{formatCurrency(selectedOrder.subtotal || selectedOrder.grandTotal)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
+                  <span style={{ color: '#64748b' }}>Delivery / Shipping:</span>
+                  <span style={{ color: '#159B32', fontWeight: 600 }}>{selectedOrder.shipping ? formatCurrency(selectedOrder.shipping) : 'FREE (मोफत)'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem', fontWeight: 800, borderTop: '1.5px solid #CBD5E1', paddingTop: '0.5rem', color: '#006B2D' }}>
+                  <span>Total Bill Amount:</span>
+                  <span>{formatCurrency(selectedOrder.grandTotal)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ fontSize: '0.75rem', color: '#64748b', textAlign: 'center', marginTop: '1rem', borderTop: '1px dashed #CBD5E1', paddingTop: '0.5rem' }}>
+              हे संगणकीय अधिकृत बिल आहे. सहारा सोशल फाऊंडेशन, कोल्हापूर (Maharashtra, India).
+            </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -601,7 +702,13 @@ export default function OrderList() {
               <Trash2 size={14} /> Delete Order
             </button>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button className="crm-btn crm-btn-secondary" onClick={() => window.print()}>Print Invoice</button>
+              <button 
+                className="crm-btn crm-btn-secondary" 
+                onClick={() => window.print()}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700 }}
+              >
+                🖨️ Print Bill / Invoice
+              </button>
               <button className="crm-btn crm-btn-primary" onClick={() => setSelectedOrder(null)}>Close</button>
             </div>
           </div>

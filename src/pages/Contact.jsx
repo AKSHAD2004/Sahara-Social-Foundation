@@ -373,10 +373,10 @@ const Contact = () => {
                 {language === 'mr' ? 'कार्यालय नकाशा स्थान: शाहूपुरी, कोल्हापूर' : 'Office Location: Shahupuri, Kolhapur'}
               </span>
             </div>
-            <div style={{ width: '100%', height: '320px' }}>
+            <div style={{ width: '100%', height: '340px' }}>
               <iframe
-                title="Sahara Social Foundation Location Map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15286.082522731876!2d74.2255745!3d16.7028124!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc1001a1829e1eb%3A0x6b86cf2ff2be9ec5!2sShahupuri%2C%20Kolhapur%2C%20Maharashtra%20416001!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                title="Sahara Social Foundation Satellite Location Map"
+                src="https://maps.google.com/maps?ll=16.7009545,74.2418972&q=16.7009962,74.2421467+(Sahara+Social+Foundation+-+Royal+Prestige)&t=k&z=19&ie=UTF8&iwloc=B&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

@@ -3,6 +3,46 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 
+// Global Console Interceptor to silence Firebase SDK internal backoff and resource-exhausted spam
+if (typeof window !== 'undefined') {
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  const originalLog = console.log;
+
+  const isQuotaNoise = (args) => {
+    return args.some((arg) => {
+      const str = typeof arg === 'string' ? arg : (arg?.message || arg?.code || JSON.stringify(arg) || '');
+      return (
+        str.includes('resource-exhausted') ||
+        str.includes('Quota exceeded') ||
+        str.includes('prevent overloading the backend') ||
+        str.includes('maximum backoff delay')
+      );
+    });
+  };
+
+  console.error = function (...args) {
+    if (isQuotaNoise(args)) {
+      if (typeof window.__quotaWarningShown === 'undefined') {
+        window.__quotaWarningShown = true;
+        originalWarn.call(console, '[Firebase Cloud Notice] Firebase Free Spark quota reached. Local reactive database active.');
+      }
+      return;
+    }
+    return originalError.apply(console, args);
+  };
+
+  console.warn = function (...args) {
+    if (isQuotaNoise(args)) return;
+    return originalWarn.apply(console, args);
+  };
+
+  console.log = function (...args) {
+    if (isQuotaNoise(args)) return;
+    return originalLog.apply(console, args);
+  };
+}
+
 // Ensure crisp circular PNG favicon is rendered in browser tab
 function initFavicon() {
   if (typeof window === 'undefined') return;

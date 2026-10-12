@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
-export default function CrmModal({ isOpen, onClose, title, children, footer, size = 'default' }) {
+export default function CrmModal({ isOpen = true, onClose, title, children, footer, size = 'default' }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -13,7 +13,7 @@ export default function CrmModal({ isOpen, onClose, title, children, footer, siz
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (isOpen === false) return null;
 
   return (
     <div className="crm-modal-backdrop" onClick={onClose}>

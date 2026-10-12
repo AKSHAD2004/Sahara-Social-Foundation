@@ -451,6 +451,7 @@ export default function HeroSlideList() {
       {/* Add / Edit Slide Modal */}
       {showModal && (
         <CrmModal
+          isOpen={showModal}
           title={editingSlide ? 'Change Slide Photo & Details' : 'Add New Home Banner Slide'}
           onClose={() => setShowModal(false)}
         >

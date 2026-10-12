@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Play, ArrowRight, Sparkles, ChevronDown, ChevronUp, ArrowDown } from 'lucide-react';
+import { Play, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { horizontalVideosData } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 import { dbService } from '../services/db';
@@ -67,16 +66,6 @@ const ResultVideosSection = () => {
       }
       return next;
     });
-  };
-
-  // One-tap smooth scroll down to the next section
-  const handleScrollDown = () => {
-    const nextSection = document.querySelector('.trust-section');
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      window.scrollBy({ top: window.innerHeight * 0.75, behavior: 'smooth' });
-    }
   };
 
   return (
@@ -304,76 +293,7 @@ const ResultVideosSection = () => {
             )}
           </button>
         )}
-
-        <Link 
-            to="/videos" 
-            style={{ 
-              backgroundColor: '#F3F8F1',
-              color: '#006B2D',
-              padding: '0.85rem 1.8rem', 
-              borderRadius: '9999px',
-              fontSize: '0.98rem',
-              fontWeight: 700,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              textDecoration: 'none',
-              border: '1.5px solid #C8E6C9',
-              boxShadow: '0 2px 10px rgba(0, 107, 45, 0.08)',
-              transition: 'all 0.25s ease'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#E2FAEA';
-              e.currentTarget.style.borderColor = '#006B2D';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#F3F8F1';
-              e.currentTarget.style.borderColor = '#C8E6C9';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <span>{language === 'mr' ? 'सर्व व्हिडिओ दालन पहा' : 'View All in Gallery'}</span>
-            <ArrowRight size={16} />
-          </Link>
-
-          {/* Quick-Scroll Down button to effortlessly glide to next section */}
-          <button
-            type="button"
-            onClick={handleScrollDown}
-            title={language === 'mr' ? 'पुढील माहितीकडे खाली स्क्रोल करा' : 'Scroll Down to Next Section'}
-            style={{
-              backgroundColor: '#ffffff',
-              color: '#006B2D',
-              padding: '0.85rem 1.4rem',
-              borderRadius: '9999px',
-              fontSize: '0.95rem',
-              fontWeight: 700,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem',
-              border: '1.5px solid #C8E6C9',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0, 107, 45, 0.06)',
-              transition: 'all 0.25s ease'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#F3F8F1';
-              e.currentTarget.style.borderColor = '#006B2D';
-              e.currentTarget.style.transform = 'translateY(2px)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#ffffff';
-              e.currentTarget.style.borderColor = '#C8E6C9';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <span>{language === 'mr' ? 'खाली स्क्रोल करा' : 'Scroll Down'}</span>
-            <ArrowDown size={16} />
-          </button>
-        </div>
+      </div>
       </div>
 
       <style>{`

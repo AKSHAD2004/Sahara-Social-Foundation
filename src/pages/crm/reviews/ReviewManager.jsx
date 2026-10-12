@@ -524,6 +524,7 @@ export default function ReviewManager() {
       {/* Add Verified Review Modal */}
       {showModal && (
         <CrmModal
+          isOpen={showModal}
           title="Add Verified Customer Review"
           onClose={() => setShowModal(false)}
         >

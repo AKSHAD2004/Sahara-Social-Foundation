@@ -204,35 +204,8 @@ const Checkout = () => {
       transactionId: paymentDetails.paymentId || paymentDetails.razorpay_payment_id || null
     };
 
-    // Save to CRM Local Reactive Store
-    try {
-      await dbService.add('orders', crmOrder);
-    } catch (orderErr) {
-      console.warn('CRM order sync note:', orderErr);
-    }
-
-    // Direct Cloud Firestore Sync Guarantee
-    try {
-      await syncOrderToFirebase(crmOrder);
-    } catch (fbErr) {
-      console.warn('Direct Firebase Cloud order sync note:', fbErr);
-    }
-
-    // 4. Add CRM Notification
-    try {
-      dbService.addNotification({
-        title: isPaidOnlineFull ? 'नवीन ऑनलाईन ऑर्डर!' : (advancePaid > 0 ? 'नवीन COD ऑर्डर (ॲडव्हान्स प्राप्त)' : 'नवीन COD ऑर्डर!'),
-        message: isPaidOnlineFull
-          ? `ऑर्डर #${orderId} - ₹${grandTotal} पूर्ण भरणा (${formData.fullName}).`
-          : `ऑर्डर #${orderId} - ₹${grandTotal} (${formData.fullName}) - पार्सल डिलिव्हरीच्या वेळी देय.`,
-        type: 'order',
-        link: '/crm/orders'
-      });
-    } catch (notifErr) {
-      console.warn('CRM notification note:', notifErr);
-    }
-
     const orderDetails = {
+      id: orderId,
       orderId,
       date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       items: [...cartItems],
@@ -251,7 +224,38 @@ const Checkout = () => {
       status: 'Confirmed'
     };
 
-    localStorage.setItem('ssf_last_order', JSON.stringify(orderDetails));
+    // Save to local storage first so bill & order confirmation are instantly available
+    try {
+      localStorage.setItem('ssf_last_order', JSON.stringify(orderDetails));
+    } catch (saveErr) {
+      console.warn('LocalStorage save error:', saveErr);
+    }
+
+    // Save to CRM Local Reactive Store
+    try {
+      await dbService.add('orders', crmOrder);
+    } catch (orderErr) {
+      console.warn('CRM order sync note:', orderErr);
+    }
+
+    // Direct Cloud Firestore Sync Guarantee (Non-blocking)
+    syncOrderToFirebase(crmOrder).catch((fbErr) => {
+      console.warn('Direct Firebase Cloud order sync note:', fbErr);
+    });
+
+    // 4. Add CRM Notification
+    try {
+      dbService.addNotification({
+        title: isPaidOnlineFull ? 'नवीन ऑनलाईन ऑर्डर!' : (advancePaid > 0 ? 'नवीन COD ऑर्डर (ॲडव्हान्स प्राप्त)' : 'नवीन COD ऑर्डर!'),
+        message: isPaidOnlineFull
+          ? `ऑर्डर #${orderId} - ₹${grandTotal} पूर्ण भरणा (${formData.fullName}).`
+          : `ऑर्डर #${orderId} - ₹${grandTotal} (${formData.fullName}) - पार्सल डिलिव्हरीच्या वेळी देय.`,
+        type: 'order',
+        link: '/crm/orders'
+      });
+    } catch (notifErr) {
+      console.warn('CRM notification note:', notifErr);
+    }
 
     // Seamlessly associate buyer profile so they have direct access to their order
     if (!customerUser && loginCustomer) {
@@ -271,7 +275,13 @@ const Checkout = () => {
       }
     }
 
-    clearCart();
+    // Clear cart and proceed immediately to bill & order confirmation page
+    try {
+      clearCart();
+    } catch (cartErr) {
+      console.warn('Cart clearing error:', cartErr);
+    }
+
     setIsSubmitting(false);
     navigate('/order-confirmation', { state: { order: orderDetails } });
   };
@@ -320,15 +330,25 @@ const Checkout = () => {
         advanceAmount: amountToPayNow,
         balanceDueOnDelivery: remainingCodBalance
       },
-      onSuccess: (paymentResponse) => {
-        completeOrderPlacement(orderId, {
-          ...paymentResponse,
-          status: isCodToken ? 'Partially Paid' : 'Paid',
-          paymentId: paymentResponse.razorpay_payment_id || paymentResponse.paymentId,
-          advancePaid: amountToPayNow,
-          balanceDue: remainingCodBalance,
-          isCod: isCodToken
-        });
+      onSuccess: async (paymentResponse) => {
+        try {
+          await completeOrderPlacement(orderId, {
+            ...paymentResponse,
+            status: isCodToken ? 'Partially Paid' : 'Paid',
+            paymentId: paymentResponse.razorpay_payment_id || paymentResponse.paymentId,
+            advancePaid: amountToPayNow,
+            balanceDue: remainingCodBalance,
+            isCod: isCodToken
+          });
+        } catch (submitErr) {
+          console.error('Order placement error after payment:', submitErr);
+          setIsSubmitting(false);
+          setPaymentNotice(
+            language === 'mr'
+              ? 'पेमेंट पूर्ण झाले आहे, परंतु ऑर्डर जतन करताना अडचण आली. कृपया ग्राहक सेवेशी संपर्क साधा.'
+              : 'Payment completed, but there was an error saving the order. Please contact support with Txn ID: ' + (paymentResponse.razorpay_payment_id || '')
+          );
+        }
       },
       onDismiss: () => {
         setIsSubmitting(false);

@@ -1230,3 +1230,53 @@ body {
     font-size: 0.72rem !important;
   }
 }
+
+/* ==========================================================================
+   Print Styles for Official Invoices & Bills
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print,
+  .navbar,
+  .footer,
+  .mobile-bottom-bar,
+  .floating-actions,
+  .crm-sidebar,
+  .crm-topbar,
+  .crm-toolbar,
+  .crm-header-btn-group,
+  .crm-stats-grid,
+  .crm-modal-footer,
+  .crm-modal-header button,
+  button {
+    display: none !important;
+  }
+
+  .crm-modal-backdrop {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .crm-modal,
+  .crm-modal-lg {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .print-only-header {
+    display: block !important;
+  }
+
+  #crm-print-invoice-area {
+    border: 1px solid #000 !important;
+    padding: 1rem !important;
+  }
+}

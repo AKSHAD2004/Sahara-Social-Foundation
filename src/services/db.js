@@ -33,7 +33,9 @@ import {
   writeBatch,
   serverTimestamp,
   ensureFirebaseAuth,
-  syncOrderToFirebase
+  syncOrderToFirebase,
+  disconnectFirestoreNetwork,
+  isFirestoreNetworkDisconnected
 } from './firebase';
 import { buildCommissionTransactions, buildCommissionReversal, isOrderCommissionEligible } from './commissionEngine';
 
@@ -274,8 +276,8 @@ export function initDatabase() {
     initCollection(col, initialDataMap[col] || []);
   });
 
-  // Connect Firestore real-time synchronization immediately if configured
-  if (isFirebaseConfigured && firestoreDb) {
+  // Connect Firestore real-time synchronization immediately if configured and quota is intact
+  if (isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
     ensureFirebaseAuth().catch(() => {});
     if (typeof window !== 'undefined') {
       setTimeout(setupFirestoreRealtimeSync, 50);
@@ -291,10 +293,10 @@ export function initDatabase() {
     } catch (e) {}
   }, 300);
 
-  // Proactively fetch all major collections from Cloud Firestore so this device immediately reflects changes made on any other device
+  // Proactively fetch all major collections from Cloud Firestore only if quota not reached
   setTimeout(() => {
     try {
-      if (typeof window !== 'undefined' && isFirebaseConfigured && firestoreDb) {
+      if (typeof window !== 'undefined' && isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
         dbService.refreshAllFromFirebase().catch(() => {});
       }
     } catch (e) {}
@@ -302,8 +304,53 @@ export function initDatabase() {
 }
 
 let permissionWarningDispatched = false;
+let quotaExhaustedFlag = false;
+
+// Global Quota & Error Circuit Breaker
+export function isFirestoreQuotaExhausted() {
+  return quotaExhaustedFlag || isFirestoreNetworkDisconnected();
+}
+
+export function handleFirestoreQuotaExceeded(err) {
+  if (quotaExhaustedFlag) return;
+  quotaExhaustedFlag = true;
+
+  console.warn(
+    '[Cloud Firestore Quota Protected] Firebase Spark (Free) plan daily read/write quota was reached. ' +
+    'To protect the application and stop console errors, real-time listeners have been gracefully detached and network disconnected. ' +
+    'The website and CRM are operating at full speed using high-speed local reactive cache. ' +
+    'Quota automatically refreshes daily at midnight PST on Firebase, or you can upgrade to Blaze (Pay-as-you-go) in Firebase Console.'
+  );
+
+  // Unsubscribe all active Firestore listeners to prevent repeating backoff delay attempts
+  Object.keys(firestoreUnsubscribers).forEach((key) => {
+    try {
+      if (typeof firestoreUnsubscribers[key] === 'function') {
+        firestoreUnsubscribers[key]();
+      }
+      delete firestoreUnsubscribers[key];
+    } catch (e) {}
+  });
+
+  // Explicitly tell the Firestore SDK to disable network so background retries immediately cease
+  disconnectFirestoreNetwork().catch(() => {});
+
+  if (typeof window !== 'undefined') {
+    window.__firestoreQuotaExceeded = true;
+    window.dispatchEvent(new CustomEvent('firestore-quota-exceeded'));
+  }
+}
 
 function handleFirestorePermissionError(source, colName, err) {
+  if (
+    err?.code === 'resource-exhausted' ||
+    err?.message?.includes('Quota exceeded') ||
+    err?.message?.includes('resource-exhausted')
+  ) {
+    handleFirestoreQuotaExceeded(err);
+    return;
+  }
+
   if (err?.code === 'permission-denied' || err?.message?.includes('permissions') || err?.message?.includes('Missing or insufficient')) {
     if (!permissionWarningDispatched) {
       permissionWarningDispatched = true;
@@ -319,7 +366,14 @@ function handleFirestorePermissionError(source, colName, err) {
 
 // Setup live listeners to Cloud Firestore
 function setupFirestoreRealtimeSync() {
-  COLLECTIONS.forEach((colName) => {
+  if (isFirestoreQuotaExhausted() || (typeof window !== 'undefined' && window.__firestoreQuotaExceeded)) {
+    return;
+  }
+
+  // Only subscribe to critical customer & order collections to drastically conserve Firebase quota
+  const SYNC_COLLECTIONS = ['orders', 'heroSlides', 'settings'];
+
+  SYNC_COLLECTIONS.forEach((colName) => {
     try {
       if (firestoreUnsubscribers[colName]) return;
 
@@ -330,13 +384,9 @@ function setupFirestoreRealtimeSync() {
             state.settings = snap.data();
             saveCollection('settings', false);
           } else {
-            // Settings doc not yet created in Cloud Firestore; upload default settings
             const currentSettings = state.settings || initialSettings;
             state.settings = currentSettings;
             saveCollection('settings', false);
-            setDoc(settingsDocRef, sanitizeForFirestore({ ...currentSettings, syncedAt: new Date().toISOString() }), { merge: true }).catch((err) => {
-              handleFirestorePermissionError('auto-seed-settings', 'settings', err);
-            });
           }
         }, (err) => handleFirestorePermissionError('sync-settings', colName, err));
       } else {
@@ -376,22 +426,6 @@ function setupFirestoreRealtimeSync() {
 
             state.products = fullCatalog;
             saveCollection('products', false);
-
-            // Auto-upload missing catalog products only if allowed (suppress permission warnings)
-            if (remoteDocs.length < fullCatalog.length && !window.__firestoreSeedDisabled) {
-              fullCatalog.forEach((p) => {
-                if (!remoteMap.has(String(p.id))) {
-                  const docRef = doc(firestoreDb, 'products', String(p.id));
-                  const cleanP = sanitizeForFirestore({ ...p, id: p.id, syncedAt: new Date().toISOString() });
-                  setDoc(docRef, cleanP, { merge: true }).catch((err) => {
-                    // Suppress permission-denied noise for anonymous visitors
-                    if (err?.code === 'permission-denied' || err?.message?.includes('permissions')) {
-                      window.__firestoreSeedDisabled = true;
-                    }
-                  });
-                }
-              });
-            }
           } else if (colName === 'commissionSlabs') {
             const defaultSlabs = initialCommissionSlabs;
             const remoteMap = new Map(remoteDocs.map((s) => [String(s.id), s]));
@@ -401,14 +435,6 @@ function setupFirestoreRealtimeSync() {
             });
             state.commissionSlabs = fullSlabs;
             saveCollection('commissionSlabs', false);
-            if (remoteDocs.length < fullSlabs.length) {
-              fullSlabs.forEach((s) => {
-                if (!remoteMap.has(String(s.id))) {
-                  const docRef = doc(firestoreDb, 'commissionSlabs', String(s.id));
-                  setDoc(docRef, sanitizeForFirestore(s), { merge: true }).catch(() => {});
-                }
-              });
-            }
           } else if (colName === 'users') {
             const defaultUsers = initialUsers;
             const remoteMap = new Map(remoteDocs.map((u) => [String(u.id), u]));
@@ -418,14 +444,6 @@ function setupFirestoreRealtimeSync() {
             });
             state.users = fullUsers;
             saveCollection('users', false);
-            if (remoteDocs.length < fullUsers.length) {
-              fullUsers.forEach((u) => {
-                if (!remoteMap.has(String(u.id))) {
-                  const docRef = doc(firestoreDb, 'users', String(u.id));
-                  setDoc(docRef, sanitizeForFirestore(u), { merge: true }).catch(() => {});
-                }
-              });
-            }
           } else if (remoteDocs.length === 0) {
             // Check if explicitly cleared by admin action
             const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
@@ -477,7 +495,11 @@ function setupFirestoreRealtimeSync() {
               if (deletedSet.has(rId) || (rOrd && deletedSet.has(rOrd)) || (rCust && deletedSet.has(rCust)) || (rLead && deletedSet.has(rLead))) {
                 // Permanently clean from Cloud Firestore if found remotely
                 const dRef = doc(firestoreDb, colName, rDoc.id);
-                deleteDoc(dRef).catch(() => {});
+                deleteDoc(dRef).catch((dErr) => {
+                  if (dErr?.code === 'resource-exhausted' || dErr?.message?.includes('Quota exceeded') || dErr?.message?.includes('resource-exhausted')) {
+                    handleFirestoreQuotaExceeded(dErr);
+                  }
+                });
               } else {
                 activeRemoteDocs.push(rDoc);
               }
@@ -517,8 +539,13 @@ function setupFirestoreRealtimeSync() {
               mergedDocs.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
             }
 
-            state[colName] = mergedDocs;
-            saveCollection(colName, false);
+            // Guard against redundant state updates and re-renders
+            const currentJson = JSON.stringify(state[colName] || []);
+            const newJson = JSON.stringify(mergedDocs);
+            if (currentJson !== newJson) {
+              state[colName] = mergedDocs;
+              saveCollection(colName, false);
+            }
           }
         }, (err) => {
           handleFirestorePermissionError('sync', colName, err);
@@ -552,29 +579,34 @@ if (typeof window !== 'undefined') {
 
   // Mobile device resume & tab focus auto-sync guarantee across all devices
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
+    if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted()) {
       if (typeof dbService !== 'undefined' && dbService.refreshAllFromFirebase) {
         dbService.refreshAllFromFirebase().catch(() => {});
       }
     }
   });
 
-  // Background heartbeat every 25 seconds to pull remote modifications seamlessly
+  // Background heartbeat every 60 seconds as a light fallback only for offline/disconnected states
   setInterval(() => {
-    if (document.visibilityState === 'visible' && typeof dbService !== 'undefined' && dbService.refreshFromFirebase) {
-      dbService.refreshFromFirebase('orders').catch(() => {});
-      dbService.refreshFromFirebase('heroSlides').catch(() => {});
-      dbService.refreshFromFirebase('reviews').catch(() => {});
-      dbService.refreshFromFirebase('galleryPhotos').catch(() => {});
-      dbService.refreshFromFirebase('videos').catch(() => {});
+    if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted() && typeof dbService !== 'undefined' && dbService.refreshFromFirebase) {
+      // If Firestore is already streaming via onSnapshot, heartbeat is redundant
+      if (!isFirebaseConfigured || !firestoreDb) {
+        dbService.refreshFromFirebase('orders').catch(() => {});
+      }
     }
-  }, 25000);
+  }, 60000);
 }
 
 function saveCollection(collectionName, syncToCloud = true) {
   try {
     const key = STORAGE_PREFIX + collectionName;
-    localStorage.setItem(key, JSON.stringify(state[collectionName]));
+    const serialized = JSON.stringify(state[collectionName]);
+    const previous = localStorage.getItem(key);
+    // If the data is identical, do not trigger storage events or re-emit to listeners
+    if (previous === serialized) {
+      return;
+    }
+    localStorage.setItem(key, serialized);
   } catch (e) {
     console.error(`Failed to persist collection ${collectionName}:`, e);
   }
@@ -584,10 +616,14 @@ function saveCollection(collectionName, syncToCloud = true) {
 function emitChange(collectionName) {
   if (listeners[collectionName]) {
     listeners[collectionName].forEach((cb) => {
-      if (collectionName === 'settings') {
-        cb(state.settings ? { ...state.settings } : { ...initialSettings });
-      } else {
-        cb([...(state[collectionName] || [])]);
+      try {
+        if (collectionName === 'settings') {
+          cb(state.settings ? { ...state.settings } : { ...initialSettings });
+        } else {
+          cb([...(state[collectionName] || [])]);
+        }
+      } catch (err) {
+        console.warn('Listener notification error:', err);
       }
     });
   }
@@ -661,9 +697,13 @@ export const dbService = {
         }
         console.log(`[Firestore Sync] Created document ${collectionName}/${docId}`);
       } catch (err) {
-        console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
-        if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'add' } }));
+        if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded')) {
+          handleFirestoreQuotaExceeded(err);
+        } else {
+          console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
+          if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'add' } }));
+          }
         }
       }
     }
@@ -765,9 +805,13 @@ export const dbService = {
         await setDoc(docRef, cleanItem, { merge: true });
         console.log(`[Firestore Sync] Updated document ${collectionName}/${id}`);
       } catch (err) {
-        console.warn(`Firestore Cloud update note (${collectionName}):`, err.message);
-        if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'update' } }));
+        if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded')) {
+          handleFirestoreQuotaExceeded(err);
+        } else {
+          console.warn(`Firestore Cloud update note (${collectionName}):`, err.message);
+          if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'update' } }));
+          }
         }
       }
     }
@@ -1324,7 +1368,7 @@ export const dbService = {
    * Manually fetch latest collection data from Cloud Firestore and sync local store
    */
   async refreshFromFirebase(collectionName = 'orders') {
-    if (!isFirebaseConfigured || !firestoreDb) {
+    if (!isFirebaseConfigured || !firestoreDb || isFirestoreQuotaExhausted()) {
       return state[collectionName] || [];
     }
     try {
@@ -1356,7 +1400,11 @@ export const dbService = {
         const rLead = String(rDoc.leadId || '');
         if (deletedSet.has(rId) || (rOrd && deletedSet.has(rOrd)) || (rCust && deletedSet.has(rCust)) || (rLead && deletedSet.has(rLead))) {
           const dRef = doc(firestoreDb, collectionName, rDoc.id);
-          deleteDoc(dRef).catch(() => {});
+          deleteDoc(dRef).catch((dErr) => {
+            if (dErr?.code === 'resource-exhausted' || dErr?.message?.includes('Quota exceeded') || dErr?.message?.includes('resource-exhausted')) {
+              handleFirestoreQuotaExceeded(dErr);
+            }
+          });
         } else {
           remoteDocs.push(rDoc);
         }

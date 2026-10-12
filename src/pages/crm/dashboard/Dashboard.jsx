@@ -7,7 +7,7 @@ import {
   RefreshCw, Globe, PackageCheck, AlertCircle, Eye, Phone
 } from 'lucide-react';
 import { formatCurrency, formatDate, formatPhone, getStatusBadgeClass } from '../../../utils/formatters';
-import { dbService } from '../../../services/db';
+import { dbService, isFirestoreQuotaExhausted, handleFirestoreQuotaExceeded } from '../../../services/db';
 import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot } from '../../../services/firebase';
 import { SalesBarChart, LeadSourceDonut, ConversionFunnel } from '../../../components/crm/Charts';
 import Customer360Modal from '../../../components/crm/Customer360Modal';
@@ -63,9 +63,9 @@ export default function Dashboard() {
     const unsubTx = dbService.subscribe('commissionTransactions', setCommissionTx);
     const unsubTkt = dbService.subscribe('supportTickets', setTickets);
 
-    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device orders
+    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device orders (only if quota intact)
     let unsubFirestoreOrders = () => {};
-    if (isFirebaseConfigured && firestoreDb) {
+    if (isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
       try {
         const colRef = collection(firestoreDb, 'orders');
         unsubFirestoreOrders = onSnapshot(colRef, (snapshot) => {
@@ -78,20 +78,29 @@ export default function Dashboard() {
             });
             setOrders(liveOrders);
           }
-        }, (err) => console.warn('Direct Firestore orders listener note:', err.message));
+        }, (err) => {
+          if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded') || err?.message?.includes('resource-exhausted')) {
+            if (typeof unsubFirestoreOrders === 'function') unsubFirestoreOrders();
+            handleFirestoreQuotaExceeded(err);
+          } else {
+            console.warn('Direct Firestore orders listener note:', err.message);
+          }
+        });
       } catch (err) {
         console.warn('Direct Firestore orders setup note:', err.message);
       }
     }
 
-    // Initial fresh pull from Cloud Firestore
-    dbService.refreshFromFirebase('orders').then((res) => {
-      if (Array.isArray(res) && res.length > 0) setOrders(res);
-    }).catch(() => {});
+    // Initial fresh pull from Cloud Firestore (only if quota intact)
+    if (!isFirestoreQuotaExhausted()) {
+      dbService.refreshFromFirebase('orders').then((res) => {
+        if (Array.isArray(res) && res.length > 0) setOrders(res);
+      }).catch(() => {});
+    }
 
-    // Uninterrupted mobile device sync heartbeat (every 15 seconds)
+    // Mobile device sync heartbeat (every 15 seconds)
     const mobileSyncTimer = setInterval(() => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted()) {
         dbService.refreshFromFirebase('orders').then((res) => {
           if (Array.isArray(res) && res.length > 0) setOrders(res);
         }).catch(() => {});

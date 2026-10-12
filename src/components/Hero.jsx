@@ -8,7 +8,7 @@ import {
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
-import { dbService } from '../services/db';
+import { dbService, isFirestoreQuotaExhausted } from '../services/db';
 
 // Configurable Hero Slideshow Images
 // Replace or add your custom image paths here when ready
@@ -129,19 +129,28 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
       return;
     }
 
-    // Proactively pull latest slides from Cloud Firestore
-    dbService.refreshFromFirebase('heroSlides').catch(() => {});
+    // Proactively pull latest slides from Cloud Firestore only if quota intact
+    if (!isFirestoreQuotaExhausted()) {
+      dbService.refreshFromFirebase('heroSlides').catch(() => {});
+    }
 
     const unsub = dbService.subscribe('heroSlides', (newSlides) => {
       if (Array.isArray(newSlides) && newSlides.length > 0) {
         const active = newSlides.filter((s) => s.status !== 'inactive');
         if (active.length > 0) {
           active.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
-          setSlides(active);
+          setSlides((prev) => {
+            const prevIds = prev.map((p) => p.id || p.image).join(',');
+            const nextIds = active.map((p) => p.id || p.image).join(',');
+            if (prevIds === nextIds && prev.length === active.length) {
+              return prev; // Preserve identity, do not trigger re-render
+            }
+            return active;
+          });
           return;
         }
       }
-      setSlides(heroSlidesData);
+      setSlides((prev) => (prev === heroSlidesData ? prev : heroSlidesData));
     });
     return unsub;
   }, [customSlides]);

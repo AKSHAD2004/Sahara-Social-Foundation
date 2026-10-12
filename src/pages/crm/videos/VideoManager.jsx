@@ -424,6 +424,7 @@ export default function VideoManager() {
       {/* Add / Edit Video Modal */}
       {showModal && (
         <CrmModal
+          isOpen={showModal}
           title={editingVideo ? 'Change Video & Details' : 'Add New Case Study Video'}
           onClose={() => setShowModal(false)}
         >

@@ -241,7 +241,14 @@ const Home = () => {
           const custom = dbMap.get(String(p.id)) || dbProducts.find((f) => f.sku && f.sku === p.sku);
           return custom ? { ...p, ...custom } : p;
         });
-        setFeaturedProducts(merged);
+        setFeaturedProducts((prev) => {
+          const prevKey = prev.map((p) => `${p.id}-${p.price}-${p.stock}`).join('|');
+          const nextKey = merged.map((p) => `${p.id}-${p.price}-${p.stock}`).join('|');
+          if (prevKey === nextKey && prev.length === merged.length) {
+            return prev;
+          }
+          return merged;
+        });
       }
     });
     return unsub;

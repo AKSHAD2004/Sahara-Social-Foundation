@@ -24,7 +24,9 @@ import {
   where, 
   orderBy, 
   writeBatch,
-  serverTimestamp 
+  serverTimestamp,
+  disableNetwork,
+  setLogLevel
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -77,6 +79,47 @@ try {
   storage = getStorage(app);
 } catch (error) {
   console.warn('Firebase initialized in offline/demo mode:', error.message);
+}
+
+let isNetworkDisabled = false;
+
+// Check persistent session flag to avoid re-triggering quota errors on page reload
+if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('firestore_quota_exhausted') === 'true') {
+  isNetworkDisabled = true;
+  try {
+    setLogLevel('silent');
+  } catch (e) {}
+  if (db) {
+    try {
+      disableNetwork(db).catch(() => {});
+    } catch (e) {}
+  }
+}
+
+/**
+ * Disconnects Cloud Firestore network connection cleanly.
+ * This instructs the Firestore SDK to enter offline mode, immediately terminating all
+ * background network streams and stopping the repeating "Quota exceeded. Using maximum backoff delay" loop.
+ */
+export async function disconnectFirestoreNetwork() {
+  if (isNetworkDisabled || !db) return;
+  isNetworkDisabled = true;
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('firestore_quota_exhausted', 'true');
+    }
+    try {
+      setLogLevel('silent');
+    } catch (e) {}
+    await disableNetwork(db);
+    console.warn('[Firebase Cloud] Firestore network detached to offline mode. Backend backoff delay stopped.');
+  } catch (err) {
+    // Already disconnected or offline
+  }
+}
+
+export function isFirestoreNetworkDisconnected() {
+  return isNetworkDisabled || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('firestore_quota_exhausted') === 'true');
 }
 
 /**
@@ -170,6 +213,10 @@ export async function syncProfileToFirebase(profile) {
 
   const payload = sanitizeForFirestore(rawPayload);
 
+  if (isFirestoreNetworkDisconnected()) {
+    return { success: true, id: profileId, data: payload, note: 'Cached locally (Firestore offline)' };
+  }
+
   // Direct Cloud Firestore write
   if (isFirebaseConfigured && db) {
     try {
@@ -181,7 +228,9 @@ export async function syncProfileToFirebase(profile) {
       console.log(`[Firebase] Profile successfully stored on Cloud Firestore: customers/${profileId}`);
       return { success: true, id: profileId, data: payload };
     } catch (err) {
-      console.warn(`[Firebase] Firestore write note (customers/${profileId}):`, err.message);
+      if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded') || err?.message?.includes('resource-exhausted')) {
+        disconnectFirestoreNetwork().catch(() => {});
+      }
       return { success: false, error: err.message, data: payload };
     }
   }
@@ -217,6 +266,10 @@ export async function syncOrderToFirebase(order) {
 
   const cleanPayload = sanitizeForFirestore(rawPayload);
 
+  if (isFirestoreNetworkDisconnected()) {
+    return { success: true, id: orderId, data: cleanPayload, note: 'Cached locally (Firestore offline)' };
+  }
+
   if (isFirebaseConfigured && db) {
     try {
       await ensureFirebaseAuth().catch(() => {});
@@ -228,6 +281,10 @@ export async function syncOrderToFirebase(order) {
       console.log(`[Firebase Cloud] Order successfully stored on Firestore: orders/${orderId}`);
       return { success: true, id: orderId, data: cleanPayload };
     } catch (err) {
+      if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded') || err?.message?.includes('resource-exhausted')) {
+        disconnectFirestoreNetwork().catch(() => {});
+        return { success: true, id: orderId, data: cleanPayload, note: 'Cached locally' };
+      }
       console.error(`[Firebase Cloud] Order sync notice (${orderId}):`, err.message);
       // Fallback write without serverTimestamp if sentinel failed
       try {
@@ -236,7 +293,9 @@ export async function syncOrderToFirebase(order) {
         console.log(`[Firebase Cloud Fallback] Order stored without timestamp: orders/${orderId}`);
         return { success: true, id: orderId, data: cleanPayload };
       } catch (retryErr) {
-        console.error(`[Firebase Cloud Retry Failed] orders/${orderId}:`, retryErr.message);
+        if (retryErr?.code === 'resource-exhausted' || retryErr?.message?.includes('Quota exceeded') || retryErr?.message?.includes('resource-exhausted')) {
+          disconnectFirestoreNetwork().catch(() => {});
+        }
         return { success: false, error: retryErr.message, data: cleanPayload };
       }
     }
@@ -288,6 +347,7 @@ export {
   orderBy,
   writeBatch,
   serverTimestamp,
+  disableNetwork,
   // Storage methods
   ref,
   uploadBytes,

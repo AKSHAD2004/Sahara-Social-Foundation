@@ -9,6 +9,7 @@ export default function PaymentList() {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('ALL');
+  const [selectedPaymentOrder, setSelectedPaymentOrder] = useState(null);
 
   useEffect(() => {
     const unsub = dbService.subscribe('orders', setOrders);
@@ -146,18 +147,27 @@ export default function PaymentList() {
                   </td>
                   <td>{formatDate(order.orderDate)}</td>
                   <td>
-                    {order.paymentStatus !== 'Paid' ? (
+                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                       <button
-                        className="crm-btn crm-btn-primary crm-btn-sm"
-                        onClick={() => handleMarkAsPaid(order.id)}
+                        className="crm-btn crm-btn-secondary crm-btn-sm"
+                        onClick={() => setSelectedPaymentOrder(order)}
+                        title="View Bill / Tax Invoice"
                       >
-                        <CheckCircle2 size={13} /> Mark Paid
+                        <FileText size={13} /> Bill
                       </button>
-                    ) : (
-                      <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
-                        ✓ Cleared
-                      </span>
-                    )}
+                      {order.paymentStatus !== 'Paid' ? (
+                        <button
+                          className="crm-btn crm-btn-primary crm-btn-sm"
+                          onClick={() => handleMarkAsPaid(order.id)}
+                        >
+                          <CheckCircle2 size={13} /> Mark Paid
+                        </button>
+                      ) : (
+                        <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                          ✓ Cleared
+                        </span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -165,6 +175,98 @@ export default function PaymentList() {
           </table>
         </div>
       </div>
+
+      {/* Bill / Invoice Modal for Payments view */}
+      {selectedPaymentOrder && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+          onClick={() => setSelectedPaymentOrder(null)}
+        >
+          <div 
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: '16px',
+              maxWidth: '680px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: '1.75rem',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #006B2D', paddingBottom: '0.85rem', marginBottom: '1.25rem' }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#006B2D', fontWeight: 800 }}>सहारा सोशल फाऊंडेशन, कोल्हापूर</h3>
+                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Reg. No. MAH/582/2014/KOP • OFFICIAL ORDER BILL</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontWeight: 800, color: '#006B2D' }}>{selectedPaymentOrder.orderId}</div>
+                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>{formatDate(selectedPaymentOrder.orderDate)}</div>
+              </div>
+            </div>
+
+            <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.88rem' }}>
+              <div>
+                <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>CUSTOMER</div>
+                <div style={{ fontWeight: 700 }}>{selectedPaymentOrder.customerName}</div>
+                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>{selectedPaymentOrder.customerMobile || selectedPaymentOrder.customerPhone || 'N/A'}</div>
+                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>{selectedPaymentOrder.shippingAddress}</div>
+              </div>
+              <div>
+                <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>PAYMENT DETAILS</div>
+                <div><strong>Mode:</strong> {selectedPaymentOrder.paymentMethod}</div>
+                <div><strong>Status:</strong> <span style={{ color: selectedPaymentOrder.paymentStatus === 'Paid' ? '#10b981' : '#f59e0b', fontWeight: 700 }}>{selectedPaymentOrder.paymentStatus}</span></div>
+                {selectedPaymentOrder.transactionId && <div><strong>Txn ID:</strong> {selectedPaymentOrder.transactionId}</div>}
+              </div>
+            </div>
+
+            <table className="crm-table" style={{ width: '100%', marginBottom: '1rem' }}>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th style={{ textAlign: 'right' }}>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(selectedPaymentOrder.products || selectedPaymentOrder.items || []).map((p, idx) => (
+                  <tr key={idx}>
+                    <td>{p.name || p.nameMr || p.nameEn || 'Nutraceutical Product'}</td>
+                    <td>{p.quantity || 1}</td>
+                    <td>{formatCurrency(p.price || 0)}</td>
+                    <td style={{ textAlign: 'right' }}><strong>{formatCurrency(p.total || ((p.price || 0) * (p.quantity || 1)))}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.25rem' }}>
+              <div style={{ minWidth: '220px', background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '1.05rem', color: '#006B2D' }}>
+                  <span>Grand Total:</span>
+                  <span>{formatCurrency(selectedPaymentOrder.grandTotal)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+              <button className="crm-btn crm-btn-secondary" onClick={() => window.print()}>🖨️ Print Bill</button>
+              <button className="crm-btn crm-btn-primary" onClick={() => setSelectedPaymentOrder(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

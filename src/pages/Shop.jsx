@@ -49,7 +49,14 @@ const Shop = () => {
             merged.push(p);
           }
         });
-        setProductsList(merged);
+        setProductsList((prev) => {
+          const prevKey = prev.map((p) => `${p.id}-${p.price}-${p.stock}`).join('|');
+          const nextKey = merged.map((p) => `${p.id}-${p.price}-${p.stock}`).join('|');
+          if (prevKey === nextKey && prev.length === merged.length) {
+            return prev;
+          }
+          return merged;
+        });
       }
     });
     return unsub;

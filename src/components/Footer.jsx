@@ -214,52 +214,50 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Col 4: Contact & Office */}
+          {/* Col 4: Contact & Office with Map */}
           <div className="footer-contact-col">
             <h4 className="footer-col-title">
-              {language === 'mr' ? 'कार्यालय संपर्क' : 'Contact Us'}
+              {language === 'mr' ? 'कार्यालय संपर्क व नकाशा' : 'Office & Location'}
             </h4>
             
             <div className="footer-contact-list">
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem' }}>
                 <MapPin size={17} style={{ color: '#34d399', flexShrink: 0, marginTop: '2px' }} />
-                <span className="desktop-only-address">
-                  {language === 'mr' ? organizationInfo.contact.address.fullAddressMr : organizationInfo.contact.address.fullAddressEn}
-                </span>
-                <span className="mobile-only-address">
-                  {language === 'mr' ? 'शाहूपुरी, कोल्हापूर – ४१६००१' : 'Shahupuri, Kolhapur – 416001'}
-                </span>
+                <div>
+                  <span className="desktop-only-address" style={{ fontSize: '0.82rem', lineHeight: 1.45, display: 'block' }}>
+                    {language === 'mr' ? organizationInfo.contact.address.fullAddressMr : organizationInfo.contact.address.fullAddressEn}
+                  </span>
+                  <span className="mobile-only-address">
+                    {language === 'mr' ? 'रॉयल प्रेस्टीज, शाहूपुरी, कोल्हापूर – ४१६००१' : 'Royal Prestige, Shahupuri, Kolhapur – 416001'}
+                  </span>
+                </div>
               </div>
 
               {/* Desktop Contact Details */}
               <div className="desktop-contact-items">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.65rem' }}>
-                  <Phone size={17} style={{ color: '#34d399', flexShrink: 0 }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.45rem' }}>
+                  <Phone size={15} style={{ color: '#34d399', flexShrink: 0 }} />
                   <div>
-                    <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#ffffff', fontWeight: 700 }}>
+                    <a href={`tel:${organizationInfo.contact.primaryPhone}`} style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.85rem' }}>
                       {organizationInfo.contact.primaryPhone}
-                    </a>
-                    <span style={{ margin: '0 0.4rem', opacity: 0.6 }}>/</span>
-                    <a href={`tel:${organizationInfo.contact.secondaryPhone}`} style={{ color: '#ffffff', fontWeight: 700 }}>
-                      {organizationInfo.contact.secondaryPhone}
                     </a>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                  <WhatsAppIcon size={17} color="#34d399" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.75rem' }}>
+                  <WhatsAppIcon size={15} color="#34d399" />
                   <a
                     href={`https://wa.me/${organizationInfo.contact.whatsappNumber}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: '#ffffff', fontWeight: 600, textDecoration: 'underline' }}
+                    style={{ color: '#ffffff', fontWeight: 600, fontSize: '0.82rem', textDecoration: 'underline' }}
                   >
                     WhatsApp: +91 {organizationInfo.contact.primaryPhone}
                   </a>
                 </div>
               </div>
 
-              {/* Mobile Quick Action Buttons (Simple, clean tap targets) */}
+              {/* Mobile Quick Action Buttons */}
               <div className="mobile-contact-actions">
                 <a href={`tel:${organizationInfo.contact.primaryPhone}`} className="mobile-footer-action-btn btn-call">
                   <Phone size={13} />
@@ -276,13 +274,49 @@ const Footer = () => {
                 </a>
               </div>
 
+              {/* Interactive Google Map in Footer */}
+              <div className="footer-map-card">
+                <div className="footer-map-header">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', overflow: 'hidden' }}>
+                    <MapPin size={13} style={{ color: '#FFC928', flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      Sahara Social Foundation
+                    </span>
+                  </div>
+                  <a
+                    href="https://maps.app.goo.gl/cd1VciJ3CEZgrmaP6"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-map-link-btn"
+                    title="Open in Google Maps"
+                  >
+                    <span>{language === 'mr' ? 'नकाशा उघडा' : 'Directions'}</span>
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
+
+                <div className="footer-map-iframe-wrap">
+                  <iframe
+                    title="Sahara Social Foundation Satellite Map"
+                    src="https://maps.google.com/maps?ll=16.7009545,74.2418972&q=16.7009962,74.2421467+(Sahara+Social+Foundation+-+Royal+Prestige)&t=k&z=19&ie=UTF8&iwloc=B&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              </div>
+
               <div className="footer-visiting-note" style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.25)',
-                padding: '0.55rem 0.75rem',
+                padding: '0.45rem 0.65rem',
                 borderRadius: '8px',
-                fontSize: '0.76rem',
+                fontSize: '0.74rem',
                 color: '#FFC928',
-                border: '1px solid rgba(255, 201, 40, 0.25)'
+                border: '1px solid rgba(255, 201, 40, 0.25)',
+                marginTop: '0.5rem'
               }}>
                 {language === 'mr' ? organizationInfo.contact.visitingNoteMr : organizationInfo.contact.visitingNote}
               </div>
@@ -438,6 +472,57 @@ const Footer = () => {
           display: block;
         }
 
+        /* Footer Map Card */
+        .footer-map-card {
+          margin-top: 0.65rem;
+          border-radius: 12px;
+          overflow: hidden;
+          background: rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        }
+
+        .footer-map-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.4rem 0.65rem;
+          background: rgba(0, 107, 45, 0.4);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-map-link-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+          font-size: 0.72rem;
+          color: #FFC928;
+          font-weight: 700;
+          text-decoration: none;
+          padding: 0.15rem 0.4rem;
+          border-radius: 4px;
+          background: rgba(255, 201, 40, 0.15);
+          transition: all 0.2s ease;
+        }
+
+        .footer-map-link-btn:hover {
+          background: #FFC928;
+          color: #17251B;
+        }
+
+        .footer-map-iframe-wrap {
+          width: 100%;
+          height: 145px;
+          position: relative;
+        }
+
+        .footer-map-iframe-wrap iframe {
+          width: 100%;
+          height: 100%;
+          border: 0;
+          filter: contrast(1.05);
+        }
+
         /* =======================================================
            COMPACT FOOTER FOR MOBILE DEVICES (< 768px)
            Dramatically reduces vertical height and simplifies layout
@@ -590,6 +675,15 @@ const Footer = () => {
             background: #159B32 !important;
             color: #ffffff !important;
             border: 1px solid #34d399 !important;
+          }
+
+          .footer-map-card {
+            margin-top: 0.5rem !important;
+            border-radius: 10px !important;
+          }
+
+          .footer-map-iframe-wrap {
+            height: 120px !important;
           }
 
           /* Sleek bottom copyright and legal */

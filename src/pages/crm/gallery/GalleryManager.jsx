@@ -349,6 +349,7 @@ export default function GalleryManager() {
       {/* Add / Edit Modal */}
       {showModal && (
         <CrmModal
+          isOpen={showModal}
           title={editingPhoto ? 'Change Photo & Details' : 'Add New Photo to Gallery'}
           onClose={() => setShowModal(false)}
         >
