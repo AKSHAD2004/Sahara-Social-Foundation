@@ -153,7 +153,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link to="/shop" className="footer-link">
-                    <span className="link-bullet">→ </span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}
+                    <span className="link-bullet">→ </span>{language === 'mr' ? 'खरेदी (Shop)' : 'Shop'}
                   </Link>
                 </li>
                 <li>

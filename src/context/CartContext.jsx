@@ -46,7 +46,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (productId) => {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
-    showToast("उत्पादन कार्टमधून काढले गेले.");
+    showToast("कार्टमधून काढले गेले.");
   };
 
   const updateQuantity = (productId, newQuantity) => {

@@ -20,9 +20,6 @@ const Videos = () => {
   });
 
   useEffect(() => {
-    // Proactively pull latest videos from Cloud Firestore
-    dbService.refreshFromFirebase('videos').catch(() => {});
-
     const unsub = dbService.subscribe('videos', (newVideos) => {
       if (Array.isArray(newVideos) && newVideos.length > 0) {
         setVideos(newVideos);

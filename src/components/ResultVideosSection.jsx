@@ -19,7 +19,6 @@ const ResultVideosSection = () => {
   });
 
   useEffect(() => {
-    dbService.refreshFromFirebase('videos').catch(() => {});
     const unsub = dbService.subscribe('videos', (newVideos) => {
       if (Array.isArray(newVideos) && newVideos.length > 0) {
         setVideos(newVideos);
@@ -176,9 +175,10 @@ const ResultVideosSection = () => {
               >
                 <video
                   src={`${video.videoUrl}#t=0.1`}
+                  poster={video.thumbnail || video.fallbackThumbnail}
                   controls
                   playsInline
-                  preload="metadata"
+                  preload="none"
                   controlsList="nodownload"
                   onPlay={handlePlay}
                   onLoadedMetadata={handleLoadedMetadata}

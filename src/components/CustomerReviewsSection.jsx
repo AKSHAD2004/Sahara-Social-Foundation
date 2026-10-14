@@ -34,9 +34,6 @@ export default function CustomerReviewsSection({
   const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
-    // Proactively pull latest reviews from Cloud Firestore
-    dbService.refreshFromFirebase('reviews').catch(() => {});
-
     const unsub = dbService.subscribe('reviews', (items) => {
       if (Array.isArray(items) && items.length > 0) {
         setReviews(items);

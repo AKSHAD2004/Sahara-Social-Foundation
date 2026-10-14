@@ -34,8 +34,6 @@ const Shop = () => {
   });
 
   useEffect(() => {
-    dbService.refreshFromFirebase('products').catch(() => {});
-
     const unsub = dbService.subscribe('products', (dbProducts) => {
       if (Array.isArray(dbProducts) && dbProducts.length > 0) {
         const base = productsData;
@@ -63,7 +61,7 @@ const Shop = () => {
   }, []);
 
   const categories = [
-    { id: 'all', nameEn: 'All Products', nameMr: 'सर्व उत्पादने' },
+    { id: 'all', nameEn: 'All', nameMr: 'सर्व' },
     { id: 'diabetes', nameEn: 'Diabetes Care', nameMr: 'मधुमेह' },
     { id: 'heart', nameEn: 'Heart & Organs', nameMr: 'हृदय व लिव्हर' },
     { id: 'addiction', nameEn: 'De-Addiction', nameMr: 'व्यसनमुक्ती' },
@@ -249,7 +247,7 @@ const Shop = () => {
             }}>
               <ShoppingBag size={44} style={{ color: '#006B2D', margin: '0 auto 0.75rem auto', opacity: 0.6 }} />
               <h3 style={{ fontSize: '1.2rem', color: '#006B2D', marginBottom: '0.4rem', fontFamily: 'var(--font-heading)' }}>
-                {language === 'mr' ? 'कोणतीही उत्पादने सापडली नाहीत' : 'No Products Found'}
+                {language === 'mr' ? 'काहीही सापडले नाही' : 'None Found'}
               </h3>
               <p style={{ color: '#5F6B61', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
                 {language === 'mr' ? 'कृपया वेगळा शब्द शोधून पहा किंवा श्रेणी बदला.' : 'Try a different search term or category.'}
@@ -259,7 +257,7 @@ const Shop = () => {
                 onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
                 className="btn btn-outline btn-sm"
               >
-                {language === 'mr' ? 'सर्व उत्पादने पहा' : 'Reset Filters'}
+                {language === 'mr' ? 'सर्व पहा' : 'Reset Filters'}
               </button>
             </div>
           )}

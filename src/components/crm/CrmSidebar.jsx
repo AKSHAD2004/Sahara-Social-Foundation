@@ -120,7 +120,7 @@ export default function CrmSidebar({ collapsed, onToggleCollapse, mobileOpen, on
 
             <NavLink to="/crm/products" className="crm-nav-link" onClick={onCloseMobile}>
               <Package size={18} />
-              {!collapsed && <span>Products</span>}
+              {!collapsed && <span>Catalog</span>}
             </NavLink>
 
             <NavLink to="/crm/banners" className="crm-nav-link" onClick={onCloseMobile}>

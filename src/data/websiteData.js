@@ -1538,7 +1538,7 @@ export const faqsData = [
     aMr: "संस्थेच्या नियमानुसार: फॉर्म्युला मिळाल्यावर कृपया ८४२११५४०९० या नंबरवर कॉल करा. आमचे समुपदेशक तुमच्या प्रकृतीनुसार आणि आजारानुसार औषध घेण्याची पद्धत व पथ्याची सविस्तर माहिती देतील."
   },
   {
-    qEn: "Are the products 100% Nutraceutical and safe?",
+    qEn: "Are the formulations 100% Nutraceutical and safe?",
     qMr: "ही औषधे १००% आयुर्वेदिक व सुरक्षित आहेत का?",
     aEn: "Yes, all Antox formulations are prepared from natural classical herbal extracts without harmful chemicals, heavy metals, or steroids. They are safe for long-term supportive care under guidance.",
     aMr: "होय, Antox चे सर्व फॉर्म्युला पूर्णपणे नैसर्गिक वनौषधींपासून बनवलेले आहेत. यात कोणतेही घातक रसायने किंवा स्टिरॉइड्स नसून ते मार्गदर्शनाखाली वापरण्यासाठी पूर्णपणे सुरक्षित आहेत."
@@ -1600,12 +1600,12 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
     titleEn: "Refund and Returns Policy",
     titleMr: "परतावा आणि बदली धोरण (Refund & Returns Policy)",
     lastUpdated: "August 2026",
-    contentEn: `At Sahara Social Foundation, we strive to deliver authentic and sealed Nutraceutical health products to support your health journey.
+    contentEn: `At Sahara Social Foundation, we strive to deliver authentic and sealed Nutraceutical health formulations to support your health journey.
 
 1. Returns Eligibility:
-- Returns are accepted if you receive a damaged, leaked, or wrong product package during transit.
+- Returns are accepted if you receive a damaged, leaked, or wrong formula package during transit.
 - Please report any damage within 48 hours of delivery by calling 8421154090 or sending parcel opening photos on WhatsApp (8421154090).
-- Products must be unopened with the original security seal intact.
+- Packages must be unopened with the original security seal intact.
 
 2. Refund Process:
 - Once the returned package is received and inspected at our Kolhapur center, refunds are processed within 5-7 working days to your original payment method / UPI.
@@ -1615,12 +1615,12 @@ Sahara Social Foundation, Shop No. B-13, Royal Prestige, Shahupuri, Kolhapur –
 - You may cancel an order before dispatch by calling our helpline 8421154090.
 
 For assistance with orders, returns, or guidance, contact our customer support at 8421154090.`,
-    contentMr: `सहारा सोशल फाऊंडेशनच्या वतीने आम्ही आपणास शुद्ध व सीलबंद आयुर्वेदिक उत्पादने पोहोचवण्यासाठी कटिबद्ध आहोत.
+    contentMr: `सहारा सोशल फाऊंडेशनच्या वतीने आम्ही आपणास शुद्ध व सीलबंद आयुर्वेदिक घटक पोहोचवण्यासाठी कटिबद्ध आहोत.
 
 १. पार्सल परत करण्याचे नियम:
 - कुरिअर प्रवासात बाटली फुटल्यास किंवा चुकीचे पार्सल आल्यास बदलून दिले जाईल.
 - पार्सल मिळाल्यापासून ४८ तासांच्या आत ८४२११५४०९० या नंबरवर संपर्क करून किंवा व्हॉट्सअ‍ॅपवर फोटो पाठवून कळवावे.
-- उत्पादनाचे मूळ सील सुरक्षित असावे.
+- पार्सलचे मूळ सील सुरक्षित असावे.
 
 २. परतावा (Refund):
 - कोल्हापूर कार्यालयात पार्सल परत आल्यानंतर ५ ते ७ कामाच्या दिवसांत मूळ खात्यावर किंवा UPI द्वारे रक्कम परत केली जाते.

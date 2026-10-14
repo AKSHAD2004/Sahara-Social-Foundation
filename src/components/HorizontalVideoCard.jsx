@@ -135,7 +135,8 @@ const HorizontalVideoCard = ({ video }) => {
         <video
           ref={videoRef}
           src={`${video.videoUrl}#t=0.1`}
-          preload="auto"
+          poster={video.thumbnail || video.fallbackThumbnail}
+          preload="none"
           playsInline
           controls
           onLoadedMetadata={handleLoadedMetadata}

@@ -18,9 +18,6 @@ const Photos = () => {
   const [activePhoto, setActivePhoto] = useState(null);
 
   useEffect(() => {
-    // Proactively pull latest photos from Cloud Firestore
-    dbService.refreshFromFirebase('galleryPhotos').catch(() => {});
-
     const unsub = dbService.subscribe('galleryPhotos', (newPhotos) => {
       if (Array.isArray(newPhotos) && newPhotos.length > 0) {
         setPhotos(newPhotos);

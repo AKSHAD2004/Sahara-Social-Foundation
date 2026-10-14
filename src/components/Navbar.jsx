@@ -88,7 +88,7 @@ const Navbar = () => {
     { nameEn: 'Home', nameMr: 'मुख्यपृष्ठ', path: '/' },
     { nameEn: 'About', nameMr: 'संस्थेविषयी', path: '/about' },
     { nameEn: 'Services', nameMr: 'सेवा', path: '/services' },
-    { nameEn: 'Products', nameMr: 'उत्पादने', path: '/shop' },
+    { nameEn: 'Shop', nameMr: 'खरेदी', path: '/shop' },
     { nameEn: 'Clinical Report', nameMr: 'क्लिनिकल रिपोर्ट', path: '/study-report' },
     { nameEn: 'Photos', nameMr: 'फोटो', path: '/photos' },
     { nameEn: 'Videos', nameMr: 'व्हिडिओ', path: '/videos' },
@@ -399,7 +399,7 @@ const Navbar = () => {
               className="mobile-cta-pill"
             >
               <Sparkles size={16} />
-              <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने ऑर्डर करा' : 'Explore & Order Products'}</span>
+              <span>{language === 'mr' ? 'ऑर्डर करा' : 'Explore & Order'}</span>
             </Link>
 
             {/* Cart & Account Items in Drawer */}

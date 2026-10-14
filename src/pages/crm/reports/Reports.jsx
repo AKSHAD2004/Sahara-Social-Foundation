@@ -68,7 +68,7 @@ export default function Reports() {
 
         <div className="crm-header-btn-group">
           {activeTab === 'sales' && (
-            <ExportButton data={productSalesList} filename="Product_Sales_Report" />
+            <ExportButton data={productSalesList} filename="Sales_Report" />
           )}
           {activeTab === 'leads' && (
             <ExportButton data={leads} filename="Leads_Report" />
@@ -85,7 +85,7 @@ export default function Reports() {
       {/* Report Navigation Tabs */}
       <div className="crm-tabs">
         <button className={`crm-tab-btn ${activeTab === 'sales' ? 'active' : ''}`} onClick={() => setActiveTab('sales')}>
-          <ShoppingBag size={15} /> Sales & Product Reports
+          <ShoppingBag size={15} /> Sales Reports
         </button>
         <button className={`crm-tab-btn ${activeTab === 'leads' ? 'active' : ''}`} onClick={() => setActiveTab('leads')}>
           <Target size={15} /> Lead & Conversion Reports
@@ -148,7 +148,7 @@ export default function Reports() {
           <div className="crm-card">
             <div className="crm-card-header">
               <h3 className="crm-card-title">
-                <ShoppingBag size={18} style={{ color: '#1b4d3e' }} /> Product-Wise Sales Breakdown
+                <ShoppingBag size={18} style={{ color: '#1b4d3e' }} /> Item-Wise Sales Breakdown
               </h3>
             </div>
             <div className="crm-card-body" style={{ padding: 0 }}>
@@ -156,7 +156,7 @@ export default function Reports() {
                 <table className="crm-table">
                   <thead>
                     <tr>
-                      <th>Product Name</th>
+                      <th>Item Name</th>
                       <th>Units Sold</th>
                       <th>Total Gross Revenue</th>
                     </tr>

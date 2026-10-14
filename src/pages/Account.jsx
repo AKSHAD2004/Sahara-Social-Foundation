@@ -605,7 +605,7 @@ const Account = () => {
                   }}
                 >
                   <Package size={18} />
-                  <span>{language === 'mr' ? 'उत्पादने (Products)' : 'Products Catalog'}</span>
+                  <span>{language === 'mr' ? 'कॅटलॉग (Catalog)' : 'Formulation Catalog'}</span>
                 </button>
 
                 {/* Divider */}
@@ -674,7 +674,7 @@ const Account = () => {
                           : 'Once you place an order on our store, your order details and delivery status will appear here.'}
                       </p>
                       <a href="/shop" className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}>
-                        <span>{language === 'mr' ? 'उत्पादने पहा (Shop Products)' : 'Browse Products'}</span>
+                        <span>{language === 'mr' ? 'खरेदी करा (Visit Shop)' : 'Browse Shop'}</span>
                       </a>
                     </div>
                   ) : (
@@ -688,7 +688,7 @@ const Account = () => {
                       const amount = ord.grandTotal || ord.totalAmount || ord.total || 1499;
                       const itemsList = ord.products || ord.items || [];
                       const itemsName = itemsList.length > 0
-                        ? itemsList.map(i => `${i.name || i.nameMr || i.nameEn || 'Nutraceutical Product'} × ${i.quantity || 1}`).join(', ')
+                        ? itemsList.map(i => `${i.name || i.nameMr || i.nameEn || 'Nutraceutical Formula'} × ${i.quantity || 1}`).join(', ')
                         : ((language === 'mr' ? ord.productNameMr : ord.productNameEn) || 'Antox D & Antox T Kit');
 
                       return (
@@ -987,16 +987,16 @@ const Account = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                     <div>
                       <h3 style={{ fontSize: '1.3rem', color: '#006B2D', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
-                        {language === 'mr' ? 'उपलब्ध उत्पादने व संपादन' : 'Products & Catalog Management'}
+                        {language === 'mr' ? 'उपलब्ध कॅटलॉग व संपादन' : 'Formulation & Catalog Management'}
                       </h3>
                       <p style={{ color: '#5F6B61', fontSize: '0.85rem', margin: '0.2rem 0 0 0' }}>
                         {language === 'mr' 
-                          ? 'येथून उत्पादनांचे नाव, विक्री किंमत (Price), MRP, स्टॉक व माहिती थेट संपादित करा.'
-                          : 'Edit product name, selling price, MRP, stock count and details in realtime.'}
+                          ? 'येथून घटकांचे नाव, विक्री किंमत (Price), MRP, स्टॉक व माहिती थेट संपादित करा.'
+                          : 'Edit formulation name, selling price, MRP, stock count and details in realtime.'}
                       </p>
                     </div>
                     <span style={{ fontSize: '0.85rem', color: '#006B2D', fontWeight: 700, backgroundColor: '#e2faea', padding: '0.3rem 0.75rem', borderRadius: '8px' }}>
-                      {products.length} {language === 'mr' ? 'सक्रिय उत्पादने' : 'Active Products'}
+                      {products.length} {language === 'mr' ? 'सक्रिय घटक' : 'Active Items'}
                     </span>
                   </div>
 
@@ -1101,7 +1101,7 @@ const Account = () => {
                               }}
                             >
                               <Edit size={15} />
-                              <span>{language === 'mr' ? 'बदल करा (Edit)' : 'Edit Product'}</span>
+                              <span>{language === 'mr' ? 'बदल करा (Edit)' : 'Edit Item'}</span>
                             </button>
                           </div>
                         </div>
@@ -1159,7 +1159,7 @@ const Account = () => {
               }}>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#ffffff' }}>
-                    {language === 'mr' ? 'उत्पादन संपादन करा (Edit Product)' : 'Edit Product Details'}
+                    {language === 'mr' ? 'संपादन करा (Edit Details)' : 'Edit Formulation Details'}
                   </h3>
                   <div style={{ fontSize: '0.8rem', color: '#d6fae0', marginTop: '0.2rem' }}>
                     SKU: {productFormData.sku} • {productFormData.category}
@@ -1189,7 +1189,7 @@ const Account = () => {
               <form onSubmit={handleSaveProductEdit} style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
-                    {language === 'mr' ? 'उत्पादनाचे नाव (Product Name) *' : 'Product Name *'}
+                    {language === 'mr' ? 'नाव (Name) *' : 'Name *'}
                   </label>
                   <input
                     type="text"
@@ -1295,7 +1295,7 @@ const Account = () => {
 
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
-                    {language === 'mr' ? 'फोटो लिंक (Image URL)' : 'Product Image URL'}
+                    {language === 'mr' ? 'फोटो लिंक (Image URL)' : 'Image URL'}
                   </label>
                   <input
                     type="text"

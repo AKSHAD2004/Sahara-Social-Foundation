@@ -424,8 +424,12 @@ function setupFirestoreRealtimeSync() {
               }
             });
 
-            state.products = fullCatalog;
-            saveCollection('products', false);
+            const currentJson = JSON.stringify(state.products || []);
+            const newJson = JSON.stringify(fullCatalog);
+            if (currentJson !== newJson) {
+              state.products = fullCatalog;
+              saveCollection('products', false);
+            }
           } else if (colName === 'commissionSlabs') {
             const defaultSlabs = initialCommissionSlabs;
             const remoteMap = new Map(remoteDocs.map((s) => [String(s.id), s]));
@@ -433,8 +437,12 @@ function setupFirestoreRealtimeSync() {
             remoteDocs.forEach((r) => {
               if (!defaultSlabs.some((ds) => String(ds.id) === String(r.id))) fullSlabs.push(r);
             });
-            state.commissionSlabs = fullSlabs;
-            saveCollection('commissionSlabs', false);
+            const currentJson = JSON.stringify(state.commissionSlabs || []);
+            const newJson = JSON.stringify(fullSlabs);
+            if (currentJson !== newJson) {
+              state.commissionSlabs = fullSlabs;
+              saveCollection('commissionSlabs', false);
+            }
           } else if (colName === 'users') {
             const defaultUsers = initialUsers;
             const remoteMap = new Map(remoteDocs.map((u) => [String(u.id), u]));
@@ -442,8 +450,12 @@ function setupFirestoreRealtimeSync() {
             remoteDocs.forEach((r) => {
               if (!defaultUsers.some((du) => String(du.id) === String(r.id))) fullUsers.push(r);
             });
-            state.users = fullUsers;
-            saveCollection('users', false);
+            const currentJson = JSON.stringify(state.users || []);
+            const newJson = JSON.stringify(fullUsers);
+            if (currentJson !== newJson) {
+              state.users = fullUsers;
+              saveCollection('users', false);
+            }
           } else if (remoteDocs.length === 0) {
             // Check if explicitly cleared by admin action
             const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
@@ -560,41 +572,25 @@ function setupFirestoreRealtimeSync() {
 // Run initial boot
 initDatabase();
 
-// Cross-tab, mobile resume, and real-time synchronization
+// Cross-tab synchronization with equality guard to prevent re-render cascades
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (event) => {
     if (event.key && event.key.startsWith(STORAGE_PREFIX)) {
       const colName = event.key.replace(STORAGE_PREFIX, '');
       try {
-        if (event.newValue) {
-          const parsed = JSON.parse(event.newValue);
-          state[colName] = parsed;
-          emitChange(colName);
+        if (event.newValue && event.newValue !== event.oldValue) {
+          const currentSerialized = JSON.stringify(state[colName]);
+          if (currentSerialized !== event.newValue) {
+            const parsed = JSON.parse(event.newValue);
+            state[colName] = parsed;
+            emitChange(colName);
+          }
         }
       } catch (err) {
         console.warn('Cross-tab storage sync note:', err);
       }
     }
   });
-
-  // Mobile device resume & tab focus auto-sync guarantee across all devices
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted()) {
-      if (typeof dbService !== 'undefined' && dbService.refreshAllFromFirebase) {
-        dbService.refreshAllFromFirebase().catch(() => {});
-      }
-    }
-  });
-
-  // Background heartbeat every 60 seconds as a light fallback only for offline/disconnected states
-  setInterval(() => {
-    if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted() && typeof dbService !== 'undefined' && dbService.refreshFromFirebase) {
-      // If Firestore is already streaming via onSnapshot, heartbeat is redundant
-      if (!isFirebaseConfigured || !firestoreDb) {
-        dbService.refreshFromFirebase('orders').catch(() => {});
-      }
-    }
-  }, 60000);
 }
 
 function saveCollection(collectionName, syncToCloud = true) {

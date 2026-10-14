@@ -67,8 +67,6 @@ const ProductDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    dbService.refreshFromFirebase('products').catch(() => {});
-
     const unsub = dbService.subscribe('products', (dbProducts) => {
       if (Array.isArray(dbProducts) && dbProducts.length > 0) {
         const base = productsData;
@@ -161,7 +159,7 @@ const ProductDetails = () => {
 
     if (updated) {
       setProductsList(dbService.getAll('products'));
-      setEditSuccessMsg('Product updated successfully! / उत्पादन यशस्वीरित्या अद्यतनित केले.');
+      setEditSuccessMsg('Updated successfully! / उत्पादन यशस्वीरित्या अद्यतनित केले.');
       setTimeout(() => {
         setShowEditModal(false);
         setEditSuccessMsg('');
@@ -284,7 +282,7 @@ const ProductDetails = () => {
                 userSelect: 'none',
                 cursor: 'grab'
               }}
-              title="Swipe left/right to view other products"
+              title="Swipe left/right to view others"
             >
               {/* Previous Product Arrow */}
               {productsList.length > 1 && (
@@ -294,7 +292,7 @@ const ProductDetails = () => {
                     e.stopPropagation();
                     goToPrevProduct();
                   }}
-                  aria-label="Previous Product"
+                  aria-label="Previous"
                   style={{
                     position: 'absolute',
                     left: '8px',
@@ -329,7 +327,7 @@ const ProductDetails = () => {
                     e.stopPropagation();
                     goToNextProduct();
                   }}
-                  aria-label="Next Product"
+                  aria-label="Next"
                   style={{
                     position: 'absolute',
                     right: '8px',
@@ -596,7 +594,7 @@ const ProductDetails = () => {
                     height: '60px',
                     flexShrink: 0
                   }}
-                  title="Main Product View"
+                  title="Main View"
                 >
                   <img src={product.image} alt="Main View" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </button>
@@ -702,7 +700,7 @@ const ProductDetails = () => {
                 }}
               >
                 <Edit size={13} />
-                <span>{language === 'mr' ? 'उत्पादन संपादित करा' : 'Edit Product'}</span>
+                <span>{language === 'mr' ? 'उत्पादन संपादित करा' : 'Edit'}</span>
               </button>
             </div>
 
@@ -754,7 +752,7 @@ const ProductDetails = () => {
               }}>
                 {(product.isCombo !== false && (product.isCombo || product.price >= 3000)) 
                   ? (language === 'mr' ? 'कॉम्बो पॅक (२ औषधी किट)' : 'Combo Pack (Full Kit)') 
-                  : (language === 'mr' ? 'सिंगल प्रॉडक्ट (१ उत्पादन)' : 'Single Product')}
+                  : (language === 'mr' ? 'सिंगल पॅक' : 'Single Pack')}
               </span>
             </div>
 
@@ -791,7 +789,7 @@ const ProductDetails = () => {
               }}>
                 <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#166534', marginBottom: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   <Sparkles size={16} />
-                  <span>{language === 'mr' ? 'या कॉम्बो किटमध्ये समाविष्ट उत्पादने:' : 'Combo Kit Includes:'}</span>
+                  <span>{language === 'mr' ? 'या किटमधील घटक:' : 'Combo Kit Includes:'}</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.65rem' }}>
                   {comboItems.map((item, idx) => (
@@ -1017,7 +1015,7 @@ const ProductDetails = () => {
                   letterSpacing: '0.04em'
                 }}>
                   <Sparkles size={13} />
-                  <span>{language === 'mr' ? 'सविस्तर उत्पादन माहिती व कॅटलॉग' : 'Detailed Product Description & Catalogue'}</span>
+                  <span>{language === 'mr' ? 'सविस्तर माहिती व कॅटलॉग' : 'Detailed Description & Catalogue'}</span>
                 </div>
                 <h3 style={{
                   fontSize: 'clamp(1.2rem, 2.5vw, 1.55rem)',
@@ -1028,7 +1026,7 @@ const ProductDetails = () => {
                 }}>
                   {language === 'mr' 
                     ? `${product.nameMr || product.nameEn} — अधिकृत माहिती पत्रक व शास्त्रीय तपशील` 
-                    : `${product.nameEn} — Official Product Guide & Formulation Details`}
+                    : `${product.nameEn} — Official Guide & Formulation Details`}
                 </h3>
               </div>
 
@@ -1152,7 +1150,7 @@ const ProductDetails = () => {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid #E1E9DF', paddingBottom: '0.75rem' }}>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#006B2D', margin: 0 }}>
-                {language === 'mr' ? 'उत्पादन संपादित करा' : 'Edit Product'}
+                {language === 'mr' ? 'संपादित करा' : 'Edit'}
               </h3>
               <button
                 type="button"
@@ -1172,7 +1170,7 @@ const ProductDetails = () => {
             <form onSubmit={handleSaveProductEdit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#006B2D', marginBottom: '0.35rem' }}>
-                  {language === 'mr' ? 'उत्पादनाचे नाव' : 'Product Name'}
+                  {language === 'mr' ? 'नाव' : 'Name'}
                 </label>
                 <input
                   type="text"

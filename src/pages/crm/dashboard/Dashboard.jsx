@@ -376,7 +376,7 @@ export default function Dashboard() {
                   <tr>
                     <th>Order & Channel</th>
                     <th>Customer Details</th>
-                    <th>Ordered Products</th>
+                    <th>Ordered Items</th>
                     <th>Amount & Payment</th>
                     <th>Payment Status</th>
                     <th>Order Status</th>
@@ -449,7 +449,7 @@ export default function Dashboard() {
                             {Array.isArray(order.products) && order.products.length > 0 ? (
                               order.products.map((p, idx) => (
                                 <div key={idx} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  • {p.name || 'Product'} <span style={{ fontWeight: 700, color: '#006B2D' }}>× {p.quantity || 1}</span>
+                                  • {p.name || 'Formula'} <span style={{ fontWeight: 700, color: '#006B2D' }}>× {p.quantity || 1}</span>
                                 </div>
                               ))
                             ) : (
@@ -690,7 +690,7 @@ export default function Dashboard() {
             </div>
 
             <div className="crm-form-group">
-              <label className="crm-form-label">Interested Product / Campaign</label>
+              <label className="crm-form-label">Interested Formula / Campaign</label>
               <select
                 className="crm-form-select"
                 value={newLeadForm.interestedProduct}

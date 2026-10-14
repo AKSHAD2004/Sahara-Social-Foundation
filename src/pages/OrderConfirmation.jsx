@@ -235,7 +235,7 @@ const OrderConfirmation = () => {
 
           <div style={{ borderTop: '1px solid #E1E9DF', paddingTop: '1.25rem' }}>
             <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#17251B', marginBottom: '0.75rem' }}>
-              {language === 'mr' ? 'मागवलेली उत्पादने:' : 'Ordered Items:'}
+              {language === 'mr' ? 'मागवलेल्या वस्तू:' : 'Ordered Items:'}
             </h4>
 
             <div style={{ width: '100%', marginBottom: '0.5rem' }}>

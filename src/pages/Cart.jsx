@@ -44,12 +44,12 @@ const Cart = () => {
           </h2>
           <p style={{ color: '#5F6B61', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
             {language === 'mr'
-              ? 'आपण अद्याप कोणतेही आयुर्वेदिक उत्पादन जोडलेले नाही. आमच्या दर्जेदार फॉर्म्युलामधून निवड करा.'
+              ? 'आपण अद्याप काहीही जोडलेले नाही. आमच्या दर्जेदार फॉर्म्युलामधून निवड करा.'
               : 'You have not added any wellness formula yet. Explore our authentic Nutraceutical store.'}
           </p>
           <Link to="/shop" className="btn btn-primary btn-lg">
             <ShoppingCart size={18} />
-            <span>{language === 'mr' ? 'उत्पादने पहा' : 'Explore Shop'}</span>
+            <span>{language === 'mr' ? 'खरेदी करा' : 'Explore Shop'}</span>
           </Link>
         </div>
       </div>
@@ -238,7 +238,7 @@ const Cart = () => {
                   }}
                 >
                   <ArrowLeft size={16} />
-                  <span>{language === 'mr' ? 'अधिक उत्पादने पहा' : 'Continue Shopping'}</span>
+                  <span>{language === 'mr' ? 'आणखी खरेदी करा' : 'Continue Shopping'}</span>
                 </Link>
 
                 <button

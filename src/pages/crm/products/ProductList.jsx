@@ -126,7 +126,7 @@ export default function ProductList() {
   };
 
   const handleDeleteProduct = async (id) => {
-    if (window.confirm('Are you sure you want to remove this product?')) {
+    if (window.confirm('Are you sure you want to remove this item?')) {
       await dbService.delete('products', id);
     }
   };
@@ -143,10 +143,10 @@ export default function ProductList() {
       <div className="crm-page-header">
         <div>
           <h1 className="crm-page-title">
-            <Package size={24} style={{ color: '#1b4d3e' }} /> Product Management & Inventory
+            <Package size={24} style={{ color: '#1b4d3e' }} /> Catalog Management & Inventory
           </h1>
           <div className="crm-page-subtitle">
-            Ayurvedic health formulations, pricing, stock levels, and commission eligibility ({products.length} products)
+            Ayurvedic health formulations, pricing, stock levels, and commission eligibility ({products.length} items)
           </div>
         </div>
 
@@ -155,13 +155,13 @@ export default function ProductList() {
             className="crm-btn crm-btn-secondary" 
             onClick={handleRestoreCatalog}
             disabled={isRestoring}
-            title="Reload standard Sahara Social Foundation product catalog"
+            title="Reload standard Sahara Social Foundation catalog"
           >
             <RotateCcw size={15} className={isRestoring ? 'spin' : ''} /> 
-            {isRestoring ? 'Restoring...' : 'Restore Official Products'}
+            {isRestoring ? 'Restoring...' : 'Restore Official Catalog'}
           </button>
           <button className="crm-btn crm-btn-primary" onClick={handleOpenAdd}>
-            <Plus size={16} /> Add New Product
+            <Plus size={16} /> Add New Item
           </button>
         </div>
       </div>
@@ -173,7 +173,7 @@ export default function ProductList() {
             <Search size={16} color="#64748b" />
             <input
               type="text"
-              placeholder="Search products by name, SKU, category..."
+              placeholder="Search by name, SKU, category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -197,11 +197,11 @@ export default function ProductList() {
           <table className="crm-table">
             <thead>
               <tr>
-                <th>Product</th>
+                <th>Item</th>
                 <th>SKU & Category</th>
                 <th>MRP / Price</th>
                 <th>Stock</th>
-                <th style={{ textAlign: 'center' }}>Edit Product</th>
+                <th style={{ textAlign: 'center' }}>Edit</th>
                 <th>Commission</th>
                 <th>Status</th>
               </tr>
@@ -262,7 +262,7 @@ export default function ProductList() {
                       <button
                         className="crm-btn crm-btn-primary crm-btn-sm"
                         onClick={() => handleOpenEdit(prod)}
-                        title="Edit Product"
+                        title="Edit"
                         style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.75rem' }}
                       >
                         <Edit size={14} /> Edit
@@ -290,11 +290,11 @@ export default function ProductList() {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
                       <Package size={48} style={{ color: '#94a3b8', opacity: 0.6 }} />
                       <div style={{ fontWeight: 600, color: '#334155', fontSize: '1.05rem' }}>
-                        {products.length === 0 ? 'No Products in Catalog' : 'No matching products found'}
+                        {products.length === 0 ? 'No Items in Catalog' : 'No matching items found'}
                       </div>
                       <p style={{ color: '#64748b', fontSize: '0.85rem', maxWidth: '400px', margin: 0 }}>
                         {products.length === 0
-                          ? 'Load the official Sahara Social Foundation Ayurvedic product catalog with 1 click.'
+                          ? 'Load the official Sahara Social Foundation Ayurvedic catalog with 1 click.'
                           : 'Try changing your search term or category filter.'}
                       </p>
                       {products.length === 0 && (
@@ -303,7 +303,7 @@ export default function ProductList() {
                           onClick={handleRestoreCatalog}
                           style={{ marginTop: '0.5rem' }}
                         >
-                          <Sparkles size={16} /> Load Official Product Catalog
+                          <Sparkles size={16} /> Load Official Catalog
                         </button>
                       )}
                     </div>
@@ -319,13 +319,13 @@ export default function ProductList() {
       <CrmModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title={editingProduct ? `Edit Product: ${editingProduct.name}` : 'Add New Product'}
+        title={editingProduct ? `Edit: ${editingProduct.name}` : 'Add New Item'}
         size="lg"
       >
         <form onSubmit={handleSaveProduct}>
           <div className="crm-form-grid">
             <div className="crm-form-group">
-              <label className="crm-form-label">Product Name *</label>
+              <label className="crm-form-label">Item Name *</label>
               <input
                 type="text"
                 className="crm-input"
@@ -413,7 +413,7 @@ export default function ProductList() {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
             <button type="button" className="crm-btn crm-btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-            <button type="submit" className="crm-btn crm-btn-primary">Save Product</button>
+            <button type="submit" className="crm-btn crm-btn-primary">Save Item</button>
           </div>
         </form>
       </CrmModal>

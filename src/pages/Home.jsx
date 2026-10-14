@@ -267,15 +267,15 @@ const Home = () => {
           <div className="section-header">
             <div className="section-badge">
               <ShoppingBag size={15} />
-              <span>{language === 'mr' ? 'आयुर्वेदिक उत्पादने' : 'Products'}</span>
+              <span>{language === 'mr' ? 'निवडक' : 'Featured'}</span>
             </div>
             <h2>
-              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक उत्पादने' : 'Featured Nutraceutical Products'}
+              {language === 'mr' ? 'आमची निवडक आयुर्वेदिक फॉर्म्युला' : 'Featured Nutraceutical'}
             </h2>
             <p>
               {language === 'mr'
                 ? 'शास्त्रीय पद्धतीनुसार तयार केलेले १००% शुद्ध व सुरक्षित आयुर्वेदिक फॉर्म्युला.'
-                : 'Authentic botanical health products manufactured with stringent quality and safety.'}
+                : 'Authentic botanical health formulations manufactured with stringent quality and safety.'}
             </p>
           </div>
 
@@ -302,7 +302,7 @@ const Home = () => {
               }}
             >
               <ShoppingBag size={20} />
-              <span>{language === 'mr' ? 'सर्व उत्पादने पहा आणि ऑर्डर करा (Explore All Products)' : 'Explore All Products'}</span>
+              <span>{language === 'mr' ? 'सर्व पहा आणि ऑर्डर करा (Explore All)' : 'Explore All'}</span>
               <ArrowRight size={20} />
             </Link>
           </div>

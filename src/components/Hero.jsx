@@ -129,11 +129,6 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
       return;
     }
 
-    // Proactively pull latest slides from Cloud Firestore only if quota intact
-    if (!isFirestoreQuotaExhausted()) {
-      dbService.refreshFromFirebase('heroSlides').catch(() => {});
-    }
-
     const unsub = dbService.subscribe('heroSlides', (newSlides) => {
       if (Array.isArray(newSlides) && newSlides.length > 0) {
         const active = newSlides.filter((s) => s.status !== 'inactive');

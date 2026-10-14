@@ -285,7 +285,7 @@ export default function LeadList() {
     { header: 'Name', key: 'customerName' },
     { header: 'Mobile', key: 'mobile' },
     { header: 'Source', key: 'source' },
-    { header: 'Product', key: 'interestedProduct' },
+    { header: 'Formula', key: 'interestedProduct' },
     { header: 'Status', key: 'leadStatus' },
     { header: 'Priority', key: 'priority' },
     { header: 'Created', key: 'createdDate' }
@@ -319,7 +319,7 @@ export default function LeadList() {
             <Search size={16} color="#64748b" />
             <input
               type="text"
-              placeholder="Search by lead name, phone, product, ID..."
+              placeholder="Search by lead name, phone, formula, ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -361,7 +361,7 @@ export default function LeadList() {
                 <th>Lead ID</th>
                 <th>Patient / Inquirer</th>
                 <th>Contact</th>
-                <th>Interested Product</th>
+                <th>Interested Formula</th>
                 <th>Source</th>
                 <th>Priority</th>
                 <th>Status</th>
@@ -611,7 +611,7 @@ export default function LeadList() {
               </div>
 
               <div className="crm-form-group">
-                <label className="crm-form-label">Interested Product / Category</label>
+                <label className="crm-form-label">Interested Formula / Category</label>
                 <select
                   className="crm-form-select"
                   value={editingLead.interestedProduct}
@@ -787,7 +787,7 @@ export default function LeadList() {
             </div>
 
             <div className="crm-form-group">
-              <label className="crm-form-label">Interested Product / Category</label>
+              <label className="crm-form-label">Interested Formula / Category</label>
               <select
                 className="crm-form-select"
                 value={formData.interestedProduct}

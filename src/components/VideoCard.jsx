@@ -75,7 +75,8 @@ const VideoCard = ({ video }) => {
       <video
         ref={videoRef}
         src={`${video.videoUrl}#t=0.5`}
-        preload="auto"
+        poster={video.thumbnail || video.fallbackThumbnail}
+        preload="none"
         playsInline
         muted={!isPlaying}
         controls={isPlaying}

@@ -233,7 +233,7 @@ const ProductCard = ({ product }) => {
         }}>
           {(product.isCombo !== false && (product.isCombo || effectivePrice >= 3000))
             ? (language === 'mr' ? 'कॉम्बो पॅक • मोफत डिलिव्हरी' : 'Combo Pack • Free Delivery')
-            : (language === 'mr' ? 'सिंगल पॅक • मोफत डिलिव्हरी' : 'Single Product • Free Delivery')}
+            : (language === 'mr' ? 'सिंगल पॅक • मोफत डिलिव्हरी' : 'Single Pack • Free Delivery')}
         </div>
 
         {/* Price Row */}

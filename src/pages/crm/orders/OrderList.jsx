@@ -442,7 +442,7 @@ export default function OrderList() {
               <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
-                <th>Products & Quantity</th>
+                <th>Items & Quantity</th>
                 <th>Total Value</th>
                 <th>Payment Status</th>
                 <th>Order Status</th>
@@ -486,7 +486,7 @@ export default function OrderList() {
                     <td style={{ maxWidth: '240px' }}>
                       {(order.products || order.items || []).map((p, idx) => (
                         <div key={idx} style={{ fontSize: '0.82rem' }}>
-                          • {p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Product'} × {p.quantity || 1}
+                          • {p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Formula'} × {p.quantity || 1}
                         </div>
                       ))}
                     </td>
@@ -658,7 +658,7 @@ export default function OrderList() {
                   {(selectedOrder.products || selectedOrder.items || []).map((p, idx) => (
                     <tr key={idx}>
                       <td>
-                        <strong>{p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Wellness Product'}</strong>
+                        <strong>{p.name || p.nameMr || p.nameEn || p.title || 'Nutraceutical Wellness Formula'}</strong>
                       </td>
                       <td style={{ textAlign: 'center' }}>{p.quantity || 1}</td>
                       <td style={{ textAlign: 'right' }}>{formatCurrency(p.price || 0)}</td>
@@ -763,14 +763,14 @@ export default function OrderList() {
             </div>
 
             <div className="crm-form-group">
-              <label className="crm-form-label">Select Product *</label>
+              <label className="crm-form-label">Select Item *</label>
               <select
                 className="crm-form-select"
                 required
                 value={newOrderForm.productId}
                 onChange={(e) => setNewOrderForm({ ...newOrderForm, productId: e.target.value })}
               >
-                <option value="">-- Select Product --</option>
+                <option value="">-- Select Item --</option>
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name} ({formatCurrency(p.price)})

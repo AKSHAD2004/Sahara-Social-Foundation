@@ -272,7 +272,7 @@ export default function Customer360Modal({ customer, isOpen, onClose, onRefresh 
                     <thead>
                       <tr>
                         <th>Order ID</th>
-                        <th>Products</th>
+                        <th>Items</th>
                         <th>Amount</th>
                         <th>Payment Status</th>
                         <th>Order Status</th>

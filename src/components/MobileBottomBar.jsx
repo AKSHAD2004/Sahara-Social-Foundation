@@ -46,10 +46,10 @@ const MobileBottomBar = ({ onOpenConsultation }) => {
         <Link
           to="/shop"
           className={`mobile-bottom-item bottom-item-shop ${location.pathname === '/shop' ? 'active' : ''}`}
-          aria-label="Shop Products"
+          aria-label="Shop"
         >
           <ShoppingBag size={20} />
-          <span>{language === 'mr' ? 'उत्पादने' : 'Products'}</span>
+          <span>{language === 'mr' ? 'खरेदी' : 'Shop'}</span>
         </Link>
 
         {/* Counseling Consultation */}
