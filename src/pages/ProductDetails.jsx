@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ShoppingCart, 
@@ -23,7 +23,7 @@ import { dbService } from '../services/db';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { getComboItems } from '../utils/comboHelper';
+import { getComboItems, getComboChildProducts } from '../utils/comboHelper';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -32,7 +32,6 @@ const ProductDetails = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editFormData, setEditFormData] = useState({
     name: '',
@@ -62,9 +61,6 @@ const ProductDetails = () => {
     return base;
   });
 
-  useEffect(() => {
-    setSelectedImage(null);
-  }, [id]);
 
   useEffect(() => {
     const unsub = dbService.subscribe('products', (dbProducts) => {
@@ -122,7 +118,17 @@ const ProductDetails = () => {
     rating: rawProduct.rating || staticMeta.rating || 4.8,
     reviewsCount: rawProduct.reviewsCount || staticMeta.reviewsCount || 100,
     badgeEn: rawProduct.badgeEn || staticMeta.badgeEn || 'Official',
-    badgeMr: rawProduct.badgeMr || staticMeta.badgeMr || 'अधिकृत'
+    badgeMr: rawProduct.badgeMr || staticMeta.badgeMr || 'अधिकृत',
+    composition: staticMeta.composition || rawProduct.composition || null,
+    gallery: (staticMeta.gallery && staticMeta.gallery.length > 0) ? staticMeta.gallery : (rawProduct.gallery || []),
+    supportiveIn: staticMeta.supportiveIn || rawProduct.supportiveIn || null,
+    netVol: staticMeta.netVol || rawProduct.netVol || '',
+    brochureSubtitle: staticMeta.brochureSubtitle || rawProduct.brochureSubtitle || '',
+    brochureSubtitleMr: staticMeta.brochureSubtitleMr || rawProduct.brochureSubtitleMr || '',
+    guidanceNote: staticMeta.guidanceNote || rawProduct.guidanceNote || '',
+    guidanceNoteMr: staticMeta.guidanceNoteMr || rawProduct.guidanceNoteMr || '',
+    dosageEn: staticMeta.dosageEn || rawProduct.dosageEn || '',
+    dosageMr: staticMeta.dosageMr || rawProduct.dosageMr || ''
   };
 
   const comboItems = getComboItems(product);
@@ -172,26 +178,118 @@ const ProductDetails = () => {
     navigate('/checkout');
   };
 
-  // Build product list for next / prev swiping
-  const currentProductIndex = productsList.findIndex(
-    (p) => p.id === product.id || p.sku === product.sku || p.alias === product.id
-  );
+  // Resolve child products if this is a combo kit
+  const childProducts = useMemo(() => {
+    return getComboChildProducts(product, productsData);
+  }, [product]);
 
-  const goToPrevProduct = () => {
-    if (productsList.length <= 1) return;
-    const prevIdx = (currentProductIndex - 1 + productsList.length) % productsList.length;
-    const target = productsList[prevIdx];
-    navigate(`/product/${target.id || target.alias || target.sku}`);
+  // Build the complete slides array for THIS product (images / combo / catalogue)
+  const slides = useMemo(() => {
+    const list = [];
+    if (comboItems && comboItems.length >= 2) {
+      // Slide 0: Complete Combo Kit View
+      list.push({
+        key: 'combo',
+        type: 'combo',
+        nameEn: product.nameEn || product.name,
+        nameMr: product.nameMr || product.name,
+        badgeEn: 'Full Combo Kit',
+        badgeMr: 'संपूर्ण किट',
+        image: null,
+        childProduct: null
+      });
+
+      // Child Product Slides
+      comboItems.forEach((cItem, cIdx) => {
+        const matchedChild = childProducts.find(
+          (cp) => cp && (cp.id === cItem.productId || (cItem.name && cp.nameEn && cItem.name.toLowerCase().includes(cp.nameEn.toLowerCase())))
+        ) || childProducts[cIdx] || null;
+
+        list.push({
+          key: `child-${cIdx}`,
+          type: 'child',
+          nameEn: cItem.name,
+          nameMr: cItem.nameMr || cItem.name,
+          badgeEn: `Item ${cIdx + 1} of Combo`,
+          badgeMr: `किटमधील घटक ${cIdx + 1}`,
+          image: cItem.image,
+          fallback: cItem.fallback,
+          childProduct: matchedChild
+        });
+      });
+
+      // Additional brochure/catalogue slides
+      if (product.gallery && product.gallery.length > 0) {
+        product.gallery.forEach((gImg, gIdx) => {
+          list.push({
+            key: `gal-${gIdx}`,
+            type: 'gallery',
+            nameEn: `Catalogue Slide ${gIdx + 1}`,
+            nameMr: `माहिती पत्रक ${gIdx + 1}`,
+            badgeEn: `Slide ${gIdx + 1}`,
+            badgeMr: `पत्रक ${gIdx + 1}`,
+            image: gImg,
+            fallback: product.fallbackImage,
+            childProduct: null
+          });
+        });
+      }
+    } else {
+      // Single product
+      list.push({
+        key: 'main',
+        type: 'main',
+        nameEn: product.nameEn || product.name,
+        nameMr: product.nameMr || product.name,
+        badgeEn: product.badgeEn || 'Official',
+        badgeMr: product.badgeMr || 'अधिकृत',
+        image: product.image,
+        fallback: product.fallbackImage,
+        childProduct: product
+      });
+
+      if (product.gallery && product.gallery.length > 0) {
+        product.gallery.forEach((gImg, gIdx) => {
+          list.push({
+            key: `gal-${gIdx}`,
+            type: 'gallery',
+            nameEn: `Catalogue Slide ${gIdx + 1}`,
+            nameMr: `माहिती पत्रक ${gIdx + 1}`,
+            badgeEn: `Slide ${gIdx + 1}`,
+            badgeMr: `पत्रक ${gIdx + 1}`,
+            image: gImg,
+            fallback: product.fallbackImage,
+            childProduct: product
+          });
+        });
+      }
+    }
+    return list;
+  }, [product, comboItems, childProducts]);
+
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
+  // Reset slide index on product change
+  useEffect(() => {
+    setCurrentSlideIndex(0);
+  }, [id]);
+
+  const currentSlide = slides[currentSlideIndex] || slides[0] || {};
+  const activeChildProduct = currentSlide.childProduct || null;
+  const displayProduct = activeChildProduct || product;
+
+  // Arrow navigation: Cycles through images of THIS product
+  const goToPrevSlide = () => {
+    if (slides.length <= 1) return;
+    setCurrentSlideIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  const goToNextProduct = () => {
-    if (productsList.length <= 1) return;
-    const nextIdx = (currentProductIndex + 1) % productsList.length;
-    const target = productsList[nextIdx];
-    navigate(`/product/${target.id || target.alias || target.sku}`);
+  const goToNextSlide = () => {
+    if (slides.length <= 1) return;
+    setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
   };
 
-  // Touch Swipe Gesture State & Handlers
+  // Touch Swipe Gesture State & Handlers (swipes between slides/images of THIS product)
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndX, setTouchEndX] = useState(null);
 
@@ -213,11 +311,11 @@ const ProductDetails = () => {
     const deltaX = touchStartX - touchEndX;
     const minSwipeDistance = 45; // pixels
     if (deltaX > minSwipeDistance) {
-      // Swiped Left -> go to Next product
-      goToNextProduct();
+      // Swiped Left -> go to Next slide
+      goToNextSlide();
     } else if (deltaX < -minSwipeDistance) {
-      // Swiped Right -> go to Previous product
-      goToPrevProduct();
+      // Swiped Right -> go to Previous slide
+      goToPrevSlide();
     }
     setTouchStartX(null);
     setTouchEndX(null);
@@ -284,15 +382,15 @@ const ProductDetails = () => {
               }}
               title="Swipe left/right to view others"
             >
-              {/* Previous Product Arrow */}
-              {productsList.length > 1 && (
+              {/* Previous Slide Arrow */}
+              {slides.length > 1 && (
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    goToPrevProduct();
+                    goToPrevSlide();
                   }}
-                  aria-label="Previous"
+                  aria-label="Previous image"
                   style={{
                     position: 'absolute',
                     left: '8px',
@@ -319,15 +417,15 @@ const ProductDetails = () => {
                 </button>
               )}
 
-              {/* Next Product Arrow */}
-              {productsList.length > 1 && (
+              {/* Next Slide Arrow */}
+              {slides.length > 1 && (
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    goToNextProduct();
+                    goToNextSlide();
                   }}
-                  aria-label="Next"
+                  aria-label="Next image"
                   style={{
                     position: 'absolute',
                     right: '8px',
@@ -353,7 +451,9 @@ const ProductDetails = () => {
                   <ChevronRight size={18} />
                 </button>
               )}
-              {comboItems && comboItems.length >= 2 && (!selectedImage || selectedImage === 'combo') ? (
+
+              {/* Main Slide Image Render */}
+              {currentSlide.type === 'combo' && comboItems && comboItems.length >= 2 ? (
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -443,12 +543,12 @@ const ProductDetails = () => {
                 </div>
               ) : (
                 <img
-                  src={selectedImage || product.image}
+                  src={currentSlide.image || product.image}
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = product.fallbackImage;
+                    e.target.src = currentSlide.fallback || product.fallbackImage;
                   }}
-                  alt={product.nameMr || product.nameEn}
+                  alt={language === 'mr' ? (currentSlide.nameMr || product.nameMr) : (currentSlide.nameEn || product.nameEn)}
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
@@ -458,27 +558,46 @@ const ProductDetails = () => {
                   }}
                 />
               )}
-              {product.badgeEn && (
+
+              {/* Badge on top-left of image */}
+              <div style={{
+                position: 'absolute',
+                top: '0.85rem',
+                left: '0.85rem',
+                backgroundColor: '#006B2D',
+                color: '#ffffff',
+                padding: '0.3rem 0.75rem',
+                borderRadius: '6px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                boxShadow: '0 2px 6px rgba(0, 107, 45, 0.25)',
+                zIndex: 3
+              }}>
+                {language === 'mr' ? (currentSlide.badgeMr || product.badgeMr) : (currentSlide.badgeEn || product.badgeEn)}
+              </div>
+
+              {/* Slide Counter on bottom-right */}
+              {slides.length > 1 && (
                 <div style={{
                   position: 'absolute',
-                  top: '0.85rem',
-                  left: '0.85rem',
-                  backgroundColor: '#006B2D',
+                  bottom: '0.65rem',
+                  right: '0.85rem',
+                  backgroundColor: 'rgba(23, 37, 27, 0.75)',
                   color: '#ffffff',
-                  padding: '0.3rem 0.75rem',
-                  borderRadius: '6px',
-                  fontSize: '0.74rem',
+                  padding: '0.2rem 0.6rem',
+                  borderRadius: '12px',
+                  fontSize: '0.72rem',
                   fontWeight: 700,
-                  boxShadow: '0 2px 6px rgba(0, 107, 45, 0.25)',
-                  zIndex: 3
+                  zIndex: 3,
+                  letterSpacing: '0.04em'
                 }}>
-                  {language === 'mr' ? product.badgeMr : product.badgeEn}
+                  {currentSlideIndex + 1} / {slides.length}
                 </div>
               )}
             </div>
 
-            {/* Product Swipe Indicator Dots */}
-            {productsList.length > 1 && (
+            {/* Slide Indicator Dots */}
+            {slides.length > 1 && (
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -486,14 +605,14 @@ const ProductDetails = () => {
                 gap: '6px',
                 marginBottom: '1rem'
               }}>
-                {productsList.map((p, pIdx) => {
-                  const isCurrent = pIdx === currentProductIndex;
+                {slides.map((s, sIdx) => {
+                  const isCurrent = sIdx === currentSlideIndex;
                   return (
                     <button
-                      key={p.id || pIdx}
+                      key={s.key || sIdx}
                       type="button"
-                      onClick={() => navigate(`/product/${p.id || p.alias || p.sku}`)}
-                      aria-label={`Go to product ${pIdx + 1}`}
+                      onClick={() => setCurrentSlideIndex(sIdx)}
+                      aria-label={`Slide ${sIdx + 1}`}
                       style={{
                         width: isCurrent ? '22px' : '7px',
                         height: '7px',
@@ -504,7 +623,7 @@ const ProductDetails = () => {
                         cursor: 'pointer',
                         transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
                       }}
-                      title={p.nameEn || p.name}
+                      title={language === 'mr' ? (s.nameMr || s.nameEn) : s.nameEn}
                     />
                   );
                 })}
@@ -512,114 +631,78 @@ const ProductDetails = () => {
             )}
 
             {/* Gallery Thumbnails Strip */}
-            {comboItems && comboItems.length >= 2 ? (
+            {slides.length > 1 && (
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedImage('combo')}
-                  style={{
-                    border: (!selectedImage || selectedImage === 'combo') ? '2px solid #006B2D' : '1px solid #E1E9DF',
-                    borderRadius: '8px',
-                    padding: '3px 6px',
-                    backgroundColor: '#ffffff',
-                    cursor: 'pointer',
-                    height: '60px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    color: '#006B2D',
-                    flexShrink: 0
-                  }}
-                  title="Combo View"
-                >
-                  <img src={comboItems[0].image} alt="" style={{ height: '42px', width: '22px', objectFit: 'contain' }} />
-                  <span style={{ fontWeight: 800 }}>+</span>
-                  <img src={comboItems[1].image} alt="" style={{ height: '42px', width: '22px', objectFit: 'contain' }} />
-                </button>
-                {comboItems.map((item, idx) => (
-                  <button
-                    key={`combo-thumb-${idx}`}
-                    type="button"
-                    onClick={() => setSelectedImage(item.image)}
-                    style={{
-                      border: selectedImage === item.image ? '2px solid #006B2D' : '1px solid #E1E9DF',
-                      borderRadius: '8px',
-                      padding: '3px',
-                      backgroundColor: '#ffffff',
-                      cursor: 'pointer',
-                      width: '60px',
-                      height: '60px',
-                      flexShrink: 0
-                    }}
-                    title={item.name}
-                  >
-                    <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  </button>
-                ))}
-                {product.gallery && product.gallery.map((gImg, idx) => (
-                  <button
-                    key={`gal-${idx}`}
-                    type="button"
-                    onClick={() => setSelectedImage(gImg)}
-                    style={{
-                      border: selectedImage === gImg ? '2px solid #006B2D' : '1px solid #E1E9DF',
-                      borderRadius: '8px',
-                      padding: '3px',
-                      backgroundColor: '#ffffff',
-                      cursor: 'pointer',
-                      width: '60px',
-                      height: '60px',
-                      flexShrink: 0
-                    }}
-                    title={`Slide ${idx + 1}`}
-                  >
-                    <img src={gImg} alt={`Slide ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
-                  </button>
-                ))}
+                {slides.map((slide, sIdx) => {
+                  const isSelected = currentSlideIndex === sIdx;
+                  if (slide.type === 'combo') {
+                    return (
+                      <button
+                        key="thumb-combo"
+                        type="button"
+                        onClick={() => setCurrentSlideIndex(sIdx)}
+                        style={{
+                          border: isSelected ? '2px solid #006B2D' : '1px solid #E1E9DF',
+                          borderRadius: '8px',
+                          padding: '3px 6px',
+                          backgroundColor: '#ffffff',
+                          cursor: 'pointer',
+                          height: '60px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          color: '#006B2D',
+                          flexShrink: 0,
+                          boxShadow: isSelected ? '0 2px 8px rgba(0, 107, 45, 0.2)' : 'none'
+                        }}
+                        title={language === 'mr' ? 'संपूर्ण किट' : 'Full Combo Kit'}
+                      >
+                        <img src={comboItems[0].image} alt="" style={{ height: '42px', width: '22px', objectFit: 'contain' }} />
+                        <span style={{ fontWeight: 800 }}>+</span>
+                        <img src={comboItems[1].image} alt="" style={{ height: '42px', width: '22px', objectFit: 'contain' }} />
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={slide.key || sIdx}
+                      type="button"
+                      onClick={() => setCurrentSlideIndex(sIdx)}
+                      style={{
+                        border: isSelected ? '2px solid #006B2D' : '1px solid #E1E9DF',
+                        borderRadius: '8px',
+                        padding: '3px',
+                        backgroundColor: '#ffffff',
+                        cursor: 'pointer',
+                        width: '60px',
+                        height: '60px',
+                        flexShrink: 0,
+                        boxShadow: isSelected ? '0 2px 8px rgba(0, 107, 45, 0.2)' : 'none'
+                      }}
+                      title={language === 'mr' ? (slide.nameMr || slide.nameEn) : slide.nameEn}
+                    >
+                      <img
+                        src={slide.image}
+                        alt={slide.nameEn || `Slide ${sIdx + 1}`}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          if (slide.fallback) e.target.src = slide.fallback;
+                        }}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: slide.type === 'gallery' ? 'cover' : 'contain',
+                          borderRadius: '4px'
+                        }}
+                      />
+                    </button>
+                  );
+                })}
               </div>
-            ) : product.gallery && product.gallery.length > 0 ? (
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedImage(product.image)}
-                  style={{
-                    border: (!selectedImage || selectedImage === product.image) ? '2px solid #006B2D' : '1px solid #E1E9DF',
-                    borderRadius: '8px',
-                    padding: '3px',
-                    backgroundColor: '#ffffff',
-                    cursor: 'pointer',
-                    width: '60px',
-                    height: '60px',
-                    flexShrink: 0
-                  }}
-                  title="Main View"
-                >
-                  <img src={product.image} alt="Main View" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                </button>
-                {product.gallery.map((gImg, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setSelectedImage(gImg)}
-                    style={{
-                      border: selectedImage === gImg ? '2px solid #006B2D' : '1px solid #E1E9DF',
-                      borderRadius: '8px',
-                      padding: '3px',
-                      backgroundColor: '#ffffff',
-                      cursor: 'pointer',
-                      width: '60px',
-                      height: '60px',
-                      flexShrink: 0
-                    }}
-                    title={`Catalogue Slide ${idx + 1}`}
-                  >
-                    <img src={gImg} alt={`Slide ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
-                  </button>
-                ))}
-              </div>
-            ) : null}
+            )}
 
             {product.nutrifeelUrl && (
               <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
@@ -680,7 +763,7 @@ const ProductDetails = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div style={{ fontSize: '0.78rem', color: '#159B32', fontWeight: 700, textTransform: 'uppercase' }}>
-                {language === 'mr' ? product.categoryNameMr : product.categoryNameEn} • SKU: {product.sku}
+                {language === 'mr' ? displayProduct.categoryNameMr : displayProduct.categoryNameEn} • SKU: {displayProduct.sku}
               </div>
               <button
                 type="button"
@@ -704,8 +787,32 @@ const ProductDetails = () => {
               </button>
             </div>
 
+            {/* Active Child Product Indicator Badge */}
+            {activeChildProduct && (
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                backgroundColor: '#e6f4ea',
+                color: '#006B2D',
+                padding: '0.25rem 0.75rem',
+                borderRadius: '16px',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                marginBottom: '0.5rem',
+                border: '1px solid #c2f5d2'
+              }}>
+                <Sparkles size={13} />
+                <span>
+                  {language === 'mr'
+                    ? `या किटमधील घटक तपशील: ${displayProduct.nameMr || displayProduct.nameEn}`
+                    : `Viewing Item in Combo: ${displayProduct.nameEn}`}
+                </span>
+              </div>
+            )}
+
             <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', color: '#006B2D', fontWeight: 800, lineHeight: 1.25, marginBottom: '0.65rem', fontFamily: 'var(--font-heading)' }}>
-              {language === 'mr' ? product.nameMr : product.nameEn}
+              {language === 'mr' ? displayProduct.nameMr : displayProduct.nameEn}
             </h1>
 
             {/* Rating Stars */}
@@ -715,9 +822,74 @@ const ProductDetails = () => {
                   <Star key={i} size={16} fill="#FFC928" color="#FFC928" />
                 ))}
               </div>
-              <span style={{ fontWeight: 700, color: '#17251B', fontSize: '0.9rem' }}>{product.rating}</span>
-              <span style={{ color: '#5F6B61', fontSize: '0.8rem' }}>({product.reviewsCount} {language === 'mr' ? 'अभिप्राय' : 'reviews'})</span>
+              <span style={{ fontWeight: 700, color: '#17251B', fontSize: '0.9rem' }}>{displayProduct.rating || product.rating}</span>
+              <span style={{ color: '#5F6B61', fontSize: '0.8rem' }}>({displayProduct.reviewsCount || product.reviewsCount} {language === 'mr' ? 'अभिप्राय' : 'reviews'})</span>
             </div>
+
+            {/* Combo Item Quick Switcher Pill Tabs */}
+            {comboItems && comboItems.length >= 2 && (
+              <div style={{
+                display: 'flex',
+                gap: '0.45rem',
+                marginBottom: '1.1rem',
+                flexWrap: 'wrap',
+                backgroundColor: '#F3F8F1',
+                padding: '0.35rem',
+                borderRadius: '12px',
+                border: '1px solid #D5E5D1'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setCurrentSlideIndex(0)}
+                  style={{
+                    flex: '1 1 auto',
+                    padding: '0.45rem 0.8rem',
+                    borderRadius: '8px',
+                    border: currentSlideIndex === 0 ? '1.5px solid #006B2D' : '1px solid transparent',
+                    backgroundColor: currentSlideIndex === 0 ? '#006B2D' : '#ffffff',
+                    color: currentSlideIndex === 0 ? '#ffffff' : '#006B2D',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    boxShadow: currentSlideIndex === 0 ? '0 2px 6px rgba(0, 107, 45, 0.25)' : 'none'
+                  }}
+                >
+                  <Sparkles size={14} />
+                  <span>{language === 'mr' ? 'संपूर्ण किट (Full Combo)' : 'Full Combo Overview'}</span>
+                </button>
+                {comboItems.map((cItem, cIdx) => {
+                  const slideIdx = 1 + cIdx;
+                  const isAct = currentSlideIndex === slideIdx;
+                  return (
+                    <button
+                      key={cIdx}
+                      type="button"
+                      onClick={() => setCurrentSlideIndex(slideIdx)}
+                      style={{
+                        flex: '1 1 auto',
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '8px',
+                        border: isAct ? '1.5px solid #006B2D' : '1px solid transparent',
+                        backgroundColor: isAct ? '#006B2D' : '#ffffff',
+                        color: isAct ? '#ffffff' : '#006B2D',
+                        fontWeight: 700,
+                        fontSize: '0.82rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        boxShadow: isAct ? '0 2px 6px rgba(0, 107, 45, 0.25)' : 'none'
+                      }}
+                    >
+                      {language === 'mr' ? `घटक ${cIdx + 1}: ${cItem.nameMr || cItem.name}` : `Item ${cIdx + 1}: ${cItem.name}`}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Price Box */}
             <div style={{
@@ -732,13 +904,22 @@ const ProductDetails = () => {
               flexWrap: 'wrap',
               gap: '0.75rem'
             }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.65rem' }}>
-                <span style={{ fontSize: '2.1rem', fontWeight: 800, color: '#006B2D' }}>
-                  ₹{product.price}
-                </span>
-                <span style={{ fontSize: '1rem', color: '#5F6B61', textDecoration: 'line-through' }}>
-                  ₹{product.originalPrice || (product.price >= 3000 ? 4000 : 2000)}
-                </span>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.65rem' }}>
+                  <span style={{ fontSize: '2.1rem', fontWeight: 800, color: '#006B2D' }}>
+                    ₹{product.price}
+                  </span>
+                  <span style={{ fontSize: '1rem', color: '#5F6B61', textDecoration: 'line-through' }}>
+                    ₹{product.originalPrice || (product.price >= 3000 ? 4000 : 2000)}
+                  </span>
+                </div>
+                {activeChildProduct && (
+                  <div style={{ fontSize: '0.75rem', color: '#15803D', fontWeight: 600, marginTop: '2px' }}>
+                    {language === 'mr'
+                      ? 'हा संपूर्ण किटचा दर आहे (दोन्ही उत्पादने समाविष्ट)'
+                      : 'Price is for the complete combo kit (both items included)'}
+                  </div>
+                )}
               </div>
 
               <span style={{ 
@@ -775,7 +956,7 @@ const ProductDetails = () => {
 
             {/* Product Description */}
             <p style={{ fontSize: '0.95rem', color: '#172033', lineHeight: 1.65, marginBottom: '1.35rem' }}>
-              {language === 'mr' ? product.descriptionMr : product.descriptionEn}
+              {language === 'mr' ? displayProduct.descriptionMr : displayProduct.descriptionEn}
             </p>
 
             {/* Combo Kit Contents (if combo product) */}
@@ -787,32 +968,64 @@ const ProductDetails = () => {
                 padding: '0.9rem 1.1rem',
                 marginBottom: '1.35rem'
               }}>
-                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#166534', marginBottom: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Sparkles size={16} />
-                  <span>{language === 'mr' ? 'या किटमधील घटक:' : 'Combo Kit Includes:'}</span>
+                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#166534', marginBottom: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Sparkles size={16} />
+                    <span>{language === 'mr' ? 'या किटमधील घटक (तपशीलासाठी क्लिक करा):' : 'Combo Kit Includes (Click to view details):'}</span>
+                  </div>
+                  {activeChildProduct && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentSlideIndex(0)}
+                      style={{
+                        backgroundColor: '#DCFCE7',
+                        border: '1px solid #86EFAC',
+                        color: '#15803D',
+                        borderRadius: '6px',
+                        padding: '2px 8px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {language === 'mr' ? 'संपूर्ण किट पहा' : 'View Full Kit'}
+                    </button>
+                  )}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.65rem' }}>
-                  {comboItems.map((item, idx) => (
-                    <div key={idx} style={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #DCFCE7',
-                      borderRadius: '8px',
-                      padding: '0.5rem 0.75rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.65rem'
-                    }}>
-                      <img src={item.image} alt={item.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-                      <div>
-                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#14532D' }}>
-                          {language === 'mr' ? (item.nameMr || item.name) : item.name}
-                        </div>
-                        <div style={{ fontSize: '0.72rem', color: '#15803D', fontWeight: 600 }}>
-                          {item.count > 1 ? `${item.count} Units Included` : '1 Unit Included'}
+                  {comboItems.map((item, idx) => {
+                    const slideIdx = 1 + idx;
+                    const isSelected = currentSlideIndex === slideIdx;
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => setCurrentSlideIndex(slideIdx)}
+                        style={{
+                          backgroundColor: isSelected ? '#DCFCE7' : '#ffffff',
+                          border: isSelected ? '1.5px solid #16A34A' : '1px solid #DCFCE7',
+                          borderRadius: '8px',
+                          padding: '0.5rem 0.75rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.65rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          boxShadow: isSelected ? '0 2px 8px rgba(22, 163, 74, 0.2)' : 'none'
+                        }}
+                        title={language === 'mr' ? 'सविस्तर माहिती पाहण्यासाठी क्लिक करा' : 'Click to view details'}
+                      >
+                        <img src={item.image} alt={item.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                        <div>
+                          <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#14532D' }}>
+                            {language === 'mr' ? (item.nameMr || item.name) : item.name}
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: '#15803D', fontWeight: 600 }}>
+                            {item.count > 1 ? `${item.count} Units Included` : '1 Unit Included'}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -934,10 +1147,12 @@ const ProductDetails = () => {
             boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)'
           }}>
             <h3 style={{ fontSize: '1.2rem', color: '#006B2D', fontWeight: 800, marginBottom: '1rem', fontFamily: 'var(--font-heading)' }}>
-              {language === 'mr' ? 'प्रमुख फायदे व वैशिष्ट्ये' : 'Key Health Benefits'}
+              {language === 'mr' 
+                ? (activeChildProduct ? `${displayProduct.nameMr || displayProduct.nameEn} चे प्रमुख फायदे` : 'प्रमुख फायदे व वैशिष्ट्ये') 
+                : (activeChildProduct ? `Key Benefits of ${displayProduct.nameEn}` : 'Key Health Benefits')}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-              {product.features?.map((feat, idx) => (
+              {(displayProduct.features || product.features)?.map((feat, idx) => (
                 <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.9rem', color: '#17251B' }}>
                   <CheckCircle2 size={16} style={{ color: '#159B32', flexShrink: 0, marginTop: '3px' }} />
                   <span>{language === 'mr' ? feat.mr : feat.en}</span>
@@ -958,7 +1173,7 @@ const ProductDetails = () => {
               {language === 'mr' ? 'सेवन पद्धती व मार्गदर्शिका' : 'Recommended Usage & Regimen'}
             </h3>
             <p style={{ fontSize: '0.92rem', color: '#5F6B61', lineHeight: 1.65, marginBottom: '1rem' }}>
-              {language === 'mr' ? product.dosageMr : product.dosageEn}
+              {language === 'mr' ? (displayProduct.dosageMr || product.dosageMr) : (displayProduct.dosageEn || product.dosageEn)}
             </p>
 
             <div style={{
@@ -978,6 +1193,225 @@ const ProductDetails = () => {
             </div>
           </div>
         </div>
+
+        {/* Supportive in / Clinical Indications Official Brochure Card */}
+        {((displayProduct.supportiveIn && displayProduct.supportiveIn.length > 0) || (product.supportiveIn && product.supportiveIn.length > 0)) && (
+          <div style={{
+            marginTop: '2rem',
+            backgroundColor: '#ffffff',
+            borderRadius: '20px',
+            padding: '1.75rem',
+            border: '1.5px solid #c3edd2',
+            boxShadow: '0 4px 18px rgba(0, 107, 45, 0.06)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+              marginBottom: '1.25rem',
+              borderBottom: '1px solid #E1E9DF',
+              paddingBottom: '0.85rem'
+            }}>
+              <div>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  color: '#006B2D',
+                  backgroundColor: '#e2faea',
+                  padding: '0.25rem 0.65rem',
+                  borderRadius: '20px',
+                  marginBottom: '0.35rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em'
+                }}>
+                  <ShieldCheck size={14} />
+                  <span>{language === 'mr' ? 'अधिकृत मार्गदर्शक माहिती' : 'Official Brochure Guide'}</span>
+                </div>
+                <h3 style={{ fontSize: '1.35rem', color: '#006B2D', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
+                  {language === 'mr' 
+                    ? `${displayProduct.nameMr || displayProduct.nameEn} : उपयुक्त व गुणकारी (Supportive in:)` 
+                    : `${displayProduct.nameEn} : Supportive in :`}
+                </h3>
+                {(displayProduct.brochureSubtitle || product.brochureSubtitle) && (
+                  <div style={{ fontSize: '0.84rem', color: '#5F6B61', marginTop: '0.25rem', fontStyle: 'italic' }}>
+                    {language === 'mr' 
+                      ? (displayProduct.brochureSubtitleMr || product.brochureSubtitleMr || displayProduct.brochureSubtitle || product.brochureSubtitle) 
+                      : (displayProduct.brochureSubtitle || product.brochureSubtitle)}
+                  </div>
+                )}
+              </div>
+
+              {(displayProduct.netVol || product.netVol) && (
+                <div style={{
+                  backgroundColor: '#F3F8F1',
+                  padding: '0.45rem 0.95rem',
+                  borderRadius: '10px',
+                  border: '1.5px solid #c3edd2',
+                  fontSize: '0.88rem',
+                  fontWeight: 800,
+                  color: '#006B2D',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}>
+                  <span>{language === 'mr' ? `निव्वळ प्रमाण: ${displayProduct.netVol || product.netVol}` : `Net Vol / Qty: ${displayProduct.netVol || product.netVol}`}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Indications Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '0.85rem',
+              marginBottom: '1.25rem'
+            }}>
+              {(displayProduct.supportiveIn || product.supportiveIn).map((item, sIdx) => (
+                <div
+                  key={sIdx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.75rem',
+                    backgroundColor: '#F8FAF7',
+                    padding: '0.85rem 1rem',
+                    borderRadius: '12px',
+                    border: '1px solid #E1E9DF',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <div style={{
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '50%',
+                    backgroundColor: '#006B2D',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    flexShrink: 0,
+                    marginTop: '2px',
+                    boxShadow: '0 2px 5px rgba(0, 107, 45, 0.25)'
+                  }}>
+                    ✓
+                  </div>
+                  <span style={{ fontSize: '0.9rem', color: '#17251B', fontWeight: 600, lineHeight: 1.45 }}>
+                    {language === 'mr' ? (item.mr || item.en) : item.en}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Official Guidance & Medical Consultation Note Footnote */}
+            <div style={{
+              backgroundColor: '#0b396b',
+              color: '#ffffff',
+              padding: '0.85rem 1.25rem',
+              borderRadius: '12px',
+              fontSize: '0.85rem',
+              lineHeight: 1.5,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.85rem',
+              flexWrap: 'wrap',
+              boxShadow: '0 3px 10px rgba(11, 57, 107, 0.25)'
+            }}>
+              <div style={{
+                backgroundColor: '#FFC928',
+                color: '#17251B',
+                fontSize: '0.74rem',
+                fontWeight: 800,
+                padding: '0.25rem 0.6rem',
+                borderRadius: '6px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                flexShrink: 0
+              }}>
+                {language === 'mr' ? 'तज्ज्ञ सल्ला' : 'CLINICAL NOTE'}
+              </div>
+              <div style={{ flex: 1, minWidth: '240px', fontWeight: 500 }}>
+                {language === 'mr'
+                  ? (displayProduct.guidanceNoteMr || product.guidanceNoteMr || 'टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.')
+                  : (displayProduct.guidanceNote || product.guidanceNote || 'NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)')}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Active Botanical Ingredients / Formulation Card */}
+        {((displayProduct.composition && displayProduct.composition.length > 0) || (product.composition && product.composition.length > 0)) && (
+          <div style={{
+            marginTop: '2rem',
+            backgroundColor: '#ffffff',
+            borderRadius: '20px',
+            padding: '1.75rem',
+            border: '1px solid #E1E9DF',
+            boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
+              <div style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '10px',
+                backgroundColor: '#e2faea',
+                color: '#006B2D',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                <Sparkles size={18} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', color: '#006B2D', fontWeight: 800, margin: 0, fontFamily: 'var(--font-heading)' }}>
+                  {language === 'mr' 
+                    ? `${displayProduct.nameMr || displayProduct.nameEn} : सक्रिय आयुर्वेदिक घटक व कार्यप्रणाली`
+                    : `${displayProduct.nameEn} : Active Botanical Ingredients & Formulation Action`}
+                </h3>
+                <div style={{ fontSize: '0.8rem', color: '#5F6B61' }}>
+                  {language === 'mr' ? '१००% शुद्ध व शास्त्रीय पद्धतीने निवडलेल्या वनौषधींचा संगम' : '100% pure, scientifically standardized botanical extracts'}
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '1rem'
+            }}>
+              {(displayProduct.composition || product.composition).map((herb, hIdx) => (
+                <div
+                  key={hIdx}
+                  style={{
+                    backgroundColor: '#F3F8F1',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    border: '1px solid #E1E9DF',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#006B2D' }}>
+                    {language === 'mr' ? (herb.nameMr || herb.nameEn) : herb.nameEn}
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: '#17251B', lineHeight: 1.5 }}>
+                    {language === 'mr' ? (herb.benefitMr || herb.benefitEn) : herb.benefitEn}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Product Description, Science & Catalogue Gallery Images (Nutrifeel Product Description Images) */}
         {product.gallery && product.gallery.length > 0 && (
@@ -1066,7 +1500,13 @@ const ProductDetails = () => {
                     e.currentTarget.style.transform = 'translateY(0)';
                     e.currentTarget.style.boxShadow = '0 3px 12px rgba(0, 0, 0, 0.05)';
                   }}
-                  onClick={() => setSelectedImage(imgUrl)}
+                  onClick={() => {
+                    const gIdx = slides.findIndex((s) => s.image === imgUrl);
+                    if (gIdx !== -1) {
+                      setCurrentSlideIndex(gIdx);
+                    }
+                    window.scrollTo({ top: 120, behavior: 'smooth' });
+                  }}
                 >
                   <div style={{
                     width: '100%',

@@ -231,9 +231,11 @@ const ProductCard = ({ product }) => {
           fontWeight: 600,
           marginBottom: '0.5rem'
         }}>
-          {(product.isCombo !== false && (product.isCombo || effectivePrice >= 3000))
-            ? (language === 'mr' ? 'कॉम्बो पॅक • मोफत डिलिव्हरी' : 'Combo Pack • Free Delivery')
-            : (language === 'mr' ? 'सिंगल पॅक • मोफत डिलिव्हरी' : 'Single Pack • Free Delivery')}
+          {product.netVol 
+            ? `${product.netVol} • ${language === 'mr' ? 'मोफत डिलिव्हरी' : 'Free Delivery'}`
+            : ((product.isCombo !== false && (product.isCombo || effectivePrice >= 3000))
+                ? (language === 'mr' ? 'कॉम्बो किट • मोफत डिलिव्हरी' : 'Combo Kit • Free Delivery')
+                : (language === 'mr' ? 'सिंगल पॅक • मोफत डिलिव्हरी' : 'Single Pack • Free Delivery'))}
         </div>
 
         {/* Price Row */}

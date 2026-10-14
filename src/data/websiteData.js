@@ -271,6 +271,13 @@ export const productsData = [
       "https://nutrifeel.org/wp-content/uploads/hd19.jpeg"
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-d-formula/",
+    composition: [
+      { nameEn: "Methi (Fenugreek / Trigonella foenum-graecum)", nameMr: "मेथी", benefitEn: "Delays glucose digestion & enhances peripheral insulin sensitivity", benefitMr: "साखरेचे शोषण नियंत्रित करून इन्सुलिन कार्यक्षमता वाढवते" },
+      { nameEn: "Bael Leaves (Bilva Patra / Aegle marmelos)", nameMr: "बेलपत्र", benefitEn: "Protects pancreatic beta-cell viability & reduces glycation", benefitMr: "स्वादुपिंडातील बीटा पेशींचे रक्षण व पुनरुज्जीवन" },
+      { nameEn: "Ashwagandha (Withania somnifera)", nameMr: "अश्वगंधा", benefitEn: "Counters chronic diabetic stress, neuropathy & exhaustion", benefitMr: "मानसिक ताण, अशक्तपणा व नसांची दुर्बलता कमी करते" },
+      { nameEn: "Gudmar (Gymnema Sylvestre)", nameMr: "गुडमार (मधुनाशिनी)", benefitEn: "Blocks intestinal glucose absorption & curbs sweet cravings", benefitMr: "गोड पदार्थांची तीव्र इच्छा कमी करते व साखरेचे शोषण रोखते" },
+      { nameEn: "Jamun Seed & Vijaysar", nameMr: "जांभूळ बी व विजयसार", benefitEn: "Traditional glycemic regulators supporting healthy fasting sugar & HbA1c", benefitMr: "फास्टिंग शुगर व पोस्ट प्रँडियल शुगर वेगाने सामान्य पातळीवर आणते" }
+    ],
     inStock: true,
     badgeEn: "Nutrifeel Official",
     badgeMr: "न्युट्रीफील अधिकृत",
@@ -286,7 +293,20 @@ export const productsData = [
       { en: "Reduces fatigue, frequent thirst and urination", mr: "अशक्तपणा, वारंवार तहान व लघवीची समस्या कमी करते" }
     ],
     dosageEn: "10-15ml with warm water twice daily before meals. Call 8421154090 for personalized dietary guidelines.",
-    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. पथ्यासाठी ८४२११५४०९० वर संपर्क करा."
+    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. पथ्यासाठी ८४२११५४०९० वर संपर्क करा.",
+    netVol: "300 ml",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic / Herbal Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी व शुद्ध हर्बल संशोधन फॉर्म्युला",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Supports healthy blood glucose & HbA1c regulation", mr: "रक्तातील साखर व HbA1c नैसर्गिक पातळीवर आणण्यास मदत" },
+      { en: "Rejuvenates pancreatic beta cells & natural insulin response", mr: "स्वादुपिंडातील बीटा पेशींचे पुनरुज्जीवन व इन्सुलिन संवेदनशीलता सुधारणे" },
+      { en: "Reduces chronic diabetic fatigue, exhaustion & general weakness", mr: "मधुमेहामुळे येणारा तीव्र थकवा, अशक्तपणा व आळस कमी करते" },
+      { en: "Controls excessive thirst (Polydipsia) & frequent night urination", mr: "वारंवार लागणारी तहान व रात्रीची वारंवार लघवीची समस्या थांबवते" },
+      { en: "Protects vital organs from long-term diabetic complications", mr: "डोळे, किडनी व मज्जारज्जूचे मधुमेहाच्या दुष्परिणामांपासून संरक्षण" },
+      { en: "Reduces burning sensations & numbness in hands and feet", mr: "हात-पायांची जळजळ, मुंग्या येणे व बधिरपणा कमी करण्यास साहाय्यक" }
+    ]
   },
 
   // ==========================================
@@ -324,6 +344,13 @@ export const productsData = [
       "https://nutrifeel.org/wp-content/uploads/T10.jpg"
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-t-2-2/",
+    composition: [
+      { nameEn: "Botanical Green Tea Extract (Camellia sinensis)", nameMr: "शुद्ध ग्रीन टी अर्क", benefitEn: "Rich in epigallocatechin gallate (EGCG) antioxidants", benefitMr: "प्रतिकारशक्ती वाढवणारे उच्च दर्जाचे अँटीऑक्सिडंट्स" },
+      { nameEn: "Tulsi (Ocimum sanctum)", nameMr: "तुळस", benefitEn: "Respiratory clearance, tridosha balancer & adaptogen", benefitMr: "श्वसनमार्ग मोकळा करणे व त्रिदोष समतोल" },
+      { nameEn: "Dalchini (Cinnamon)", nameMr: "दालचिनी", benefitEn: "Promotes healthy blood circulation & lipid metabolic speed", benefitMr: "रक्ताभिसरण सुधारणे व रक्तातील चरबी कमी करणे" },
+      { nameEn: "Sunthi & Kali Mirch (Dry Ginger & Black Pepper)", nameMr: "सुंठ व काळी मिरी", benefitEn: "Stimulates deep digestive fire (Agni) & removes Ama toxins", benefitMr: "जठराग्नी प्रदीप्त करून शरीरातील आमदोष नष्ट करते" },
+      { nameEn: "Cardamom & Lemongrass", nameMr: "वेलची व गवती चहा", benefitEn: "Alkalizes digestion, relieves nausea & uplifts natural energy", benefitMr: "पचन शांत करणे व शरीराला ताजेतवाने ठेवणे" }
+    ],
     inStock: true,
     badgeEn: "Nutrifeel Official",
     badgeMr: "न्युट्रीफील अधिकृत",
@@ -339,7 +366,19 @@ export const productsData = [
       { en: "Accelerates absorption of liquid herbal extracts", mr: "इतर आयुर्वेदिक औषधांचे परिणाम गतिमान करतो" }
     ],
     dosageEn: "Dip 1 tea bag in 1 cup boiling water, infuse for 3-5 minutes. Drink morning & evening.",
-    dosageMr: "१ कप गरम पाण्यात १ टी-बॅग ३-५ मिनिटे ठेवून सकाळी व संध्याकाळी प्यावे."
+    dosageMr: "१ कप गरम पाण्यात १ टी-बॅग ३-५ मिनिटे ठेवून सकाळी व संध्याकाळी प्यावे.",
+    netVol: "60 Dip Bags (1 Box)",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic / Herbal Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी व शुद्ध हर्बल संशोधन फॉर्म्युला",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Flushes accumulated metabolic toxins, free radicals & uric acid", mr: "शरीरातील साचलेले विषारी घटक, युरिक अॅसिड व दूषित दोष बाहेर टाकणे" },
+      { en: "Stimulates deep digestive fire (Agni) & reduces bloating/gas", mr: "जठराग्नी प्रदीप्त करून अपचन, पोट फुगणे व गॅसेसचा त्रास दूर करणे" },
+      { en: "Balances Tridosha (Vata, Pitta, Kapha) & harmonizes body systems", mr: "वात, पित्त, कफ या त्रिदोषांचा नैसर्गिक समतोल राखण्यास मदत" },
+      { en: "Accelerates absorption & therapeutic efficacy of liquid extracts", mr: "इतर आयुर्वेदिक औषधांचे व अर्कांचे शरीरात शोषण वाढवणे" },
+      { en: "100% Caffeine-free natural antioxidant rejuvenation", mr: "१००% कॅफिन-मुक्त नैसर्गिक अँटीऑक्सिडंट्सने शरीराला ताजेतवाने ठेवणे" }
+    ]
   },
 
   // ==========================================
@@ -369,6 +408,12 @@ export const productsData = [
       "https://nutrifeel.org/wp-content/uploads/spraynew-2.jpeg"
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/spray-b-nico-formula/",
+    composition: [
+      { nameEn: "Jyotishmati (Celastrus paniculatus)", nameMr: "ज्योतिष्मती (मालकांगणी)", benefitEn: "Calms neuro-chemical craving signals in the brain", benefitMr: "मेंदूतील व्यसनाची तीव्र तलफ व अस्वस्थता शांत करते" },
+      { nameEn: "Vacha (Acorus calamus)", nameMr: "वचा", benefitEn: "Restores oral neuro-receptors and reduces habitual reflexes", benefitMr: "वारंवार तंबाखू किंवा गुटखा खाण्याची सवय मोडते" },
+      { nameEn: "Brahmi & Shankhpushpi", nameMr: "ब्राह्मी व शंखपुष्पी", benefitEn: "Counters withdrawal irritability, mood swings and restlessness", benefitMr: "व्यसन सोडताना होणारी चिडचिड व मानसिक ताण कमी करते" },
+      { nameEn: "Pudina Satva & Lavanga (Clove Oil)", nameMr: "पुदिना सत्व व लवंग", benefitEn: "Provides instantaneous oral freshness and alters tobacco taste", benefitMr: "तोंडात त्वरित ताजेतवानेपणा देऊन तंबाखूची चव विसरण्यास मदत" }
+    ],
     inStock: true,
     badgeEn: "Nutrifeel Official",
     badgeMr: "न्युट्रीफील अधिकृत",
@@ -384,7 +429,19 @@ export const productsData = [
       { en: "Reduces anxiety and oral addiction reflexes", mr: "मानसिक अस्वस्थता व वारंवार तंबाखू खाण्याची सवय मोडते" }
     ],
     dosageEn: "Spray 1-2 puffs in the mouth whenever craving arises. Call 8421154090.",
-    dosageMr: "व्यसनाची तलफ येईल तेव्हा तोंडात १-२ स्प्रे मारावेत. संपर्क: ८४२११५४०९०."
+    dosageMr: "व्यसनाची तलफ येईल तेव्हा तोंडात १-२ स्प्रे मारावेत. संपर्क: ८४२११५४०९०.",
+    netVol: "50 ml Pocket Spray",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic / Herbal Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी व शुद्ध हर्बल संशोधन फॉर्म्युला",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Instant sublingual craving control for tobacco, gutkha & cigarettes", mr: "तंबाखू, गुटखा, मावा, सिगारेटची तीव्र तलफ जिभेवर २ स्प्रेने त्वरित थांबवणे" },
+      { en: "Curbs alcohol urges and withdrawal restlessness", mr: "दारू पिण्याची इच्छा व व्यसन सोडताना होणारी अस्वस्थता कमी करणे" },
+      { en: "Alters oral taste buds and neutralizes addictive neuro-signals", mr: "जिभेची चव बदलून मेंदूतील व्यसनाचे न्यूरो-केमिकल सिग्नल्स शांत करणे" },
+      { en: "Relieves anxiety, mood swings and agitation during de-addiction", mr: "व्यसनमुक्ती दरम्यान होणारी चिडचिड, भीती व मानसिक ताण दूर करणे" },
+      { en: "100% Herbal, non-habit forming and safe pocket formula", mr: "१००% नैसर्गिक, सवय न लागणारा आणि खिशात बाळगता येणारा सुरक्षित स्प्रे" }
+    ]
   },
 
   // ==========================================
@@ -411,9 +468,51 @@ export const productsData = [
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.52.31-PM.jpeg",
     gallery: [
       "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.52.31-PM.jpeg",
-      "https://nutrifeel.org/wp-content/uploads/X-catlogue-final-2-scaled.png",
-      "https://nutrifeel.org/wp-content/uploads/X-catlogue-final-3-scaled.png",
-      "https://nutrifeel.org/wp-content/uploads/X-catlogue-final-4-scaled.png"
+      "https://nutrifeel.org/wp-content/uploads/AX1.jpg",
+      "https://nutrifeel.org/wp-content/uploads/AX2.png",
+      "https://nutrifeel.org/wp-content/uploads/AX3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX5.png",
+      "https://nutrifeel.org/wp-content/uploads/AX6.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX7.png",
+      "https://nutrifeel.org/wp-content/uploads/AX8.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX9.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX10.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX11.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX12.png",
+      "https://nutrifeel.org/wp-content/uploads/AX13.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX14.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX15.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX16.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX17.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX18.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/header-1.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/header.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/ANTOX_X_Hindi_Catalogue.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh5.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh6.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh7.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh8.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh9.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh10.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh11.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh12.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh13.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh14.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh15.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh16.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh17.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/xh18.jpeg"
+    ],
+    composition: [
+      { nameEn: "Ashwagandha (Withania somnifera)", nameMr: "अश्वगंधा", benefitEn: "Boosts vital stamina, combats physical burnout & fatigue", benefitMr: "शारीरिक ऊर्जा, स्टॅमिना व उत्साह वाढवते" },
+      { nameEn: "Safed Musli & Kaunch Beej", nameMr: "पांढरी मुसळी व कौंच बीज", benefitEn: "Rebuilds muscular strength, vitality and reproductive vigor", benefitMr: "स्नायूंची ताकद, वीर्यबल आणि दीर्घकालीन चैतन्य देते" },
+      { nameEn: "Shilajit & Gokshura", nameMr: "शुद्ध शिलाजीत व गोखरू", benefitEn: "Enhances oxygen uptake, cellular energy & urinary vitality", benefitMr: "पेशींमधील ऊर्जा निर्मिती व नैसर्गिक ताकद वाढवते" },
+      { nameEn: "Shatavari & Vidarikand", nameMr: "शतावरी व विदारीकंद", benefitEn: "Nourishes seven body tissues (Sapta Dhatus) & supports immunity", benefitMr: "सप्त धातूंचे पोषण व रोगप्रतिकारशक्ती वृद्धी" },
+      { nameEn: "Akarkara & Jaiphal", nameMr: "अक्कलकारा व जायफळ", benefitEn: "Nervous tonic promoting restorative sleep and active vigor", benefitMr: "नसांना बळकटी व दिवसभर उत्साह टिकवणे" }
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-x/",
     inStock: true,
@@ -431,7 +530,19 @@ export const productsData = [
       { en: "Calms stress and supports nervous resilience", mr: "मानसिक ताण कमी करून चैतन्य टिकवून ठेवते" }
     ],
     dosageEn: "10-15ml twice daily before meals with lukewarm water. Call 8421154090.",
-    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ८४२११५४०९०."
+    dosageMr: "जेवणापूर्वी १०-१५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ८४२११५४०९०.",
+    netVol: "300 ml",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic / Herbal Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी व शुद्ध हर्बल संशोधन फॉर्म्युला",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Fights chronic physical exhaustion, mental burnout & general weakness", mr: "शारीरिक थकवा, मानसिक ताण, अशक्तपणा व आळस समूळ नष्ट करणे" },
+      { en: "Builds muscular stamina, vigor and vital energy reserves", mr: "स्नायूंची ताकद, शारीरिक स्टॅमिना व उत्साह वाढवणे" },
+      { en: "Nourishes Sapta Dhatus (seven bodily tissues) & boosts immunity", mr: "रस, रक्त, मांस, मेद, अस्थी, मज्जा, शुक्र या सप्तधातूंना पोषण देणे" },
+      { en: "Strengthens nervous system resilience & supports deep restorative sleep", mr: "मज्जासंस्थेला बळकटी देऊन शांत झोप व मनःशांती मिळवून देणे" },
+      { en: "Enriched with 10 potent Rasayana herbs (Ashwagandha, Shilajit, Musli)", mr: "१० दुर्मीळ रसायन वनौषधींचा (अश्वगंधा, शिलाजीत, मुसळी) सिद्ध फॉर्म्युला" }
+    ]
   },
 
   // ==========================================
@@ -467,7 +578,24 @@ export const productsData = [
     gallery: [
       "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
       "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
-      "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg"
+      "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD5.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD6.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD7.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD8.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/Methi_Page12_1536x1024_printable.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/Bael_Leaves_Page13_1536x1024_printable.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/Ashwagandha_Page14_1536x1024_printable.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/hd1.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/hd2.png",
+      "https://nutrifeel.org/wp-content/uploads/T1.png",
+      "https://nutrifeel.org/wp-content/uploads/T2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T3.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T4.jpg"
     ],
     inStock: true,
     badgeEn: "Bestseller Combo",
@@ -483,7 +611,19 @@ export const productsData = [
       { en: "Flushes metabolic toxins & boosts energy", mr: "शरीरातील दूषित घटक काढून ऊर्जा वाढवते" }
     ],
     dosageEn: "ANTOX-D: 10-15ml twice daily before meals; ANTOX-T: 1 cup morning & evening.",
-    dosageMr: "ANTOX-D: जेवणापूर्वी १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप काढा."
+    dosageMr: "ANTOX-D: जेवणापूर्वी १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप काढा.",
+    netVol: "1 Bottle (300ml) + 1 Box (60 Bags)",
+    brochureSubtitle: "Synergistic Dual Formulation for Complete Blood Glucose & Metabolic Care",
+    brochureSubtitleMr: "मधुमेह नियंत्रण व संपूर्ण चयापचय शुद्धीसाठी संयुक्त आयुर्वेदिक उपचार",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Dual therapeutic action: Glucose management + deep systemic waste detox", mr: "रक्तातील साखर नियंत्रण (ANTOX-D) + शरीरातील विषारी घटक बाहेर काढणे (ANTOX-T)" },
+      { en: "Restores pancreatic beta-cell vitality and insulin receptor responsiveness", mr: "स्वादुपिंडातील पेशींची कार्यक्षमता वाढवून इन्सुलिन निर्मिती गतिमान करणे" },
+      { en: "Clears micro-vascular arterial blockages caused by long-term high glucose", mr: "साखरेमुळे रक्तवाहिन्यांवर येणारा ताण व गाठी दूर करून रक्ताभिसरण सुधारणे" },
+      { en: "Relieves diabetic neuropathy, leg numbness, calf cramps and weakness", mr: "पायांची जळजळ, मुंग्या येणे, पिढ्या दुखणे व तीव्र अशक्तपणा यांवर आराम" },
+      { en: "Free telephone diet consultation and customized routine upon parcel delivery", mr: "पार्सल मिळाल्यावर दूरध्वनीवरून मोफत वैयक्तिक पथ्य व दिनचर्या मार्गदर्शन" }
+    ]
   },
 
   // ==========================================
@@ -519,7 +659,24 @@ export const productsData = [
     gallery: [
       "https://nutrifeel.org/wp-content/uploads/antox-d-new-266x400.png",
       "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
-      "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg"
+      "https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD5.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD6.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD7.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AD8.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/Methi_Page12_1536x1024_printable.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/Bael_Leaves_Page13_1536x1024_printable.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/Ashwagandha_Page14_1536x1024_printable.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/hd1.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/hd2.png",
+      "https://nutrifeel.org/wp-content/uploads/T1.png",
+      "https://nutrifeel.org/wp-content/uploads/T2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T3.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T4.jpg"
     ],
     inStock: true,
     badgeEn: "Mega Saver Combo",
@@ -535,7 +692,19 @@ export const productsData = [
       { en: "Free telephone diet & regimen guidance on delivery", mr: "पार्सल मिळाल्यावर फोनवर मोफत वैयक्तिक पथ्य मार्गदर्शन" }
     ],
     dosageEn: "ANTOX-D: 10-15ml twice daily before meals; ANTOX-T: 1 cup morning & evening. Call 8421154090.",
-    dosageMr: "ANTOX-D: जेवणापूर्वी १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप काढा. फोन: ८४२११५४०९०."
+    dosageMr: "ANTOX-D: जेवणापूर्वी १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप काढा. फोन: ८४२११५४०९०.",
+    netVol: "2 Bottles (300ml each) + 1 Box (60 Bags)",
+    brochureSubtitle: "Intensive 60-Day Dual Regimen for Chronic High Sugar & Cellular Pancreatic Support",
+    brochureSubtitleMr: "तीव्र मधुमेहासाठी ६० दिवसांचा सखोल व प्रगत आयुर्वेदिक उपचार",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Intensive 60-day glycemic stabilization for high fasting and post-meal sugar", mr: "६० दिवसांचा सखोल कोर्स - हाय फास्टिंग व पोस्ट-प्रँडियल साखरेवर खात्रीशीर नियंत्रण" },
+      { en: "Two full bottles of ANTOX-D ensure continuous pancreatic beta-cell recovery", mr: "२ मोठ्या बाटल्यांमुळे खंड न पडता स्वादुपिंडातील इन्सुलिन पेशींचे सातत्यपूर्ण पोषण" },
+      { en: "Deep micro-toxin flushing & blood cleansing through 60 antioxidant tea dips", mr: "६० हर्बल टी-बॅग्सद्वारे रक्तातील दूषित घटकांची संपूर्ण स्वच्छता" },
+      { en: "Protects eyesight, kidney function & nerve endings from diabetic decline", mr: "डोळ्यांची दृष्टी, किडनी व मज्जातंतूंचे मधुमेहाच्या दीर्घकालीन दुष्परिणामांपासून संरक्षण" },
+      { en: "Personal telephonic counselor tracking and free dietary regimen support", mr: "तज्ज्ञ समुपदेशकांकडून नियमित फोनवर प्रगतीचा आढावा व आहार मार्गदर्शन" }
+    ]
   },
 
   // ==========================================
@@ -560,6 +729,19 @@ export const productsData = [
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/spray-new-266x400.png",
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/spraynew-2.jpeg",
+    comboItems: [
+      { name: "1 SPRAY-B-AI NICO (50ml)", nameMr: "१ SPRAY-B-AI NICO (५० मिली)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/spray-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/spraynew-2.jpeg" },
+      { name: "1 ANTOX-T (60 Tea Bags)", nameMr: "१ ANTOX-T (६० टी बॅग्स)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/antoxt.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/spray-new.png",
+      "https://nutrifeel.org/wp-content/uploads/spraynew-2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+      "https://nutrifeel.org/wp-content/uploads/T1.png",
+      "https://nutrifeel.org/wp-content/uploads/T2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T3.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T4.jpg"
+    ],
     inStock: true,
     badgeEn: "De-Addiction Combo",
     badgeMr: "व्यसनमुक्ती कॉम्बो पॅक",
@@ -574,7 +756,19 @@ export const productsData = [
       { en: "Flushes nicotine & alcohol toxins from body", mr: "शरीरातील निकोटीन व विषारी घटक बाहेर काढते" }
     ],
     dosageEn: "Spray 1-2 puffs when cravings arise; drink 1 cup ANTOX-T morning & evening.",
-    dosageMr: "तलफ होईल तेव्हा १-२ स्प्रे तोंडात मारावेत; सकाळी व संध्याकाळी १ कप ANTOX-T चहा प्यावा."
+    dosageMr: "तलफ होईल तेव्हा १-२ स्प्रे तोंडात मारावेत; सकाळी व संध्याकाळी १ कप ANTOX-T चहा प्यावा.",
+    netVol: "1 Spray (50ml) + 1 Box (60 Bags)",
+    brochureSubtitle: "Comprehensive Oral Craving Control & Systemic Nicotine/Alcohol Detoxification",
+    brochureSubtitleMr: "तोंडी तलफ नियंत्रण व संपूर्ण शरीर विषमुक्ती किट",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Immediate oral & sublingual craving control for tobacco, gutkha & cigarettes", mr: "तंबाखू, गुटखा व सिगारेटची तीव्र तलफ जिभेवर २ स्प्रेने तात्काळ रोखणे" },
+      { en: "Reduces alcohol dependence pangs and associated restless agitation", mr: "दारूची तलफ कमी करणे व व्यसन सोडताना होणारी अस्वस्थता शांत करणे" },
+      { en: "Detox tea flushes stubborn nicotine metabolites and toxins via kidneys", mr: "हर्बल डिटॉक्स चहा शरीरातील निकोटीन व दूषित घटक लघवीवाटे बाहेर काढतो" },
+      { en: "Balances neurotransmitter receptors to prevent mood swings & anger", mr: "मेंदूतील न्यूरोट्रांसमीटर संतुलित करून चिडचिड व मानसिक ताण रोखणे" },
+      { en: "100% Herbal, non-habit forming and trusted natural de-addiction regimen", mr: "१००% नैसर्गिक, सवय न लागणारा व सुरक्षित आयुर्वेदिक व्यसनमुक्ती मार्ग" }
+    ]
   },
   {
     id: "prod_antox_pn_combo",
@@ -595,6 +789,24 @@ export const productsData = [
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/pn-new-266x400.png",
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/oil-new-266x400.png",
+    comboItems: [
+      { name: "1 ANTOX -PN POWDER (200g)", nameMr: "१ ANTOX -PN पावडर (२०० ग्रॅम)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/pn-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.57.12-PM.jpeg" },
+      { name: "1 ANTOX – PN OIL (200ml)", nameMr: "१ ANTOX – PN ऑईल (२०० मिली)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/oil-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/pnoil.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/pnoil.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/oil-new.png",
+      "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.57.12-PM.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/pn2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN3.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN4.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN5.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN6.jpg",
+      "https://nutrifeel.org/wp-content/uploads/pn7.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN8.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN9.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN10.jpg"
+    ],
     inStock: true,
     badgeEn: "Joint Care Combo",
     badgeMr: "सांधेदुखी कॉम्बो पॅक",
@@ -602,14 +814,26 @@ export const productsData = [
     shortDescMr: "गुडघेदुखी, कंबरदुखी, संधिवात व सांध्यांमधील कडकपणावर अंतर्गत पावडर व बाह्य मालिश तेल किट.",
     description: "Therapeutic joint flexibility and pain soothing duo with internal cartilage powder and external cold-pressed herbal massage oil.",
     descriptionEn: "ANTOX -PN POWDER nourishes cartilage and reduces systemic Vata inflammation, while ANTOX – PN OIL penetrates muscles to relieve friction and stiffness.",
-    descriptionMr: "पावडर शरीरातील वातदोष कमी करते आणि तेल सांध्यांना वंगण देऊन वेदना कमी करते.",
+    descriptionMr: "पावडर शरीरातील वातदोष कमी करते आणि तेल सांध्यांना वंगण देऊन वेदना कमी करते. संपर्क: ८४२११५४०९०.",
     features: [
       { en: "Complete internal powder + external massage oil combo", mr: "अंतर्गत पावडर + बाह्य मालिश तेल संपूर्ण किट" },
       { en: "Relieves chronic knee, hip and back pain", mr: "जुनाट गुडघेदुखी व कंबरदुखीपासून आराम" },
       { en: "Nourishes synovial fluid and cartilage", mr: "सांध्यांमधील सायनोव्हियल फ्लुईड टिकवून ठेवते" }
     ],
     dosageEn: "Powder: 1 teaspoon twice daily; Oil: Massage affected joints twice daily.",
-    dosageMr: "पावडर: १ चमचा दिवसातून दोनदा; तेल: दुखणाऱ्या भागावर हलक्या हाताने मालिश करावी."
+    dosageMr: "पावडर: १ चमचा दिवसातून दोनदा; तेल: दुखणाऱ्या भागावर हलक्या हाताने मालिश करावी.",
+    netVol: "1 Jar (200g) + 1 Bottle (200ml)",
+    brochureSubtitle: "Complete 360° Internal Cartilage Nourishment & External Joint Massage Regimen",
+    brochureSubtitleMr: "अंतर्गत पोषण व बाह्य मालिश संपूर्ण सांधेदुखी मुक्ती किट",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Relief in knee joint pain, neck pain, lumbar back pain & severe stiffness", mr: "गुडघेदुखी, मानदुखी, कंबरदुखी व तीव्र सांधे आखडण्यापासून खात्रीशीर आराम" },
+      { en: "Helpful in neuropathic pain, sciatica, slip disc & cervical spondylosis", mr: "नसांचे दुखणे (Neuropathic pain), सायटिका, स्लिप डिस्क व मणक्याचे आजार यांवर गुणकारी" },
+      { en: "Nourishes cartilage and restores synovial fluid lubrication naturally", mr: "सांध्यांमधील कार्टिलेजची झीज भरून काढणे व वंगण (Synovial Fluid) टिकवणे" },
+      { en: "Reduces joint inflammation, friction cracking sounds and muscular spasms", mr: "सांध्यांची सूज, चालताना होणारे कट-कट आवाज व स्नायूंचे पेटके कमी करणे" },
+      { en: "Improves blood circulation and supports natural healing of nerves & tissues", mr: "रक्ताभिसरण गतिमान करून मज्जातंतू व पेशींच्या नैसर्गिक पुनरुज्जीवनास चालना" }
+    ]
   },
   {
     id: "prod_antox_hlk_combo",
@@ -630,6 +854,23 @@ export const productsData = [
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/hlk-new-266x400.png",
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.36.32-PM.jpeg",
+    comboItems: [
+      { name: "1 ANTOX-HLK (300ml)", nameMr: "१ ANTOX-HLK (३०० मिली)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/hlk-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.36.32-PM.jpeg" },
+      { name: "1 ANTOX-T (60 Tea Bags)", nameMr: "१ ANTOX-T (६० टी बॅग्स)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/antoxt.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.36.32-PM.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK5.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HH_1.jpg",
+      "https://nutrifeel.org/wp-content/uploads/HH2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+      "https://nutrifeel.org/wp-content/uploads/T1.png",
+      "https://nutrifeel.org/wp-content/uploads/T2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T3.jpg"
+    ],
     inStock: true,
     badgeEn: "Triple Care Combo",
     badgeMr: "त्रिसूत्री कॉम्बो पॅक",
@@ -637,14 +878,26 @@ export const productsData = [
     shortDescMr: "हृदय, लिव्हर आणि किडनीचे कार्य सुरळीत ठेवणारे व शरीरातील टॉक्सिन्स बाहेर टाकणारे प्रभावी कॉम्बो किट.",
     description: "Comprehensive natural organ detoxifier and revitalizer supporting cardiac performance, liver enzyme balance, and kidney filtration wellness.",
     descriptionEn: "ANTOX-HLK & ANTOX-T combines powerful cardioprotective, hepatoprotective, and nephroprotective Nutraceutical herbs with systemic detox brew for vital organ rejuvenation.",
-    descriptionMr: "अर्जुन, पुनर्नवा, भुईआवळा आणि गोखरू यांसारख्या वनौषधींचा संगम असलेले हे कॉम्बो किट अवयवांचे आरोग्य सुधारण्यास मदत करते.",
+    descriptionMr: "अर्जुन, पुनर्नवा, भुईआवळा आणि गोखरू यांसारख्या वनौषधींचा संगम असलेले हे कॉम्बो किट अवयवांचे आरोग्य सुधारण्यास मदत करते. संपर्क: ८४२११५४०९०.",
     features: [
       { en: "Full vital organ combo: ANTOX-HLK bottle + ANTOX-T detox tea", mr: "संपूर्ण किट: ANTOX-HLK बाटली + ANTOX-T डिटॉक्स चहा" },
       { en: "Supports healthy heart muscle function & blood pressure", mr: "हृदयाची कार्यक्षमता व रक्तदाब समतोल" },
       { en: "Flushes toxic buildup from liver & kidneys", mr: "यकृत व किडनीतील घातक विषारी द्रव्ये बाहेर काढणे" }
     ],
     dosageEn: "As prescribed during personal telephone consultation. Call 8421154090.",
-    dosageMr: "फोनवरील समुपदेशनानुसार घ्यावे. संपर्क: ८४२११५४०९०."
+    dosageMr: "फोनवरील समुपदेशनानुसार घ्यावे. संपर्क: ८४२११५४०९०.",
+    netVol: "1 Bottle (300ml) + 1 Box (60 Bags)",
+    brochureSubtitle: "Synergistic Vital Organ Shield: Heart, Liver & Kidney Cellular Support",
+    brochureSubtitleMr: "हृदय, यकृत व मूत्रपिंड आरोग्य संवर्धन व त्रिदोष शुद्धी किट",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Comprehensive triple-organ protection: strengthens heart, detoxes liver, purifies kidneys", mr: "त्रिसूत्री संरक्षण: हृदयाची ताकद वाढवणे, यकृताची शुद्धी व मूत्रपिंडाची गाळणक्रिया सुधारणे" },
+      { en: "Helps maintain healthy blood pressure and optimal cardiac muscle performance", mr: "रक्तदाब नियंत्रित ठेवण्यास व हृदयाचे ठोके नियमित ठेवण्यास मदत" },
+      { en: "Assists in fatty liver recovery and normalizes elevated SGOT & SGPT enzyme levels", mr: "फॅटी लिव्हरची समस्या कमी करून यकृतातील एन्झाईम्स सामान्य पातळीवर आणणे" },
+      { en: "Supports natural creatinine and urea elimination while relieving swollen limbs (Edema)", mr: "क्रिएटीनिन व युरियाची पातळी नियंत्रणात ठेवून हात-पायांची सूज दूर करणे" },
+      { en: "Detox tea flushes free radicals, metabolic wastes & reduces systemic cholesterol", mr: "डिटॉक्स चहा शरीरातील घातक टॉक्सिन्स बाहेर टाकून कोलेस्ट्रॉल कमी करतो" }
+    ]
   },
   {
     id: "prod_antox_b_acid_combo",
@@ -665,6 +918,19 @@ export const productsData = [
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/b-acid-new-266x400.png",
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/bacidnew-2.jpeg",
+    comboItems: [
+      { name: "1 ANTOX-B ACID (300ml)", nameMr: "१ ANTOX-B ACID (३०० मिली)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/b-acid-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/bacidnew-2.jpeg" },
+      { name: "1 ANTOX-T (60 Tea Bags)", nameMr: "१ ANTOX-T (६० टी बॅग्स)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/antoxt.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/b-acid-new.png",
+      "https://nutrifeel.org/wp-content/uploads/bacidnew-2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+      "https://nutrifeel.org/wp-content/uploads/T1.png",
+      "https://nutrifeel.org/wp-content/uploads/T2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T3.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T4.jpg"
+    ],
     inStock: true,
     badgeEn: "Digestive Care Combo",
     badgeMr: "पित्तमुक्ती कॉम्बो पॅक",
@@ -672,14 +938,26 @@ export const productsData = [
     shortDescMr: "वारंवार होणारे पित्त, छातीत जळजळ, अपचन, पोट फुगणे व पचनाच्या तक्रारींवर मुळापासून आराम देणारा किट.",
     description: "Comprehensive Nutraceutical duo for hyperacidity, acid reflux, chronic gas, bile distress, and digestive cleansing with herbal detox brew.",
     descriptionEn: "ANTOX-B ACID & ANTOX-T neutralizes stomach acid secretions and cleanses intestinal pathways, providing long-term relief from GERD and indigestion.",
-    descriptionMr: "हे किट आम्लपित्त, जळजळ आणि बद्धकोष्ठतेवर अत्यंत गुणकारी आहे. फोन: ८४२११५४०९०.",
+    descriptionMr: "हे किट आम्लपित्त, जळजळ आणि बद्धकोष्ठतेवर अत्यंत गुणकारी आहे. संपर्क: ८४२११५४०९०.",
     features: [
       { en: "Dual digestive combo: ANTOX-B ACID liquid + ANTOX-T detox tea", mr: "दुहेरी किट: ANTOX-B ACID + ANTOX-T चहा" },
       { en: "Neutralizes excess stomach acid & bile distress", mr: "पोटातील अतिरिक्त पित्त शांत करते" },
       { en: "Relieves heartburn, sour belching & bloating", mr: "छातीतील जळजळ व आंबट ढेकर थांबवते" }
     ],
     dosageEn: "ANTOX-B ACID: 10-15ml with water after meals; ANTOX-T: 1 cup morning & evening.",
-    dosageMr: "ANTOX-B ACID: जेवणानंतर १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप."
+    dosageMr: "ANTOX-B ACID: जेवणानंतर १०-१५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप.",
+    netVol: "1 Bottle (300ml) + 1 Box (60 Bags)",
+    brochureSubtitle: "Complete Pitta Pacifying & Systemic Intestinal Toxin Clearing Combo",
+    brochureSubtitleMr: "आम्लपित्त मुक्ती व संपूर्ण पचनमार्ग शुद्धी किट",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Fast alkaline neutralization of excess gastric acid, heartburn & GERD distress", mr: "अति आम्लपित्त, छातीतील जळजळ व घशाशी येणारे आंबट पाणी यांवर तात्काळ आराम" },
+      { en: "Relieves morning bile taste, sour belching, nausea and continuous gas bloating", mr: "तोंडाला येणारी कडवट चव, आंबट ढेकर, मळमळ व पोट फुगणे समूळ थांबवणे" },
+      { en: "Detox tea flushes gut toxins (Ama), supports intestinal healing & regular bowels", mr: "हर्बल चहा पोटातील आमदोष बाहेर काढून पचनमार्ग स्वच्छ व निरोगी ठेवतो" },
+      { en: "Soothes irritated stomach lining and protects from gastric/peptic ulcers", mr: "अल्सरची जळजळ शांत करून जठराच्या आतील अस्तराचे रक्षण करणे" },
+      { en: "Promotes restful undisturbed night sleep free from midnight acidity attacks", mr: "रात्री पित्तामुळे होणारी अस्वस्थता थांबवून शांत गाढ झोप मिळवून देणे" }
+    ]
   },
   {
     id: "prod_antox_amrut_51_combo",
@@ -700,6 +978,22 @@ export const productsData = [
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/amrut-new-266x400.png",
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/amrut51.jpeg",
+    comboItems: [
+      { name: "1 ANTOX – AMRUT 51 (300ml)", nameMr: "१ ANTOX – AMRUT 51 (३०० मिली)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/amrut-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/51H-LABEL.jpg" },
+      { name: "1 ANTOX-T (60 Tea Bags)", nameMr: "१ ANTOX-T (६० टी बॅग्स)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/antoxt.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/51H-LABEL.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_8.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_9.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_10.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H1.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+      "https://nutrifeel.org/wp-content/uploads/T1.png",
+      "https://nutrifeel.org/wp-content/uploads/T2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T3.jpg"
+    ],
     inStock: true,
     badgeEn: "Master Rasayana Combo",
     badgeMr: "अमृत रसायन कॉम्बो पॅक",
@@ -707,14 +1001,26 @@ export const productsData = [
     shortDescMr: "५१ दुर्मिळ वनौषधींचा अर्क आणि डिटॉक्स टी चा संगम. संपूर्ण शरीराला नवचैतन्य, ऊर्जा व रोगप्रतिकारक कवच देणारे किट.",
     description: "Premium blend of 51 therapeutic Himalayan herbs paired with herbal detox tea for full-body rejuvenation, stamina, and cellular immunity.",
     descriptionEn: "Nutrifeel ANTOX – AMRUT 51 combined with ANTOX-T accelerates cellular tissue purification and recharges daily energy levels naturally.",
-    descriptionMr: "शरीरातील विषारी घटक बाहेर काढून प्रतिकारशक्ती प्रचंड वाढवणारे व दीर्घायुष्य देणारे अमृत किट.",
+    descriptionMr: "शरीरातील विषारी घटक बाहेर काढून प्रतिकारशक्ती प्रचंड वाढवणारे व दीर्घायुष्य देणारे अमृत किट. संपर्क: ८४२११५४०९०.",
     features: [
       { en: "51 botanical extracts + ANTOX-T detox tea", mr: "५१ आयुर्वेदिक वनस्पतींचा अर्क + ANTOX-T चहा" },
       { en: "Strengthens whole-body immune defenses", mr: "रोगप्रतिकारक शक्ती मजबूत करते" },
       { en: "Combats chronic fatigue and recharges vitality", mr: "जुनाट थकवा घालवून दिवसभर ताजेतवाने ठेवते" }
     ],
     dosageEn: "Amrut 51: 15ml twice daily before food; ANTOX-T: 1 cup morning & evening.",
-    dosageMr: "Amrut 51: जेवणापूर्वी १५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप."
+    dosageMr: "Amrut 51: जेवणापूर्वी १५ मिली; ANTOX-T: सकाळी व संध्याकाळी १ कप.",
+    netVol: "1 Bottle (300ml) + 1 Box (60 Bags)",
+    brochureSubtitle: "Master Multi-Herb Rejuvenation & Daily Systemic Detoxification Regimen",
+    brochureSubtitleMr: "५१ वनौषधी अमृत रसायन व संपूर्ण शरीर शुद्धी किट",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Master cellular rejuvenation combining 51 therapeutic herbs with antioxidant tea", mr: "५१ दुर्मिळ वनौषधींचा अर्क आणि अँटीऑक्सिडंट चहाचा संगम - संपूर्ण पेशींचा कायाकल्प" },
+      { en: "Provides multi-layered immunity shields against recurring infections and fever", mr: "वारंवार होणाऱ्या सर्दी, खोकला, संसर्ग व तापापासून संपूर्ण शरीराचे संरक्षण" },
+      { en: "Restores vitality, mental agility and banishes chronic day-long exhaustion", mr: "दीर्घकालीन थकवा, आळस व मानसिक ताण दूर करून दिवसभर उत्साही ठेवणे" },
+      { en: "Flushes deep metabolic toxins from liver, kidneys and lymphatic channels", mr: "यकृत, मूत्रपिंड व लसिका ग्रंथींमधील घातक टॉक्सिन्स बाहेर टाकणे" },
+      { en: "Promotes longevity, tissue nourishment (Dhatu Pushti) and radiant skin health", mr: "सप्तधातूंचे पोषण, त्वचेची चमक आणि निरोगी दीर्घायुष्यासाठी सर्वोच्च रसायन" }
+    ]
   },
   {
     id: "prod_antox_x_combo",
@@ -735,6 +1041,22 @@ export const productsData = [
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/x-new-266x400.png",
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+    comboItems: [
+      { name: "1 ANTOX- X (300ml)", nameMr: "१ ANTOX- X (३०० मिली)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/x-new-266x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.52.31-PM.jpeg" },
+      { name: "1 ANTOX-T (60 Tea Bags)", nameMr: "१ ANTOX-T (६० टी बॅग्स)", count: 1, image: "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png", fallback: "https://nutrifeel.org/wp-content/uploads/antoxt.jpeg" }
+    ],
+    gallery: [
+      "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.52.31-PM.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX1.jpg",
+      "https://nutrifeel.org/wp-content/uploads/AX2.png",
+      "https://nutrifeel.org/wp-content/uploads/AX3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/AX4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/ANTOX_X_Hindi_Catalogue.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/t-ew-419x400.png",
+      "https://nutrifeel.org/wp-content/uploads/T1.png",
+      "https://nutrifeel.org/wp-content/uploads/T2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/T3.jpg"
+    ],
     inStock: true,
     badgeEn: "Vitality Combo",
     badgeMr: "ऊर्जा कॉम्बो पॅक",
@@ -742,14 +1064,26 @@ export const productsData = [
     shortDescMr: "१० दुर्मीळ रसायन वनौषधींचा संगम आणि डिटॉक्स चहा. ऊर्जा, स्टॅमिना आणि उत्साह वाढवणारा किट.",
     description: "Dual revitalization kit combining 10 rasayana energy herbs with detoxifying herbal brew tea.",
     descriptionEn: "ANTOX- X paired with ANTOX-T restores cellular vitality, fights physical exhaustion, and promotes healthy energy throughout the day.",
-    descriptionMr: "थकवा घालवून स्टॅमिना व ऊर्जा टिकवण्यासाठी हे किट अतिशय गुणकारी आहे.",
+    descriptionMr: "थकवा घालवून स्टॅमिना व ऊर्जा टिकवण्यासाठी हे किट अतिशय गुणकारी आहे. संपर्क: ८४२११५४०९०.",
     features: [
       { en: "Dual combo: ANTOX- X liquid + ANTOX-T tea", mr: "दुहेरी कॉम्बो: ANTOX- X + ANTOX-T चहा" },
       { en: "Recharges physical stamina & vitality", mr: "शारीरिक स्टॅमिना व ताकद वाढवते" },
       { en: "100% Herbal & non-toxic formulation", mr: "१००% शुद्ध आयुर्वेदिक व सुरक्षित" }
     ],
-    dosageEn: "As advised by personal health counselor. Call 8421154090.",
-    dosageMr: "समुपदेशकाच्या सल्ल्यानुसार घ्यावे. फोन: ८४२११५४०९०."
+    dosageEn: "ANTOX- X: 10-15ml with lukewarm water before meals; ANTOX-T: 1 cup morning & evening.",
+    dosageMr: "ANTOX- X: जेवणापूर्वी १०-१५ मिली कोमट पाण्यासोबत; ANTOX-T: सकाळी व संध्याकाळी १ कप चहा. फोन: ८४२११५४०९०.",
+    netVol: "1 Bottle (300ml) + 1 Box (60 Bags)",
+    brochureSubtitle: "Master Stamina & Tissue Rejuvenation Regimen with Cellular Toxic Clearance",
+    brochureSubtitleMr: "शारीरिक ऊर्जा, स्टॅमिना व त्रिदोष शुद्धी संपूर्ण किट",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Rebuilds drained physical stamina, muscle tone and vitality using 10 Rasayanas", mr: "१० दुर्मीळ रसायनांच्या साहाय्याने स्नायूंची ताकद, शारीरिक स्टॅमिना व ऊर्जा परत मिळवणे" },
+      { en: "Cleanses metabolic blockages with antioxidant tea for rapid nutrient assimilation", mr: "डिटॉक्स चहा चयापचय नलिका स्वच्छ करून औषधी घटकांचे शोषण जलद करतो" },
+      { en: "Combats workday burnout, chronic exhaustion and sluggish mental drive", mr: "दिवसभराचा कामाचा ताण, थकवा, सुस्ती व मानसिक आळस समूळ नष्ट करणे" },
+      { en: "Nourishes reproductive tissue reserves, Ojas and supports natural vigor", mr: "सप्तधातूंना सखोल पोषण देऊन ओज, उत्साह व नैसर्गिक चैतन्य टिकवून ठेवणे" },
+      { en: "100% Pure herbal adaptogen formula without synthetic stimulants or jitters", mr: "कोणत्याही कृत्रिम रसायनांशिवाय १००% सुरक्षित व शाश्वत आयुर्वेदिक ऊर्जा" }
+    ]
   },
 
   // ==========================================
@@ -779,6 +1113,12 @@ export const productsData = [
       "https://nutrifeel.org/wp-content/uploads/pnoil.jpeg"
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-pn-oil/",
+    composition: [
+      { nameEn: "Mahanarayan & Mahavishgarbha Taila", nameMr: "महानारायण व महाविषगर्भ तेल", benefitEn: "Penetrates deep into joints to alleviate chronic Vata pain & stiffness", benefitMr: "सांध्यांच्या खोलवर जाऊन वातदोष व ठणक शांत करते" },
+      { nameEn: "Gandhapura Oil (Wintergreen / Gaultheria)", nameMr: "गंधपुरा तेल", benefitEn: "Natural botanical salicylate for instant muscular ease", benefitMr: "नैसर्गिक वेदनाशामक गुणधर्मांनी तात्काळ आराम देते" },
+      { nameEn: "Shallaki Oil (Boswellia)", nameMr: "शल्लाकी तेल", benefitEn: "Suppresses joint swelling, friction & articular stiffness", benefitMr: "सांध्यांमधील सूज, घर्षण व कडकपणा कमी करते" },
+      { nameEn: "Nilgiri & Karpura (Camphor)", nameMr: "निलगिरी व कापूर", benefitEn: "Boosts localized micro-circulation and brings warming relief", benefitMr: "रक्ताभिसरण गतिमान करून स्नायूंना उबदार आराम देते" }
+    ],
     inStock: true,
     badgeEn: "Nutrifeel Official",
     badgeMr: "न्युट्रीफील अधिकृत",
@@ -794,7 +1134,21 @@ export const productsData = [
       { en: "Relieves joint friction and muscle tension", mr: "सांध्यांमधील घर्षण व स्नायूंचा ताण कमी करते" }
     ],
     dosageEn: "Gently massage on painful joint area twice daily.",
-    dosageMr: "दुखणाऱ्या सांध्यावर दिवसातून दोनदा हलक्या हाताने मालिश करावी."
+    dosageMr: "दुखणाऱ्या सांध्यावर दिवसातून दोनदा हलक्या हाताने मालिश करावी.",
+    netVol: "200 ml",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी उत्पादन संशोधन व विकास",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Relief in joint pain, neck pain, back pain & muscle stiffness", mr: "सांधेदुखी, मानदुखी, कंबरदुखी व स्नायूंचा कडकपणा यांतून आराम" },
+      { en: "Helpful in neuropathic pain, sciatica, cervical spondylosis", mr: "नसांचे दुखणे (Neuropathic pain), सायटिका, मणक्याचे आजार (Spondylosis) यांत गुणकारी" },
+      { en: "Relaxes muscles and improves mobility", mr: "आखडलेले स्नायू मोकळे करून सांध्यांची हालचाल सुलभ करते" },
+      { en: "Reduces inflammation and swelling", mr: "सांध्यांमधील अंतर्गत सूज व दाह वेगाने कमी करते" },
+      { en: "Improves blood circulation to affected areas", mr: "दुखणाऱ्या भागातील रक्ताभिसरण गतिमान करून उबदार आराम देते" },
+      { en: "Supports natural healing of nerves and tissues", mr: "मज्जातंतू व पेशींच्या नैसर्गिक पुनरुज्जीवनास मदत करते" },
+      { en: "General body pain, sprains and strains", mr: "अंगदुखी, लचक, चमक भरणे व स्नायूंचा ताण यांवर तात्काळ प्रभावी" }
+    ]
   },
   {
     id: "prod_antox_pn_powder",
@@ -817,9 +1171,24 @@ export const productsData = [
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.57.12-PM.jpeg",
     gallery: [
       "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.57.12-PM.jpeg",
-      "https://nutrifeel.org/wp-content/uploads/PN-Catlogue-Final-2-scaled.png",
-      "https://nutrifeel.org/wp-content/uploads/PN-Catlogue-Final-3-scaled.png",
-      "https://nutrifeel.org/wp-content/uploads/PN-Catlogue-Final-4-scaled.png"
+      "https://nutrifeel.org/wp-content/uploads/pn2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN3.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN4.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN5.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN6.jpg",
+      "https://nutrifeel.org/wp-content/uploads/pn7.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN8.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN9.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN10.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN11.jpg",
+      "https://nutrifeel.org/wp-content/uploads/PN12.jpg"
+    ],
+    composition: [
+      { nameEn: "Shallaki (Boswellia serrata)", nameMr: "शल्लाकी", benefitEn: "Blocks 5-LOX enzyme pathway to protect joint cartilage", benefitMr: "सांध्यांमधील कार्टिलेजची झीज थांबवून सूज कमी करते" },
+      { nameEn: "Shuddh Guggulu (Commiphora mukul)", nameMr: "शुद्ध गुग्गुळ", benefitEn: "Reduces circulating uric acid & systemic joint inflammation", benefitMr: "युरिक अॅसिड कमी करून सांध्यांमधील विषारी दोष दूर करते" },
+      { nameEn: "Hadjod (Cissus quadrangularis)", nameMr: "हाडजोड", benefitEn: "Enhances bone mineral density, ligament repair & calcium uptake", benefitMr: "हाडे मजबूत करून लिगामेंट्स व फ्रॅक्चर जोडण्यास मदत" },
+      { nameEn: "Ashwagandha & Rasna", nameMr: "अश्वगंधा व रास्ना", benefitEn: "Balances chronic Vata Dosha and eases morning mobility", benefitMr: "वातदोष संतुलित करून सकाळी सांधे आखडणे थांबवते" },
+      { nameEn: "Sunthi, Methi & Chopchini", nameMr: "सुंठ, मेथी व चोपचिनी", benefitEn: "Maintains healthy synovial fluid lubrication in knees & spine", benefitMr: "गुडघे व मणक्यातील वंगण टिकवून हालचाल सुलभ करते" }
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-pn-formula/",
     inStock: true,
@@ -837,7 +1206,19 @@ export const productsData = [
       { en: "Reduces morning stiffness & swelling", mr: "सकाळचा कडकपणा व सांध्यांची सूज कमी करते" }
     ],
     dosageEn: "1 teaspoon with lukewarm water twice daily after meals.",
-    dosageMr: "जेवणानंतर १ चमचा कोमट पाण्यासोबत दिवसातून दोनदा."
+    dosageMr: "जेवणानंतर १ चमचा कोमट पाण्यासोबत दिवसातून दोनदा.",
+    netVol: "200 g (Jar)",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी उत्पादन संशोधन व विकास",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Deep nourishment for joint cartilage & preservation of synovial fluid", mr: "सांध्यांमधील कार्टिलेजचे सखोल पोषण व सायनोव्हियल फ्लुईड (वंगण) टिकवणे" },
+      { en: "Balances aggravated Vata Dosha to prevent friction and cracking sounds", mr: "प्रकुपित वातदोष शांत करून सांध्यांमधील कट-कट आवाज व घर्षण थांबवणे" },
+      { en: "Reduces severe morning stiffness, joint swelling & knee pain", mr: "सकाळी उठल्यावर जाणवणारा सांध्यांचा कडकपणा, सूज व गुडघेदुखी कमी करणे" },
+      { en: "Aids in bone mineral density, ligament flexibility & spinal alignment", mr: "हाडांची घनता वाढवणे, लिगामेंट्स लवचिक करणे व मणक्याचे आरोग्य सुधारणे" },
+      { en: "Synergistic botanical action of Shallaki, Shuddh Guggulu, Hadjod & Ashwagandha", mr: "शल्लाकी, शुद्ध गुग्गुळ, हाडजोड, रास्ना व अश्वगंधा या वनौषधींचा संगम" }
+    ]
   },
   {
     id: "prod_antox_hlk",
@@ -860,9 +1241,37 @@ export const productsData = [
     fallbackImage: "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.36.32-PM.jpeg",
     gallery: [
       "https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.36.32-PM.jpeg",
-      "https://nutrifeel.org/wp-content/uploads/HLK-catlogue-2-scaled.png",
-      "https://nutrifeel.org/wp-content/uploads/HLK-catlogue-3-scaled.png",
-      "https://nutrifeel.org/wp-content/uploads/HLK-catlogue-4-scaled.png"
+      "https://nutrifeel.org/wp-content/uploads/HLK2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK5.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK6.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK7.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK8.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK9.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK10.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK11.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK12.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HLK13.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/BLANK.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HH_1.jpg",
+      "https://nutrifeel.org/wp-content/uploads/HH2.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HH3.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HH4.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HH5.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HH6.jpeg",
+      "https://nutrifeel.org/wp-content/uploads/HH7.jpg",
+      "https://nutrifeel.org/wp-content/uploads/HH8.jpg",
+      "https://nutrifeel.org/wp-content/uploads/HH9.jpg",
+      "https://nutrifeel.org/wp-content/uploads/HH10.jpg",
+      "https://nutrifeel.org/wp-content/uploads/HH11.jpg"
+    ],
+    composition: [
+      { nameEn: "Arjuna Bark (Terminalia arjuna)", nameMr: "अर्जुन साल", benefitEn: "Strengthens heart muscle pump, regulates blood pressure & cholesterol", benefitMr: "हृदयाचे स्नायू बळकट करते, रक्तदाब व कोलेस्ट्रॉल नियंत्रित ठेवते" },
+      { nameEn: "Bhumi Amla (Phyllanthus niruri)", nameMr: "भुईआवळा", benefitEn: "Reverses fatty liver changes, supports SGOT/SGPT enzyme balance", benefitMr: "फॅटी लिव्हरवर गुणकारी, यकृतातील एन्झाईम्स सुरळीत ठेवते" },
+      { nameEn: "Kalmegh (Andrographis paniculata)", nameMr: "कालमेघ", benefitEn: "Powerful hepatic purifier flushing deep alcohol and chemical toxins", benefitMr: "यकृतातील विषारी घटक बाहेर काढून पचनशक्ती वाढवते" },
+      { nameEn: "Punarnava (Boerhavia diffusa)", nameMr: "पुनर्नवा", benefitEn: "Rejuvenates renal filtration tubules & clears fluid retention", benefitMr: "किडनीची गाळणक्रिया सुधारते व शरीरातील सूज कमी करते" },
+      { nameEn: "Gokshura (Tribulus terrestris)", nameMr: "गोखरू", benefitEn: "Maintains optimal urinary pH, creatinine balance & renal wellness", benefitMr: "मूत्रमार्गाचे आरोग्य व क्रिएटीनिन समतोल राखण्यास मदत" }
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-hlk/",
     inStock: true,
@@ -880,7 +1289,19 @@ export const productsData = [
       { en: "Aids in cholesterol and lipid balance", mr: "कोलेस्ट्रॉल व ट्रायग्लिसराईड्स नियंत्रणात मदत" }
     ],
     dosageEn: "10-15ml with water twice daily after meals. Call 8421154090.",
-    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ८४२११५४०९०."
+    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ८४२११५४०९०.",
+    netVol: "300 ml",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी उत्पादन संशोधन व विकास",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Cardioprotective support: strengthens heart muscles & helps stabilize blood pressure", mr: "हृदयाचे स्नायू बळकट करणे, रक्तदाब समतोल राखणे व हृदयाची पंपिंग क्षमता सुधारणे" },
+      { en: "Hepatoprotective detox: clears fatty liver deposits & regulates SGOT/SGPT enzymes", mr: "फॅटी लिव्हरची समस्या दूर करून यकृतातील एन्झाईम्स सामान्य पातळीवर आणणे" },
+      { en: "Nephroprotective care: aids kidney filtration & maintains optimal creatinine levels", mr: "किडनीची गाळणक्षमता सुधारून क्रिएटीनिन व युरियाची पातळी नियंत्रणात ठेवणे" },
+      { en: "Reduces fluid retention, facial puffiness & swelling in legs/feet (Edema)", mr: "हात, पाय व चेहऱ्यावरील सूज (Edema) कमी करून अतिरिक्त पाणी बाहेर काढणे" },
+      { en: "Aids in cholesterol management & protects internal organs from toxin damage", mr: "कोलेस्ट्रॉल व ट्रायग्लिसराईड्स नियंत्रणात ठेवून अवयवांना विषारी दोषांपासून वाचवणे" }
+    ]
   },
   {
     id: "prod_antox_b_acid",
@@ -905,6 +1326,12 @@ export const productsData = [
       "https://nutrifeel.org/wp-content/uploads/b-acid-new.png",
       "https://nutrifeel.org/wp-content/uploads/bacidnew-2.jpeg"
     ],
+    composition: [
+      { nameEn: "Yashtimadhu (Licorice / Glycyrrhiza glabra)", nameMr: "ज्येष्ठमध", benefitEn: "Soothes inflamed esophageal mucosa and stops acid burns", benefitMr: "अन्ननलिकेची जळजळ शांत करून अल्सरपासून संरक्षण करते" },
+      { nameEn: "Shatavari & Amalaki", nameMr: "शतावरी व आवळा", benefitEn: "Potent cooling Pitta shamaka balancing gastric heat", benefitMr: "पोटातील उष्णता व अतिप्रमाणातील पित्त शांत करते" },
+      { nameEn: "Kamdudha Ras & Shankha Bhasma", nameMr: "कामदुधा रस व शंख भस्म", benefitEn: "Natural alkaline compounds neutralizing excess stomach acid", benefitMr: "अति आम्लता वेगाने कमी करून आंबट ढेकर थांबवते" },
+      { nameEn: "Pittapapada & Saunf (Fennel)", nameMr: "पित्तपापडा व बडीशेप", benefitEn: "Prevents nausea, bloating, sour reflux & promotes gut ease", benefitMr: "मळमळ, उलट्या व पोट फुगण्याच्या त्रासावर आराम देते" }
+    ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-b-acid/",
     inStock: true,
     badgeEn: "Nutrifeel Official",
@@ -921,7 +1348,19 @@ export const productsData = [
       { en: "Calms stomach lining and promotes gut balance", mr: "पोटातील अल्सर व जळजळ शांत करते" }
     ],
     dosageEn: "10-15ml with water after meals twice daily. Call 8421154090.",
-    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ८४२११५४०९०."
+    dosageMr: "जेवणानंतर १०-१५ मिली कोमट पाण्यातून दिवसातून दोनदा. फोन: ८४२११५४०९०.",
+    netVol: "300 ml",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी उत्पादन संशोधन व विकास",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Immediate cooling relief from acute hyperacidity, acid reflux & heartburn (GERD)", mr: "तीव्र आम्लपित्त, छातीत जळजळ व अन्ननलिकेत आग होण्यावर त्वरित आराम" },
+      { en: "Neutralizes excessive gastric acid secretion and bile overproduction", mr: "पोटातील अति आम्लता व अतिरिक्त पित्ताचा स्राव शांत करणे" },
+      { en: "Relieves sour belching, bitter mouth taste, morning nausea & vomiting", mr: "आंबट ढेकर, तोंडाला कडवट चव, मळमळ व पित्ताच्या उलट्या थांबवणे" },
+      { en: "Heals and soothes stomach ulcerations, gut irritation & bloating", mr: "पोटातील अल्सरची जळजळ शांत करणे, पोट फुगणे व मंदाग्नीवर गुणकारी" },
+      { en: "Supports healthy bowel movement & calms midnight gastric discomfort", mr: "पचनमार्ग स्वच्छ ठेवून रात्री शांत झोप मिळवून देण्यास साहाय्यक" }
+    ]
   },
   {
     id: "prod_antox_amrut_51",
@@ -941,12 +1380,38 @@ export const productsData = [
     reviewsCount: 152,
     stock: 100,
     image: "https://nutrifeel.org/wp-content/uploads/amrut-new-266x400.png",
-    fallbackImage: "https://nutrifeel.org/wp-content/uploads/amrut51.jpeg",
+    fallbackImage: "https://nutrifeel.org/wp-content/uploads/51H-LABEL.jpg",
     gallery: [
-      "https://nutrifeel.org/wp-content/uploads/amrut51.jpeg",
-      "https://nutrifeel.org/wp-content/uploads/Antox-51-Brochure-2-scaled.jpg",
-      "https://nutrifeel.org/wp-content/uploads/Antox-51-Brochure-3-scaled.jpg",
-      "https://nutrifeel.org/wp-content/uploads/Antox-51-Brochure-4-scaled.jpg"
+      "https://nutrifeel.org/wp-content/uploads/A51_8.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_9.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_10.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_11.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_12.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_13.jpg",
+      "https://nutrifeel.org/wp-content/uploads/A51_14.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H-LABEL.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H-LABEL-1.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H1.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H2.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H3.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H4.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H5.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H6.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H7.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H8.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H9.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H10.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H11.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H12.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H13.jpg",
+      "https://nutrifeel.org/wp-content/uploads/51H14.jpg"
+    ],
+    composition: [
+      { nameEn: "Ashwagandha, Shatavari & Brahmi", nameMr: "अश्वगंधा, शतावरी व ब्राह्मी", benefitEn: "Cognitive clarity, neuro-protection and cellular anti-stress", benefitMr: "मानसिक एकाग्रता, मेंदूचे पोषण व पेशींची शक्ती" },
+      { nameEn: "Triphala (Amla, Haritaki, Bibhitaki)", nameMr: "त्रिफळा (आवळा, हरडे, बेहेडा)", benefitEn: "Complete systemic digestion and colon detoxification", benefitMr: "पचनक्रिया सुधारणा व संपूर्ण शरीरशुद्धी" },
+      { nameEn: "Guduchi (Giloy) & Tulsi", nameMr: "गुळवेल व तुळस", benefitEn: "Recharges immune surveillance against recurrent infections", benefitMr: "वारंवार होणाऱ्या आजारांपासून नैसर्गिक प्रतिकार कवच" },
+      { nameEn: "Trikatu (Sunthi, Maricha, Pippali)", nameMr: "त्रिकटू (सुंठ, मिरी, पिंपळी)", benefitEn: "Bio-enhancer maximizing deep cellular absorption of 51 herbs", benefitMr: "सर्व ५१ औषधी वनस्पतींचे पोषण शरीरात शोषून घेण्यास मदत" },
+      { nameEn: "Kesar, Safed Musli & Vidari", nameMr: "केशर, पांढरी मुसळी व विदारीकंद", benefitEn: "Master Rasayana revitalizing Ojas, vigor, skin glow & longevity", benefitMr: "ओज, तेज, तारुण्य व दीर्घायुष्य देणारे सर्वोच्च रसायन" }
     ],
     nutrifeelUrl: "https://nutrifeel.org/product/antox-amrut-51/",
     inStock: true,
@@ -964,7 +1429,19 @@ export const productsData = [
       { en: "Natural cellular detoxification & anti-aging support", mr: "शरीरातील पेशींची नैसर्गिक स्वच्छता व कायाकल्प" }
     ],
     dosageEn: "15ml twice daily before meals with lukewarm water. Call 8421154090.",
-    dosageMr: "जेवणापूर्वी १५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ८४२११५४०९०."
+    dosageMr: "जेवणापूर्वी १५ मिली कोमट पाण्यासोबत दिवसातून दोनदा. फोन: ८४२११५४०९०.",
+    netVol: "300 ml",
+    brochureSubtitle: "For promotion & development of Electro-Homeopathic Product",
+    brochureSubtitleMr: "इलेक्ट्रो-होमिओपॅथी उत्पादन संशोधन व विकास",
+    guidanceNote: "NOTE : This product is based on Electro-Homeopathy (EH HERBAL) under Guidance and Consultation of Dr. B.S MANE (MD, EH, ADEH, BEMS)",
+    guidanceNoteMr: "टीप: हे उत्पादन इलेक्ट्रो-होमिओपॅथी (EH HERBAL) तत्त्वांवर आधारित असून डॉ. बी. एस. माने (MD, EH, ADEH, BEMS) यांच्या तज्ज्ञ मार्गदर्शन व सल्ल्यानुसार विकसित केलेले आहे.",
+    supportiveIn: [
+      { en: "Master multi-system cellular rejuvenation powered by 51 Himalayan botanicals", mr: "५१ दुर्मिळ हिमालयातील वनौषधींनी युक्त संपूर्ण शरीराचा कायाकल्प व पेशींचे पुनरुज्जीवन" },
+      { en: "Strengthens innate immune defenses against seasonal viruses & chronic illness", mr: "ऋतुबदलामुळे होणारे आजार, संसर्ग व विषाणूंविरुद्ध अभेद्य प्रतिकारक कवच" },
+      { en: "Overcomes chronic fatigue, brain fog & revitalizes whole-body stamina", mr: "जुनाट थकवा, मानसिक सुस्ती घालवून संपूर्ण शरीराला प्रचंड ऊर्जा व उत्साह देणे" },
+      { en: "Cleanses micro-circulatory channels (Srotas) & eliminates free radical damage", mr: "सूक्ष्म रक्तवाहिन्यांची शुद्धी करून पेशींमधील घातक विषारी घटकांचे उच्चाटन" },
+      { en: "Promotes youthful vitality, radiant skin glow, Ojas and natural longevity", mr: "ओज, तेज, तारुण्य, त्वचेची कांती आणि निरोगी दीर्घायुष्य देणारे महा-रसायन" }
+    ]
   }
 ];
 

@@ -3,6 +3,7 @@ export const COMBO_CATALOG = {
   prod_antox_d_combo: {
     items: [
       {
+        productId: 'prod_antox_d',
         name: '1 ANTOX-D (300ml Liquid)',
         nameMr: '१ ANTOX-D (३०० मिली लिक्विड)',
         count: 1,
@@ -10,6 +11,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg'
       },
       {
+        productId: 'prod_antox_t',
         name: '1 ANTOX-T (60 Tea Bags)',
         nameMr: '१ ANTOX-T (६० टी बॅग्स)',
         count: 1,
@@ -21,6 +23,7 @@ export const COMBO_CATALOG = {
   prod_antox_2d_1t_combo: {
     items: [
       {
+        productId: 'prod_antox_d',
         name: '2 ANTOX-D (300ml each)',
         nameMr: '२ बाटल्या ANTOX-D (प्रत्येकी ३०० मिली)',
         count: 2,
@@ -28,6 +31,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.23.25-PM.jpeg'
       },
       {
+        productId: 'prod_antox_t',
         name: '1 ANTOX-T (60 Tea Bags)',
         nameMr: '१ ANTOX-T (६० टी बॅग्स)',
         count: 1,
@@ -39,6 +43,7 @@ export const COMBO_CATALOG = {
   prod_spray_nico_combo: {
     items: [
       {
+        productId: 'prod_spray_b_ai_nico',
         name: 'SPRAY-B-AI NICO (50ml Spray)',
         nameMr: 'SPRAY-B-AI NICO (५० मिली स्प्रे)',
         count: 1,
@@ -46,6 +51,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/spraynew-2.jpeg'
       },
       {
+        productId: 'prod_antox_t',
         name: 'ANTOX-T (60 Tea Bags)',
         nameMr: 'ANTOX-T (६० टी बॅग्स चहा)',
         count: 1,
@@ -57,6 +63,7 @@ export const COMBO_CATALOG = {
   prod_antox_pn_combo: {
     items: [
       {
+        productId: 'prod_antox_pn_powder',
         name: 'ANTOX -PN POWDER (Joint Care)',
         nameMr: 'ANTOX -PN पावडर',
         count: 1,
@@ -64,6 +71,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.57.12-PM.jpeg'
       },
       {
+        productId: 'prod_antox_pn_oil',
         name: 'ANTOX – PN OIL (100ml Oil)',
         nameMr: 'ANTOX – PN ऑईल (१०० मिली मालिश तेल)',
         count: 1,
@@ -75,6 +83,7 @@ export const COMBO_CATALOG = {
   prod_antox_hlk_combo: {
     items: [
       {
+        productId: 'prod_antox_hlk',
         name: 'ANTOX-HLK (Heart, Liver, Kidney)',
         nameMr: 'ANTOX-HLK (हृदय, लिव्हर, किडनी टॉनिक)',
         count: 1,
@@ -82,6 +91,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.36.32-PM.jpeg'
       },
       {
+        productId: 'prod_antox_t',
         name: 'ANTOX-T (60 Tea Bags)',
         nameMr: 'ANTOX-T (६० टी बॅग्स चहा)',
         count: 1,
@@ -93,6 +103,7 @@ export const COMBO_CATALOG = {
   prod_antox_b_acid_combo: {
     items: [
       {
+        productId: 'prod_antox_b_acid',
         name: 'ANTOX-B ACID (Acidity & Gas)',
         nameMr: 'ANTOX-B ACID (पित्तनाशक लिक्विड)',
         count: 1,
@@ -100,6 +111,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/bacidnew-2.jpeg'
       },
       {
+        productId: 'prod_antox_t',
         name: 'ANTOX-T (60 Tea Bags)',
         nameMr: 'ANTOX-T (६० टी बॅग्स चहा)',
         count: 1,
@@ -111,6 +123,7 @@ export const COMBO_CATALOG = {
   prod_antox_amrut_51_combo: {
     items: [
       {
+        productId: 'prod_antox_amrut_51',
         name: 'ANTOX – AMRUT 51',
         nameMr: 'ANTOX – अमृत ५१ (५१ वनौषधी अर्क)',
         count: 1,
@@ -118,6 +131,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/amrut51.jpeg'
       },
       {
+        productId: 'prod_antox_t',
         name: 'ANTOX-T (60 Tea Bags)',
         nameMr: 'ANTOX-T (६० टी बॅग्स चहा)',
         count: 1,
@@ -129,6 +143,7 @@ export const COMBO_CATALOG = {
   prod_antox_x_combo: {
     items: [
       {
+        productId: 'prod_antox_x',
         name: 'ANTOX- X (Vitality & Stamina)',
         nameMr: 'ANTOX- X (ऊर्जा व स्टॅमिना)',
         count: 1,
@@ -136,6 +151,7 @@ export const COMBO_CATALOG = {
         fallback: 'https://nutrifeel.org/wp-content/uploads/WhatsApp-Image-2026-06-11-at-4.52.31-PM.jpeg'
       },
       {
+        productId: 'prod_antox_t',
         name: 'ANTOX-T (60 Tea Bags)',
         nameMr: 'ANTOX-T (६० टी बॅग्स चहा)',
         count: 1,
@@ -144,6 +160,39 @@ export const COMBO_CATALOG = {
       }
     ]
   }
+};
+
+export const COMBO_CHILD_MAP = {
+  prod_antox_d_combo: ['prod_antox_d', 'prod_antox_t'],
+  prod_antox_2d_1t_combo: ['prod_antox_d', 'prod_antox_t'],
+  prod_spray_nico_combo: ['prod_spray_b_ai_nico', 'prod_antox_t'],
+  prod_antox_pn_combo: ['prod_antox_pn_powder', 'prod_antox_pn_oil'],
+  prod_antox_hlk_combo: ['prod_antox_hlk', 'prod_antox_t'],
+  prod_antox_b_acid_combo: ['prod_antox_b_acid', 'prod_antox_t'],
+  prod_antox_amrut_51_combo: ['prod_antox_amrut_51', 'prod_antox_t'],
+  prod_antox_x_combo: ['prod_antox_x', 'prod_antox_t']
+};
+
+export const getComboChildProducts = (product, allProducts = []) => {
+  if (!product || !allProducts || allProducts.length === 0) return [];
+  const comboKey = String(product.id || '').trim();
+  let childIds = COMBO_CHILD_MAP[comboKey];
+  if (!childIds) {
+    const nameLower = (product.nameEn || product.name || product.nameMr || '').toLowerCase();
+    const aliasLower = (product.alias || '').toLowerCase();
+    if (nameLower.includes('2 antox-d') || aliasLower.includes('2-antox-d') || nameLower.includes('२ antox-d')) childIds = COMBO_CHILD_MAP.prod_antox_2d_1t_combo;
+    else if (nameLower.includes('antox-d') && nameLower.includes('antox-t')) childIds = COMBO_CHILD_MAP.prod_antox_d_combo;
+    else if (nameLower.includes('spray') && nameLower.includes('antox-t')) childIds = COMBO_CHILD_MAP.prod_spray_nico_combo;
+    else if ((nameLower.includes('powder') && nameLower.includes('oil')) || (nameLower.includes('पावडर') && nameLower.includes('ऑईल'))) childIds = COMBO_CHILD_MAP.prod_antox_pn_combo;
+    else if (nameLower.includes('hlk') && nameLower.includes('antox-t')) childIds = COMBO_CHILD_MAP.prod_antox_hlk_combo;
+    else if (nameLower.includes('acid') && nameLower.includes('antox-t')) childIds = COMBO_CHILD_MAP.prod_antox_b_acid_combo;
+    else if (nameLower.includes('amrut') && nameLower.includes('antox-t')) childIds = COMBO_CHILD_MAP.prod_antox_amrut_51_combo;
+    else if ((nameLower.includes('antox- x') || nameLower.includes('antox-x')) && nameLower.includes('antox-t')) childIds = COMBO_CHILD_MAP.prod_antox_x_combo;
+  }
+  if (childIds && Array.isArray(childIds)) {
+    return childIds.map(cid => allProducts.find(p => p.id === cid)).filter(Boolean);
+  }
+  return [];
 };
 
 /**
