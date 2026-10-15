@@ -107,6 +107,8 @@ const Photos = () => {
               >
                 <img
                   src={photo.image}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = photo.fallback;

@@ -156,7 +156,7 @@ const Videos = () => {
             margin: '0 auto'
           }}>
             <h3 style={{ fontSize: '1.5rem', color: '#006B2D', fontWeight: 800, marginBottom: '0.5rem', fontFamily: 'var(--font-heading)' }}>
-              {language === 'mr' ? 'आपलाही अनुभव शेअर करायचा आहे किंवा सल्ला हवा आहे?' : 'Want to Share Your Story or Consult With Our Health Staff?'}
+              {language === 'mr' ? 'आपलाही अनुभव शेअर करायचा आहे किंवा सल्ला हवा आहे?' : 'Want to Share Your Story or Consult With Our Health Advisor?'}
             </h3>
             <p style={{ color: '#5F6B61', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.75rem' }}>
               {language === 'mr'

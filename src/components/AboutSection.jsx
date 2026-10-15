@@ -14,42 +14,59 @@ import { organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 import MissionLogoBadge from './MissionLogoBadge';
 
-// Animated Count-Up Hook Component
-const CountUpNumber = ({ target, suffix = '', duration = 1600 }) => {
-  const [count, setCount] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
+// Animated Count-Up Hook Component (Supports integers and decimals like 3.5)
+const CountUpNumber = ({ target, suffix = '', decimals = 0, duration = 1600 }) => {
+  const numTarget = parseFloat(target) || 0;
+  const [count, setCount] = useState(numTarget);
   const ref = useRef(null);
 
   useEffect(() => {
+    setCount(numTarget);
+  }, [numTarget]);
+
+  useEffect(() => {
+    let frame = 0;
+    const totalFrames = Math.round(duration / 16);
+    let counter = null;
+    let hasRun = false;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          const end = parseInt(target, 10) || 0;
-          const totalFrames = Math.round(duration / 16);
-          let frame = 0;
+        if (entry.isIntersecting && !hasRun) {
+          hasRun = true;
+          setCount(0);
+          frame = 0;
+          if (counter) clearInterval(counter);
 
-          const counter = setInterval(() => {
+          counter = setInterval(() => {
             frame++;
             const progress = frame / totalFrames;
-            const current = Math.round(end * (1 - Math.pow(1 - progress, 3)));
+            const factor = 1 - Math.pow(1 - progress, 3);
+            const current = numTarget * factor;
             setCount(current);
 
             if (frame >= totalFrames) {
               clearInterval(counter);
-              setCount(end);
+              setCount(numTarget);
             }
           }, 16);
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
 
     if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target, duration, hasAnimated]);
+    return () => {
+      observer.disconnect();
+      if (counter) clearInterval(counter);
+    };
+  }, [numTarget, duration]);
 
-  return <span ref={ref}>{hasAnimated ? count.toLocaleString() : 0}{suffix}</span>;
+  const displayValue = decimals > 0 
+    ? Number(count).toFixed(decimals) 
+    : Math.round(count).toLocaleString();
+
+  return <span ref={ref}>{displayValue}{suffix}</span>;
 };
 
 const AboutSection = () => {
@@ -72,9 +89,9 @@ const AboutSection = () => {
   }, []);
 
   const stats = [
-    { target: 18, suffix: '+', labelEn: 'Years Experience', labelMr: 'वर्षांचा अखंड अनुभव', icon: <Calendar size={18} style={{ color: '#006B2D' }} /> },
+    { target: 10, suffix: '+', labelEn: 'Years Experience', labelMr: 'वर्षांचा अखंड अनुभव', icon: <Calendar size={18} style={{ color: '#006B2D' }} /> },
     { target: 500, suffix: '+', labelEn: 'Social Programs', labelMr: 'आरोग्य शिबिरे व कार्यक्रम', icon: <Award size={18} style={{ color: '#FFC928' }} /> },
-    { target: 10000, suffix: '+', labelEn: 'Lives Impacted', labelMr: 'लाभार्थी व नागरिक', icon: <Users size={18} style={{ color: '#159B32' }} /> }
+    { target: 3.5, decimals: 1, suffixEn: ' lacs+', suffixMr: ' लाख+', suffix: ' lacs+', labelEn: 'Lives Impacted', labelMr: 'लाभार्थी व नागरिक', icon: <Users size={18} style={{ color: '#159B32' }} /> }
   ];
 
   return (
@@ -135,7 +152,12 @@ const AboutSection = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' }}>
                     {stat.icon}
                     <span className="about-stat-number">
-                      <CountUpNumber target={stat.target} suffix={stat.suffix} />
+                      <CountUpNumber 
+                        key={`${stat.target}-${stat.decimals || 0}-${language}`}
+                        target={stat.target} 
+                        decimals={stat.decimals || 0}
+                        suffix={language === 'mr' ? (stat.suffixMr || stat.suffix) : (stat.suffixEn || stat.suffix)} 
+                      />
                     </span>
                   </div>
                   <div className="about-stat-label">

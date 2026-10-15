@@ -1,18 +1,44 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { User, CheckCircle, Clock, Sparkles, Phone, Video as VideoIcon } from 'lucide-react';
+import { User, CheckCircle, Clock, Phone, Video as VideoIcon } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 
 const HorizontalVideoCard = ({ video }) => {
   const { language } = useLanguage();
+  const cardRef = useRef(null);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isInView, setIsInView] = useState(false);
 
   const title = language === 'mr' ? (video.titleMr || video.title) : (video.titleEn || video.title);
   const speaker = language === 'mr' ? (video.speakerMr || video.patientName) : (video.speakerEn || video.patientName);
   const summary = language === 'mr' ? (video.summaryMr || video.summary) : (video.summaryEn || video.summary);
   const categoryLabel = language === 'mr' ? (video.categoryMr || video.category) : (video.categoryEn || video.category);
+
+  // Lazy observe when this card is near the viewport before downloading video metadata
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+
+    if (!('IntersectionObserver' in window)) {
+      setIsInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Global pause helper: when any video plays, pause all other videos on the page
   const pauseOtherVideos = () => {
@@ -26,7 +52,7 @@ const HorizontalVideoCard = ({ video }) => {
   const handleLoadedMetadata = () => {
     if (videoRef.current && videoRef.current.currentTime === 0) {
       try {
-        videoRef.current.currentTime = 0.1;
+        videoRef.current.currentTime = 0.5;
       } catch (e) {
         // Ignore seek errors
       }
@@ -53,10 +79,11 @@ const HorizontalVideoCard = ({ video }) => {
       videoEl.removeEventListener('play', handlePlay);
       videoEl.removeEventListener('pause', handlePause);
     };
-  }, []);
+  }, [isInView]);
 
   return (
     <div 
+      ref={cardRef}
       className="horizontal-video-card"
       style={{
         backgroundColor: '#ffffff',
@@ -70,35 +97,18 @@ const HorizontalVideoCard = ({ video }) => {
         transition: 'transform 0.25s ease, box-shadow 0.25s ease'
       }}
     >
-      {/* Video Header: Category Pill & Duration Badge */}
-      <div 
-        style={{
-          padding: '0.75rem 1rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: '#F8FAF7',
-          borderBottom: '1px solid #EBF2E9'
-        }}
-      >
+      {/* Video Header: Duration Badge */}
+      {video.duration && (
         <div 
           style={{
-            backgroundColor: '#006B2D',
-            color: '#ffffff',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            padding: '0.25rem 0.65rem',
-            borderRadius: '9999px',
-            display: 'inline-flex',
+            padding: '0.6rem 1rem',
+            display: 'flex',
             alignItems: 'center',
-            gap: '0.35rem'
+            justifyContent: 'flex-end',
+            backgroundColor: '#F8FAF7',
+            borderBottom: '1px solid #EBF2E9'
           }}
         >
-          <Sparkles size={11} style={{ color: '#F4A261' }} />
-          <span>{categoryLabel}</span>
-        </div>
-
-        {video.duration && (
           <div 
             style={{
               backgroundColor: '#ffffff',
@@ -116,8 +126,8 @@ const HorizontalVideoCard = ({ video }) => {
             <Clock size={11} style={{ color: '#006B2D' }} />
             <span>{video.duration}</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Video Player Frame with Native Controls and 100% Uncropped Display */}
       <div 
@@ -132,26 +142,51 @@ const HorizontalVideoCard = ({ video }) => {
           justifyContent: 'center'
         }}
       >
-        <video
-          ref={videoRef}
-          src={`${video.videoUrl}#t=0.1`}
-          poster={video.thumbnail || video.fallbackThumbnail}
-          preload="none"
-          playsInline
-          controls
-          onLoadedMetadata={handleLoadedMetadata}
-          onLoadedData={handleLoadedMetadata}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain',
-            backgroundColor: '#000000',
-            display: 'block'
-          }}
-        >
-          <source src={video.videoUrl} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        {isInView ? (
+          <video
+            ref={videoRef}
+            src={`${video.videoUrl}#t=0.5`}
+            preload="metadata"
+            playsInline
+            controls
+            onLoadedMetadata={handleLoadedMetadata}
+            onLoadedData={handleLoadedMetadata}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              backgroundColor: '#000000',
+              display: 'block'
+            }}
+          >
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#0c140d'
+            }}
+          >
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <VideoIcon size={22} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Card Details Body */}

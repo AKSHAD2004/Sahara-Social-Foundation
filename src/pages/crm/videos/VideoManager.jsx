@@ -66,8 +66,8 @@ export default function VideoManager() {
     setEditingVideo(null);
     setFormData({
       videoUrl: '',
-      thumbnail: 'https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg',
-      fallbackThumbnail: 'https://samarthkolhapur.com/wp-content/uploads/2026/04/Antox-D-T.jpeg',
+      thumbnail: '',
+      fallbackThumbnail: '',
       speakerMr: 'सहारा सोशल फाऊंडेशन लाभार्थी',
       speakerEn: 'Sahara Beneficiary',
       titleMr: '',
@@ -322,33 +322,22 @@ export default function VideoManager() {
                 aspectRatio: '16/9'
               }}>
                 <video
-                  src={video.videoUrl}
-                  poster={video.thumbnail || video.fallbackThumbnail}
+                  src={`${video.videoUrl}#t=0.5`}
                   controls
                   preload="metadata"
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
 
                 {/* Top Badge Overlay */}
-                <div style={{
-                  position: 'absolute',
-                  top: '0.6rem',
-                  left: '0.6rem',
-                  display: 'flex',
-                  gap: '0.4rem',
-                  pointerEvents: 'none'
-                }}>
-                  <span style={{
-                    backgroundColor: '#006B2D',
-                    color: '#ffffff',
-                    fontSize: '0.72rem',
-                    fontWeight: 800,
-                    padding: '0.2rem 0.55rem',
-                    borderRadius: '6px'
+                {video.duration && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '0.6rem',
+                    right: '0.6rem',
+                    display: 'flex',
+                    gap: '0.4rem',
+                    pointerEvents: 'none'
                   }}>
-                    {video.category}
-                  </span>
-                  {video.duration && (
                     <span style={{
                       backgroundColor: 'rgba(0,0,0,0.65)',
                       color: '#ffffff',
@@ -363,8 +352,8 @@ export default function VideoManager() {
                       <Clock size={11} />
                       {video.duration}
                     </span>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
 
               {/* Speaker / Patient */}

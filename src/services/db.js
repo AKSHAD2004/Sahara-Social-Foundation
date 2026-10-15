@@ -174,6 +174,10 @@ function initCollection(collectionName, defaultData) {
         const mergedSettings = { ...parsed, phone: defaultData.phone, whatsappNumber: defaultData.whatsappNumber };
         state[collectionName] = mergedSettings;
         localStorage.setItem(key, JSON.stringify(mergedSettings));
+      } else if (collectionName === 'videos' && Array.isArray(parsed)) {
+        const cleanedVideos = parsed.map((v) => ({ ...v, thumbnail: '', fallbackThumbnail: '' }));
+        state[collectionName] = cleanedVideos;
+        localStorage.setItem(key, JSON.stringify(cleanedVideos));
       } else if (collectionName === 'orders' && Array.isArray(defaultData)) {
         const existingOrders = Array.isArray(parsed) ? parsed : [];
         const orderMap = new Map(existingOrders.map((o) => [String(o.id || o.orderId), o]));
@@ -286,21 +290,24 @@ export function initDatabase() {
     }
   }
 
-  // Automatically sync/generate commissions for any pending paid orders
-  setTimeout(() => {
-    try {
-      dbService.syncAllOrderCommissions();
-    } catch (e) {}
-  }, 300);
+  // Automatically sync/generate commissions for any pending paid orders (only in CRM context)
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/crm')) {
+    setTimeout(() => {
+      try {
+        dbService.syncAllOrderCommissions();
+      } catch (e) {}
+    }, 1500);
+  }
 
-  // Proactively fetch all major collections from Cloud Firestore only if quota not reached
-  setTimeout(() => {
-    try {
-      if (typeof window !== 'undefined' && isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
+  // Defer cloud refresh until browser is idle to ensure instant initial render
+  if (typeof window !== 'undefined' && isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
+    const scheduleRefresh = window.requestIdleCallback || ((cb) => setTimeout(cb, 2500));
+    scheduleRefresh(() => {
+      try {
         dbService.refreshAllFromFirebase().catch(() => {});
-      }
-    } catch (e) {}
-  }, 400);
+      } catch (e) {}
+    });
+  }
 }
 
 let permissionWarningDispatched = false;
@@ -1337,18 +1344,26 @@ export const dbService = {
   /**
    * Proactively refresh all primary collections from Cloud Firestore across all devices
    */
-  async refreshAllFromFirebase() {
-    const collectionsToRefresh = [
-      'orders',
-      'heroSlides',
-      'galleryPhotos',
-      'videos',
-      'reviews',
-      'products',
-      'customers',
-      'leads',
-      'settings'
-    ];
+  async refreshAllFromFirebase(isCrmContext = false) {
+    const isCrm = isCrmContext || (typeof window !== 'undefined' && window.location.pathname.startsWith('/crm'));
+    const collectionsToRefresh = isCrm
+      ? [
+          'orders',
+          'heroSlides',
+          'galleryPhotos',
+          'videos',
+          'reviews',
+          'products',
+          'customers',
+          'leads',
+          'settings'
+        ]
+      : [
+          'settings',
+          'heroSlides',
+          'products'
+        ];
+
     const results = {};
     for (const col of collectionsToRefresh) {
       try {

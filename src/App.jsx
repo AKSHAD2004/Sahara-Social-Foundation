@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 
 // Public Layout Components
@@ -10,24 +10,26 @@ import Toast from './components/Toast';
 import ConsultationModal from './components/ConsultationModal';
 import CustomerAuthModal from './components/CustomerAuthModal';
 
-// Public Pages
+// Core Public Pages (Synchronous for instantaneous first paint)
 import Home from './pages/Home';
-import About from './pages/About';
-import Services from './pages/Services';
 import Shop from './pages/Shop';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
-import OrderConfirmation from './pages/OrderConfirmation';
-import Photos from './pages/Photos';
-import Videos from './pages/Videos';
-import Contact from './pages/Contact';
-import Account from './pages/Account';
-import Affiliate from './pages/Affiliate';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import RefundPolicy from './pages/RefundPolicy';
-import StudyReport from './pages/StudyReport';
-import NotFound from './pages/NotFound';
+
+// Secondary Public Pages (Lazy Loaded on Demand)
+const About = lazy(() => import('./pages/About'));
+const Services = lazy(() => import('./pages/Services'));
+const OrderConfirmation = lazy(() => import('./pages/OrderConfirmation'));
+const Photos = lazy(() => import('./pages/Photos'));
+const Videos = lazy(() => import('./pages/Videos'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Account = lazy(() => import('./pages/Account'));
+const Affiliate = lazy(() => import('./pages/Affiliate'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
+const StudyReport = lazy(() => import('./pages/StudyReport'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Context Providers
 import { LanguageProvider } from './context/LanguageContext';
@@ -35,33 +37,53 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 
-// CRM Components & Pages
-import CrmLayout from './components/crm/CrmLayout';
-import CrmLogin from './pages/crm/auth/Login';
-import CrmDashboard from './pages/crm/dashboard/Dashboard';
-import CustomerList from './pages/crm/customers/CustomerList';
-import LeadList from './pages/crm/leads/LeadList';
-import FollowupList from './pages/crm/followups/FollowupList';
-import OrderList from './pages/crm/orders/OrderList';
-import ProductList from './pages/crm/products/ProductList';
-import HeroSlideList from './pages/crm/banners/HeroSlideList';
-import GalleryManager from './pages/crm/gallery/GalleryManager';
-import VideoManager from './pages/crm/videos/VideoManager';
-import ReviewManager from './pages/crm/reviews/ReviewManager';
-import AffiliateList from './pages/crm/affiliates/AffiliateList';
-import AffiliatePortal from './pages/crm/affiliates/AffiliatePortal';
-import CommissionDashboard from './pages/crm/commission/CommissionDashboard';
-import CommissionSlabs from './pages/crm/commission/CommissionSlabs';
-import EmployeeCommission from './pages/crm/commission/EmployeeCommission';
-import CommissionTransactions from './pages/crm/commission/CommissionTransactions';
-import CommissionPayouts from './pages/crm/commission/CommissionPayouts';
-import PaymentList from './pages/crm/payments/PaymentList';
-import SupportTicketList from './pages/crm/support/SupportTicketList';
-import Reports from './pages/crm/reports/Reports';
-import Notifications from './pages/crm/notifications/Notifications';
-import UserList from './pages/crm/users/UserList';
-import AuditLogs from './pages/crm/audit/AuditLogs';
-import Settings from './pages/crm/settings/Settings';
+// CRM Components & Pages (Lazy Loaded so public visitors never download CRM code)
+const CrmLayout = lazy(() => import('./components/crm/CrmLayout'));
+const CrmLogin = lazy(() => import('./pages/crm/auth/Login'));
+const CrmDashboard = lazy(() => import('./pages/crm/dashboard/Dashboard'));
+const CustomerList = lazy(() => import('./pages/crm/customers/CustomerList'));
+const LeadList = lazy(() => import('./pages/crm/leads/LeadList'));
+const FollowupList = lazy(() => import('./pages/crm/followups/FollowupList'));
+const OrderList = lazy(() => import('./pages/crm/orders/OrderList'));
+const ProductList = lazy(() => import('./pages/crm/products/ProductList'));
+const HeroSlideList = lazy(() => import('./pages/crm/banners/HeroSlideList'));
+const GalleryManager = lazy(() => import('./pages/crm/gallery/GalleryManager'));
+const VideoManager = lazy(() => import('./pages/crm/videos/VideoManager'));
+const ReviewManager = lazy(() => import('./pages/crm/reviews/ReviewManager'));
+const AffiliateList = lazy(() => import('./pages/crm/affiliates/AffiliateList'));
+const AffiliatePortal = lazy(() => import('./pages/crm/affiliates/AffiliatePortal'));
+const CommissionDashboard = lazy(() => import('./pages/crm/commission/CommissionDashboard'));
+const CommissionSlabs = lazy(() => import('./pages/crm/commission/CommissionSlabs'));
+const EmployeeCommission = lazy(() => import('./pages/crm/commission/EmployeeCommission'));
+const CommissionTransactions = lazy(() => import('./pages/crm/commission/CommissionTransactions'));
+const CommissionPayouts = lazy(() => import('./pages/crm/commission/CommissionPayouts'));
+const PaymentList = lazy(() => import('./pages/crm/payments/PaymentList'));
+const SupportTicketList = lazy(() => import('./pages/crm/support/SupportTicketList'));
+const Reports = lazy(() => import('./pages/crm/reports/Reports'));
+const Notifications = lazy(() => import('./pages/crm/notifications/Notifications'));
+const UserList = lazy(() => import('./pages/crm/users/UserList'));
+const AuditLogs = lazy(() => import('./pages/crm/audit/AuditLogs'));
+const Settings = lazy(() => import('./pages/crm/settings/Settings'));
+
+// Lightweight Page Loading Spinner
+const RouteLoader = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '50vh', padding: '2rem' }}>
+    <div style={{
+      width: '36px',
+      height: '36px',
+      border: '3px solid #E8F5E9',
+      borderTop: '3px solid #006B2D',
+      borderRadius: '50%',
+      animation: 'appSpin 0.75s linear infinite'
+    }} />
+    <style>{`
+      @keyframes appSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `}</style>
+  </div>
+);
 
 // Scroll to top & Affiliate Referral Link Tracker
 function AppTracker() {
@@ -128,88 +150,90 @@ function App() {
         <AuthProvider>
           <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AppTracker />
-            <Routes>
-              {/* CRM Public Login */}
-              <Route path="/crm/login" element={<CrmLogin />} />
+            <Suspense fallback={<RouteLoader />}>
+              <Routes>
+                {/* CRM Public Login */}
+                <Route path="/crm/login" element={<CrmLogin />} />
 
-              {/* Secure CRM Portal (Role-Protected) */}
-              <Route
-                path="/crm"
-                element={
-                  <ProtectedRoute>
-                    <CrmLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<CrmDashboard />} />
-                <Route path="customers" element={<CustomerList />} />
-                <Route path="leads" element={<LeadList />} />
-                <Route path="followups" element={<FollowupList />} />
-                <Route path="orders" element={<OrderList />} />
-                <Route path="products" element={<ProductList />} />
-                <Route path="banners" element={<HeroSlideList />} />
-                <Route path="slides" element={<HeroSlideList />} />
-                <Route path="gallery" element={<GalleryManager />} />
-                <Route path="photos-manager" element={<GalleryManager />} />
-                <Route path="videos" element={<VideoManager />} />
-                <Route path="videos-manager" element={<VideoManager />} />
-                <Route path="reviews" element={<ReviewManager />} />
-                <Route path="reviews-manager" element={<ReviewManager />} />
-                <Route path="affiliates" element={<AffiliateList />} />
-                <Route path="affiliate-portal" element={<AffiliatePortal />} />
-                
-                {/* Commission Subroutes */}
-                <Route path="commission" element={<CommissionDashboard />} />
-                <Route path="commission/slabs" element={<CommissionSlabs />} />
-                <Route path="commission/employees" element={<EmployeeCommission />} />
-                <Route path="commission/transactions" element={<CommissionTransactions />} />
-                <Route path="commission/payouts" element={<CommissionPayouts />} />
+                {/* Secure CRM Portal (Role-Protected) */}
+                <Route
+                  path="/crm"
+                  element={
+                    <ProtectedRoute>
+                      <CrmLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<CrmDashboard />} />
+                  <Route path="customers" element={<CustomerList />} />
+                  <Route path="leads" element={<LeadList />} />
+                  <Route path="followups" element={<FollowupList />} />
+                  <Route path="orders" element={<OrderList />} />
+                  <Route path="products" element={<ProductList />} />
+                  <Route path="banners" element={<HeroSlideList />} />
+                  <Route path="slides" element={<HeroSlideList />} />
+                  <Route path="gallery" element={<GalleryManager />} />
+                  <Route path="photos-manager" element={<GalleryManager />} />
+                  <Route path="videos" element={<VideoManager />} />
+                  <Route path="videos-manager" element={<VideoManager />} />
+                  <Route path="reviews" element={<ReviewManager />} />
+                  <Route path="reviews-manager" element={<ReviewManager />} />
+                  <Route path="affiliates" element={<AffiliateList />} />
+                  <Route path="affiliate-portal" element={<AffiliatePortal />} />
+                  
+                  {/* Commission Subroutes */}
+                  <Route path="commission" element={<CommissionDashboard />} />
+                  <Route path="commission/slabs" element={<CommissionSlabs />} />
+                  <Route path="commission/employees" element={<EmployeeCommission />} />
+                  <Route path="commission/transactions" element={<CommissionTransactions />} />
+                  <Route path="commission/payouts" element={<CommissionPayouts />} />
 
-                <Route path="payments" element={<PaymentList />} />
-                <Route path="support" element={<SupportTicketList />} />
-                <Route path="reports" element={<Reports />} />
-                <Route path="notifications" element={<Notifications />} />
-                <Route path="users" element={<UserList />} />
-                <Route path="audit-logs" element={<AuditLogs />} />
-                <Route path="settings" element={<Settings />} />
-              </Route>
+                  <Route path="payments" element={<PaymentList />} />
+                  <Route path="support" element={<SupportTicketList />} />
+                  <Route path="reports" element={<Reports />} />
+                  <Route path="notifications" element={<Notifications />} />
+                  <Route path="users" element={<UserList />} />
+                  <Route path="audit-logs" element={<AuditLogs />} />
+                  <Route path="settings" element={<Settings />} />
+                </Route>
 
-              {/* Public Website Routes */}
-              <Route element={<PublicLayout />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/about-us" element={<About />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/shop/:id" element={<ProductDetails />} />
-                <Route path="/nutrifeel-product" element={<Shop />} />
-                <Route path="/nutrifeel-products" element={<Shop />} />
-                <Route path="/products" element={<Shop />} />
-                <Route path="/product/:id" element={<ProductDetails />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-confirmation" element={<OrderConfirmation />} />
-                <Route path="/photos" element={<Photos />} />
-                <Route path="/videos" element={<Videos />} />
-                <Route path="/video" element={<Videos />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/contact-us" element={<Contact />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/my-account" element={<Account />} />
-                <Route path="/affiliate" element={<Affiliate />} />
-                <Route path="/affiliates" element={<Affiliate />} />
-                <Route path="/affiliate-registration" element={<Affiliate />} />
-                <Route path="/affiliate/register" element={<Affiliate />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/refund-policy" element={<RefundPolicy />} />
-                <Route path="/refund_returns" element={<RefundPolicy />} />
-                <Route path="/study-report" element={<StudyReport />} />
-                <Route path="/clinical-report" element={<StudyReport />} />
-                <Route path="/clinical-reports" element={<StudyReport />} />
-                <Route path="/report" element={<StudyReport />} />
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
+                {/* Public Website Routes */}
+                <Route element={<PublicLayout />}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/about-us" element={<About />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/shop/:id" element={<ProductDetails />} />
+                  <Route path="/nutrifeel-product" element={<Shop />} />
+                  <Route path="/nutrifeel-products" element={<Shop />} />
+                  <Route path="/products" element={<Shop />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                  <Route path="/photos" element={<Photos />} />
+                  <Route path="/videos" element={<Videos />} />
+                  <Route path="/video" element={<Videos />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/contact-us" element={<Contact />} />
+                  <Route path="/account" element={<Account />} />
+                  <Route path="/my-account" element={<Account />} />
+                  <Route path="/affiliate" element={<Affiliate />} />
+                  <Route path="/affiliates" element={<Affiliate />} />
+                  <Route path="/affiliate-registration" element={<Affiliate />} />
+                  <Route path="/affiliate/register" element={<Affiliate />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="/refund_returns" element={<RefundPolicy />} />
+                  <Route path="/study-report" element={<StudyReport />} />
+                  <Route path="/clinical-report" element={<StudyReport />} />
+                  <Route path="/clinical-reports" element={<StudyReport />} />
+                  <Route path="/report" element={<StudyReport />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </Suspense>
           </Router>
         </AuthProvider>
       </CartProvider>

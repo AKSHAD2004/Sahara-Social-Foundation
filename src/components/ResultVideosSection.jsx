@@ -5,6 +5,167 @@ import { horizontalVideosData } from '../data/websiteData';
 import { useLanguage } from '../context/LanguageContext';
 import { dbService } from '../services/db';
 
+// Lazy video item that only mounts the <video> tag when scrolled within 300px of viewport
+const ResultVideoCardItem = ({ video, idx, language, handlePlay }) => {
+  const containerRef = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    if (!('IntersectionObserver' in window)) {
+      setInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleLoadedMetadata = (e) => {
+    try {
+      if (e.target && e.target.currentTime === 0) {
+        e.target.currentTime = 0.5;
+      }
+    } catch (err) {}
+  };
+
+  return (
+    <div 
+      ref={containerRef}
+      className="result-video-item"
+      style={{
+        backgroundColor: '#000000',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 6px 22px rgba(0, 0, 0, 0.12)',
+        border: '1px solid #E0E0E0',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        touchAction: 'pan-y'
+      }}
+    >
+      {/* Native Video Player with First-Frame Render and Mutual Pause */}
+      <div 
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '16 / 9',
+          backgroundColor: '#000000',
+          overflow: 'hidden',
+          touchAction: 'pan-y'
+        }}
+      >
+        {inView ? (
+          <video
+            src={`${video.videoUrl}#t=0.5`}
+            controls
+            playsInline
+            preload="metadata"
+            controlsList="nodownload"
+            onPlay={handlePlay}
+            onLoadedMetadata={handleLoadedMetadata}
+            onLoadedData={handleLoadedMetadata}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              backgroundColor: '#000000',
+              display: 'block',
+              touchAction: 'pan-y'
+            }}
+          >
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#0c140d'
+            }}
+          >
+            <div
+              style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Play size={20} style={{ color: 'rgba(255, 255, 255, 0.7)', marginLeft: '2px' }} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Minimal Clean Caption matching samarthkolhapur.com */}
+      <div 
+        style={{
+          backgroundColor: '#FAFAFA',
+          padding: '0.65rem 0.95rem',
+          borderTop: '1px solid #EEEEEE',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '0.5rem'
+        }}
+      >
+        <div style={{ minWidth: 0 }}>
+          <span 
+            style={{ 
+              fontSize: '0.88rem', 
+              fontWeight: 700, 
+              color: '#222222',
+              display: 'block',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {language === 'mr' ? (video.speakerMr || video.titleMr) : (video.speakerEn || video.titleEn)}
+          </span>
+        </div>
+
+        {video.duration && (
+          <span 
+            style={{
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              color: '#666666',
+              backgroundColor: '#FFFFFF',
+              padding: '0.15rem 0.55rem',
+              borderRadius: '6px',
+              border: '1px solid #E0E0E0',
+              flexShrink: 0
+            }}
+          >
+            {video.duration}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const ResultVideosSection = () => {
   const { language } = useLanguage();
   const [showAllVideos, setShowAllVideos] = useState(false);
@@ -44,11 +205,11 @@ const ResultVideosSection = () => {
     });
   };
 
-  // Ensure first frame of the video loads and is visible immediately (prevents black screen)
+  // Ensure clear preview frame of the video loads and is visible immediately (prevents black screen)
   const handleLoadedMetadata = (e) => {
     try {
-      if (e.target.currentTime === 0) {
-        e.target.currentTime = 0.1;
+      if (e.target && e.target.currentTime === 0) {
+        e.target.currentTime = 0.5;
       }
     } catch (err) {
       // Ignore seek restriction errors
@@ -147,102 +308,13 @@ const ResultVideosSection = () => {
           }}
         >
           {visibleVideos.map((video, idx) => (
-            <div 
+            <ResultVideoCardItem
               key={video.id || idx}
-              className="result-video-item"
-              style={{
-                backgroundColor: '#000000',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 6px 22px rgba(0, 0, 0, 0.12)',
-                border: '1px solid #E0E0E0',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                touchAction: 'pan-y'
-              }}
-            >
-              {/* Native Video Player with First-Frame Render and Mutual Pause */}
-              <div 
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  aspectRatio: '16 / 9',
-                  backgroundColor: '#000000',
-                  overflow: 'hidden',
-                  touchAction: 'pan-y'
-                }}
-              >
-                <video
-                  src={`${video.videoUrl}#t=0.1`}
-                  poster={video.thumbnail || video.fallbackThumbnail}
-                  controls
-                  playsInline
-                  preload="none"
-                  controlsList="nodownload"
-                  onPlay={handlePlay}
-                  onLoadedMetadata={handleLoadedMetadata}
-                  onLoadedData={handleLoadedMetadata}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    backgroundColor: '#000000',
-                    display: 'block',
-                    touchAction: 'pan-y'
-                  }}
-                >
-                  <source src={video.videoUrl} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-
-              {/* Minimal Clean Caption matching samarthkolhapur.com */}
-              <div 
-                style={{
-                  backgroundColor: '#FAFAFA',
-                  padding: '0.65rem 0.95rem',
-                  borderTop: '1px solid #EEEEEE',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '0.5rem'
-                }}
-              >
-                <div style={{ minWidth: 0 }}>
-                  <span 
-                    style={{ 
-                      fontSize: '0.88rem', 
-                      fontWeight: 700, 
-                      color: '#222222',
-                      display: 'block',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}
-                  >
-                    {language === 'mr' ? (video.speakerMr || video.titleMr) : (video.speakerEn || video.titleEn)}
-                  </span>
-                </div>
-
-                {video.duration && (
-                  <span 
-                    style={{
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      color: '#666666',
-                      backgroundColor: '#FFFFFF',
-                      padding: '0.15rem 0.55rem',
-                      borderRadius: '6px',
-                      border: '1px solid #E0E0E0',
-                      flexShrink: 0
-                    }}
-                  >
-                    {video.duration}
-                  </span>
-                )}
-              </div>
-            </div>
+              video={video}
+              idx={idx}
+              language={language}
+              handlePlay={handlePlay}
+            />
           ))}
         </div>
 
