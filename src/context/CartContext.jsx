@@ -10,7 +10,7 @@ export const CartProvider = ({ children }) => {
     } catch {
       return [];
     }
-  });
+  }); 
 
   const [toastMessage, setToastMessage] = useState(null);
 
