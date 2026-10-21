@@ -46,7 +46,8 @@ export default function Dashboard() {
       }
       await dbService.refreshFromFirebase('customers');
       await dbService.refreshFromFirebase('leads');
-      setSyncNotice('✓ All orders and customer records live-synced from Cloud Firestore!');
+      await dbService.refreshFromFirebase('users');
+      setSyncNotice('✓ All orders, leads, and partner records live-synced from Cloud Firestore!');
       setTimeout(() => setSyncNotice(''), 4500);
     } catch (e) {
       setSyncNotice('Sync note: ' + e.message);

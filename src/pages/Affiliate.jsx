@@ -16,13 +16,26 @@ import {
   AlertCircle,
   Sparkles,
   ArrowRight,
-  UserCheck
+  UserCheck,
+  QrCode,
+  IdCard,
+  UserPlus,
+  Send,
+  Download,
+  Printer,
+  CreditCard,
+  X,
+  FileText,
+  Calendar,
+  MapPin,
+  HeartHandshake
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { organizationInfo } from '../data/websiteData';
 import { dbService } from '../services/db';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import WhatsAppIcon from '../components/WhatsAppIcon';
+import MissionLogoBadge from '../components/MissionLogoBadge';
 
 const STORAGE_AFFILIATE_KEY = 'sahara_logged_in_affiliate';
 
@@ -47,6 +60,16 @@ const Affiliate = () => {
     return 'register';
   });
 
+  // Feature Modals & Drawers
+  const [showReferPatientModal, setShowReferPatientModal] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [showIdCardModal, setShowIdCardModal] = useState(false);
+  const [showShareKitModal, setShowShareKitModal] = useState(false);
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+
+  // Activity list filter: 'all', 'leads', 'orders'
+  const [activityFilter, setActivityFilter] = useState('all');
+
   // Registration form state
   const [regData, setRegData] = useState({
     name: '',
@@ -69,12 +92,36 @@ const Affiliate = () => {
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  // Direct Patient Referral form state
+  const [patientData, setPatientData] = useState({
+    name: '',
+    phone: '',
+    disease: 'मधुमेह (Diabetes)',
+    city: '',
+    notes: ''
+  });
+  const [patientSuccessMsg, setPatientSuccessMsg] = useState('');
+  const [isSubmittingPatient, setIsSubmittingPatient] = useState(false);
+
+  // Payout settings state
+  const [payoutForm, setPayoutForm] = useState(() => {
+    return {
+      upiId: loggedAffiliate?.payoutDetails?.upiId || '',
+      bankName: loggedAffiliate?.payoutDetails?.bankName || '',
+      accountNo: loggedAffiliate?.payoutDetails?.accountNo || '',
+      ifsc: loggedAffiliate?.payoutDetails?.ifsc || '',
+      holderName: loggedAffiliate?.payoutDetails?.holderName || ''
+    };
+  });
+  const [payoutSavedMsg, setPayoutSavedMsg] = useState('');
+
   // Dashboard dynamic data state
   const [orders, setOrders] = useState([]);
   const [leads, setLeads] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [commissionTx, setCommissionTx] = useState([]);
   const [copied, setCopied] = useState(false);
+  const [shareKitCopiedIdx, setShareKitCopiedIdx] = useState(null);
 
   // Subscribe to real-time collections for live dashboard updates
   useEffect(() => {
@@ -137,13 +184,17 @@ const Affiliate = () => {
         return;
       }
 
-      // Generate customized Ambassador Code (matching screenshot format SSF-AMB-XXXX or SAHARA-XXXX)
-      const codeSuffix = cleanPhone.slice(-4);
-      const code = `SSF-AMB-${codeSuffix}`;
+      // Generate customized Ambassador Code (matching screenshot format SAHARA-NAME-XXX or SSF-AMB-XXXX)
+      const firstName = (regData.name.trim().split(' ')[0] || 'VARUN').toUpperCase();
+      const codeRandom = Math.floor(100 + Math.random() * 900);
+      const code = `SAHARA-${firstName}-${codeRandom}`;
+      const newAffiliateId = `usr_aff_${Date.now()}_${codeRandom}`;
 
       const newAffiliate = {
+        id: newAffiliateId,
         name: regData.name.trim(),
         phone: cleanPhone,
+        mobile: cleanPhone,
         email: regData.email.trim() || `${cleanPhone}@saharaaffiliate.com`,
         password: regData.password.trim(),
         role: 'affiliate',
@@ -153,11 +204,21 @@ const Affiliate = () => {
         experience: regData.experience.trim() || '',
         state: 'Maharashtra',
         status: 'active',
+        upiId: '',
+        bankAccount: '',
+        ifsc: '',
+        payoutDetails: {
+          upiId: '',
+          bankName: '',
+          accountNo: '',
+          ifsc: '',
+          holderName: ''
+        },
         createdAt: new Date().toISOString(),
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120'
       };
 
-      const addedUser = await dbService.add('users', newAffiliate);
+      await dbService.add('users', newAffiliate);
 
       dbService.addNotification({
         title: 'New Ambassador Registered',
@@ -239,6 +300,121 @@ const Affiliate = () => {
     }
   };
 
+  // Direct Patient Referral Submission (Feature 1)
+  const handleDirectPatientSubmit = async (e) => {
+    e.preventDefault();
+    if (!loggedAffiliate) return;
+
+    setIsSubmittingPatient(true);
+    try {
+      const cleanPatientPhone = (patientData.phone || '').replace(/\D/g, '').trim();
+      if (!patientData.name.trim()) {
+        alert(language === 'mr' ? 'कृपया रुग्णाचे पूर्ण नाव टाका.' : 'Please enter patient full name.');
+        setIsSubmittingPatient(false);
+        return;
+      }
+      if (!cleanPatientPhone || cleanPatientPhone.length !== 10) {
+        alert(language === 'mr' ? 'कृपया रुग्णाचा १० अंकी वैध मोबाईल नंबर टाका.' : 'Please enter valid 10-digit mobile number.');
+        setIsSubmittingPatient(false);
+        return;
+      }
+
+      const leadRandom = Math.floor(1000 + Math.random() * 9000);
+      const leadId = `LEAD-${new Date().getFullYear()}-${leadRandom}`;
+      const patientFullName = patientData.name.trim();
+
+      const newLead = {
+        id: leadId,
+        leadId: leadId,
+        customerName: patientFullName,
+        name: patientFullName,
+        mobile: cleanPatientPhone,
+        phone: cleanPatientPhone,
+        mobileNumber: cleanPatientPhone,
+        email: '',
+        interestedProduct: `${patientData.disease} (Ambassador Referral)`,
+        disease: patientData.disease,
+        healthConcern: patientData.disease,
+        source: 'Affiliate / Ambassador Direct',
+        leadSource: 'Affiliate / Ambassador Direct',
+        priority: 'High',
+        leadStatus: 'New',
+        status: 'New',
+        stage: 'Counseling Pending',
+        city: patientData.city.trim() || loggedAffiliate.city || 'Kolhapur',
+        notes: patientData.notes.trim() 
+          ? `[Ambassador ${loggedAffiliate.name} - ${myReferralCode}]: ${patientData.notes.trim()}` 
+          : `Directly referred by Ambassador ${loggedAffiliate.name} (${myReferralCode})`,
+        assignedAffiliate: loggedAffiliate.id,
+        affiliateName: loggedAffiliate.name,
+        referralCode: myReferralCode,
+        assignedEmployee: 'usr_emp_akash',
+        employeeName: 'Akash Shinde',
+        estimatedValue: 3200,
+        createdDate: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        nextFollowup: new Date().toISOString()
+      };
+
+      await dbService.add('leads', newLead);
+
+      dbService.addNotification({
+        title: 'New Patient Referred by Ambassador',
+        message: `${loggedAffiliate.name} (${myReferralCode}) referred patient ${patientFullName} (${cleanPatientPhone}) for ${patientData.disease}.`,
+        type: 'lead',
+        link: '/crm/leads'
+      });
+
+      setPatientSuccessMsg(language === 'mr' 
+        ? `रुग्ण ${patientFullName} यांची नोंदणी यशस्वी झाली! सहारा समुपदेशक टीम लवकरच रुग्णाशी संपर्क करेल.` 
+        : `Patient ${patientFullName} referred successfully! Sent to medical counseling team.`);
+      
+      setPatientData({ name: '', phone: '', disease: 'मधुमेह (Diabetes)', city: '', notes: '' });
+      setTimeout(() => {
+        setPatientSuccessMsg('');
+        setShowReferPatientModal(false);
+      }, 2500);
+    } catch (err) {
+      alert('Error registering patient: ' + err.message);
+    } finally {
+      setIsSubmittingPatient(false);
+    }
+  };
+
+  // Payout Details Save
+  const handleSavePayoutDetails = async (e) => {
+    e.preventDefault();
+    if (!loggedAffiliate) return;
+
+    try {
+      const updatedAffiliate = {
+        ...loggedAffiliate,
+        payoutDetails: { ...payoutForm },
+        upiId: payoutForm.upiId || loggedAffiliate.upiId || '',
+        bankAccount: payoutForm.accountNo || loggedAffiliate.bankAccount || '',
+        ifsc: payoutForm.ifsc || loggedAffiliate.ifsc || '',
+        holderName: payoutForm.holderName || loggedAffiliate.holderName || ''
+      };
+
+      await dbService.update('users', loggedAffiliate.id, {
+        payoutDetails: { ...payoutForm },
+        upiId: payoutForm.upiId || '',
+        bankAccount: payoutForm.accountNo || '',
+        ifsc: payoutForm.ifsc || '',
+        holderName: payoutForm.holderName || ''
+      });
+      setLoggedAffiliate(updatedAffiliate);
+      localStorage.setItem(STORAGE_AFFILIATE_KEY, JSON.stringify(updatedAffiliate));
+      setPayoutSavedMsg(language === 'mr' ? 'बँक / UPI तपशील यशस्वीरित्या सेव्ह झाले!' : 'Payout details saved successfully!');
+      setTimeout(() => {
+        setPayoutSavedMsg('');
+        setShowPayoutModal(false);
+      }, 2000);
+    } catch (err) {
+      alert('Error saving payout details: ' + err.message);
+    }
+  };
+
   // Quick Demo Login helper for convenience
   const handleQuickDemoLogin = (userEmail = 'rahul@saharasocialfoundation.org') => {
     const allUsers = dbService.getAll('users') || [];
@@ -248,7 +424,7 @@ const Affiliate = () => {
       email: 'rahul@saharasocialfoundation.org',
       role: 'affiliate',
       phone: '8421154090',
-      referralCode: 'SSF-AMB-8421',
+      referralCode: 'SAHARA-RAHUL-101',
       city: 'Kolhapur',
       status: 'active'
     };
@@ -268,17 +444,20 @@ const Affiliate = () => {
 
   // Live Statistics for Logged-In Affiliate
   const myAffiliateId = loggedAffiliate?.id;
-  const myReferralCode = loggedAffiliate?.referralCode || `SSF-AMB-${(loggedAffiliate?.phone || '8421').slice(-4)}`;
+  const myReferralCode = loggedAffiliate?.referralCode || `SAHARA-${(loggedAffiliate?.name?.split(' ')[0] || 'PARTNER').toUpperCase()}-${(loggedAffiliate?.phone || '8421').slice(-3)}`;
   const referralLink = `https://samarthkolhapur.com/?ref=${myReferralCode}`;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(referralLink)}&margin=12`;
 
   // Filter dynamic data for this affiliate
   const myOrders = orders.filter(o => 
     o.assignedAffiliate === myAffiliateId || 
-    (o.affiliateName && loggedAffiliate?.name && o.affiliateName.toLowerCase() === loggedAffiliate.name.toLowerCase())
+    (o.affiliateName && loggedAffiliate?.name && o.affiliateName.toLowerCase() === loggedAffiliate.name.toLowerCase()) ||
+    (o.referralCode && o.referralCode.toUpperCase() === myReferralCode.toUpperCase())
   );
 
   const myLeads = leads.filter(l => 
     l.assignedAffiliate === myAffiliateId ||
+    (l.affiliateName && loggedAffiliate?.name && l.affiliateName.toLowerCase() === loggedAffiliate.name.toLowerCase()) ||
     (l.referralCode && l.referralCode.toUpperCase() === myReferralCode.toUpperCase())
   );
 
@@ -289,9 +468,9 @@ const Affiliate = () => {
 
   const myTransactions = commissionTx.filter(tx => tx.beneficiaryId === myAffiliateId);
 
-  // Compute live KPI counts (guarantee at least clean authentic display)
-  const referredPatientsCount = Math.max(myLeads.length + myCustomers.length, myOrders.length > 0 ? myOrders.length : (loggedAffiliate?.id === 'usr_aff_rahul' ? 18 : 0));
-  const counselingCompletedCount = Math.max(myOrders.length, (loggedAffiliate?.id === 'usr_aff_rahul' ? 14 : 0));
+  // Compute live KPI counts
+  const referredPatientsCount = (myLeads.length + myCustomers.length);
+  const counselingCompletedCount = myOrders.length;
   const totalCommissionEarned = myTransactions
     .filter(tx => tx.status === 'Approved' || tx.status === 'Paid')
     .reduce((sum, tx) => sum + (Number(tx.commissionAmount) || 0), 0);
@@ -303,11 +482,91 @@ const Affiliate = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
     } catch (e) {
-      // Fallback
       setCopied(true);
       setTimeout(() => setCopied(false), 2200);
     }
   };
+
+  // WhatsApp promotional templates for Feature 4 (Share Kit)
+  const shareKitTemplates = [
+    {
+      titleMr: 'मधुमेह मुक्त भारत संदेश',
+      titleEn: 'Diabetes Care Message',
+      badge: 'Antox D + T',
+      color: '#006B2D',
+      text: language === 'mr'
+        ? `*सहारा सोशल फाऊंडेशन • मधुमेह मुक्त भारत अभियान*\n\nआपल्या कुटुंबात किंवा परिचयात कोणाला मधुमेहाचा (Diabetes) त्रास आहे का? साखर नियंत्रित ठेवण्यासाठी व औषधांवरील अवलंबित्व कमी करण्यासाठी सहारा फाऊंडेशनचे आयुर्वेदिक न्युट्रास्युटिकल्स अत्यंत प्रभावी आहेत.\n\nअधिकृत माहिती व मोफत समुपदेशनासाठी खालील लिंकवर क्लिक करा:\n👉 ${referralLink}\n\nआरोग्य दूत: ${loggedAffiliate?.name || 'सहारा प्रतिनिधी'}\nहेल्पलाइन: +91 8421154090`
+        : `*Sahara Social Foundation • Diabetes-Free Mission*\n\nGet clinically tested natural nutraceuticals for blood sugar control and revitalizing energy.\n\nClick here for free health consultation & official formula:\n👉 ${referralLink}\n\nHealth Ambassador: ${loggedAffiliate?.name || 'Sahara Partner'}\nHelpline: +91 8421154090`
+    },
+    {
+      titleMr: 'व्यसनमुक्त भारत संदेश',
+      titleEn: 'De-Addiction Drive Message',
+      badge: 'Antox B-AL-NICO',
+      color: '#B45309',
+      text: language === 'mr'
+        ? `*व्यसनमुक्त भारत अभियान • सहारा सोशल फाऊंडेशन*\n\nदारू, तंबाखू, गुटखा, सिगारेट यांसारख्या कोणत्याही व्यसनापासून नैसर्गिक व सुरक्षितपणे मुक्ती मिळवा. १००% आयुर्वेदिक अर्क व मोफत मार्गदर्शन उपलब्ध आहे.\n\nमाहिती व ऑर्डरसाठी येथे क्लिक करा:\n👉 ${referralLink}\n\nआरोग्य दूत: ${loggedAffiliate?.name || 'सहारा प्रतिनिधी'}\nकोल्हापूर कार्यालय`
+        : `*Addiction-Free India Campaign • Sahara Foundation*\n\nNatural herbal solutions to overcome tobacco, alcohol, and nicotine cravings without side effects.\n\nOrder / Inquire here:\n👉 ${referralLink}\n\nAmbassador: ${loggedAffiliate?.name || 'Sahara Partner'}`
+    },
+    {
+      titleMr: 'सांधेदुखी व मणके आराम संदेश',
+      titleEn: 'Joint & Spine Pain Relief',
+      badge: 'Antox PN Powder + Oil',
+      color: '#1E40AF',
+      text: language === 'mr'
+        ? `*वेदनामुक्त भारत अभियान • सांधेदुखी व मणके आराम*\n\nगुडघेदुखी, कंबरदुखी, सायटिका किंवा मणक्याच्या त्रासाने त्रस्त आहात का? मरीन कोलेजन व हर्बल तेलाच्या साह्याने नैसर्गिक सांधे आरोग्य मिळवा.\n\nमाहितीसाठी लिंक:\n👉 ${referralLink}\n\nआरोग्य दूत: ${loggedAffiliate?.name || 'सहारा प्रतिनिधी'}`
+        : `*Pain-Free Living • Joint & Spine Relief*\n\nMarine collagen and herbal extract formula for severe knee, back, and joint pain.\n\nClick link to consult:\n👉 ${referralLink}\n\nAmbassador: ${loggedAffiliate?.name || 'Sahara Partner'}`
+    },
+    {
+      titleMr: 'मोफत आरोग्य समुपदेशन शिबीर संदेश',
+      titleEn: 'Free Health Consultation Camp',
+      badge: 'Free Guidance',
+      color: '#7C3AED',
+      text: language === 'mr'
+        ? `*मोफत आरोग्य समुपदेशन नोंदणी*\n\nसहारा सोशल फाऊंडेशनतर्फे आपल्या गावातील नागरिकांसाठी मोफत आरोग्य मार्गदर्शन व पथ्य आहार सल्ला उपलब्ध आहे. आजच नोंदणी करा:\n👉 ${referralLink}\n\nआपला नम्र: ${loggedAffiliate?.name || 'आरोग्य दूत'} (${loggedAffiliate?.city || 'महाराष्ट्र'})`
+        : `*Free Health Consultation Drive*\n\nSahara Social Foundation offers free dietary guidance and consultation for chronic lifestyle disorders.\n\nRegister here:\n👉 ${referralLink}\n\nAmbassador: ${loggedAffiliate?.name || 'Sahara Partner'}`
+    }
+  ];
+
+  // Copy template text
+  const handleCopyTemplate = (text, idx) => {
+    navigator.clipboard.writeText(text);
+    setShareKitCopiedIdx(idx);
+    setTimeout(() => setShareKitCopiedIdx(null), 2000);
+  };
+
+  // Combine Leads & Orders into a unified activity feed
+  const combinedActivity = [
+    ...myLeads.map(l => ({
+      id: l.id,
+      type: 'lead',
+      name: l.name || 'रुग्ण (Patient)',
+      phone: l.phone,
+      disease: l.disease || l.healthConcern || 'मधुमेह (Diabetes)',
+      city: l.city,
+      date: l.createdAt || new Date().toISOString(),
+      status: l.status || l.stage || 'Counseling Pending',
+      statusColor: '#FEF3C7',
+      statusTextColor: '#92400E'
+    })),
+    ...myOrders.map(o => ({
+      id: o.id,
+      type: 'order',
+      name: o.customerName || 'रुग्ण खरेदीदार',
+      phone: o.customerMobile,
+      disease: o.products?.[0]?.nameMr || o.products?.[0]?.name || 'Antox D Kit',
+      amount: o.grandTotal || o.total || 0,
+      date: o.orderDate || o.date || new Date().toISOString(),
+      status: o.orderStatus || 'Confirmed',
+      statusColor: o.orderStatus === 'Delivered' ? '#E8F5E9' : '#DBEAFE',
+      statusTextColor: o.orderStatus === 'Delivered' ? '#1B5E20' : '#1E40AF'
+    }))
+  ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const filteredActivity = combinedActivity.filter(item => {
+    if (activityFilter === 'leads') return item.type === 'lead';
+    if (activityFilter === 'orders') return item.type === 'order';
+    return true;
+  });
 
   return (
     <div className="affiliate-page">
@@ -332,7 +591,7 @@ const Affiliate = () => {
       <section className="section" style={{ backgroundColor: '#F3F8F1', minHeight: '650px', padding: '2.5rem 0 4rem' }}>
         <div className="container" style={{ maxWidth: '880px' }}>
           
-          {/* Navigation Tab Bar matching screenshot aesthetics */}
+          {/* Navigation Tab Bar */}
           <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -479,7 +738,7 @@ const Affiliate = () => {
                         type="text"
                         className="form-input"
                         required
-                        placeholder={language === 'mr' ? 'उदा. राहुल देशमुख' : 'e.g. Rahul Deshmukh'}
+                        placeholder={language === 'mr' ? 'उदा. वरुण यादव' : 'e.g. Varun Yadav'}
                         value={regData.name}
                         onChange={(e) => setRegData({ ...regData, name: e.target.value })}
                       />
@@ -540,7 +799,7 @@ const Affiliate = () => {
                         type="text"
                         className="form-input"
                         required
-                        placeholder={language === 'mr' ? 'उदा. कोल्हापूर / हातकणंगले' : 'e.g. Kolhapur'}
+                        placeholder={language === 'mr' ? 'उदा. सांगली / कोल्हापूर' : 'e.g. Sangli / Kolhapur'}
                         value={regData.city}
                         onChange={(e) => setRegData({ ...regData, city: e.target.value })}
                       />
@@ -598,7 +857,7 @@ const Affiliate = () => {
             </div>
           )}
 
-          {/* TAB 2: LOGIN FORM (Shown first right after registration or when user clicks login) */}
+          {/* TAB 2: LOGIN FORM */}
           {activeTab === 'login' && !loggedAffiliate && (
             <div style={{
               backgroundColor: '#ffffff',
@@ -607,7 +866,6 @@ const Affiliate = () => {
               border: '1px solid #E1E9DF',
               boxShadow: '0 8px 30px rgba(0,107,45,0.04)'
             }}>
-              {/* Registration Success Banner if arriving from registration */}
               {regSuccessMsg && (
                 <div style={{
                   backgroundColor: '#E8F5E9',
@@ -726,7 +984,7 @@ const Affiliate = () => {
                   </button>
                 </div>
 
-                {/* Quick Demo Button for effortless preview and testing */}
+                {/* Quick Demo Button */}
                 <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px dashed #E1E9DF', textAlign: 'center' }}>
                   <div style={{ fontSize: '0.8rem', color: '#718096', marginBottom: '0.6rem', fontWeight: 600 }}>
                     {language === 'mr' ? 'चाचणी / प्रात्यक्षिक लॉगिन:' : 'Instant Demo / Evaluation:'}
@@ -756,7 +1014,7 @@ const Affiliate = () => {
             </div>
           )}
 
-          {/* TAB 3: AMBASSADOR DASHBOARD (Rendered once the affiliate is logged in!) */}
+          {/* TAB 3: AMBASSADOR DASHBOARD */}
           {(activeTab === 'dashboard' || loggedAffiliate) && loggedAffiliate && (
             <div style={{
               backgroundColor: '#ffffff',
@@ -765,14 +1023,14 @@ const Affiliate = () => {
               border: '1px solid #E1E9DF',
               boxShadow: '0 8px 30px rgba(0,107,45,0.04)'
             }}>
-              {/* Dashboard Top Header matching screenshot title with Live Ambassador Info */}
+              {/* Dashboard Top Header matching screenshot */}
               <div style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between', 
                 flexWrap: 'wrap', 
                 gap: '1rem',
-                marginBottom: '1.75rem',
+                marginBottom: '1.25rem',
                 paddingBottom: '1.25rem',
                 borderBottom: '1px solid #EBF2E9'
               }}>
@@ -781,7 +1039,7 @@ const Affiliate = () => {
                     {language === 'mr' ? 'आरोग्यदूत पोर्टल (Ambassador Portal)' : 'Ambassador Portal'}
                   </h3>
                   <div style={{ fontSize: '0.88rem', color: '#5F6B61', marginTop: '0.2rem' }}>
-                    {language === 'mr' ? 'स्वागत आहे' : 'Welcome'}, <strong style={{ color: '#17251B' }}>{loggedAffiliate.name}</strong> • {loggedAffiliate.city || 'Kolhapur'}
+                    {language === 'mr' ? 'स्वागत आहे' : 'Welcome'}, <strong style={{ color: '#17251B' }}>{loggedAffiliate.name}</strong> • {loggedAffiliate.city || 'Sangli'}
                   </div>
                 </div>
 
@@ -815,12 +1073,136 @@ const Affiliate = () => {
                       gap: '0.35rem',
                       transition: 'all 0.2s ease'
                     }}
-                    title="Log out from dashboard"
+                    title="Log out"
                   >
                     <LogOut size={14} />
                     <span>{language === 'mr' ? 'लॉगआउट' : 'Logout'}</span>
                   </button>
                 </div>
+              </div>
+
+              {/* ACTION TOOLBAR: EXTRA FEATURES FOR AMBASSADOR */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.65rem',
+                flexWrap: 'wrap',
+                marginBottom: '1.75rem',
+                padding: '0.85rem 1rem',
+                backgroundColor: '#F7FAF7',
+                borderRadius: '14px',
+                border: '1px solid #E1E9DF'
+              }}>
+                {/* Feature 1: Refer Patient Directly */}
+                <button
+                  type="button"
+                  onClick={() => setShowReferPatientModal(true)}
+                  style={{
+                    backgroundColor: '#006B2D',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.55rem 1rem',
+                    borderRadius: '10px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    boxShadow: '0 2px 8px rgba(0, 107, 45, 0.2)'
+                  }}
+                >
+                  <UserPlus size={16} />
+                  <span>{language === 'mr' ? '+ थेट रुग्ण जोडा (Refer Patient)' : '+ Refer a Patient Directly'}</span>
+                </button>
+
+                {/* Feature 2: Show QR Code */}
+                <button
+                  type="button"
+                  onClick={() => setShowQrModal(true)}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#006B2D',
+                    border: '1.5px solid #C8E6C9',
+                    padding: '0.55rem 0.9rem',
+                    borderRadius: '10px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <QrCode size={16} />
+                  <span>{language === 'mr' ? 'क्युआर कोड (QR)' : 'QR Code'}</span>
+                </button>
+
+                {/* Feature 3: Digital ID Card */}
+                <button
+                  type="button"
+                  onClick={() => setShowIdCardModal(true)}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#15803D',
+                    border: '1.5px solid #C8E6C9',
+                    padding: '0.55rem 0.9rem',
+                    borderRadius: '10px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <IdCard size={16} />
+                  <span>{language === 'mr' ? 'माझे ओळखपत्र (ID Card)' : 'Digital ID Card'}</span>
+                </button>
+
+                {/* Feature 4: WhatsApp Share Kit */}
+                <button
+                  type="button"
+                  onClick={() => setShowShareKitModal(true)}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#0284C7',
+                    border: '1.5px solid #BAE6FD',
+                    padding: '0.55rem 0.9rem',
+                    borderRadius: '10px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <Share2 size={16} />
+                  <span>{language === 'mr' ? 'प्रचार किट (Templates)' : 'Share Kit'}</span>
+                </button>
+
+                {/* Feature 5: Payout / UPI Settings */}
+                <button
+                  type="button"
+                  onClick={() => setShowPayoutModal(true)}
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#B45309',
+                    border: '1.5px solid #FDE68A',
+                    padding: '0.55rem 0.9rem',
+                    borderRadius: '10px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <CreditCard size={16} />
+                  <span>{language === 'mr' ? 'बँक / UPI खाती (Payout)' : 'Payout Settings'}</span>
+                </button>
               </div>
 
               {/* 3 Metric Cards matching exact user screenshot design */}
@@ -901,7 +1283,7 @@ const Affiliate = () => {
                 </div>
               )}
 
-              {/* Referral Link Box matching exact screenshot format with Copy & WhatsApp Share */}
+              {/* Referral Link Box matching screenshot */}
               <div style={{
                 backgroundColor: '#F3F8F1',
                 borderRadius: '16px',
@@ -914,7 +1296,7 @@ const Affiliate = () => {
                     {language === 'mr' ? 'आपली विशेष संदर्भ लिंक:' : 'Your Referral Link:'}
                   </strong>
 
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={handleCopyLink}
@@ -988,39 +1370,101 @@ const Affiliate = () => {
                 </div>
               </div>
 
-              {/* Recent Patient Referrals Section */}
+              {/* Recent Patient Referrals & Activity Section with Filter Tabs */}
               <div>
-                <h4 style={{ fontSize: '1.08rem', color: '#17251B', fontWeight: 800, marginBottom: '0.75rem' }}>
-                  {language === 'mr' ? 'अलीकडील संदर्भित रुग्ण व ऑर्डर्स' : 'Recent Patient Referrals & Activity'}
-                </h4>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <h4 style={{ fontSize: '1.08rem', color: '#17251B', fontWeight: 800, margin: 0 }}>
+                    {language === 'mr' ? 'अलीकडील संदर्भित रुग्ण व ऑर्डर्स' : 'Recent Patient Referrals & Activity'}
+                  </h4>
 
-                {myOrders.length > 0 ? (
+                  <div style={{ display: 'flex', gap: '0.35rem', backgroundColor: '#F3F8F1', padding: '3px', borderRadius: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setActivityFilter('all')}
+                      style={{
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: 'pointer',
+                        backgroundColor: activityFilter === 'all' ? '#006B2D' : 'transparent',
+                        color: activityFilter === 'all' ? '#ffffff' : '#5F6B61'
+                      }}
+                    >
+                      {language === 'mr' ? `सर्व (${combinedActivity.length})` : `All (${combinedActivity.length})`}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActivityFilter('leads')}
+                      style={{
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: 'pointer',
+                        backgroundColor: activityFilter === 'leads' ? '#006B2D' : 'transparent',
+                        color: activityFilter === 'leads' ? '#ffffff' : '#5F6B61'
+                      }}
+                    >
+                      {language === 'mr' ? `रुग्ण संदर्भ (${myLeads.length})` : `Referrals (${myLeads.length})`}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActivityFilter('orders')}
+                      style={{
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: 'pointer',
+                        backgroundColor: activityFilter === 'orders' ? '#006B2D' : 'transparent',
+                        color: activityFilter === 'orders' ? '#ffffff' : '#5F6B61'
+                      }}
+                    >
+                      {language === 'mr' ? `ऑर्डर्स (${myOrders.length})` : `Orders (${myOrders.length})`}
+                    </button>
+                  </div>
+                </div>
+
+                {filteredActivity.length > 0 ? (
                   <div style={{ overflowX: 'auto', border: '1px solid #E1E9DF', borderRadius: '12px' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
                       <thead style={{ backgroundColor: '#F8FAF7', borderBottom: '1px solid #E1E9DF' }}>
                         <tr>
-                          <th style={{ padding: '0.75rem 1rem', color: '#006B2D', fontWeight: 700 }}>{language === 'mr' ? 'रुग्ण / ग्राहक' : 'Patient / Customer'}</th>
+                          <th style={{ padding: '0.75rem 1rem', color: '#006B2D', fontWeight: 700 }}>{language === 'mr' ? 'रुग्ण नाव' : 'Patient Name'}</th>
+                          <th style={{ padding: '0.75rem 1rem', color: '#006B2D', fontWeight: 700 }}>{language === 'mr' ? 'आजाराचे नाव / उत्पादन' : 'Disease / Kit'}</th>
                           <th style={{ padding: '0.75rem 1rem', color: '#006B2D', fontWeight: 700 }}>{language === 'mr' ? 'तारीख' : 'Date'}</th>
-                          <th style={{ padding: '0.75rem 1rem', color: '#006B2D', fontWeight: 700 }}>{language === 'mr' ? 'ऑर्डर रक्कम' : 'Amount'}</th>
                           <th style={{ padding: '0.75rem 1rem', color: '#006B2D', fontWeight: 700 }}>{language === 'mr' ? 'स्थिती' : 'Status'}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {myOrders.slice(0, 5).map((ord, idx) => (
-                          <tr key={ord.id || idx} style={{ borderBottom: '1px solid #F0F4EF' }}>
-                            <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>{ord.customerName || 'रुग्ण (Patient)'}</td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#5F6B61' }}>{formatDate(ord.orderDate || ord.date)}</td>
-                            <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#006B2D' }}>{formatCurrency(ord.grandTotal || ord.total || 0)}</td>
+                        {filteredActivity.map((item, idx) => (
+                          <tr key={item.id || idx} style={{ borderBottom: '1px solid #F0F4EF' }}>
+                            <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>
+                              <div>{item.name}</div>
+                              {item.phone && <div style={{ fontSize: '0.76rem', color: '#78716C' }}>+91 {item.phone.slice(-10)}</div>}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#17251B' }}>
+                              {item.disease}
+                              {item.amount > 0 && <div style={{ fontSize: '0.78rem', color: '#006B2D', fontWeight: 700 }}>{formatCurrency(item.amount)}</div>}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#5F6B61', fontSize: '0.82rem' }}>
+                              {formatDate(item.date)}
+                            </td>
                             <td style={{ padding: '0.75rem 1rem' }}>
                               <span style={{
-                                backgroundColor: ord.orderStatus === 'Delivered' ? '#E8F5E9' : '#FEF3C7',
-                                color: ord.orderStatus === 'Delivered' ? '#1B5E20' : '#92400E',
-                                padding: '0.2rem 0.55rem',
+                                backgroundColor: item.statusColor,
+                                color: item.statusTextColor,
+                                padding: '0.22rem 0.6rem',
                                 borderRadius: '6px',
                                 fontSize: '0.78rem',
-                                fontWeight: 700
+                                fontWeight: 700,
+                                display: 'inline-block'
                               }}>
-                                {ord.orderStatus || 'Confirmed'}
+                                {item.status}
                               </span>
                             </td>
                           </tr>
@@ -1032,19 +1476,29 @@ const Affiliate = () => {
                   <div style={{
                     backgroundColor: '#FAFAF9',
                     borderRadius: '12px',
-                    padding: '1.5rem',
+                    padding: '2rem 1.5rem',
                     textAlign: 'center',
                     border: '1px dashed #D6D3D1',
                     color: '#78716C'
                   }}>
-                    <div style={{ fontSize: '0.92rem', fontWeight: 600, marginBottom: '0.35rem' }}>
+                    <HeartHandshake size={36} style={{ color: '#006B2D', opacity: 0.6, margin: '0 auto 0.75rem auto' }} />
+                    <div style={{ fontSize: '0.94rem', fontWeight: 700, color: '#17251B', marginBottom: '0.35rem' }}>
                       {language === 'mr' ? 'अद्याप कोणत्याही रुग्णाची नोंद नाही.' : 'No patient referrals recorded yet.'}
                     </div>
-                    <div style={{ fontSize: '0.84rem' }}>
+                    <div style={{ fontSize: '0.84rem', maxWidth: '440px', margin: '0 auto 1.25rem' }}>
                       {language === 'mr'
-                        ? 'आपली संदर्भ लिंक व्हॉट्सअ‍ॅपवर शेअर करा आणि रुग्णांना मार्गदर्शन मिळवून द्या.'
-                        : 'Share your referral link on WhatsApp to begin helping patients and tracking results here.'}
+                        ? 'आपल्या गावातील रुग्णांना थेट जोडण्यासाठी वरील "+ थेट रुग्ण जोडा" बटण वापरा किंवा संदर्भ लिंक व्हॉट्सअ‍ॅपवर शेअर करा.'
+                        : 'Use the "+ Refer a Patient Directly" button above or share your WhatsApp link to begin helping patients.'}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowReferPatientModal(true)}
+                      className="btn btn-primary btn-sm"
+                      style={{ padding: '0.45rem 1.1rem', fontSize: '0.82rem' }}
+                    >
+                      <UserPlus size={14} />
+                      <span>{language === 'mr' ? 'पहिला रुग्ण नोंदवा' : 'Refer First Patient'}</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -1053,6 +1507,762 @@ const Affiliate = () => {
 
         </div>
       </section>
+
+      {/* MODAL 1: DIRECT PATIENT REFERRAL MODAL */}
+      {showReferPatientModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(3px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '20px',
+            maxWidth: '520px',
+            width: '100%',
+            padding: '2rem',
+            position: 'relative',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowReferPatientModal(false)}
+              style={{
+                position: 'absolute',
+                top: '1.25rem',
+                right: '1.25rem',
+                backgroundColor: '#F3F4F6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#E8F5E9', color: '#006B2D', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <UserPlus size={22} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#006B2D', margin: 0 }}>
+                  {language === 'mr' ? 'नवीन रुग्ण थेट संदर्भ नोंदणी' : 'Refer Patient Directly'}
+                </h3>
+                <div style={{ fontSize: '0.78rem', color: '#5F6B61' }}>
+                  {language === 'mr' ? 'आरोग्यदूत संदर्भ: ' : 'Referred by: '}{loggedAffiliate?.name} ({myReferralCode})
+                </div>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.84rem', color: '#5F6B61', marginBottom: '1.25rem' }}>
+              {language === 'mr'
+                ? 'रुग्णाची माहिती भरून पाठवा. सहारा सोशल फाऊंडेशनचे डॉक्टर व समुपदेशक रुग्णाशी संपर्क करून मार्गदर्शन करतील.'
+                : 'Enter patient details. Our medical counselors will contact them and credit this referral to your account.'}
+            </p>
+
+            {patientSuccessMsg && (
+              <div style={{
+                backgroundColor: '#ECFDF5',
+                border: '1.5px solid #10B981',
+                color: '#065F46',
+                padding: '0.75rem 1rem',
+                borderRadius: '10px',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <CheckCircle2 size={18} />
+                <span>{patientSuccessMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleDirectPatientSubmit}>
+              <div className="form-group" style={{ marginBottom: '0.9rem' }}>
+                <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                  {language === 'mr' ? 'रुग्णाचे पूर्ण नाव *' : 'Patient Full Name *'}
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  required
+                  placeholder={language === 'mr' ? 'उदा. महादेव पाटील' : 'e.g. Mahadev Patil'}
+                  value={patientData.name}
+                  onChange={(e) => setPatientData({ ...patientData, name: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '0.9rem' }}>
+                <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                  {language === 'mr' ? 'रुग्णाचा मोबाईल नंबर *' : 'Patient Mobile Number *'}
+                </label>
+                <input
+                  type="tel"
+                  className="form-input"
+                  required
+                  maxLength={10}
+                  placeholder={language === 'mr' ? '१० अंकी मोबाईल नंबर' : '10-digit mobile number'}
+                  value={patientData.phone}
+                  onChange={(e) => setPatientData({ ...patientData, phone: e.target.value.replace(/\D/g, '') })}
+                />
+              </div>
+
+              <div className="grid-2" style={{ gap: '0.75rem', marginBottom: '0.9rem' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                    {language === 'mr' ? 'आजाराचा प्रकार / समस्या *' : 'Health Concern *'}
+                  </label>
+                  <select
+                    className="form-input"
+                    value={patientData.disease}
+                    onChange={(e) => setPatientData({ ...patientData, disease: e.target.value })}
+                  >
+                    <option value="मधुमेह (Diabetes)">मधुमेह (Diabetes Care)</option>
+                    <option value="व्यसनमुक्ती (De-Addiction)">व्यसनमुक्ती (दारू, तंबाखू)</option>
+                    <option value="सांधेदुखी व मणके (Joint Pain)">सांधेदुखी व मणके (Joint Pain)</option>
+                    <option value="पित्त व ॲसिडिटी (Acidity)">पित्त व पचन विकार (Acidity)</option>
+                    <option value="हार्ट / लिव्हर / किडनी (Vital Organs)">हार्ट / लिव्हर / किडनी</option>
+                    <option value="इतर आजार (General Wellness)">इतर आरोग्य समस्या</option>
+                  </select>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                    {language === 'mr' ? 'गाव / तालुका / शहर' : 'Village / City'}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder={language === 'mr' ? 'उदा. सांगली' : 'e.g. Sangli'}
+                    value={patientData.city}
+                    onChange={(e) => setPatientData({ ...patientData, city: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                  {language === 'mr' ? 'रुग्णाची थोडक्यात माहिती / लक्षणे' : 'Notes / Symptoms (Optional)'}
+                </label>
+                <textarea
+                  rows={2}
+                  className="form-textarea"
+                  placeholder={language === 'mr' ? 'उदा. ५ वर्षांपासून मधुमेह आहे, गोळ्या चालू आहेत...' : 'e.g. Has diabetes for 5 years...'}
+                  value={patientData.notes}
+                  onChange={(e) => setPatientData({ ...patientData, notes: e.target.value })}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '0.75rem', fontWeight: 700 }}
+                disabled={isSubmittingPatient}
+              >
+                {isSubmittingPatient ? (language === 'mr' ? 'नोंदणी होत आहे...' : 'Submitting...') : (language === 'mr' ? 'रुग्ण संदर्भ सबमिट करा' : 'Submit Patient Referral')}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: QR CODE MODAL */}
+      {showQrModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(3px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            maxWidth: '420px',
+            width: '100%',
+            padding: '2rem',
+            textAlign: 'center',
+            position: 'relative',
+            boxShadow: '0 20px 45px rgba(0,0,0,0.25)'
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowQrModal(false)}
+              style={{
+                position: 'absolute',
+                top: '1.25rem',
+                right: '1.25rem',
+                backgroundColor: '#F3F4F6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <MissionLogoBadge size={50} style={{ margin: '0 auto 0.75rem auto' }} />
+            
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#006B2D', margin: 0 }}>
+              {language === 'mr' ? 'आपला विशेष क्युआर कोड' : 'Official Referral QR Code'}
+            </h3>
+            <div style={{ fontSize: '0.84rem', color: '#5F6B61', marginTop: '0.2rem', marginBottom: '1.25rem' }}>
+              {loggedAffiliate?.name} • ID: <strong style={{ color: '#006B2D' }}>{myReferralCode}</strong>
+            </div>
+
+            {/* QR Box with Scan Border */}
+            <div style={{
+              backgroundColor: '#F9FAFB',
+              border: '2px dashed #006B2D',
+              borderRadius: '16px',
+              padding: '1rem',
+              display: 'inline-block',
+              margin: '0 auto 1.25rem auto'
+            }}>
+              <img
+                src={qrCodeUrl}
+                alt="Ambassador QR Code"
+                style={{ width: '220px', height: '220px', display: 'block', borderRadius: '8px' }}
+              />
+            </div>
+
+            <p style={{ fontSize: '0.82rem', color: '#5F6B61', lineHeight: 1.45, marginBottom: '1.25rem' }}>
+              {language === 'mr'
+                ? 'रुग्णांना त्यांच्या मोबाईल कॅमेऱ्याने किंवा Google Lens ने हा क्युआर कोड स्कॅन करायला सांगा. थेट आपली अधिकृत लिंक उघडेल.'
+                : 'Patients can scan this QR code with any smartphone camera or Google Lens to immediately connect via your referral link.'}
+            </p>
+
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+              <a
+                href={qrCodeUrl}
+                download={`QR_${myReferralCode}.png`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-sm"
+                style={{ padding: '0.55rem 1rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+              >
+                <Download size={15} />
+                <span>{language === 'mr' ? 'क्युआर डाउनलोड करा' : 'Download QR'}</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="btn btn-secondary btn-sm"
+                style={{ padding: '0.55rem 1rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+              >
+                <Printer size={15} />
+                <span>{language === 'mr' ? 'प्रिंट करा' : 'Print QR'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: DIGITAL ID CARD MODAL */}
+      {showIdCardModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(3px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            maxWidth: '460px',
+            width: '100%',
+            padding: '1.75rem',
+            position: 'relative',
+            boxShadow: '0 20px 45px rgba(0,0,0,0.3)'
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowIdCardModal(false)}
+              style={{
+                position: 'absolute',
+                top: '1.25rem',
+                right: '1.25rem',
+                backgroundColor: '#F3F4F6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 10
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#006B2D', margin: 0 }}>
+                {language === 'mr' ? 'अधिकृत आरोग्य दूत ओळखपत्र' : 'Official Ambassador ID Card'}
+              </h3>
+              <div style={{ fontSize: '0.78rem', color: '#5F6B61' }}>
+                Sahara Social Foundation • Reg: MAH/582/2014/KOP
+              </div>
+            </div>
+
+            {/* Realistic Laminated Identity Card */}
+            <div id="ambassador-id-card-print" style={{
+              background: 'linear-gradient(145deg, #004D20 0%, #006B2D 50%, #003616 100%)',
+              color: '#ffffff',
+              borderRadius: '18px',
+              padding: '1.5rem',
+              boxShadow: '0 10px 25px rgba(0, 107, 45, 0.35)',
+              position: 'relative',
+              overflow: 'hidden',
+              border: '2px solid #E8F5E9'
+            }}>
+              {/* Watermark Logo */}
+              <div style={{
+                position: 'absolute',
+                right: '-25px',
+                bottom: '-25px',
+                opacity: 0.12,
+                pointerEvents: 'none'
+              }}>
+                <MissionLogoBadge size={180} />
+              </div>
+
+              {/* ID Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <MissionLogoBadge size={38} />
+                  <div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 800, letterSpacing: '0.02em', lineHeight: 1.1 }}>सहारा सोशल फाऊंडेशन</div>
+                    <div style={{ fontSize: '0.68rem', color: '#A7F3D0' }}>SAHARA SOCIAL FOUNDATION</div>
+                  </div>
+                </div>
+
+                <div style={{
+                  backgroundColor: '#FEF08A',
+                  color: '#713F12',
+                  fontSize: '0.66rem',
+                  fontWeight: 800,
+                  padding: '2px 8px',
+                  borderRadius: '9999px',
+                  textTransform: 'uppercase'
+                }}>
+                  VERIFIED
+                </div>
+              </div>
+
+              {/* ID Body */}
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '12px',
+                  backgroundColor: '#ffffff',
+                  color: '#006B2D',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '1.75rem',
+                  flexShrink: 0,
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+                  border: '2px solid #86EFAC'
+                }}>
+                  {(loggedAffiliate?.name || 'A')[0]}
+                </div>
+
+                <div>
+                  <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.2 }}>
+                    {loggedAffiliate?.name}
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#86EFAC', fontWeight: 700, marginTop: '2px' }}>
+                    अधिकृत आरोग्य दूत (Health Ambassador)
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#E2E8F0', marginTop: '2px' }}>
+                    क्षेत्र: <strong>{loggedAffiliate?.city || 'Sangli'}</strong>, महाराष्ट्र
+                  </div>
+                </div>
+              </div>
+
+              {/* ID Details Row */}
+              <div style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.25)',
+                borderRadius: '10px',
+                padding: '0.65rem 0.85rem',
+                fontSize: '0.78rem',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '0.5rem',
+                border: '1px solid rgba(255,255,255,0.15)'
+              }}>
+                <div>
+                  <span style={{ color: '#86EFAC', display: 'block', fontSize: '0.68rem', fontWeight: 600 }}>AMBASSADOR ID:</span>
+                  <strong style={{ fontSize: '0.86rem', letterSpacing: '0.04em' }}>{myReferralCode}</strong>
+                </div>
+                <div>
+                  <span style={{ color: '#86EFAC', display: 'block', fontSize: '0.68rem', fontWeight: 600 }}>CONTACT:</span>
+                  <strong>+91 {loggedAffiliate?.phone || '8421154090'}</strong>
+                </div>
+                <div>
+                  <span style={{ color: '#86EFAC', display: 'block', fontSize: '0.68rem', fontWeight: 600 }}>CAMPAIGN:</span>
+                  <span style={{ fontSize: '0.74rem' }}>मधुमेह व व्यसनमुक्त भारत</span>
+                </div>
+                <div>
+                  <span style={{ color: '#86EFAC', display: 'block', fontSize: '0.68rem', fontWeight: 600 }}>VALID TILL:</span>
+                  <span style={{ fontSize: '0.74rem' }}>Active (2026-2027)</span>
+                </div>
+              </div>
+
+              {/* ID Footer */}
+              <div style={{ marginTop: '0.85rem', textAlign: 'center', fontSize: '0.66rem', color: '#A7F3D0', borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '0.5rem' }}>
+                कार्यालय: शाहूपुरी, कोल्हापूर • अधिकृत हेल्पलाइन: +91 8421154090
+              </div>
+            </div>
+
+            {/* Print / Save button */}
+            <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.6rem', justifyContent: 'center' }}>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="btn btn-primary"
+                style={{ padding: '0.6rem 1.4rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                <Printer size={16} />
+                <span>{language === 'mr' ? 'ओळखपत्र प्रिंट करा / सेव्ह करा' : 'Print / Save ID Card'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: WHATSAPP SHARE KIT / TEMPLATES */}
+      {showShareKitModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(3px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            maxWidth: '620px',
+            width: '100%',
+            padding: '2rem',
+            position: 'relative',
+            boxShadow: '0 20px 45px rgba(0,0,0,0.25)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowShareKitModal(false)}
+              style={{
+                position: 'absolute',
+                top: '1.25rem',
+                right: '1.25rem',
+                backgroundColor: '#F3F4F6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.25rem' }}>
+              <Share2 size={24} style={{ color: '#006B2D' }} />
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#006B2D', margin: 0 }}>
+                {language === 'mr' ? 'व्हॉट्सअ‍ॅप प्रचार साहित्य व मेसेज किट' : 'Ambassador WhatsApp Share Kit'}
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: '#5F6B61', marginBottom: '1.5rem' }}>
+              {language === 'mr'
+                ? 'आपल्या परिसरातील व्हॉट्सअ‍ॅप ग्रुप्स व सोशल मीडियावर पाठवण्यासाठी तयार संदेश. यामध्ये आपली संदर्भ लिंक आपोआप जोडलेली आहे.'
+                : 'Ready-to-use WhatsApp messages pre-loaded with your unique referral link.'}
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {shareKitTemplates.map((item, idx) => (
+                <div key={idx} style={{
+                  backgroundColor: '#F9FAFB',
+                  border: '1.5px solid #E5E7EB',
+                  borderRadius: '14px',
+                  padding: '1.1rem'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 800, color: item.color }}>
+                      {language === 'mr' ? item.titleMr : item.titleEn}
+                    </span>
+                    <span style={{ backgroundColor: '#E5E7EB', color: '#374151', fontSize: '0.72rem', fontWeight: 700, padding: '2px 8px', borderRadius: '9999px' }}>
+                      {item.badge}
+                    </span>
+                  </div>
+
+                  <div style={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    padding: '0.75rem',
+                    fontSize: '0.8rem',
+                    lineHeight: 1.5,
+                    color: '#374151',
+                    whiteSpace: 'pre-line',
+                    marginBottom: '0.75rem'
+                  }}>
+                    {item.text}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyTemplate(item.text, idx)}
+                      style={{
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #D1D5DB',
+                        color: shareKitCopiedIdx === idx ? '#006B2D' : '#374151',
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.3rem'
+                      }}
+                    >
+                      {shareKitCopiedIdx === idx ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+                      <span>{shareKitCopiedIdx === idx ? (language === 'mr' ? 'कॉपी झाली!' : 'Copied!') : (language === 'mr' ? 'मेसेज कॉपी करा' : 'Copy Message')}</span>
+                    </button>
+
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(item.text)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        backgroundColor: '#25D366',
+                        color: '#ffffff',
+                        padding: '0.35rem 0.85rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
+                      }}
+                    >
+                      <WhatsAppIcon size={14} />
+                      <span>{language === 'mr' ? 'WhatsApp वर पाठवा' : 'Share on WhatsApp'}</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 5: PAYOUT / UPI SETTINGS */}
+      {showPayoutModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(3px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            maxWidth: '480px',
+            width: '100%',
+            padding: '2rem',
+            position: 'relative',
+            boxShadow: '0 20px 45px rgba(0,0,0,0.25)'
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowPayoutModal(false)}
+              style={{
+                position: 'absolute',
+                top: '1.25rem',
+                right: '1.25rem',
+                backgroundColor: '#F3F4F6',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.3rem' }}>
+              <CreditCard size={22} style={{ color: '#B45309' }} />
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#17251B', margin: 0 }}>
+                {language === 'mr' ? 'मानधन / बँक खाते तपशील' : 'Payout & Bank Settings'}
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.84rem', color: '#5F6B61', marginBottom: '1.25rem' }}>
+              {language === 'mr'
+                ? 'आपले मानधन व कमिशन थेट प्राप्त करण्यासाठी UPI ID किंवा बँक खात्याचा तपशील भरा.'
+                : 'Enter your UPI ID or Bank account details for receiving ambassador incentives.'}
+            </p>
+
+            {payoutSavedMsg && (
+              <div style={{
+                backgroundColor: '#ECFDF5',
+                border: '1.5px solid #10B981',
+                color: '#065F46',
+                padding: '0.75rem 1rem',
+                borderRadius: '10px',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <CheckCircle2 size={18} />
+                <span>{payoutSavedMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSavePayoutDetails}>
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                  {language === 'mr' ? 'UPI ID (Google Pay / PhonePe / Paytm) *' : 'UPI ID (GPay / PhonePe / Paytm) *'}
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. 9876543210@upi or varun@oksbi"
+                  value={payoutForm.upiId}
+                  onChange={(e) => setPayoutForm({ ...payoutForm, upiId: e.target.value })}
+                />
+              </div>
+
+              <div style={{ textAlign: 'center', margin: '0.75rem 0', color: '#9CA3AF', fontSize: '0.8rem', fontWeight: 600 }}>
+                --- किंवा बँक खाते (OR Bank Account) ---
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+                <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                  {language === 'mr' ? 'खातेधारकाचे पूर्ण नाव' : 'Account Holder Name'}
+                </label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. Varun Yadav"
+                  value={payoutForm.holderName}
+                  onChange={(e) => setPayoutForm({ ...payoutForm, holderName: e.target.value })}
+                />
+              </div>
+
+              <div className="grid-2" style={{ gap: '0.75rem', marginBottom: '1.25rem' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                    {language === 'mr' ? 'बँक खाते क्रमांक' : 'Account Number'}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Account Number"
+                    value={payoutForm.accountNo}
+                    onChange={(e) => setPayoutForm({ ...payoutForm, accountNo: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontWeight: 700, fontSize: '0.85rem' }}>
+                    {language === 'mr' ? 'IFSC कोड' : 'IFSC Code'}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. SBIN0001234"
+                    value={payoutForm.ifsc}
+                    onChange={(e) => setPayoutForm({ ...payoutForm, ifsc: e.target.value.toUpperCase() })}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '0.75rem', fontWeight: 700 }}
+              >
+                {language === 'mr' ? 'तपशील सेव्ह करा (Save Details)' : 'Save Payout Details'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

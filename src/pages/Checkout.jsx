@@ -194,6 +194,7 @@ const Checkout = () => {
       assignedEmployee: 'usr_emp_akash',
       assignedAffiliate: matchingAffiliate ? matchingAffiliate.id : '',
       affiliateName: matchingAffiliate ? matchingAffiliate.name : '',
+      referralCode: activeRefCode || (matchingAffiliate ? matchingAffiliate.referralCode : ''),
       commissionStatus: isPaidOnlineFull ? 'Eligible' : 'Pending Delivery',
       orderDate: new Date().toISOString(),
       deliveredDate: null,

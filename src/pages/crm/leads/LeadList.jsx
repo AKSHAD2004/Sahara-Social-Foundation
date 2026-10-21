@@ -93,15 +93,27 @@ export default function LeadList() {
 
   const filteredLeads = leads.filter((l) => {
     const q = searchTerm.toLowerCase();
+    const custName = (l.customerName || l.name || '').toLowerCase();
+    const phoneNo = String(l.mobile || l.phone || l.mobileNumber || '');
+    const lId = String(l.leadId || l.id || '').toLowerCase();
+    const formula = String(l.interestedProduct || l.disease || l.healthConcern || '').toLowerCase();
+    const affName = String(l.affiliateName || '').toLowerCase();
+    const refCode = String(l.referralCode || '').toLowerCase();
+
     const matchSearch =
       !searchTerm ||
-      l.customerName.toLowerCase().includes(q) ||
-      l.mobile.includes(q) ||
-      l.leadId.toLowerCase().includes(q) ||
-      l.interestedProduct.toLowerCase().includes(q);
+      custName.includes(q) ||
+      phoneNo.includes(q) ||
+      lId.includes(q) ||
+      formula.includes(q) ||
+      affName.includes(q) ||
+      refCode.includes(q);
 
-    const matchStatus = statusFilter === 'ALL' || l.leadStatus === statusFilter;
-    const matchPriority = priorityFilter === 'ALL' || l.priority === priorityFilter;
+    const leadStatusVal = l.leadStatus || l.status || 'New';
+    const priorityVal = l.priority || 'High';
+
+    const matchStatus = statusFilter === 'ALL' || leadStatusVal === statusFilter;
+    const matchPriority = priorityFilter === 'ALL' || priorityVal === priorityFilter;
 
     return matchSearch && matchStatus && matchPriority;
   });
@@ -379,25 +391,33 @@ export default function LeadList() {
               ) : (
                 filteredLeads.map((lead) => {
                   const assignedEmp = employees.find((e) => e.id === lead.assignedEmployee);
-                  const assignedAff = affiliates.find((a) => a.id === lead.assignedAffiliate);
+                  const assignedAff = affiliates.find((a) => a.id === lead.assignedAffiliate || (lead.referralCode && a.referralCode === lead.referralCode));
+                  const leadDisplayId = lead.leadId || lead.id || 'LEAD-NEW';
+                  const leadDisplayName = lead.customerName || lead.name || 'Patient';
+                  const leadDisplayPhone = lead.mobile || lead.phone || lead.mobileNumber || '';
+                  const leadDisplayProduct = lead.interestedProduct || lead.disease || lead.healthConcern || 'Health Counseling';
+                  const leadDisplayDate = lead.createdDate || lead.createdAt || new Date().toISOString();
+                  const leadDisplayStatus = lead.leadStatus || lead.status || 'New';
+                  const leadDisplayPriority = lead.priority || 'High';
+                  const leadDisplaySource = lead.source || lead.leadSource || 'Website';
 
                   return (
                     <tr key={lead.id}>
                       <td>
-                        <strong>{lead.leadId}</strong>
+                        <strong>{leadDisplayId}</strong>
                       </td>
                       <td>
-                        <div style={{ fontWeight: 600, color: '#1e293b' }}>{lead.customerName}</div>
+                        <div style={{ fontWeight: 600, color: '#1e293b' }}>{leadDisplayName}</div>
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                          Created {formatDate(lead.createdDate)}
+                          Created {formatDate(leadDisplayDate)}
                         </div>
                       </td>
                       <td>
-                        <div>{formatPhone(lead.mobile)}</div>
+                        <div>{formatPhone(leadDisplayPhone)}</div>
                         {lead.email && <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{lead.email}</div>}
                       </td>
                       <td style={{ maxWidth: '220px' }}>
-                        <div style={{ fontWeight: 500, fontSize: '0.82rem' }}>{lead.interestedProduct}</div>
+                        <div style={{ fontWeight: 500, fontSize: '0.82rem' }}>{leadDisplayProduct}</div>
                         {lead.notes && (
                           <div style={{ fontSize: '0.75rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {lead.notes}
@@ -405,16 +425,16 @@ export default function LeadList() {
                         )}
                       </td>
                       <td>
-                        <span className="badge badge-neutral">{lead.source}</span>
+                        <span className="badge badge-neutral">{leadDisplaySource}</span>
                       </td>
                       <td>
-                        <span className={`badge ${getStatusBadgeClass(lead.priority)}`}>{lead.priority}</span>
+                        <span className={`badge ${getStatusBadgeClass(leadDisplayPriority)}`}>{leadDisplayPriority}</span>
                       </td>
                       <td>
                         <select
                           className="crm-select"
                           style={{ fontSize: '0.78rem', padding: '0.25rem 0.5rem' }}
-                          value={lead.leadStatus}
+                          value={leadDisplayStatus}
                           onChange={(e) => handleUpdateStatus(lead.id, e.target.value)}
                         >
                           <option value="New">New</option>
@@ -429,11 +449,12 @@ export default function LeadList() {
                       </td>
                       <td>
                         <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#1e293b' }}>
-                          {assignedEmp ? assignedEmp.name : 'Akash Shinde'}
+                          {assignedEmp ? assignedEmp.name : (lead.employeeName || 'Akash Shinde')}
                         </div>
-                        {assignedAff && (
-                          <div style={{ fontSize: '0.72rem', color: '#c69214', fontWeight: 500 }}>
-                            Ref: {assignedAff.name.split(' ')[0]}
+                        {(assignedAff || lead.affiliateName || lead.referralCode) && (
+                          <div style={{ fontSize: '0.72rem', color: '#006B2D', fontWeight: 700, marginTop: '2px' }}>
+                            Ref: {lead.affiliateName || assignedAff?.name || 'Ambassador'}
+                            {lead.referralCode && ` (${lead.referralCode})`}
                           </div>
                         )}
                       </td>

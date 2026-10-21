@@ -60,18 +60,21 @@ export default function CrmHeader({ onToggleMobile }) {
 
     const q = query.toLowerCase();
     const customers = dbService.getAll('customers').filter((c) => 
-      c.fullName.toLowerCase().includes(q) || 
-      c.mobileNumber.includes(q) || 
-      c.customerId.toLowerCase().includes(q)
+      (c.fullName || c.name || '').toLowerCase().includes(q) || 
+      String(c.mobileNumber || c.phone || '').includes(q) || 
+      String(c.customerId || c.id || '').toLowerCase().includes(q)
     );
     const leads = dbService.getAll('leads').filter((l) => 
-      l.customerName.toLowerCase().includes(q) || 
-      l.mobile.includes(q) || 
-      l.leadId.toLowerCase().includes(q)
+      (l.customerName || l.name || '').toLowerCase().includes(q) || 
+      String(l.mobile || l.phone || l.mobileNumber || '').includes(q) || 
+      String(l.leadId || l.id || '').toLowerCase().includes(q) ||
+      String(l.affiliateName || '').toLowerCase().includes(q) ||
+      String(l.referralCode || '').toLowerCase().includes(q)
     );
     const orders = dbService.getAll('orders').filter((o) => 
-      o.orderId.toLowerCase().includes(q) || 
-      o.customerName.toLowerCase().includes(q)
+      String(o.orderId || o.id || '').toLowerCase().includes(q) || 
+      (o.customerName || '').toLowerCase().includes(q) ||
+      String(o.referralCode || '').toLowerCase().includes(q)
     );
 
     setSearchResults({ customers, leads, orders });

@@ -377,8 +377,8 @@ function setupFirestoreRealtimeSync() {
     return;
   }
 
-  // Only subscribe to critical customer & order collections to drastically conserve Firebase quota
-  const SYNC_COLLECTIONS = ['orders', 'heroSlides', 'settings'];
+  // Real-time bidirectional sync across Cloud Firestore and local reactive stores
+  const SYNC_COLLECTIONS = ['orders', 'leads', 'users', 'customers', 'heroSlides', 'settings'];
 
   SYNC_COLLECTIONS.forEach((colName) => {
     try {
@@ -1349,13 +1349,14 @@ export const dbService = {
     const collectionsToRefresh = isCrm
       ? [
           'orders',
+          'leads',
+          'users',
+          'customers',
           'heroSlides',
           'galleryPhotos',
           'videos',
           'reviews',
           'products',
-          'customers',
-          'leads',
           'settings'
         ]
       : [

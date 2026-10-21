@@ -35,9 +35,20 @@ export default function AffiliatePortal() {
   const myReferralCode = currentUser?.referralCode || 'SAHARA-PARTNER-001';
   const referralLink = `https://samarthkolhapur.com/?ref=${myReferralCode}`;
 
-  const myOrders = orders.filter((o) => o.assignedAffiliate === myAffiliateId);
-  const myLeads = leads.filter((l) => l.assignedAffiliate === myAffiliateId);
-  const myCustomers = customers.filter((c) => c.assignedAffiliate === myAffiliateId);
+  const myOrders = orders.filter((o) => 
+    o.assignedAffiliate === myAffiliateId ||
+    (o.referralCode && currentUser?.referralCode && o.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase()) ||
+    (o.affiliateName && currentUser?.name && o.affiliateName.toLowerCase() === currentUser.name.toLowerCase())
+  );
+  const myLeads = leads.filter((l) => 
+    l.assignedAffiliate === myAffiliateId ||
+    (l.referralCode && currentUser?.referralCode && l.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase()) ||
+    (l.affiliateName && currentUser?.name && l.affiliateName.toLowerCase() === currentUser.name.toLowerCase())
+  );
+  const myCustomers = customers.filter((c) => 
+    c.assignedAffiliate === myAffiliateId ||
+    (c.referralCode && currentUser?.referralCode && c.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase())
+  );
   const myTransactions = commissionTx.filter((tx) => tx.beneficiaryId === myAffiliateId);
 
   const totalSales = myOrders.reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
