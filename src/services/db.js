@@ -42,6 +42,19 @@ import { buildCommissionTransactions, buildCommissionReversal, isOrderCommission
 const STORAGE_PREFIX = 'sahara_crm_prod_';
 const DELETED_STORAGE_PREFIX = 'sahara_crm_deleted_';
 
+export const UNWANTED_DUMMY_IDS = new Set([
+  'ORD-2026-9953',
+  'orde_1790320226159_297',
+  'orde_1791196143354_124',
+  'SSF-842101',
+  'CUST-8421154090',
+  'cust_1789982815598_992',
+  'lead_1789981569824_327',
+  'lead_1789984653453_688',
+  'user_1791544252159_4',
+  'user_1792565317925_821'
+]);
+
 export function getDeletedSet(collectionName) {
   try {
     const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(DELETED_STORAGE_PREFIX + collectionName) : null;
@@ -64,16 +77,17 @@ export function isItemDeleted(collectionName, itemOrId) {
   if (!itemOrId) return false;
   const set = getDeletedSet(collectionName);
   if (typeof itemOrId === 'string' || typeof itemOrId === 'number') {
-    return set.has(String(itemOrId));
+    const sId = String(itemOrId);
+    return set.has(sId) || UNWANTED_DUMMY_IDS.has(sId);
   }
   const id = itemOrId.id ? String(itemOrId.id) : null;
   const orderId = itemOrId.orderId ? String(itemOrId.orderId) : null;
   const customerId = itemOrId.customerId ? String(itemOrId.customerId) : null;
   const leadId = itemOrId.leadId ? String(itemOrId.leadId) : null;
-  return (id && set.has(id)) || 
-         (orderId && set.has(orderId)) || 
-         (customerId && set.has(customerId)) || 
-         (leadId && set.has(leadId));
+  return (id && (set.has(id) || UNWANTED_DUMMY_IDS.has(id))) || 
+         (orderId && (set.has(orderId) || UNWANTED_DUMMY_IDS.has(orderId))) || 
+         (customerId && (set.has(customerId) || UNWANTED_DUMMY_IDS.has(customerId))) || 
+         (leadId && (set.has(leadId) || UNWANTED_DUMMY_IDS.has(leadId)));
 }
 
 // In-memory state and listeners
@@ -178,18 +192,8 @@ function initCollection(collectionName, defaultData) {
         const cleanedVideos = parsed.map((v) => ({ ...v, thumbnail: '', fallbackThumbnail: '' }));
         state[collectionName] = cleanedVideos;
         localStorage.setItem(key, JSON.stringify(cleanedVideos));
-      } else if (collectionName === 'orders' && Array.isArray(defaultData)) {
-        const existingOrders = Array.isArray(parsed) ? parsed : [];
-        const orderMap = new Map(existingOrders.map((o) => [String(o.id || o.orderId), o]));
-
-        // Ensure default website orders are present ONLY IF NOT deleted
-        defaultData.forEach((defOrd) => {
-          const ordKey = String(defOrd.id || defOrd.orderId);
-          if (!orderMap.has(ordKey) && !deletedSet.has(ordKey)) {
-            existingOrders.push(defOrd);
-            orderMap.set(ordKey, defOrd);
-          }
-        });
+      } else if (collectionName === 'orders') {
+        const existingOrders = (Array.isArray(parsed) ? parsed : []).filter((o) => !isItemDeleted('orders', o));
 
         // Also recover any order placed via website checkout in ssf_last_order ONLY IF NOT deleted
         try {
@@ -197,9 +201,9 @@ function initCollection(collectionName, defaultData) {
           if (lastOrderRaw) {
             const lastOrd = JSON.parse(lastOrderRaw);
             const lKey = String(lastOrd.id || lastOrd.orderId || '');
-            if (deletedSet.has(lKey) || deletedSet.has(String(lastOrd.id)) || deletedSet.has(String(lastOrd.orderId))) {
+            if (isItemDeleted('orders', lKey) || isItemDeleted('orders', lastOrd)) {
               localStorage.removeItem('ssf_last_order');
-            } else if (lKey && !orderMap.has(lKey)) {
+            } else if (lKey && !existingOrders.some((o) => String(o.id || o.orderId) === lKey)) {
               existingOrders.unshift({
                 ...lastOrd,
                 id: lKey,
@@ -207,7 +211,6 @@ function initCollection(collectionName, defaultData) {
                 source: 'Website Checkout',
                 orderStatus: lastOrd.status || 'Confirmed'
               });
-              orderMap.set(lKey, true);
             }
           }
         } catch (e) {}
@@ -221,20 +224,21 @@ function initCollection(collectionName, defaultData) {
 
         state[collectionName] = existingOrders;
         localStorage.setItem(key, JSON.stringify(existingOrders));
-      } else if (collectionName === 'customers' && Array.isArray(defaultData)) {
-        const existingCustomers = Array.isArray(parsed) ? parsed : [];
-        const custMap = new Map(existingCustomers.map((c) => [String(c.id || c.customerId || c.mobileNumber || c.phone), c]));
-        defaultData.forEach((defCust) => {
-          const custKey = String(defCust.id || defCust.customerId || defCust.mobileNumber || defCust.phone);
-          const custId = String(defCust.id || '');
-          const customerId = String(defCust.customerId || '');
-          if (!custMap.has(custKey) && !deletedSet.has(custId) && !deletedSet.has(customerId)) {
-            existingCustomers.push(defCust);
-            custMap.set(custKey, defCust);
-          }
-        });
+      } else if (collectionName === 'customers') {
+        const existingCustomers = (Array.isArray(parsed) ? parsed : []).filter((c) => !isItemDeleted('customers', c));
         state[collectionName] = existingCustomers;
         localStorage.setItem(key, JSON.stringify(existingCustomers));
+      } else if (collectionName === 'users') {
+        const existingUsers = (Array.isArray(parsed) ? parsed : []).filter((u) => !isItemDeleted('users', u));
+        const officialUserIds = new Set(initialUsers.map((u) => u.id));
+        const mergedUsers = [...initialUsers];
+        existingUsers.forEach((u) => {
+          if (!officialUserIds.has(u.id)) {
+            mergedUsers.push(u);
+          }
+        });
+        state[collectionName] = mergedUsers;
+        localStorage.setItem(key, JSON.stringify(mergedUsers));
       } else {
         state[collectionName] = parsed;
       }
@@ -288,15 +292,6 @@ export function initDatabase() {
     } else {
       setupFirestoreRealtimeSync();
     }
-  }
-
-  // Automatically sync/generate commissions for any pending paid orders (only in CRM context)
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/crm')) {
-    setTimeout(() => {
-      try {
-        dbService.syncAllOrderCommissions();
-      } catch (e) {}
-    }, 1500);
   }
 
   // Defer cloud refresh until browser is idle to ensure instant initial render
@@ -378,7 +373,19 @@ function setupFirestoreRealtimeSync() {
   }
 
   // Real-time bidirectional sync across Cloud Firestore and local reactive stores
-  const SYNC_COLLECTIONS = ['orders', 'leads', 'users', 'customers', 'heroSlides', 'settings'];
+  const SYNC_COLLECTIONS = [
+    'products',
+    'orders',
+    'leads',
+    'users',
+    'customers',
+    'heroSlides',
+    'reviews',
+    'commissionSlabs',
+    'videos',
+    'galleryPhotos',
+    'settings'
+  ];
 
   SYNC_COLLECTIONS.forEach((colName) => {
     try {
@@ -455,7 +462,9 @@ function setupFirestoreRealtimeSync() {
             const remoteMap = new Map(remoteDocs.map((u) => [String(u.id), u]));
             const fullUsers = defaultUsers.map((defU) => remoteMap.get(String(defU.id)) || defU);
             remoteDocs.forEach((r) => {
-              if (!defaultUsers.some((du) => String(du.id) === String(r.id))) fullUsers.push(r);
+              if (!defaultUsers.some((du) => String(du.id) === String(r.id)) && !isItemDeleted('users', r)) {
+                fullUsers.push(r);
+              }
             });
             const currentJson = JSON.stringify(state.users || []);
             const newJson = JSON.stringify(fullUsers);
@@ -463,62 +472,36 @@ function setupFirestoreRealtimeSync() {
               state.users = fullUsers;
               saveCollection('users', false);
             }
+          } else if (colName === 'heroSlides') {
+            // Filter out any broken base64 slides, fall back to official initial slides
+            const validSlides = remoteDocs.filter((s) => s.image && !s.image.startsWith('data:'));
+            const finalSlides = validSlides.length > 0 ? validSlides : initialHeroSlides;
+            finalSlides.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
+            state.heroSlides = finalSlides;
+            saveCollection('heroSlides', false);
           } else if (remoteDocs.length === 0) {
-            // Check if explicitly cleared by admin action
-            const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
-            if (wasPurged) {
+            // For operational collections, 0 documents in Firestore means clean and empty!
+            const isOperational = ['orders', 'customers', 'leads', 'followups', 'commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(colName);
+            if (isOperational) {
               state[colName] = [];
               saveCollection(colName, false);
               return;
             }
 
-            const deletedSet = getDeletedSet(colName);
-            const localItems = ((Array.isArray(state[colName]) && state[colName].length > 0)
+            const localItems = (Array.isArray(state[colName]) && state[colName].length > 0)
               ? state[colName]
-              : (initialDataMap[colName] || [])).filter((item) => {
-                const iId = String(item.id || '');
-                const iOrd = String(item.orderId || '');
-                const iCust = String(item.customerId || '');
-                const iLead = String(item.leadId || '');
-                return !deletedSet.has(iId) && (!iOrd || !deletedSet.has(iOrd)) && (!iCust || !deletedSet.has(iCust)) && (!iLead || !deletedSet.has(iLead));
-              });
+              : (initialDataMap[colName] || []);
 
-            if (localItems.length > 0) {
-              state[colName] = localItems;
-              saveCollection(colName, false);
-
-              // Auto-seed to Cloud Firestore in the background only for active non-deleted items
-              localItems.forEach((item) => {
-                const docId = String(item.id || `${colName}_${Date.now()}_${Math.floor(Math.random() * 1000)}`);
-                const docRef = doc(firestoreDb, colName, docId);
-                const cleanItem = sanitizeForFirestore({ ...item, id: docId, syncedAt: new Date().toISOString() });
-                setDoc(docRef, cleanItem, { merge: true }).catch((err) => {
-                  if (err?.code !== 'permission-denied' && !err?.message?.includes('permissions')) {
-                    console.warn(`Firestore auto-seed doc note (${colName}/${docId}):`, err.message);
-                  }
-                });
-              });
-            } else {
-              state[colName] = [];
-              saveCollection(colName, false);
-            }
+            state[colName] = localItems;
+            saveCollection(colName, false);
           } else {
-            // Remote Cloud Firestore has documents: purge any deleted ones and synchronize
-            const deletedSet = getDeletedSet(colName);
+            // Remote Cloud Firestore has documents: purge any deleted/unwanted ones and synchronize
             const activeRemoteDocs = [];
             for (const rDoc of remoteDocs) {
-              const rId = String(rDoc.id || '');
-              const rOrd = String(rDoc.orderId || '');
-              const rCust = String(rDoc.customerId || '');
-              const rLead = String(rDoc.leadId || '');
-              if (deletedSet.has(rId) || (rOrd && deletedSet.has(rOrd)) || (rCust && deletedSet.has(rCust)) || (rLead && deletedSet.has(rLead))) {
-                // Permanently clean from Cloud Firestore if found remotely
+              if (isItemDeleted(colName, rDoc)) {
+                // Clean from Cloud Firestore if found remotely
                 const dRef = doc(firestoreDb, colName, rDoc.id);
-                deleteDoc(dRef).catch((dErr) => {
-                  if (dErr?.code === 'resource-exhausted' || dErr?.message?.includes('Quota exceeded') || dErr?.message?.includes('resource-exhausted')) {
-                    handleFirestoreQuotaExceeded(dErr);
-                  }
-                });
+                deleteDoc(dRef).catch(() => {});
               } else {
                 activeRemoteDocs.push(rDoc);
               }
@@ -532,11 +515,9 @@ function setupFirestoreRealtimeSync() {
             if (colName === 'orders') {
               localItems.forEach((localItem) => {
                 const localKey = String(localItem.id || localItem.orderId || '');
-                const localOrderId = String(localItem.orderId || '');
                 if (
                   localKey &&
-                  !deletedSet.has(localKey) &&
-                  (!localOrderId || !deletedSet.has(localOrderId)) &&
+                  !isItemDeleted('orders', localItem) &&
                   !remoteMap.has(localKey) &&
                   (localItem.source === 'Website Checkout' || localItem.orderStatus === 'Confirmed')
                 ) {
@@ -554,8 +535,6 @@ function setupFirestoreRealtimeSync() {
                 const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
                 return dateB - dateA;
               });
-            } else if (colName === 'heroSlides') {
-              mergedDocs.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
             }
 
             // Guard against redundant state updates and re-renders
@@ -1269,7 +1248,18 @@ export const dbService = {
       state[col] = [];
       saveCollection(col);
       emitChange(col);
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem(STORAGE_PREFIX + col);
+          localStorage.removeItem(DELETED_STORAGE_PREFIX + col);
+        }
+      } catch (e) {}
     });
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('ssf_last_order');
+      }
+    } catch (e) {}
 
     // Delete all operational documents from Cloud Firestore
     if (isFirebaseConfigured && firestoreDb) {
@@ -1473,34 +1463,16 @@ export const dbService = {
         state[collectionName] = merged;
         saveCollection(collectionName, false);
         return merged;
-      } else if (localItems.length > 0) {
-        // Remote Firestore collection is empty - only seed active non-deleted items
-        const wasPurged = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('crm_explicitly_purged') === 'true';
-        if (!wasPurged && !window.__firestoreSeedDisabled) {
-          for (const local of localItems) {
-            const key = String(local.id || local.orderId || '');
-            const ordKey = String(local.orderId || '');
-            if (key && !deletedSet.has(key) && (!ordKey || !deletedSet.has(ordKey))) {
-              try {
-                const docRef = doc(firestoreDb, collectionName, key);
-                const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
-                await setDoc(docRef, cleanDoc, { merge: true });
-              } catch (e) {
-                if (e?.code === 'permission-denied') {
-                  window.__firestoreSeedDisabled = true;
-                  break;
-                }
-              }
-            }
-          }
-        }
-        state[collectionName] = localItems;
-        saveCollection(collectionName, false);
-        return localItems;
       } else {
-        state[collectionName] = [];
+        const isOperational = ['orders', 'customers', 'leads', 'followups', 'commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(collectionName);
+        if (isOperational) {
+          state[collectionName] = [];
+          saveCollection(collectionName, false);
+          return [];
+        }
+        state[collectionName] = localItems.length > 0 ? localItems : (initialDataMap[collectionName] || []);
         saveCollection(collectionName, false);
-        return [];
+        return state[collectionName];
       }
     } catch (err) {
       handleFirestorePermissionError('refresh', collectionName, err);

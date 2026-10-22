@@ -83,17 +83,9 @@ try {
 
 let isNetworkDisabled = false;
 
-// Check persistent session flag to avoid re-triggering quota errors on page reload
-if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('firestore_quota_exhausted') === 'true') {
-  isNetworkDisabled = true;
-  try {
-    setLogLevel('silent');
-  } catch (e) {}
-  if (db) {
-    try {
-      disableNetwork(db).catch(() => {});
-    } catch (e) {}
-  }
+// Clear stale session quota flag on init so browser sessions can always use live Firestore
+if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('firestore_quota_exhausted')) {
+  sessionStorage.removeItem('firestore_quota_exhausted');
 }
 
 /**
@@ -105,9 +97,6 @@ export async function disconnectFirestoreNetwork() {
   if (isNetworkDisabled || !db) return;
   isNetworkDisabled = true;
   try {
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem('firestore_quota_exhausted', 'true');
-    }
     try {
       setLogLevel('silent');
     } catch (e) {}
@@ -119,7 +108,7 @@ export async function disconnectFirestoreNetwork() {
 }
 
 export function isFirestoreNetworkDisconnected() {
-  return isNetworkDisabled || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('firestore_quota_exhausted') === 'true');
+  return isNetworkDisabled;
 }
 
 /**

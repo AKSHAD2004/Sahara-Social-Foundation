@@ -1,4 +1,4 @@
-// Standalone script to upload all initial & local CRM data to Firebase Firestore
+// Standalone script to upload all official necessary catalog data to Firebase Firestore
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { readFileSync, existsSync } from 'fs';
@@ -51,20 +51,17 @@ if (!firebaseConfig.apiKey) {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Import seed data dynamically
+// Import clean seed data dynamically
 import('../src/services/seedData.js').then(async (seed) => {
+  // Sync ONLY necessary static/catalog collections (no dummy operational data)
   const collections = {
     users: seed.initialUsers,
     products: seed.initialProducts,
     commissionSlabs: seed.initialCommissionSlabs,
-    customers: seed.initialCustomers || [],
-    leads: seed.initialLeads || [],
-    followups: seed.initialFollowups || [],
-    orders: seed.initialOrders || [],
-    commissionTransactions: seed.initialCommissionTransactions || [],
-    commissionPayouts: seed.initialPayouts || [],
-    supportTickets: seed.initialSupportTickets || [],
-    auditLogs: seed.initialAuditLogs || []
+    heroSlides: seed.initialHeroSlides || [],
+    galleryPhotos: seed.galleryPhotos || [],
+    videos: seed.horizontalVideosData || [],
+    reviews: seed.initialReviews || []
   };
 
   let totalUploaded = 0;
@@ -72,7 +69,7 @@ import('../src/services/seedData.js').then(async (seed) => {
   for (const [colName, items] of Object.entries(collections)) {
     console.log(`Syncing collection: ${colName} (${items.length} records)...`);
     for (const item of items) {
-      const docId = item.id || `${colName}_${Date.now()}`;
+      const docId = String(item.id || `${colName}_${Date.now()}`);
       await setDoc(doc(db, colName, docId), {
         ...item,
         id: docId,
@@ -90,7 +87,7 @@ import('../src/services/seedData.js').then(async (seed) => {
   }, { merge: true });
   totalUploaded++;
 
-  console.log(`\nSUCCESS: Uploaded ${totalUploaded} records to Firebase Firestore!`);
+  console.log(`\nSUCCESS: Uploaded ${totalUploaded} necessary records to Firebase Firestore!`);
   process.exit(0);
 }).catch((err) => {
   console.error('Failed to sync to Firebase:', err);

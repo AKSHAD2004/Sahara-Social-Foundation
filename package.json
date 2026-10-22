@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "sync:firebase": "node scripts/syncFirebase.js"
+    "sync:firebase": "node scripts/syncFirebase.js",
+    "clean:firestore": "node scripts/cleanFirestore.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",
