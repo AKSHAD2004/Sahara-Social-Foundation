@@ -33,14 +33,6 @@ const ResultVideoCardItem = ({ video, idx, language, handlePlay }) => {
     return () => observer.disconnect();
   }, []);
 
-  const handleLoadedMetadata = (e) => {
-    try {
-      if (e.target && e.target.currentTime === 0) {
-        e.target.currentTime = 0.5;
-      }
-    } catch (err) {}
-  };
-
   return (
     <div 
       ref={containerRef}
@@ -76,8 +68,6 @@ const ResultVideoCardItem = ({ video, idx, language, handlePlay }) => {
             preload="metadata"
             controlsList="nodownload"
             onPlay={handlePlay}
-            onLoadedMetadata={handleLoadedMetadata}
-            onLoadedData={handleLoadedMetadata}
             style={{
               width: '100%',
               height: '100%',

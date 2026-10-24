@@ -367,25 +367,37 @@ function handleFirestorePermissionError(source, colName, err) {
 }
 
 // Setup live listeners to Cloud Firestore
-function setupFirestoreRealtimeSync() {
+export function setupFirestoreRealtimeSync(forceCrm = false) {
   if (isFirestoreQuotaExhausted() || (typeof window !== 'undefined' && window.__firestoreQuotaExceeded)) {
     return;
   }
 
-  // Real-time bidirectional sync across Cloud Firestore and local reactive stores
-  const SYNC_COLLECTIONS = [
+  const isCrm = forceCrm || (typeof window !== 'undefined' && (
+    window.location.pathname.startsWith('/crm') ||
+    Boolean(localStorage.getItem('sahara_crm_current_user'))
+  ));
+
+  // Public collections needed for website visitors
+  const publicCols = [
     'products',
-    'orders',
-    'leads',
-    'users',
-    'customers',
     'heroSlides',
     'reviews',
-    'commissionSlabs',
     'videos',
     'galleryPhotos',
     'settings'
   ];
+
+  // Sensitive/heavy operational collections only synced inside CRM
+  const crmCols = [
+    'orders',
+    'leads',
+    'users',
+    'customers',
+    'commissionSlabs'
+  ];
+
+  // Real-time bidirectional sync across Cloud Firestore and local reactive stores
+  const SYNC_COLLECTIONS = isCrm ? [...publicCols, ...crmCols] : publicCols;
 
   SYNC_COLLECTIONS.forEach((colName) => {
     try {

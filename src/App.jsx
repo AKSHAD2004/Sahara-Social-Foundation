@@ -10,12 +10,12 @@ import Toast from './components/Toast';
 import ConsultationModal from './components/ConsultationModal';
 import CustomerAuthModal from './components/CustomerAuthModal';
 
-// Core Public Pages (Synchronous for instantaneous first paint)
+// Core Public Pages (Home synchronous for instantaneous first paint, others lazy-loaded)
 import Home from './pages/Home';
-import Shop from './pages/Shop';
-import ProductDetails from './pages/ProductDetails';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
+const Shop = lazy(() => import('./pages/Shop'));
+const ProductDetails = lazy(() => import('./pages/ProductDetails'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
 
 // Secondary Public Pages (Lazy Loaded on Demand)
 const About = lazy(() => import('./pages/About'));

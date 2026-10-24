@@ -49,16 +49,6 @@ const HorizontalVideoCard = ({ video }) => {
     });
   };
 
-  const handleLoadedMetadata = () => {
-    if (videoRef.current && videoRef.current.currentTime === 0) {
-      try {
-        videoRef.current.currentTime = 0.5;
-      } catch (e) {
-        // Ignore seek errors
-      }
-    }
-  };
-
   useEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) return;
@@ -149,8 +139,6 @@ const HorizontalVideoCard = ({ video }) => {
             preload="metadata"
             playsInline
             controls
-            onLoadedMetadata={handleLoadedMetadata}
-            onLoadedData={handleLoadedMetadata}
             style={{
               width: '100%',
               height: '100%',

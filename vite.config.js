@@ -9,22 +9,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 function syncFavicon() {
   try {
     const publicDir = path.resolve(__dirname, 'public')
-    const logoJpg = path.join(publicDir, 'sahara-logo.jpg')
-    if (fs.existsSync(logoJpg)) {
-      const buffer = fs.readFileSync(logoJpg)
-      const b64 = buffer.toString('base64')
-      
-      const svgContent = `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    const svgPath = path.join(publicDir, 'favicon.svg')
+    const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <clipPath id="circleClip">
-      <circle cx="250" cy="250" r="248" />
-    </clipPath>
+    <linearGradient id="ssfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#006B2D"/>
+      <stop offset="100%" stop-color="#04200E"/>
+    </linearGradient>
   </defs>
-  <circle cx="250" cy="250" r="250" fill="#ffffff" />
-  <image href="data:image/jpeg;base64,${b64}" xlink:href="data:image/jpeg;base64,${b64}" x="0" y="0" width="500" height="500" clip-path="url(#circleClip)" />
+  <circle cx="32" cy="32" r="30" fill="url(#ssfGrad)" stroke="#FFC928" stroke-width="2.5"/>
+  <path d="M32 14c-5.5 0-10 4.5-10 10 0 9 10 17 10 17s10-8 10-17c0-5.5-4.5-10-10-10z" fill="#ffffff"/>
+  <path d="M32 19c-3 0-5.5 2.5-5.5 5.5 0 5 5.5 9.5 5.5 9.5s5.5-4.5 5.5-9.5c0-3-2.5-5.5-5.5-5.5z" fill="#006B2D"/>
+  <circle cx="32" cy="24.5" r="2.2" fill="#FFC928"/>
+  <path d="M22 46h20" stroke="#FFC928" stroke-width="2.5" stroke-linecap="round"/>
 </svg>`
-      fs.writeFileSync(path.join(publicDir, 'favicon.svg'), svgContent, 'utf8')
-    }
+    fs.writeFileSync(svgPath, svgContent, 'utf8')
   } catch (e) {
     console.error('[Favicon Sync Error]', e)
   }
@@ -662,6 +661,8 @@ export default defineConfig({
     open: false
   },
   build: {
+    target: 'es2020',
+    cssCodeSplit: true,
     chunkSizeWarningLimit: 1200,
     rollupOptions: {
       output: {

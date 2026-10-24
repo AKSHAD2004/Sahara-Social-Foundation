@@ -217,8 +217,8 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
                       alt={language === 'mr' ? slide.titleMr : slide.titleEn}
                       className="hero-slide-img"
                       loading={index === 0 ? "eager" : "lazy"}
-                      fetchpriority={index === 0 ? "high" : "low"}
-                      decoding={index === 0 ? "sync" : "async"}
+                      fetchPriority={index === 0 ? "high" : "low"}
+                      decoding="async"
                       onError={(e) => {
                         if (slide.fallback && e.target.src !== slide.fallback) {
                           e.target.onerror = null;
@@ -392,13 +392,16 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           opacity: 0;
           visibility: hidden;
           transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-          transform: scale(1.02);
+          transform: scale(1.02) translateZ(0);
+          will-change: opacity, transform;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
         }
 
         .hero-slide-item.slide-active {
           opacity: 1;
           visibility: visible;
-          transform: scale(1);
+          transform: scale(1) translateZ(0);
         }
 
         .hero-slide-img {

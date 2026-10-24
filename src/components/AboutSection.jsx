@@ -25,9 +25,8 @@ const CountUpNumber = ({ target, suffix = '', decimals = 0, duration = 1600 }) =
   }, [numTarget]);
 
   useEffect(() => {
-    let frame = 0;
-    const totalFrames = Math.round(duration / 16);
-    let counter = null;
+    let animationFrame = null;
+    let startTime = null;
     let hasRun = false;
 
     const observer = new IntersectionObserver(
@@ -35,21 +34,21 @@ const CountUpNumber = ({ target, suffix = '', decimals = 0, duration = 1600 }) =
         if (entry.isIntersecting && !hasRun) {
           hasRun = true;
           setCount(0);
-          frame = 0;
-          if (counter) clearInterval(counter);
 
-          counter = setInterval(() => {
-            frame++;
-            const progress = frame / totalFrames;
+          const step = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
             const factor = 1 - Math.pow(1 - progress, 3);
-            const current = numTarget * factor;
-            setCount(current);
+            setCount(numTarget * factor);
 
-            if (frame >= totalFrames) {
-              clearInterval(counter);
+            if (progress < 1) {
+              animationFrame = requestAnimationFrame(step);
+            } else {
               setCount(numTarget);
             }
-          }, 16);
+          };
+          animationFrame = requestAnimationFrame(step);
         }
       },
       { threshold: 0.15 }
@@ -58,7 +57,7 @@ const CountUpNumber = ({ target, suffix = '', decimals = 0, duration = 1600 }) =
     if (ref.current) observer.observe(ref.current);
     return () => {
       observer.disconnect();
-      if (counter) clearInterval(counter);
+      if (animationFrame) cancelAnimationFrame(animationFrame);
     };
   }, [numTarget, duration]);
 

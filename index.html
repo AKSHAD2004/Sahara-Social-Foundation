@@ -3,58 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <!-- Official Sahara Social Foundation Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=12" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/sahara-logo.jpg?v=12" />
-    <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg?v=12" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/sahara-logo.jpg?v=12" />
-    
-    <!-- Instant Client-Side Favicon Renderer (Guarantees fresh round PNG favicon across all browsers) -->
-    <script type="text/javascript">
-      (function() {
-        function renderLiveFavicon() {
-          try {
-            var img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = function() {
-              var canvas = document.createElement('canvas');
-              canvas.width = 64;
-              canvas.height = 64;
-              var ctx = canvas.getContext('2d');
-              if (!ctx) return;
-              ctx.beginPath();
-              ctx.arc(32, 32, 31, 0, Math.PI * 2);
-              ctx.closePath();
-              ctx.clip();
-              ctx.drawImage(img, 0, 0, 64, 64);
-              var pngUrl = canvas.toDataURL('image/png');
-              
-              var oldIcons = document.querySelectorAll("link[rel*='icon']");
-              for (var i = 0; i < oldIcons.length; i++) {
-                if (oldIcons[i].parentNode) oldIcons[i].parentNode.removeChild(oldIcons[i]);
-              }
-              
-              var fav = document.createElement('link');
-              fav.rel = 'icon';
-              fav.type = 'image/png';
-              fav.href = pngUrl;
-              document.head.appendChild(fav);
-              
-              var short = document.createElement('link');
-              short.rel = 'shortcut icon';
-              short.type = 'image/png';
-              short.href = pngUrl;
-              document.head.appendChild(short);
-            };
-            img.src = '/sahara-logo.jpg?v=' + Date.now();
-          } catch (e) {}
-        }
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-          renderLiveFavicon();
-        } else {
-          window.addEventListener('DOMContentLoaded', renderLiveFavicon);
-        }
-      })();
-    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/jpeg" sizes="192x192" href="/sahara-logo.jpg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/sahara-logo.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#006B2D" />
     
@@ -88,13 +39,14 @@
     <meta name="twitter:description" content="मधुमेह मुक्त भारत आणि व्यसनमुक्त भारत अभियान. शुद्ध न्युट्रास्युटिकल्स, मोफत आरोग्य समुपदेशन व मार्गदर्शन केंद्र, कोल्हापूर. हेल्पलाइन: 8421154090." />
     <meta name="twitter:image" content="https://raw.githubusercontent.com/AKSHAD2004/Sahara-Social-Foundation/main/public/sahara-logo.jpg" />
 
-    <!-- Google Fonts for English & Devanagari (Marathi) -->
+    <!-- Google Fonts for English & Devanagari (Marathi) with non-blocking display -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Mukta:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Rozha+One&family=Yatra+One&display=swap" rel="stylesheet" />
-    
-    <!-- Razorpay Standard Checkout SDK -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Mukta:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Rozha+One&family=Yatra+One&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Mukta:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Rozha+One&family=Yatra+One&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Mukta:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Rozha+One&family=Yatra+One&display=swap" rel="stylesheet" />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>
