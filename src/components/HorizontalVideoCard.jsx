@@ -222,19 +222,6 @@ const HorizontalVideoCard = ({ video }) => {
             {title}
           </h3>
 
-          {/* Short Description */}
-          {summary && (
-            <p 
-              style={{
-                fontSize: '0.86rem',
-                color: '#5F6B61',
-                lineHeight: 1.5,
-                margin: 0
-              }}
-            >
-              {summary}
-            </p>
-          )}
         </div>
 
         {/* Quick Contact & Action Buttons */}
