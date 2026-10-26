@@ -18,7 +18,7 @@ import {
   initialAuditLogs, 
   initialSettings,
   initialReviews
-} from './seedData';
+} from './seedData.js';
 import { 
   isFirebaseConfigured, 
   db as firestoreDb,
@@ -42,26 +42,63 @@ import { buildCommissionTransactions, buildCommissionReversal, isOrderCommission
 const STORAGE_PREFIX = 'sahara_crm_prod_';
 const DELETED_STORAGE_PREFIX = 'sahara_crm_deleted_';
 
-export const UNWANTED_DUMMY_IDS = new Set([
-  'ORD-2026-9953',
-  'orde_1790320226159_297',
-  'orde_1791196143354_124',
-  'SSF-842101',
-  'CUST-8421154090',
-  'cust_1789982815598_992',
-  'lead_1789981569824_327',
-  'lead_1789984653453_688',
-  'user_1791544252159_4',
-  'user_1792565317925_821'
+export const UNWANTED_DUMMY_IDS = new Set([]);
+
+export const PURGE_DUMMY_IDS = new Set([
+  'CUST-9822154002',
+  'CUST-9423154003',
+  'SSF-842102',
+  'SSF-842103',
+  'LEAD-842101',
+  'LEAD-842102',
+  'FOL-842101'
 ]);
 
 export function getDeletedSet(collectionName) {
   try {
     const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(DELETED_STORAGE_PREFIX + collectionName) : null;
-    return raw ? new Set(JSON.parse(raw)) : new Set();
+    const set = raw ? new Set(JSON.parse(raw)) : new Set();
+    // Guarantee customer and order records are never blocked by residual deleted sets
+    set.delete('CUST-8055557120');
+    set.delete('CUST-8421154090');
+    set.delete('ORD-2026-2275');
+    set.delete('SSF-842101');
+    return set;
   } catch (e) {
     return new Set();
   }
+}
+
+// Cleanse any residual dummy records from browser storage on init
+if (typeof localStorage !== 'undefined') {
+  try {
+    ['orders', 'customers', 'leads', 'followups'].forEach((col) => {
+      const k = STORAGE_PREFIX + col;
+      const raw = localStorage.getItem(k);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const cleaned = parsed.filter((item) => {
+            const id = String(item.id || item.orderId || item.customerId || item.leadId || '');
+            return !PURGE_DUMMY_IDS.has(id);
+          });
+          localStorage.setItem(k, JSON.stringify(cleaned));
+        }
+      }
+    });
+    ['orders', 'customers'].forEach((col) => {
+      const delKey = DELETED_STORAGE_PREFIX + col;
+      const rawDel = localStorage.getItem(delKey);
+      if (rawDel) {
+        const delSet = new Set(JSON.parse(rawDel));
+        delSet.delete('CUST-8055557120');
+        delSet.delete('CUST-8421154090');
+        delSet.delete('ORD-2026-2275');
+        delSet.delete('SSF-842101');
+        localStorage.setItem(delKey, JSON.stringify([...delSet]));
+      }
+    });
+  } catch (e) {}
 }
 
 export function recordDeletedId(collectionName, ...ids) {
@@ -78,16 +115,16 @@ export function isItemDeleted(collectionName, itemOrId) {
   const set = getDeletedSet(collectionName);
   if (typeof itemOrId === 'string' || typeof itemOrId === 'number') {
     const sId = String(itemOrId);
-    return set.has(sId) || UNWANTED_DUMMY_IDS.has(sId);
+    return set.has(sId) || PURGE_DUMMY_IDS.has(sId);
   }
   const id = itemOrId.id ? String(itemOrId.id) : null;
   const orderId = itemOrId.orderId ? String(itemOrId.orderId) : null;
   const customerId = itemOrId.customerId ? String(itemOrId.customerId) : null;
   const leadId = itemOrId.leadId ? String(itemOrId.leadId) : null;
-  return (id && (set.has(id) || UNWANTED_DUMMY_IDS.has(id))) || 
-         (orderId && (set.has(orderId) || UNWANTED_DUMMY_IDS.has(orderId))) || 
-         (customerId && (set.has(customerId) || UNWANTED_DUMMY_IDS.has(customerId))) || 
-         (leadId && (set.has(leadId) || UNWANTED_DUMMY_IDS.has(leadId)));
+  return (id && (set.has(id) || PURGE_DUMMY_IDS.has(id))) || 
+         (orderId && (set.has(orderId) || PURGE_DUMMY_IDS.has(orderId))) || 
+         (customerId && (set.has(customerId) || PURGE_DUMMY_IDS.has(customerId))) || 
+         (leadId && (set.has(leadId) || PURGE_DUMMY_IDS.has(leadId)));
 }
 
 // In-memory state and listeners
@@ -193,7 +230,7 @@ function initCollection(collectionName, defaultData) {
         state[collectionName] = cleanedVideos;
         localStorage.setItem(key, JSON.stringify(cleanedVideos));
       } else if (collectionName === 'orders') {
-        const existingOrders = (Array.isArray(parsed) ? parsed : []).filter((o) => !isItemDeleted('orders', o));
+        let existingOrders = (Array.isArray(parsed) ? parsed : []).filter((o) => !isItemDeleted('orders', o));
 
         // Also recover any order placed via website checkout in ssf_last_order ONLY IF NOT deleted
         try {
@@ -222,12 +259,49 @@ function initCollection(collectionName, defaultData) {
           return dateB - dateA;
         });
 
+        // Filter out dummy items
+        existingOrders = existingOrders.filter((o) => !PURGE_DUMMY_IDS.has(String(o.id || o.orderId)));
+
+        // Ensure real baseline defaultData is present
+        if (Array.isArray(defaultData)) {
+          defaultData.forEach((defOrd) => {
+            const defKey = String(defOrd.id || defOrd.orderId);
+            if (defKey && !existingOrders.some((o) => String(o.id || o.orderId) === defKey)) {
+              existingOrders.push(defOrd);
+            }
+          });
+        }
+
         state[collectionName] = existingOrders;
         localStorage.setItem(key, JSON.stringify(existingOrders));
       } else if (collectionName === 'customers') {
-        const existingCustomers = (Array.isArray(parsed) ? parsed : []).filter((c) => !isItemDeleted('customers', c));
+        let existingCustomers = (Array.isArray(parsed) ? parsed : [])
+          .filter((c) => !isItemDeleted('customers', c))
+          .filter((c) => !PURGE_DUMMY_IDS.has(String(c.id || c.customerId)));
+
+        // Ensure real baseline defaultData is present
+        if (Array.isArray(defaultData)) {
+          defaultData.forEach((defCust) => {
+            const defKey = String(defCust.id || defCust.customerId);
+            if (defKey && !existingCustomers.some((c) => String(c.id || c.customerId) === defKey)) {
+              existingCustomers.push(defCust);
+            }
+          });
+        }
         state[collectionName] = existingCustomers;
         localStorage.setItem(key, JSON.stringify(existingCustomers));
+      } else if (collectionName === 'leads') {
+        let existingLeads = (Array.isArray(parsed) ? parsed : [])
+          .filter((l) => !isItemDeleted('leads', l))
+          .filter((l) => !PURGE_DUMMY_IDS.has(String(l.id || l.leadId)));
+        state[collectionName] = existingLeads;
+        localStorage.setItem(key, JSON.stringify(existingLeads));
+      } else if (collectionName === 'followups') {
+        let existingFollowups = (Array.isArray(parsed) ? parsed : [])
+          .filter((f) => !isItemDeleted('followups', f))
+          .filter((f) => !PURGE_DUMMY_IDS.has(String(f.id || f.followupId)));
+        state[collectionName] = existingFollowups;
+        localStorage.setItem(key, JSON.stringify(existingFollowups));
       } else if (collectionName === 'users') {
         const existingUsers = (Array.isArray(parsed) ? parsed : []).filter((u) => !isItemDeleted('users', u));
         const officialUserIds = new Set(initialUsers.map((u) => u.id));
@@ -377,22 +451,22 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
     Boolean(localStorage.getItem('sahara_crm_current_user'))
   ));
 
-  // Public collections needed for website visitors
+  // Public collections needed for website visitors & customer eCommerce sync
   const publicCols = [
     'products',
     'heroSlides',
     'reviews',
     'videos',
     'galleryPhotos',
-    'settings'
+    'settings',
+    'customers',
+    'orders'
   ];
 
-  // Sensitive/heavy operational collections only synced inside CRM
+  // Internal CRM administrative collections only synced inside CRM
   const crmCols = [
-    'orders',
     'leads',
     'users',
-    'customers',
     'commissionSlabs'
   ];
 
@@ -492,25 +566,117 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
             state.heroSlides = finalSlides;
             saveCollection('heroSlides', false);
           } else if (remoteDocs.length === 0) {
-            // For operational collections, 0 documents in Firestore means clean and empty!
-            const isOperational = ['orders', 'customers', 'leads', 'followups', 'commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(colName);
+            const localItems = (Array.isArray(state[colName]) ? state[colName] : []).filter((item) => !isItemDeleted(colName, item));
+
+            // If we have orders placed on this device or baseline orders, NEVER wipe them out! Auto-upload them to Firestore!
+            if (colName === 'orders') {
+              let ordersToSync = [...localItems].filter((o) => !PURGE_DUMMY_IDS.has(String(o.id || o.orderId)));
+              if (ordersToSync.length === 0 && Array.isArray(initialOrders) && initialOrders.length > 0) {
+                ordersToSync = [...initialOrders];
+              }
+              if (ordersToSync.length === 0 && typeof localStorage !== 'undefined') {
+                try {
+                  const lastOrd = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
+                  if (lastOrd && !isItemDeleted('orders', lastOrd) && !PURGE_DUMMY_IDS.has(String(lastOrd.id || lastOrd.orderId))) {
+                    ordersToSync.push({
+                      ...lastOrd,
+                      id: String(lastOrd.id || lastOrd.orderId),
+                      orderId: String(lastOrd.id || lastOrd.orderId),
+                      source: 'Website Checkout',
+                      orderStatus: lastOrd.status || 'Confirmed'
+                    });
+                  }
+                } catch (e) {}
+              }
+
+              if (ordersToSync.length > 0) {
+                ordersToSync.forEach((ord) => {
+                  const key = String(ord.id || ord.orderId);
+                  if (key && !isItemDeleted('orders', key) && !PURGE_DUMMY_IDS.has(key)) {
+                    const docRef = doc(firestoreDb, 'orders', key);
+                    setDoc(docRef, sanitizeForFirestore({ ...ord, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+                    console.log(`[Firestore live sync] Auto-uploaded order ${key} to Firestore!`);
+                  }
+                });
+                state.orders = ordersToSync;
+                saveCollection('orders', false);
+                return;
+              }
+            }
+
+            if (colName === 'customers') {
+              let customersToSync = [...localItems].filter((c) => !PURGE_DUMMY_IDS.has(String(c.id || c.customerId)));
+              if (customersToSync.length === 0 && Array.isArray(initialCustomers) && initialCustomers.length > 0) {
+                customersToSync = [...initialCustomers];
+              }
+              if (customersToSync.length > 0) {
+                customersToSync.forEach((cust) => {
+                  const key = String(cust.id || cust.customerId);
+                  if (key && !isItemDeleted('customers', key) && !PURGE_DUMMY_IDS.has(key)) {
+                    const docRef = doc(firestoreDb, 'customers', key);
+                    setDoc(docRef, sanitizeForFirestore({ ...cust, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+                    console.log(`[Firestore live sync] Auto-uploaded customer ${key} to Firestore!`);
+                  }
+                });
+                state.customers = customersToSync;
+                saveCollection('customers', false);
+                return;
+              }
+            }
+
+            if (colName === 'leads') {
+              let leadsToSync = [...localItems];
+              if (leadsToSync.length === 0 && Array.isArray(initialLeads) && initialLeads.length > 0) {
+                leadsToSync = [...initialLeads];
+              }
+              if (leadsToSync.length > 0) {
+                leadsToSync.forEach((lead) => {
+                  const key = String(lead.id || lead.leadId);
+                  if (key && !isItemDeleted('leads', key)) {
+                    const docRef = doc(firestoreDb, 'leads', key);
+                    setDoc(docRef, sanitizeForFirestore({ ...lead, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+                  }
+                });
+                state.leads = leadsToSync;
+                saveCollection('leads', false);
+                return;
+              }
+            }
+
+            if (colName === 'followups') {
+              let followupsToSync = [...localItems];
+              if (followupsToSync.length === 0 && Array.isArray(initialFollowups) && initialFollowups.length > 0) {
+                followupsToSync = [...initialFollowups];
+              }
+              if (followupsToSync.length > 0) {
+                followupsToSync.forEach((fol) => {
+                  const key = String(fol.id || fol.followupId);
+                  if (key && !isItemDeleted('followups', key)) {
+                    const docRef = doc(firestoreDb, 'followups', key);
+                    setDoc(docRef, sanitizeForFirestore({ ...fol, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+                  }
+                });
+                state.followups = followupsToSync;
+                saveCollection('followups', false);
+                return;
+              }
+            }
+
+            const isOperational = ['commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(colName);
             if (isOperational) {
               state[colName] = [];
               saveCollection(colName, false);
               return;
             }
 
-            const localItems = (Array.isArray(state[colName]) && state[colName].length > 0)
-              ? state[colName]
-              : (initialDataMap[colName] || []);
-
-            state[colName] = localItems;
+            state[colName] = localItems.length > 0 ? localItems : (initialDataMap[colName] || []);
             saveCollection(colName, false);
           } else {
             // Remote Cloud Firestore has documents: purge any deleted/unwanted ones and synchronize
             const activeRemoteDocs = [];
             for (const rDoc of remoteDocs) {
-              if (isItemDeleted(colName, rDoc)) {
+              const rKey = String(rDoc.id || rDoc.orderId || rDoc.customerId || '');
+              if (isItemDeleted(colName, rDoc) || PURGE_DUMMY_IDS.has(rKey)) {
                 // Clean from Cloud Firestore if found remotely
                 const dRef = doc(firestoreDb, colName, rDoc.id);
                 deleteDoc(dRef).catch(() => {});
@@ -525,17 +691,43 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
 
             // Only preserve and upload local orders placed directly from this device while offline (NEVER deleted!)
             if (colName === 'orders') {
-              localItems.forEach((localItem) => {
+              const orderCandidates = localItems.length > 0 ? localItems : (initialOrders || []);
+              orderCandidates.forEach((localItem) => {
                 const localKey = String(localItem.id || localItem.orderId || '');
                 if (
                   localKey &&
                   !isItemDeleted('orders', localItem) &&
-                  !remoteMap.has(localKey) &&
-                  (localItem.source === 'Website Checkout' || localItem.orderStatus === 'Confirmed')
+                  !remoteMap.has(localKey)
                 ) {
                   mergedDocs.unshift(localItem);
                   const docRef = doc(firestoreDb, colName, localKey);
                   setDoc(docRef, sanitizeForFirestore({ ...localItem, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+                }
+              });
+            }
+
+            // Also preserve customers if not in remote
+            if (colName === 'customers') {
+              const custCandidates = localItems.length > 0 ? localItems : (initialCustomers || []);
+              custCandidates.forEach((localCust) => {
+                const localKey = String(localCust.id || localCust.customerId || '');
+                if (localKey && !isItemDeleted('customers', localCust) && !remoteMap.has(localKey)) {
+                  mergedDocs.push(localCust);
+                  const docRef = doc(firestoreDb, colName, localKey);
+                  setDoc(docRef, sanitizeForFirestore({ ...localCust, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
+                }
+              });
+            }
+
+            // Also preserve leads if not in remote
+            if (colName === 'leads') {
+              const leadCandidates = localItems.length > 0 ? localItems : (initialLeads || []);
+              leadCandidates.forEach((localLead) => {
+                const localKey = String(localLead.id || localLead.leadId || '');
+                if (localKey && !isItemDeleted('leads', localLead) && !remoteMap.has(localKey)) {
+                  mergedDocs.push(localLead);
+                  const docRef = doc(firestoreDb, colName, localKey);
+                  setDoc(docRef, sanitizeForFirestore({ ...localLead, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
                 }
               });
             }
@@ -1476,7 +1668,87 @@ export const dbService = {
         saveCollection(collectionName, false);
         return merged;
       } else {
-        const isOperational = ['orders', 'customers', 'leads', 'followups', 'commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(collectionName);
+        // Remote Cloud Firestore currently has 0 documents
+        if (collectionName === 'orders') {
+          let ordersToSync = [...localItems].filter((o) => !PURGE_DUMMY_IDS.has(String(o.id || o.orderId)));
+          if (ordersToSync.length === 0 && Array.isArray(initialOrders) && initialOrders.length > 0) {
+            ordersToSync = [...initialOrders];
+          }
+          if (ordersToSync.length === 0 && typeof localStorage !== 'undefined') {
+            try {
+              const lastOrd = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
+              if (lastOrd && !isItemDeleted('orders', lastOrd) && !PURGE_DUMMY_IDS.has(String(lastOrd.id || lastOrd.orderId))) {
+                ordersToSync.push({
+                  ...lastOrd,
+                  id: String(lastOrd.id || lastOrd.orderId),
+                  orderId: String(lastOrd.id || lastOrd.orderId),
+                  source: 'Website Checkout',
+                  orderStatus: lastOrd.status || 'Confirmed'
+                });
+              }
+            } catch (e) {}
+          }
+
+          if (ordersToSync.length > 0) {
+            for (const ord of ordersToSync) {
+              const key = String(ord.id || ord.orderId);
+              if (key && !deletedSet.has(key) && !PURGE_DUMMY_IDS.has(key)) {
+                try {
+                  const docRef = doc(firestoreDb, 'orders', key);
+                  await setDoc(docRef, sanitizeForFirestore({ ...ord, id: key, syncedAt: new Date().toISOString() }), { merge: true });
+                  console.log(`[Firestore live sync] Auto-uploaded local order ${key} to Firestore!`);
+                } catch (err) {}
+              }
+            }
+            state.orders = ordersToSync;
+            saveCollection('orders', false);
+            return ordersToSync;
+          }
+        }
+
+        if (collectionName === 'customers') {
+          let customersToSync = [...localItems].filter((c) => !PURGE_DUMMY_IDS.has(String(c.id || c.customerId)));
+          if (customersToSync.length === 0 && Array.isArray(initialCustomers) && initialCustomers.length > 0) {
+            customersToSync = [...initialCustomers];
+          }
+          if (customersToSync.length > 0) {
+            for (const cust of customersToSync) {
+              const key = String(cust.id || cust.customerId);
+              if (key && !deletedSet.has(key) && !PURGE_DUMMY_IDS.has(key)) {
+                try {
+                  const docRef = doc(firestoreDb, 'customers', key);
+                  await setDoc(docRef, sanitizeForFirestore({ ...cust, id: key, syncedAt: new Date().toISOString() }), { merge: true });
+                } catch (err) {}
+              }
+            }
+            state.customers = customersToSync;
+            saveCollection('customers', false);
+            return customersToSync;
+          }
+        }
+
+        if (collectionName === 'leads') {
+          let leadsToSync = [...localItems];
+          if (leadsToSync.length === 0 && Array.isArray(initialLeads) && initialLeads.length > 0) {
+            leadsToSync = [...initialLeads];
+          }
+          if (leadsToSync.length > 0) {
+            for (const lead of leadsToSync) {
+              const key = String(lead.id || lead.leadId);
+              if (key && !deletedSet.has(key)) {
+                try {
+                  const docRef = doc(firestoreDb, 'leads', key);
+                  await setDoc(docRef, sanitizeForFirestore({ ...lead, id: key, syncedAt: new Date().toISOString() }), { merge: true });
+                } catch (err) {}
+              }
+            }
+            state.leads = leadsToSync;
+            saveCollection('leads', false);
+            return leadsToSync;
+          }
+        }
+
+        const isOperational = ['commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(collectionName);
         if (isOperational) {
           state[collectionName] = [];
           saveCollection(collectionName, false);

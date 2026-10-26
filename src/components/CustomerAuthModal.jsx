@@ -85,7 +85,9 @@ const CustomerAuthModal = () => {
         } else {
           // Check previous orders
           const allOrders = dbService.getAll('orders') || [];
-          const pastOrder = allOrders.find(o => o.customerPhone === cleanPhone || o.phone === cleanPhone);
+          const pastOrder = allOrders.find(o => 
+            String(o.customerMobile || o.customerPhone || o.phone || '').replace(/\D/g, '') === cleanPhone
+          );
 
           if (pastOrder) {
             customerPayload = {

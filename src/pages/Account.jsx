@@ -33,7 +33,16 @@ const Account = () => {
   
   // Login / Register mode for logged out state: 'existing' or 'new'
   const [authMode, setAuthMode] = useState('existing'); // 'existing' (Login) vs 'new' (Register)
-  const [loginMobile, setLoginMobile] = useState('');
+  const [loginMobile, setLoginMobile] = useState(() => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const lastOrder = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
+        const savedInfo = JSON.parse(localStorage.getItem('ssf_customer_checkout_info') || 'null');
+        return savedInfo?.phone || lastOrder?.customerMobile || '';
+      }
+    } catch (e) {}
+    return '';
+  });
   const [loginError, setLoginError] = useState('');
 
   // Register form state
@@ -145,6 +154,43 @@ const Account = () => {
     setShowEditProductModal(false);
     setTimeout(() => setProductUpdateMsg(''), 4000);
   };
+
+  // Automatically restore previously filled user profile & orders on this device
+  useEffect(() => {
+    if (!customerUser && typeof localStorage !== 'undefined') {
+      try {
+        const savedCust = JSON.parse(localStorage.getItem('sahara_customer_user') || 'null');
+        const lastOrder = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
+        const savedInfo = JSON.parse(localStorage.getItem('ssf_customer_checkout_info') || 'null');
+
+        let candidatePhone = (savedCust?.phone || lastOrder?.customerMobile || lastOrder?.phone || savedInfo?.phone || '').replace(/\D/g, '');
+        if (candidatePhone) {
+          const allCustomers = dbService.getAll('customers') || [];
+          const found = allCustomers.find((c) => {
+            const cp = String(c.phone || c.mobileNumber || '').replace(/\D/g, '');
+            return cp && (cp === candidatePhone || cp.endsWith(candidatePhone) || candidatePhone.endsWith(cp));
+          });
+          if (found) {
+            loginCustomer(found);
+          } else if (savedCust) {
+            loginCustomer(savedCust);
+          } else if (lastOrder) {
+            loginCustomer({
+              id: lastOrder.customerId || `CUST-${candidatePhone}`,
+              fullName: lastOrder.customerName || 'ग्राहक',
+              phone: candidatePhone,
+              mobileNumber: candidatePhone,
+              email: lastOrder.customerEmail || '',
+              address: lastOrder.shippingAddress || '',
+              city: lastOrder.city || '',
+              pincode: lastOrder.pincode || '',
+              state: 'Maharashtra'
+            });
+          }
+        }
+      } catch (e) {}
+    }
+  }, [customerUser]);
 
   useEffect(() => {
     if (customerUser) {

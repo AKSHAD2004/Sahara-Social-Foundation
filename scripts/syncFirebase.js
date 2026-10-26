@@ -53,10 +53,14 @@ const db = getFirestore(app);
 
 // Import clean seed data dynamically
 import('../src/services/seedData.js').then(async (seed) => {
-  // Sync ONLY necessary static/catalog collections (no dummy operational data)
+  // Sync catalog collections and historical baseline operational data
   const collections = {
     users: seed.initialUsers,
     products: seed.initialProducts,
+    customers: seed.initialCustomers || [],
+    orders: seed.initialOrders || [],
+    leads: seed.initialLeads || [],
+    followups: seed.initialFollowups || [],
     commissionSlabs: seed.initialCommissionSlabs,
     heroSlides: seed.initialHeroSlides || [],
     galleryPhotos: seed.galleryPhotos || [],

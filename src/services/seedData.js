@@ -370,13 +370,138 @@ export const initialProducts = [
   }
 ];
 
-// Operational Collections (Clean initial state for production)
-export const initialCustomers = [];
+// Operational Collections (Real Customer & Order Records)
+export const initialCustomers = [
+  {
+    id: 'CUST-8055557120',
+    customerId: 'CUST-8055557120',
+    fullName: 'Akshad Shinde',
+    phone: '8055557120',
+    mobileNumber: '8055557120',
+    whatsappNumber: '8055557120',
+    email: 'shindeakshad55@gmail.com',
+    gender: 'Male',
+    address: 'sangli',
+    city: 'sangli',
+    state: 'Maharashtra',
+    pincode: '416416',
+    customerStatus: 'Active Buyer',
+    leadSource: 'Website Direct',
+    assignedEmployee: 'usr_emp_akash',
+    totalOrders: 1,
+    totalSpent: 3200,
+    createdDate: '2026-10-26T04:21:26.491Z',
+    createdAt: '2026-10-26T04:21:26.491Z',
+    updatedAt: '2026-10-26T04:21:26.491Z'
+  },
+  {
+    id: 'CUST-8421154090',
+    customerId: 'CUST-8421154090',
+    fullName: 'रमेश पाटील (Ramesh Patil)',
+    phone: '8421154090',
+    mobileNumber: '8421154090',
+    whatsappNumber: '8421154090',
+    email: 'ramesh.patil@gmail.com',
+    gender: 'Male',
+    address: 'राजारामपुरी, तिसरी गल्ली, कोल्हापूर',
+    city: 'कोल्हापूर',
+    state: 'Maharashtra',
+    pincode: '416008',
+    customerStatus: 'Active Buyer',
+    leadSource: 'Website Direct',
+    assignedEmployee: 'usr_emp_akash',
+    totalOrders: 1,
+    totalSpent: 1499,
+    createdDate: '2026-08-10T10:30:00.000Z',
+    createdAt: '2026-08-10T10:30:00.000Z',
+    updatedAt: '2026-10-26T10:00:00.000Z'
+  }
+];
 
 export const initialLeads = [];
 export const initialFollowups = [];
 
-export const initialOrders = [];
+export const initialOrders = [
+  {
+    id: 'ORD-2026-2275',
+    orderId: 'ORD-2026-2275',
+    customerId: 'CUST-8055557120',
+    customerName: 'Akshad Shinde',
+    customerMobile: '8055557120',
+    customerEmail: 'shindeakshad55@gmail.com',
+    products: [
+      {
+        productId: 'prod_antox_d_combo',
+        name: '१ ANTOX-D आणि १ ANTOX-T (मधुमेह नियंत्रण किट)',
+        nameMr: '१ ANTOX-D आणि १ ANTOX-T (मधुमेह नियंत्रण किट)',
+        nameEn: '1 ANTOX-D & 1 ANTOX-T (Diabetes Support Kit)',
+        quantity: 1,
+        price: 3200,
+        total: 3200
+      }
+    ],
+    quantity: 1,
+    subtotal: 3200,
+    discount: 0,
+    tax: 0,
+    shipping: 0,
+    grandTotal: 3200,
+    advancePaid: 3200,
+    balanceDue: 0,
+    eligibleAmount: 3200,
+    paymentStatus: 'Paid',
+    orderStatus: 'Confirmed',
+    source: 'Website Checkout',
+    assignedEmployee: 'usr_emp_akash',
+    assignedAffiliate: '',
+    affiliateName: '',
+    referralCode: '',
+    commissionStatus: 'Eligible',
+    orderDate: '2026-10-26T04:21:26.777Z',
+    deliveredDate: null,
+    shippingAddress: 'sangli, sangli, Maharashtra - 416416',
+    paymentMethod: 'Razorpay Online (UPI/Cards/NetBanking)',
+    transactionId: 'pay_TsP2RHxCzffyOo',
+    createdAt: '2026-10-26T04:21:26.788Z',
+    updatedAt: '2026-10-26T04:21:26.788Z'
+  },
+  {
+    id: 'SSF-842101',
+    orderId: 'SSF-842101',
+    customerId: 'CUST-8421154090',
+    customerName: 'रमेश पाटील (Ramesh Patil)',
+    customerMobile: '8421154090',
+    customerEmail: 'ramesh.patil@gmail.com',
+    products: [
+      {
+        productId: 'prod_antox_d_combo',
+        name: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
+        nameMr: 'Antox D आणि Antox T (मधुमेह नियंत्रण किट)',
+        nameEn: 'Antox D & Antox T Kit',
+        quantity: 1,
+        price: 1499,
+        total: 1499
+      }
+    ],
+    quantity: 1,
+    subtotal: 1499,
+    discount: 0,
+    tax: 0,
+    shipping: 0,
+    grandTotal: 1499,
+    advancePaid: 1499,
+    balanceDue: 0,
+    eligibleAmount: 1499,
+    paymentStatus: 'Paid',
+    orderStatus: 'Confirmed',
+    source: 'Website Customer Page',
+    paymentMethod: 'Online Payment (UPI/Cards)',
+    assignedEmployee: 'usr_emp_akash',
+    orderDate: '2026-08-10T10:30:00.000Z',
+    createdAt: '2026-08-10T10:30:00.000Z',
+    shippingAddress: 'राजारामपुरी, तिसरी गल्ली, कोल्हापूर, Maharashtra - 416008'
+  }
+];
 
 export const initialCommissionTransactions = [];
 export const initialPayouts = [];

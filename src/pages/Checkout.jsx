@@ -26,36 +26,81 @@ const Checkout = () => {
   const { customerUser, loginCustomer } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    fullName: customerUser?.fullName || '',
-    phone: customerUser?.phone || '',
-    altPhone: '',
-    email: customerUser?.email || '',
-    address: customerUser?.address || '',
-    landmark: '',
-    city: customerUser?.city || '',
-    state: customerUser?.state || 'Maharashtra',
-    pincode: customerUser?.pincode || '',
-    paymentMethod: 'razorpay', // 'razorpay' (Online UPI/Cards) or 'cod' (Cash on Delivery)
-    healthNotes: ''
-  });
+  const getInitialCheckoutData = () => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const savedInfo = JSON.parse(localStorage.getItem('ssf_customer_checkout_info') || 'null');
+        const lastOrder = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
+        const savedCust = JSON.parse(localStorage.getItem('sahara_customer_user') || 'null');
+        const source = customerUser || savedCust || savedInfo || lastOrder;
+        if (source) {
+          return {
+            fullName: source.fullName || source.customerName || source.name || '',
+            phone: source.phone || source.customerMobile || source.mobile || '',
+            altPhone: source.altPhone || '',
+            email: source.email || source.customerEmail || '',
+            address: source.address || source.shippingAddress || '',
+            landmark: source.landmark || '',
+            city: source.city || '',
+            state: source.state || 'Maharashtra',
+            pincode: source.pincode || '',
+            paymentMethod: 'razorpay',
+            healthNotes: source.healthNotes || ''
+          };
+        }
+      }
+    } catch (e) {}
+    return {
+      fullName: '',
+      phone: '',
+      altPhone: '',
+      email: '',
+      address: '',
+      landmark: '',
+      city: '',
+      state: 'Maharashtra',
+      pincode: '',
+      paymentMethod: 'razorpay',
+      healthNotes: ''
+    };
+  };
+
+  const [formData, setFormData] = useState(getInitialCheckoutData);
 
   const [paymentNotice, setPaymentNotice] = useState('');
 
+  // Recover previously filled data if state has empty fields
   useEffect(() => {
-    if (customerUser) {
-      setFormData((prev) => ({
-        ...prev,
-        fullName: prev.fullName || customerUser.fullName || '',
-        phone: prev.phone || customerUser.phone || '',
-        email: prev.email || customerUser.email || '',
-        address: prev.address || customerUser.address || '',
-        city: prev.city || customerUser.city || '',
-        state: prev.state || customerUser.state || 'Maharashtra',
-        pincode: prev.pincode || customerUser.pincode || ''
-      }));
-    }
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const savedInfo = JSON.parse(localStorage.getItem('ssf_customer_checkout_info') || 'null');
+        const lastOrder = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
+        const savedCust = JSON.parse(localStorage.getItem('sahara_customer_user') || 'null');
+        const source = customerUser || savedCust || savedInfo || lastOrder;
+        if (source) {
+          setFormData((prev) => ({
+            ...prev,
+            fullName: prev.fullName || source.fullName || source.customerName || source.name || '',
+            phone: prev.phone || source.phone || source.customerMobile || source.mobile || '',
+            email: prev.email || source.email || source.customerEmail || '',
+            address: prev.address || source.address || source.shippingAddress || '',
+            city: prev.city || source.city || '',
+            state: prev.state || source.state || 'Maharashtra',
+            pincode: prev.pincode || source.pincode || ''
+          }));
+        }
+      }
+    } catch (e) {}
   }, [customerUser]);
+
+  // Persist filled data as the user types so they never lose filled info across reloads
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined' && (formData.fullName || formData.phone || formData.address)) {
+      try {
+        localStorage.setItem('ssf_customer_checkout_info', JSON.stringify(formData));
+      } catch (e) {}
+    }
+  }, [formData]);
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -239,10 +284,13 @@ const Checkout = () => {
       console.warn('CRM order sync note:', orderErr);
     }
 
-    // Direct Cloud Firestore Sync Guarantee (Non-blocking)
-    syncOrderToFirebase(crmOrder).catch((fbErr) => {
+    // Direct Cloud Firestore Sync Guarantee (Guaranteed write to Firestore)
+    try {
+      await syncOrderToFirebase(crmOrder);
+      console.log('[Checkout] Order successfully synchronized to Firebase Firestore:', orderId);
+    } catch (fbErr) {
       console.warn('Direct Firebase Cloud order sync note:', fbErr);
-    });
+    }
 
     // 4. Add CRM Notification
     try {
@@ -722,7 +770,46 @@ const Checkout = () => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  {/* Option 1: Razorpay Online Payment */}
+                  {/* Option 1: Cash on Delivery (Pay on Delivery) */}
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.85rem',
+                    padding: '1.15rem',
+                    borderRadius: '16px',
+                    border: '2px solid',
+                    borderColor: formData.paymentMethod === 'cod' ? '#006B2D' : '#E1E9DF',
+                    backgroundColor: formData.paymentMethod === 'cod' ? '#f0fdf4' : '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: formData.paymentMethod === 'cod' ? '0 4px 12px rgba(0, 107, 45, 0.08)' : 'none'
+                  }}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={formData.paymentMethod === 'cod'}
+                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      style={{ accentColor: '#006B2D', width: '18px', height: '18px', marginTop: '3px', flexShrink: 0 }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.35rem' }}>
+                        <div style={{ fontWeight: 800, color: '#006B2D', fontSize: '0.98rem' }}>
+                          {language === 'mr' ? 'कॅश ऑन डिलिव्हरी (Cash on Delivery - पार्सल मिळाल्यावर रोख)' : 'Cash on Delivery (Pay 100% upon delivery)'}
+                        </div>
+                        <span style={{ fontSize: '0.8rem', backgroundColor: '#006B2D', color: '#ffffff', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 800 }}>
+                          COD
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.3rem', lineHeight: 1.45 }}>
+                        {language === 'mr' 
+                          ? `आत्ता कोणतेही ऑनलाईन पेमेंट करण्याची गरज नाही. पार्सल हातात आल्यावर संपूर्ण ₹${grandTotal} रोख द्या.` 
+                          : `No advance payment required. Pay full ₹${grandTotal} in cash directly when courier delivers your package.`}
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* Option 2: Razorpay Online Payment */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'flex-start',

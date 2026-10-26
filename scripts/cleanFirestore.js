@@ -46,31 +46,16 @@ console.log('Project ID:', firebaseConfig.projectId);
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const UNWANTED_DUMMY_IDS = new Set([
-  'ORD-2026-9953',
-  'orde_1790320226159_297',
-  'orde_1791196143354_124',
-  'SSF-842101',
-  'CUST-8421154090',
-  'cust_1789982815598_992',
-  'lead_1789981569824_327',
-  'lead_1789984653453_688',
-  'user_1791544252159_4',
-  'user_1792565317925_821'
-]);
+const UNWANTED_DUMMY_IDS = new Set([]);
 
 import('../src/services/seedData.js').then(async (seed) => {
-  // 1. Purge unwanted operational collections (notifications, auditLogs, commissionTransactions, etc.)
+  // 1. Purge unwanted ephemeral collections (notifications, auditLogs, etc.)
   const collectionsToClear = [
     'notifications',
     'auditLogs',
     'commissionTransactions',
     'commissionPayouts',
-    'supportTickets',
-    'orders',
-    'leads',
-    'customers',
-    'followups'
+    'supportTickets'
   ];
 
   for (const colName of collectionsToClear) {
