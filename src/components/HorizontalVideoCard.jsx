@@ -1,20 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { User, CheckCircle, Clock, Phone, Video as VideoIcon } from 'lucide-react';
-import WhatsAppIcon from './WhatsAppIcon';
-import { organizationInfo } from '../data/websiteData';
-import { useLanguage } from '../context/LanguageContext';
+import { Clock, Video as VideoIcon } from 'lucide-react';
 
 const HorizontalVideoCard = ({ video }) => {
-  const { language } = useLanguage();
   const cardRef = useRef(null);
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isInView, setIsInView] = useState(false);
-
-  const title = language === 'mr' ? (video.titleMr || video.title) : (video.titleEn || video.title);
-  const speaker = language === 'mr' ? (video.speakerMr || video.patientName) : (video.speakerEn || video.patientName);
-  const summary = language === 'mr' ? (video.summaryMr || video.summary) : (video.summaryEn || video.summary);
-  const categoryLabel = language === 'mr' ? (video.categoryMr || video.category) : (video.categoryEn || video.category);
 
   // Lazy observe when this card is near the viewport before downloading video metadata
   useEffect(() => {
@@ -175,113 +166,6 @@ const HorizontalVideoCard = ({ video }) => {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Card Details Body */}
-      <div 
-        style={{
-          padding: '1.25rem',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          justifyContent: 'space-between',
-          gap: '0.85rem'
-        }}
-      >
-        <div>
-          {/* Speaker or Beneficiary Name */}
-          {speaker && (
-            <div 
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                fontSize: '0.82rem',
-                color: '#006B2D',
-                fontWeight: 700,
-                marginBottom: '0.45rem'
-              }}
-            >
-              <User size={13} />
-              <span>{speaker}</span>
-              <CheckCircle size={13} style={{ color: '#006B2D' }} />
-            </div>
-          )}
-
-          {/* Video Title */}
-          <h3 
-            style={{
-              fontSize: '1.05rem',
-              fontWeight: 800,
-              color: '#17251B',
-              lineHeight: 1.35,
-              margin: '0 0 0.5rem 0',
-              fontFamily: 'var(--font-heading)'
-            }}
-          >
-            {title}
-          </h3>
-
-        </div>
-
-        {/* Quick Contact & Action Buttons */}
-        <div 
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '0.5rem',
-            paddingTop: '0.75rem',
-            borderTop: '1px solid #F0F4EF'
-          }}
-        >
-          <a
-            href={`tel:${organizationInfo.contact.primaryPhone}`}
-            style={{
-              backgroundColor: '#F3F8F1',
-              color: '#006B2D',
-              border: '1px solid #D5E4D2',
-              padding: '0.5rem 0.6rem',
-              borderRadius: '8px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.4rem',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#006B2D'; e.currentTarget.style.color = '#ffffff'; }}
-            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#F3F8F1'; e.currentTarget.style.color = '#006B2D'; }}
-          >
-            <Phone size={14} />
-            <span>{language === 'mr' ? 'फोन करा' : 'Call'}</span>
-          </a>
-
-          <a
-            href={`https://wa.me/${organizationInfo.contact.whatsappNumber}?text=${encodeURIComponent(`नमस्कार, मी samarthkolhapur.com वरील व्हिडिओ पाहिला (${title}). मला अधिक माहिती हवी आहे.`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              backgroundColor: '#25D366',
-              color: '#ffffff',
-              padding: '0.5rem 0.6rem',
-              borderRadius: '8px',
-              fontSize: '0.82rem',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.4rem',
-              textDecoration: 'none',
-              boxShadow: '0 2px 6px rgba(37, 211, 102, 0.25)',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <WhatsAppIcon size={14} color="#ffffff" />
-            <span>{language === 'mr' ? 'व्हॉट्सअ‍ॅप' : 'WhatsApp'}</span>
-          </a>
-        </div>
       </div>
     </div>
   );
