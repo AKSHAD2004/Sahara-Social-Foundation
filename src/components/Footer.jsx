@@ -196,11 +196,6 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/affiliate" className="footer-link">
-                    <span className="link-bullet">• </span>{language === 'mr' ? 'समाज सेवक' : 'Affiliate'}
-                  </Link>
-                </li>
-                <li>
                   <Link to="/privacy-policy" className="footer-link">
                     <span className="link-bullet">• </span>{language === 'mr' ? 'गोपनीयता' : 'Privacy'}
                   </Link>
