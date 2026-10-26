@@ -9,8 +9,6 @@ import { dbService } from '../services/db';
 
 const Videos = () => {
   const { language } = useLanguage();
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
   const [videos, setVideos] = useState(() => {
     try {
       const stored = dbService.getAll('videos');
@@ -30,23 +28,8 @@ const Videos = () => {
     return unsub;
   }, []);
 
-  const categories = [
-    { id: 'All', nameEn: `All Videos (${videos.length})`, nameMr: `सर्व व्हिडिओ (${videos.length})` },
-    { id: 'Diabetes', nameEn: 'Diabetes (मधुमेह)', nameMr: 'मधुमेह मुक्ती' },
-    { id: 'Addiction', nameEn: 'De-Addiction (व्यसनमुक्ती)', nameMr: 'व्यसनमुक्त भारत' },
-    { id: 'Bones', nameEn: 'Joint Pain (सांधेदुखी)', nameMr: 'सांधेदुखी व हाडे' },
-    { id: 'Acidity', nameEn: 'Acidity & Digestion', nameMr: 'पित्त व पचन' },
-    { id: 'Ayurveda', nameEn: 'Ayurveda & Guidance', nameMr: 'आयुर्वेद व पथ्य' },
-    { id: 'Camps', nameEn: 'Health Camps', nameMr: 'आरोग्य शिबिरे' }
-  ];
-
-  const filteredHorizontalVideos = selectedCategory === 'All'
-    ? videos
-    : videos.filter((v) => v.category === selectedCategory);
-
-  const filteredReels = selectedCategory === 'All'
-    ? resultVideos
-    : resultVideos.filter((v) => v.category === selectedCategory);
+  const filteredHorizontalVideos = videos;
+  const filteredReels = resultVideos;
 
   return (
     <div className="videos-page">
@@ -70,39 +53,6 @@ const Videos = () => {
 
       <section className="section" style={{ backgroundColor: '#F3F8F1' }}>
         <div className="container">
-          {/* Category Filter Chips */}
-          <div className="videos-filter-chips" style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '0.6rem',
-            flexWrap: 'wrap',
-            marginBottom: '3rem'
-          }}>
-            {categories.map((cat) => {
-              const isActive = selectedCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  style={{
-                    padding: '0.55rem 1.35rem',
-                    borderRadius: '9999px',
-                    fontSize: '0.9rem',
-                    fontWeight: 700,
-                    border: '1.5px solid',
-                    borderColor: isActive ? '#006B2D' : '#E1E9DF',
-                    backgroundColor: isActive ? '#006B2D' : '#ffffff',
-                    color: isActive ? '#ffffff' : '#17251B',
-                    cursor: 'pointer',
-                    boxShadow: isActive ? '0 4px 12px rgba(0, 107, 45, 0.25)' : '0 2px 6px rgba(0, 107, 45, 0.04)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  {language === 'mr' ? cat.nameMr : cat.nameEn}
-                </button>
-              );
-            })}
-          </div>
 
           {/* Authentic Videos Grid (Direct from samarthkolhapur.com) */}
           {filteredHorizontalVideos.length > 0 && (
