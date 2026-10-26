@@ -242,18 +242,13 @@ const ProductCard = ({ product }) => {
         <div style={{ 
           display: 'flex', 
           alignItems: 'baseline', 
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
           marginBottom: '0.65rem', 
           marginTop: 'auto' 
         }}>
           <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#006B2D' }}>
             ₹{effectivePrice}
           </span>
-          {product.originalPrice && product.originalPrice > effectivePrice && (
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', textDecoration: 'line-through' }}>
-              ₹{product.originalPrice}
-            </span>
-          )}
         </div>
 
         {/* Single Clean Full-Width Order Button */}

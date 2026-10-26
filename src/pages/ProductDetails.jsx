@@ -909,9 +909,6 @@ const ProductDetails = () => {
                   <span style={{ fontSize: '2.1rem', fontWeight: 800, color: '#006B2D' }}>
                     ₹{product.price}
                   </span>
-                  <span style={{ fontSize: '1rem', color: '#5F6B61', textDecoration: 'line-through' }}>
-                    ₹{product.originalPrice || (product.price >= 3000 ? 4000 : 2000)}
-                  </span>
                 </div>
                 {activeChildProduct && (
                   <div style={{ fontSize: '0.75rem', color: '#15803D', fontWeight: 600, marginTop: '2px' }}>
