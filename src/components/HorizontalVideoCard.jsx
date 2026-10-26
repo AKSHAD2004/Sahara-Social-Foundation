@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Clock, Video as VideoIcon } from 'lucide-react';
+import { Video as VideoIcon } from 'lucide-react';
 
 const HorizontalVideoCard = ({ video }) => {
   const cardRef = useRef(null);
@@ -78,37 +78,6 @@ const HorizontalVideoCard = ({ video }) => {
         transition: 'transform 0.25s ease, box-shadow 0.25s ease'
       }}
     >
-      {/* Video Header: Duration Badge */}
-      {video.duration && (
-        <div 
-          style={{
-            padding: '0.6rem 1rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            backgroundColor: '#F8FAF7',
-            borderBottom: '1px solid #EBF2E9'
-          }}
-        >
-          <div 
-            style={{
-              backgroundColor: '#ffffff',
-              border: '1px solid #D5E4D2',
-              color: '#2D3A30',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              padding: '0.22rem 0.55rem',
-              borderRadius: '9999px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            <Clock size={11} style={{ color: '#006B2D' }} />
-            <span>{video.duration}</span>
-          </div>
-        </div>
-      )}
 
       {/* Video Player Frame with Native Controls and 100% Uncropped Display */}
       <div 

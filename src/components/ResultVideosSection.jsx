@@ -106,52 +106,6 @@ const ResultVideoCardItem = ({ video, idx, language, handlePlay }) => {
           </div>
         )}
       </div>
-
-      {/* Minimal Clean Caption matching samarthkolhapur.com */}
-      <div 
-        style={{
-          backgroundColor: '#FAFAFA',
-          padding: '0.65rem 0.95rem',
-          borderTop: '1px solid #EEEEEE',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '0.5rem'
-        }}
-      >
-        <div style={{ minWidth: 0 }}>
-          <span 
-            style={{ 
-              fontSize: '0.88rem', 
-              fontWeight: 700, 
-              color: '#222222',
-              display: 'block',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
-            }}
-          >
-            {language === 'mr' ? (video.speakerMr || video.titleMr) : (video.speakerEn || video.titleEn)}
-          </span>
-        </div>
-
-        {video.duration && (
-          <span 
-            style={{
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              color: '#666666',
-              backgroundColor: '#FFFFFF',
-              padding: '0.15rem 0.55rem',
-              borderRadius: '6px',
-              border: '1px solid #E0E0E0',
-              flexShrink: 0
-            }}
-          >
-            {video.duration}
-          </span>
-        )}
-      </div>
     </div>
   );
 };
