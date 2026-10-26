@@ -704,30 +704,6 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {product.nutrifeelUrl && (
-              <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
-                <a
-                  href={product.nutrifeelUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                    fontSize: '0.78rem',
-                    color: '#006B2D',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    backgroundColor: '#e6f4ea',
-                    padding: '0.4rem 0.85rem',
-                    borderRadius: '20px',
-                    border: '1px solid #b7e1cd'
-                  }}
-                >
-                  <span>{language === 'mr' ? 'अधिकृत न्युट्रीफील वेबसाईट पहा ↗' : 'View on Official Nutrifeel ↗'}</span>
-                </a>
-              </div>
-            )}
 
             {/* Trust Badges */}
             <div style={{
