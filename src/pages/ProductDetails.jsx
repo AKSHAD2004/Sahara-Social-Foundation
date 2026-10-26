@@ -737,31 +737,6 @@ const ProductDetails = () => {
 
           {/* Right Column: Information & Actions */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <div style={{ fontSize: '0.78rem', color: '#159B32', fontWeight: 700, textTransform: 'uppercase' }}>
-                {language === 'mr' ? displayProduct.categoryNameMr : displayProduct.categoryNameEn} • SKU: {displayProduct.sku}
-              </div>
-              <button
-                type="button"
-                onClick={handleOpenEdit}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  backgroundColor: '#e2faea',
-                  color: '#006B2D',
-                  border: '1px solid #c3edd2',
-                  borderRadius: '6px',
-                  padding: '0.25rem 0.65rem',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                <Edit size={13} />
-                <span>{language === 'mr' ? 'उत्पादन संपादित करा' : 'Edit'}</span>
-              </button>
-            </div>
 
             {/* Active Child Product Indicator Badge */}
             {activeChildProduct && (
