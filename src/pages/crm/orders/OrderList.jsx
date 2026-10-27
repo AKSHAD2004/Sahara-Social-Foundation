@@ -359,27 +359,22 @@ export default function OrderList() {
       )}
 
       {/* Top Summary Metrics */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1rem',
-        marginBottom: '1.25rem'
-      }}>
-        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #1b4d3e' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Total Orders</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginTop: '0.2rem' }}>{orders.length}</div>
+      <div className="crm-stats-grid crm-stats-grid-responsive" style={{ marginBottom: '1.25rem' }}>
+        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #1b4d3e' }}>
+          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Total Orders</div>
+          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginTop: '0.2rem' }}>{orders.length}</div>
         </div>
-        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #006B2D' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>🌐 Website Online Orders</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#006B2D', marginTop: '0.2rem' }}>{websiteOrdersCount}</div>
+        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #006B2D' }}>
+          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>🌐 Online Orders</div>
+          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#006B2D', marginTop: '0.2rem' }}>{websiteOrdersCount}</div>
         </div>
-        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #16a34a' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Paid Order Volume</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a', marginTop: '0.2rem' }}>{formatCurrency(totalRevenue)}</div>
+        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #16a34a' }}>
+          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Paid Volume</div>
+          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a', marginTop: '0.2rem' }}>{formatCurrency(totalRevenue)}</div>
         </div>
-        <div className="crm-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #eab308' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Active / Pending Delivery</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#854d0e', marginTop: '0.2rem' }}>{pendingDeliveryCount}</div>
+        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #eab308' }}>
+          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Pending Delivery</div>
+          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#854d0e', marginTop: '0.2rem' }}>{pendingDeliveryCount}</div>
         </div>
       </div>
 
@@ -434,6 +429,10 @@ export default function OrderList() {
               <option value="Refunded">Refunded</option>
             </select>
           </div>
+        </div>
+
+        <div className="crm-table-swipe-hint">
+          <span>↔ Swipe table horizontally to see full details & actions</span>
         </div>
 
         <div className="crm-table-wrapper">

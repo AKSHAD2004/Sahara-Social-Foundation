@@ -308,6 +308,79 @@ export async function fetchOrdersFromFirebase() {
   }
 }
 
+/**
+ * Directly writes a user document to Cloud Firestore in the 'users' collection.
+ * Ensures the account is remembered permanently in Firebase.
+ *
+ * @param {Object} user - User/affiliate profile object
+ * @returns {Promise<{success: boolean, id: string, data: Object}>}
+ */
+export async function syncUserToFirebase(user) {
+  if (!user) return { success: false, message: 'No user data provided' };
+
+  const userId = String(user.id || `usr_aff_${Date.now()}`);
+  const cleanPhone = (user.phone || user.mobile || '').replace(/\D/g, '').trim();
+  const rawPayload = {
+    ...user,
+    id: userId,
+    phone: cleanPhone || user.phone || '',
+    mobile: cleanPhone || user.mobile || '',
+    email: (user.email || '').trim().toLowerCase(),
+    role: user.role || 'affiliate',
+    status: user.status || 'active',
+    syncedAt: new Date().toISOString()
+  };
+
+  const cleanPayload = sanitizeForFirestore(rawPayload);
+
+  if (isFirestoreNetworkDisconnected()) {
+    return { success: true, id: userId, data: cleanPayload, note: 'Cached locally (Firestore offline)' };
+  }
+
+  if (isFirebaseConfigured && db) {
+    try {
+      await ensureFirebaseAuth().catch(() => {});
+      const docRef = doc(db, 'users', userId);
+      await setDoc(docRef, {
+        ...cleanPayload,
+        firebaseUpdatedAt: serverTimestamp()
+      }, { merge: true });
+      console.log(`[Firebase Cloud] User remembered to Firestore: users/${userId}`);
+      return { success: true, id: userId, data: cleanPayload };
+    } catch (err) {
+      if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded')) {
+        disconnectFirestoreNetwork().catch(() => {});
+        return { success: true, id: userId, data: cleanPayload, note: 'Cached locally' };
+      }
+      console.warn(`[Firebase Cloud] User sync notice (${userId}):`, err.message);
+      try {
+        const docRef = doc(db, 'users', userId);
+        await setDoc(docRef, cleanPayload, { merge: true });
+        return { success: true, id: userId, data: cleanPayload };
+      } catch (retryErr) {
+        return { success: false, error: retryErr.message, data: cleanPayload };
+      }
+    }
+  }
+
+  return { success: true, id: userId, data: cleanPayload, note: 'Cached locally' };
+}
+
+/**
+ * Direct query to retrieve all active users from Cloud Firestore.
+ */
+export async function fetchUsersFromFirebase() {
+  if (!isFirebaseConfigured || !db) return [];
+  try {
+    const colRef = collection(db, 'users');
+    const snapshot = await getDocs(colRef);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.warn('[Firebase Cloud] Error fetching users directly from Firestore:', err.message);
+    return [];
+  }
+}
+
 export { 
   app, 
   auth, 

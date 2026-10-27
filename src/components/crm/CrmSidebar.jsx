@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Target, Calendar, ShoppingBag, 
   Package, Handshake, Percent, CreditCard, LifeBuoy, 
   BarChart3, Bell, UserCheck, Settings, ChevronDown, 
-  ChevronRight, FileText, ChevronLeft, Award, Sparkles, ExternalLink, Sliders, Camera, Video, MessageSquareQuote
+  ChevronRight, FileText, ChevronLeft, Award, Sparkles, ExternalLink, Sliders, Camera, Video, MessageSquareQuote, X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { dbService } from '../../services/db';
@@ -53,12 +53,24 @@ export default function CrmSidebar({ collapsed, onToggleCollapse, mobileOpen, on
           )}
         </NavLink>
 
+        {/* Desktop Collapse Toggle */}
         <button 
-          className="crm-sidebar-toggle" 
+          className="crm-sidebar-toggle crm-desktop-toggle-btn" 
           onClick={onToggleCollapse} 
           title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          aria-label={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
+
+        {/* Mobile / Tablet Close Button */}
+        <button 
+          className="crm-sidebar-toggle crm-mobile-close-btn" 
+          onClick={onCloseMobile} 
+          title="Close Navigation Menu"
+          aria-label="Close Navigation Menu"
+        >
+          <X size={20} />
         </button>
       </div>
 

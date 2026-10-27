@@ -1,12 +1,13 @@
 // Top Navigation Header with Search, Role Switcher, and Notifications for CRM
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import { 
   Search, Bell, Menu, LogOut, ShieldCheck, Check, 
   User, ExternalLink, RefreshCw 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { dbService } from '../../services/db';
+import MissionLogoBadge from '../MissionLogoBadge';
 
 export default function CrmHeader({ onToggleMobile }) {
   const { currentUser, logout, switchUser, availableUsers } = useAuth();
@@ -125,27 +126,34 @@ export default function CrmHeader({ onToggleMobile }) {
         </div>
       )}
       <header className="crm-header">
-        {/* Mobile Hamburger + Global Search */}
+        {/* Mobile / Tablet Hamburger + Brand + Global Search */}
         <div className="crm-header-left">
           <button 
-            className="crm-sidebar-toggle" 
-            style={{ display: 'flex' }}
+            type="button"
+            className="crm-header-hamburger" 
             onClick={onToggleMobile}
-            title="Toggle Mobile Menu"
-        >
-          <Menu size={20} />
-        </button>
+            title="Open Navigation Menu"
+            aria-label="Open Navigation Menu"
+          >
+            <Menu size={20} />
+          </button>
 
-        <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
-          <div className="crm-header-search">
-            <Search size={15} style={{ flexShrink: 0 }} />
-            <input 
-              type="text" 
-              placeholder="Search customers, leads, orders (e.g. Patil, ORD)..." 
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-          </div>
+          {/* Mobile / Tablet Brand Mark */}
+          <NavLink to="/crm" className="crm-mobile-brand" title="Sahara Social Foundation CRM">
+            <MissionLogoBadge size={28} style={{ filter: 'none', flexShrink: 0 }} />
+            <span className="crm-mobile-brand-title">SSF CRM</span>
+          </NavLink>
+
+          <div className="crm-search-container" style={{ position: 'relative', flex: 1, minWidth: 0 }}>
+            <div className="crm-header-search">
+              <Search size={15} style={{ flexShrink: 0 }} />
+              <input 
+                type="text" 
+                placeholder="Search customers, leads, orders (e.g. Patil, ORD)..." 
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
 
           {/* Search Dropdown Popup */}
           {searchResults && (
@@ -237,8 +245,8 @@ export default function CrmHeader({ onToggleMobile }) {
       <div className="crm-header-actions">
         {/* Instant Role Switcher for Evaluation */}
         <div className="crm-role-switcher" title="Instantly switch user to test RBAC and role experiences">
-          <ShieldCheck size={16} />
-          <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Active Role:</span>
+          <ShieldCheck size={16} className="crm-role-icon" />
+          <span className="crm-role-label">Active Role:</span>
           <select 
             className="crm-role-select" 
             value={currentUser?.id || ''}
@@ -246,7 +254,7 @@ export default function CrmHeader({ onToggleMobile }) {
           >
             {availableUsers.map((u) => (
               <option key={u.id} value={u.id}>
-                {u.name} ({u.role.replace('_', ' ').toUpperCase()})
+                {u.name?.split(' ')[0] || 'User'} ({u.role?.replace('_', ' ').toUpperCase() || 'ROLE'})
               </option>
             ))}
           </select>
@@ -254,28 +262,13 @@ export default function CrmHeader({ onToggleMobile }) {
 
         {/* Real-time Cloud Sync Trigger across all devices */}
         <button 
-          className="crm-icon-btn" 
+          className="crm-icon-btn crm-cloud-sync-btn" 
           onClick={handleManualSync}
           disabled={isSyncing}
           title="Click to instantly sync data across all devices from Cloud Firestore"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '0.4rem 0.75rem',
-            width: 'auto',
-            borderRadius: '8px',
-            background: syncSuccess ? '#ecfdf5' : '#f8fafc',
-            color: syncSuccess ? '#059669' : '#334155',
-            border: syncSuccess ? '1px solid #a7f3d0' : '1px solid #cbd5e1',
-            fontWeight: 600,
-            fontSize: '0.75rem',
-            cursor: isSyncing ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s ease'
-          }}
         >
-          <RefreshCw size={13} style={{ animation: isSyncing ? 'spin 1s linear infinite' : 'none' }} />
-          <span>{isSyncing ? 'Syncing...' : syncSuccess ? 'Synced ✓' : 'Cloud Sync'}</span>
+          <RefreshCw size={13} style={{ animation: isSyncing ? 'spin 1s linear infinite' : 'none', flexShrink: 0 }} />
+          <span className="crm-cloud-sync-text">{isSyncing ? 'Syncing...' : syncSuccess ? 'Synced ✓' : 'Cloud Sync'}</span>
         </button>
 
         {/* Notifications Icon with Popup */}

@@ -34,6 +34,7 @@ import {
   serverTimestamp,
   ensureFirebaseAuth,
   syncOrderToFirebase,
+  syncUserToFirebase,
   disconnectFirestoreNetwork,
   isFirestoreNetworkDisconnected
 } from './firebase';
@@ -304,13 +305,32 @@ function initCollection(collectionName, defaultData) {
         localStorage.setItem(key, JSON.stringify(existingFollowups));
       } else if (collectionName === 'users') {
         const existingUsers = (Array.isArray(parsed) ? parsed : []).filter((u) => !isItemDeleted('users', u));
-        const officialUserIds = new Set(initialUsers.map((u) => u.id));
-        const mergedUsers = [...initialUsers];
+        
+        // Also retrieve any custom registered users from backup storage
+        let customBackups = [];
+        try {
+          if (typeof window !== 'undefined') {
+            const rawBackups = localStorage.getItem('sahara_custom_registered_users');
+            if (rawBackups) customBackups = JSON.parse(rawBackups);
+          }
+        } catch (e) {}
+
+        const mergedMap = new Map();
+        initialUsers.forEach((u) => mergedMap.set(String(u.id), u));
         existingUsers.forEach((u) => {
-          if (!officialUserIds.has(u.id)) {
-            mergedUsers.push(u);
+          if (!mergedMap.has(String(u.id))) {
+            mergedMap.set(String(u.id), u);
           }
         });
+        if (Array.isArray(customBackups)) {
+          customBackups.forEach((cu) => {
+            if (cu && cu.id && !mergedMap.has(String(cu.id))) {
+              mergedMap.set(String(cu.id), cu);
+            }
+          });
+        }
+
+        const mergedUsers = Array.from(mergedMap.values());
         state[collectionName] = mergedUsers;
         localStorage.setItem(key, JSON.stringify(mergedUsers));
       } else {
@@ -552,6 +572,21 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
                 fullUsers.push(r);
               }
             });
+
+            // CRITICAL: Preserve any locally registered users in state.users or custom backup
+            const currentLocalUsers = (Array.isArray(state.users) ? state.users : []).filter((u) => !isItemDeleted('users', u));
+            currentLocalUsers.forEach((locU) => {
+              const locId = String(locU.id);
+              const exists = fullUsers.some((fu) => 
+                String(fu.id) === locId || 
+                (locU.phone && fu.phone && String(locU.phone).replace(/\D/g, '') === String(fu.phone).replace(/\D/g, '')) ||
+                (locU.email && fu.email && locU.email.toLowerCase().trim() === fu.email.toLowerCase().trim())
+              );
+              if (!exists) {
+                fullUsers.push(locU);
+              }
+            });
+
             const currentJson = JSON.stringify(state.users || []);
             const newJson = JSON.stringify(fullUsers);
             if (currentJson !== newJson) {
@@ -864,6 +899,18 @@ export const dbService = {
     state[collectionName].unshift(newItem);
     saveCollection(collectionName);
 
+    // Save persistent backup for newly created/registered users
+    if (collectionName === 'users' && typeof window !== 'undefined') {
+      try {
+        const backupKey = 'sahara_custom_registered_users';
+        const existing = JSON.parse(localStorage.getItem(backupKey) || '[]');
+        const idStr = String(newItem.id);
+        const filtered = existing.filter((u) => String(u.id) !== idStr);
+        filtered.unshift(newItem);
+        localStorage.setItem(backupKey, JSON.stringify(filtered));
+      } catch (e) {}
+    }
+
     // Sync to Cloud Firestore if connected
     if (isFirebaseConfigured && firestoreDb) {
       try {
@@ -880,6 +927,8 @@ export const dbService = {
 
         if (collectionName === 'orders') {
           await syncOrderToFirebase(cleanItem).catch(() => {});
+        } else if (collectionName === 'users') {
+          await syncUserToFirebase(cleanItem).catch(() => {});
         }
         console.log(`[Firestore Sync] Created document ${collectionName}/${docId}`);
       } catch (err) {

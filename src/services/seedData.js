@@ -32,6 +32,19 @@ export const initialUsers = [
     avatar: null,
     department: 'Affiliate Network',
     status: 'active'
+  },
+  {
+    id: 'usr_aff_rahul_chougule',
+    name: 'Rahul Chougule',
+    email: 'rahulchougule407@gmail.com',
+    role: 'affiliate',
+    phone: '8421154090',
+    mobile: '8421154090',
+    referralCode: 'SAHARA-RAHUL-407',
+    city: 'Kolhapur',
+    avatar: null,
+    department: 'Affiliate Network',
+    status: 'active'
   }
 ];
 

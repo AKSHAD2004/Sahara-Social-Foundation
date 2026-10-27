@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import CrmSidebar from './CrmSidebar';
 import CrmHeader from './CrmHeader';
+import CrmMobileBottomBar from './CrmMobileBottomBar';
 import { setupFirestoreRealtimeSync } from '../../services/db';
 import '../../styles/crm.css';
 
@@ -37,6 +38,7 @@ export default function CrmLayout() {
         <main className="crm-content">
           <Outlet />
         </main>
+        <CrmMobileBottomBar onToggleMenu={() => setMobileOpen(true)} />
       </div>
     </div>
   );

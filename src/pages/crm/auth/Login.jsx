@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, Lock, Mail, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import '../../../styles/crm.css';
 
 export default function Login() {
   const { currentUser, login, availableUsers } = useAuth();
@@ -15,6 +16,15 @@ export default function Login() {
   const [resetSent, setResetSent] = useState(false);
 
   const from = location.state?.from?.pathname || '/crm';
+
+  // Deduplicate demo users by email to avoid duplicate pills
+  const demoUsers = (availableUsers || []).reduce((acc, user) => {
+    const emailKey = (user.email || '').toLowerCase().trim();
+    if (emailKey && !acc.some((u) => (u.email || '').toLowerCase().trim() === emailKey)) {
+      acc.push(user);
+    }
+    return acc;
+  }, []);
 
   useEffect(() => {
     if (currentUser) {
@@ -145,14 +155,14 @@ export default function Login() {
             Quick Demo Login Roles:
           </div>
           <div className="crm-demo-pills">
-            {availableUsers.map((u) => (
+            {demoUsers.map((u) => (
               <button 
-                key={u.id} 
+                key={u.id || u.email} 
                 type="button"
                 className="crm-demo-pill"
                 onClick={() => handleQuickSelect(u.email)}
               >
-                {u.name.split(' ')[0]} ({u.role.replace('_', ' ')})
+                {u.name?.split(' ')[0] || 'User'} ({u.role?.replace('_', ' ') || 'Staff'})
               </button>
             ))}
           </div>

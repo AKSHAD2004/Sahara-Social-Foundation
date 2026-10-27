@@ -29,6 +29,7 @@ const Affiliate = lazy(() => import('./pages/Affiliate'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
 const StudyReport = lazy(() => import('./pages/StudyReport'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Context Providers
@@ -98,6 +99,13 @@ function AppTracker() {
     if (refCode) {
       localStorage.setItem('sahara_active_ref', refCode.toUpperCase());
     }
+
+    // Toggle GTranslate visibility: keep clean on CRM login and dashboard
+    const isCrmRoute = location.pathname.startsWith('/crm');
+    const gtWrappers = document.querySelectorAll('.gtranslate_wrapper, #gt_float_wrapper');
+    gtWrappers.forEach((el) => {
+      if (el) el.style.display = isCrmRoute ? 'none' : '';
+    });
 
     // Global single-video playback: whenever any video plays, pause all other videos
     const handleGlobalVideoPlay = (e) => {
@@ -226,6 +234,7 @@ function App() {
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/refund-policy" element={<RefundPolicy />} />
                   <Route path="/refund_returns" element={<RefundPolicy />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/study-report" element={<StudyReport />} />
                   <Route path="/clinical-report" element={<StudyReport />} />
                   <Route path="/clinical-reports" element={<StudyReport />} />
