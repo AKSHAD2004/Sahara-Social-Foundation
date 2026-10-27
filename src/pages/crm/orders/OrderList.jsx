@@ -481,6 +481,11 @@ export default function OrderList() {
                     <td>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{order.customerName}</div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{order.customerMobile || order.customerPhone || order.phone}</div>
+                      {(order.affiliateName || order.referralCode) && (
+                        <div style={{ fontSize: '0.72rem', color: '#006B2D', fontWeight: 600, marginTop: '2px' }}>
+                          Ref: {order.referralCode || order.affiliateName}
+                        </div>
+                      )}
                     </td>
                     <td style={{ maxWidth: '240px' }}>
                       {(order.products || order.items || []).map((p, idx) => (

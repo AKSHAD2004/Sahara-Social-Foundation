@@ -1309,7 +1309,23 @@ export const dbService = {
       }
     }
 
-    // Resolve employee and affiliate names
+    // Resolve employee and affiliate names and bidirectional referral matching
+    if (!effectiveOrder.assignedAffiliate && effectiveOrder.referralCode) {
+      const allUsers = this.getAll('users') || [];
+      const affUser = allUsers.find(
+        (u) => u.referralCode && u.referralCode.toUpperCase() === String(effectiveOrder.referralCode).toUpperCase()
+      );
+      if (affUser) {
+        effectiveOrder.assignedAffiliate = affUser.id;
+        effectiveOrder.affiliateName = affUser.name;
+      }
+    }
+
+    if (effectiveOrder.assignedAffiliate && !effectiveOrder.referralCode) {
+      const aff = this.getById('users', effectiveOrder.assignedAffiliate);
+      if (aff && aff.referralCode) effectiveOrder.referralCode = aff.referralCode;
+    }
+
     if (effectiveOrder.assignedEmployee && !effectiveOrder.employeeName) {
       const emp = this.getById('users', effectiveOrder.assignedEmployee);
       if (emp) effectiveOrder.employeeName = emp.name;
@@ -1365,14 +1381,15 @@ export const dbService = {
   async syncAllOrderCommissions(currentUser = null) {
     const orders = this.getAll('orders');
     const settings = this.getAll('settings');
-    const slabs = this.getAll('commissionSlabs');
     const existingTx = this.getAll('commissionTransactions') || [];
 
     let generatedCount = 0;
     for (const order of orders) {
       if (isOrderCommissionEligible(order, settings)) {
+        const hasAffiliate = Boolean(order.assignedAffiliate || order.referralCode);
         const matchingTx = existingTx.find(
-          (tx) => tx.orderId === order.id || tx.orderRef === order.orderId
+          (tx) => (tx.orderId === order.id || tx.orderRef === order.orderId) &&
+                  (!hasAffiliate || tx.beneficiaryType === 'Affiliate' || tx.beneficiaryId === order.assignedAffiliate)
         );
         if (!matchingTx || Number(matchingTx.commissionAmount) === 0) {
           await this.processOrderCommission(order, currentUser);

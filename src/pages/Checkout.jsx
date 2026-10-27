@@ -167,9 +167,34 @@ const Checkout = () => {
   };
 
   const completeOrderPlacement = async (orderId, paymentDetails = {}) => {
-    const activeRefCode = localStorage.getItem('sahara_active_ref') || '';
-    const users = dbService.getAll('users');
-    const matchingAffiliate = users.find((u) => u.referralCode && u.referralCode.toUpperCase() === activeRefCode.toUpperCase());
+    // 0. Resolve active affiliate referral code across localStorage, sessionStorage, and URL
+    let activeRefCode = (
+      localStorage.getItem('sahara_active_ref') || 
+      sessionStorage.getItem('sahara_active_ref') || 
+      (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('ref') : '') ||
+      ''
+    ).trim();
+
+    let allUsers = dbService.getAll('users') || [];
+    try {
+      const backupUsers = JSON.parse(localStorage.getItem('sahara_custom_registered_users') || '[]');
+      if (Array.isArray(backupUsers)) {
+        backupUsers.forEach((bu) => {
+          if (!allUsers.some((u) => String(u.id) === String(bu.id))) allUsers.push(bu);
+        });
+      }
+    } catch (e) {}
+
+    const matchingAffiliate = activeRefCode
+      ? allUsers.find((u) => u.referralCode && u.referralCode.toUpperCase() === activeRefCode.toUpperCase())
+      : null;
+
+    const assignedAffiliateId = matchingAffiliate 
+      ? matchingAffiliate.id 
+      : (activeRefCode ? `usr_aff_${activeRefCode.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : '');
+    const assignedAffiliateName = matchingAffiliate 
+      ? matchingAffiliate.name 
+      : (activeRefCode ? `Ambassador (${activeRefCode})` : '');
 
     // 1. Create / Update Customer in CRM & Firebase Firestore
     const cleanPhone = (formData.phone || '').replace(/\D/g, '').trim();
@@ -188,7 +213,7 @@ const Checkout = () => {
       pincode: formData.pincode,
       leadSource: activeRefCode ? 'Affiliate' : 'Website Direct',
       assignedEmployee: 'usr_emp_akash',
-      assignedAffiliate: matchingAffiliate ? matchingAffiliate.id : '',
+      assignedAffiliate: assignedAffiliateId,
       customerStatus: 'Active Buyer',
       notes: formData.healthNotes ? `Health Notes: ${formData.healthNotes}` : 'Website Checkout Order'
     };
@@ -237,10 +262,10 @@ const Checkout = () => {
       orderStatus: 'Confirmed',
       source: 'Website Checkout',
       assignedEmployee: 'usr_emp_akash',
-      assignedAffiliate: matchingAffiliate ? matchingAffiliate.id : '',
-      affiliateName: matchingAffiliate ? matchingAffiliate.name : '',
+      assignedAffiliate: assignedAffiliateId,
+      affiliateName: assignedAffiliateName,
       referralCode: activeRefCode || (matchingAffiliate ? matchingAffiliate.referralCode : ''),
-      commissionStatus: isPaidOnlineFull ? 'Eligible' : 'Pending Delivery',
+      commissionStatus: 'Eligible',
       orderDate: new Date().toISOString(),
       deliveredDate: null,
       shippingAddress: `${formData.address}, ${formData.landmark ? formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`,
@@ -282,6 +307,13 @@ const Checkout = () => {
       await dbService.add('orders', crmOrder);
     } catch (orderErr) {
       console.warn('CRM order sync note:', orderErr);
+    }
+
+    // Instantly calculate and persist commission transaction so it appears in both Affiliate and Admin portals
+    try {
+      await dbService.processOrderCommission(crmOrder);
+    } catch (commErr) {
+      console.warn('Commission transaction trigger note:', commErr);
     }
 
     // Direct Cloud Firestore Sync Guarantee (Guaranteed write to Firestore)
@@ -360,6 +392,16 @@ const Checkout = () => {
     const amountToPayNow = isCodToken ? codAdvanceAmount : grandTotal;
     const remainingCodBalance = isCodToken ? codBalanceDue : 0;
 
+    // Mobile safety timer: prevent button from indefinitely showing "Processing Order..."
+    const safetyTimer = setTimeout(() => {
+      setIsSubmitting(false);
+      setPaymentNotice(
+        language === 'mr'
+          ? 'पेमेंट विंडो उघडण्यास वेळ लागत आहे. कृपया पुन्हा प्रयत्न करा किंवा COD पर्याय निवडा.'
+          : 'Payment window took too long to open. Please try again or choose Cash on Delivery.'
+      );
+    }, 6500);
+
     initializeRazorpayPayment({
       amountInRupees: amountToPayNow,
       orderId: orderId,
@@ -380,6 +422,7 @@ const Checkout = () => {
         balanceDueOnDelivery: remainingCodBalance
       },
       onSuccess: async (paymentResponse) => {
+        clearTimeout(safetyTimer);
         try {
           await completeOrderPlacement(orderId, {
             ...paymentResponse,
@@ -400,6 +443,7 @@ const Checkout = () => {
         }
       },
       onDismiss: () => {
+        clearTimeout(safetyTimer);
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'
@@ -408,6 +452,7 @@ const Checkout = () => {
         );
       },
       onError: (err) => {
+        clearTimeout(safetyTimer);
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'

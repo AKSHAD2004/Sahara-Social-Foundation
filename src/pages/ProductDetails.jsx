@@ -62,6 +62,21 @@ const ProductDetails = () => {
   });
 
 
+  // Capture affiliate referral code from URL query parameters
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref');
+        if (ref) {
+          const cleanRef = ref.trim().toUpperCase();
+          localStorage.setItem('sahara_active_ref', cleanRef);
+          sessionStorage.setItem('sahara_active_ref', cleanRef);
+        }
+      }
+    } catch (e) {}
+  }, []);
+
   useEffect(() => {
     const unsub = dbService.subscribe('products', (dbProducts) => {
       if (Array.isArray(dbProducts) && dbProducts.length > 0) {

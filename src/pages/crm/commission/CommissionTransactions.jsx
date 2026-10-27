@@ -24,9 +24,10 @@ export default function CommissionTransactions() {
     const q = searchTerm.toLowerCase();
     const matchSearch =
       !searchTerm ||
-      tx.transactionId.toLowerCase().includes(q) ||
-      tx.orderRef.toLowerCase().includes(q) ||
-      tx.beneficiaryName.toLowerCase().includes(q);
+      (tx.transactionId || tx.id || '').toLowerCase().includes(q) ||
+      (tx.orderRef || tx.orderId || '').toLowerCase().includes(q) ||
+      (tx.beneficiaryName || '').toLowerCase().includes(q) ||
+      (tx.referralCode || '').toLowerCase().includes(q);
 
     const matchStatus = statusFilter === 'ALL' || tx.status === statusFilter;
     const matchBeneficiary = beneficiaryFilter === 'ALL' || tx.beneficiaryType === beneficiaryFilter;
@@ -155,14 +156,19 @@ export default function CommissionTransactions() {
                 filteredTx.map((tx) => (
                   <tr key={tx.id}>
                     <td>
-                      <strong>{tx.transactionId}</strong>
+                      <strong>{tx.transactionId || tx.id}</strong>
                     </td>
-                    <td>{tx.orderRef}</td>
+                    <td>{tx.orderRef || tx.orderId}</td>
                     <td>
                       <div style={{ fontWeight: 600, color: '#1e293b' }}>{tx.beneficiaryName}</div>
                       <span className="badge badge-neutral" style={{ fontSize: '0.68rem' }}>
                         {tx.beneficiaryType?.toUpperCase()}
                       </span>
+                      {tx.referralCode && (
+                        <span className="badge badge-primary" style={{ fontSize: '0.65rem', marginLeft: '0.35rem' }}>
+                          Ref: {tx.referralCode}
+                        </span>
+                      )}
                     </td>
                     <td>
                       <div style={{ fontWeight: 600 }}>{formatCurrency(tx.saleAmount)}</div>

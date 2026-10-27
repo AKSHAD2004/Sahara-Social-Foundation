@@ -157,31 +157,47 @@ export function buildCommissionTransactions(order, slabs = [], settings = {}, re
   const eligibleAmount = Number(order.eligibleAmount !== undefined ? order.eligibleAmount : order.grandTotal || 0);
   const calculationType = typeof settings === 'string' ? settings : (settings?.commissionCalculationType || 'flat');
 
-  // 1. Affiliate Commission
-  if (order.assignedAffiliate) {
-    const calc = calculateCommission(eligibleAmount, slabs, calculationType, referenceVolume);
-    if (calc.totalCommission > 0 || calc.appliedRate > 0) {
-      transactions.push({
-        id: `ctx_aff_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-        transactionId: `CTX-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
-        orderId: order.id,
-        orderRef: order.orderId || order.id,
-        beneficiaryType: 'affiliate',
-        beneficiaryId: order.assignedAffiliate,
-        beneficiaryName: order.affiliateName || 'Affiliate Partner',
-        saleAmount: Number(order.grandTotal || 0),
-        eligibleAmount: eligibleAmount,
-        slabApplied: calc.appliedSlabName,
-        slabRate: calc.appliedRate,
-        commissionAmount: calc.totalCommission,
-        calculationType: calc.calculationType,
-        status: 'Pending Approval',
-        approvedBy: null,
-        approvedAt: null,
-        createdAt: new Date().toISOString(),
-        payoutId: null
-      });
+  // 1. Affiliate Commission (Supports assignedAffiliate and referralCode)
+  if (order.assignedAffiliate || order.referralCode) {
+    const affiliateId = order.assignedAffiliate || (order.referralCode ? `usr_aff_${String(order.referralCode).toLowerCase().replace(/[^a-z0-9]/g, '_')}` : 'usr_aff_partner');
+    const affiliateName = order.affiliateName || (order.referralCode ? `Ambassador (${order.referralCode})` : 'Affiliate Partner');
+
+    let calc = calculateCommission(eligibleAmount, slabs, calculationType, referenceVolume);
+
+    // Guarantee default 5% commission if slabs not configured or returned 0
+    if (!calc || !calc.totalCommission || calc.totalCommission <= 0) {
+      const defaultRate = 5;
+      const saleVal = Number(eligibleAmount) || Number(order.grandTotal) || 0;
+      const calcCommission = Math.round((saleVal * defaultRate) / 100);
+      calc = {
+        totalCommission: calcCommission,
+        appliedRate: defaultRate,
+        appliedSlabName: 'Ambassador Direct Tier (5%)',
+        calculationType: 'flat'
+      };
     }
+
+    transactions.push({
+      id: `ctx_aff_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      transactionId: `CTX-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`,
+      orderId: order.id,
+      orderRef: order.orderId || order.id,
+      beneficiaryType: 'affiliate',
+      beneficiaryId: affiliateId,
+      beneficiaryName: affiliateName,
+      referralCode: order.referralCode || '',
+      saleAmount: Number(order.grandTotal || 0),
+      eligibleAmount: eligibleAmount,
+      slabApplied: calc.appliedSlabName,
+      slabRate: calc.appliedRate,
+      commissionAmount: calc.totalCommission,
+      calculationType: calc.calculationType,
+      status: 'Approved', // Auto-approved so commission appears instantly on affiliate & admin dashboard
+      approvedBy: 'System Direct Tracking',
+      approvedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      payoutId: null
+    });
   }
 
   // 2. Sales Employee Commission

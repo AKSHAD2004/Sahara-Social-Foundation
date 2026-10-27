@@ -826,13 +826,18 @@ const Affiliate = () => {
     (c.referralCode && c.referralCode.toUpperCase() === myReferralCode.toUpperCase())
   );
 
-  const myTransactions = commissionTx.filter(tx => tx.beneficiaryId === myAffiliateId);
+  const myTransactions = commissionTx.filter(tx => 
+    tx.beneficiaryId === myAffiliateId ||
+    (myReferralCode && tx.referralCode && String(tx.referralCode).toUpperCase() === String(myReferralCode).toUpperCase()) ||
+    (loggedAffiliate?.name && tx.beneficiaryName && tx.beneficiaryName.toLowerCase() === loggedAffiliate.name.toLowerCase()) ||
+    myOrders.some(o => (o.id && o.id === tx.orderId) || (o.orderId && (o.orderId === tx.orderId || o.orderId === tx.orderRef)))
+  );
 
   // Compute live KPI counts
   const referredPatientsCount = (myLeads.length + myCustomers.length);
   const counselingCompletedCount = myOrders.length;
   const totalCommissionEarned = myTransactions
-    .filter(tx => tx.status === 'Approved' || tx.status === 'Paid')
+    .filter(tx => tx.status === 'Approved' || tx.status === 'Paid' || tx.status === 'Eligible' || tx.status === 'Pending Approval')
     .reduce((sum, tx) => sum + (Number(tx.commissionAmount) || 0), 0);
 
   // Copy primary product referral link to clipboard
@@ -1673,29 +1678,27 @@ const Affiliate = () => {
                 </div>
               </div>
 
-              {/* Commission Earnings Strip (Bonus Real-Time Value for Affiliates) */}
-              {totalCommissionEarned > 0 && (
-                <div style={{
-                  backgroundColor: '#ECFDF5',
-                  border: '1.5px solid #A7F3D0',
-                  borderRadius: '12px',
-                  padding: '0.85rem 1.25rem',
-                  marginBottom: '1.75rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: '0.5rem'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#065F46', fontWeight: 700, fontSize: '0.92rem' }}>
-                    <DollarSign size={18} style={{ color: '#059669' }} />
-                    <span>{language === 'mr' ? 'एकूण मंजूर मानधन (Commission Earned):' : 'Total Approved Commission:'}</span>
-                  </div>
-                  <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#047857' }}>
-                    {formatCurrency(totalCommissionEarned)}
-                  </div>
+              {/* Commission Earnings Strip (Real-Time Value for Affiliates) */}
+              <div style={{
+                backgroundColor: totalCommissionEarned > 0 ? '#ECFDF5' : '#F0FDF4',
+                border: totalCommissionEarned > 0 ? '1.5px solid #A7F3D0' : '1.5px solid #BBF7D0',
+                borderRadius: '12px',
+                padding: '0.85rem 1.25rem',
+                marginBottom: '1.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.5rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#065F46', fontWeight: 700, fontSize: '0.92rem' }}>
+                  <DollarSign size={18} style={{ color: '#059669' }} />
+                  <span>{language === 'mr' ? 'एकूण कमिशन / मानधन (Commission Earned):' : 'Total Approved Commission:'}</span>
                 </div>
-              )}
+                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#047857' }}>
+                  {formatCurrency(totalCommissionEarned)}
+                </div>
+              </div>
 
               {/* Product Referral Links Main Container */}
               <div style={{

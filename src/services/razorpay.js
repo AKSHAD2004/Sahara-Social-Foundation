@@ -5,29 +5,67 @@ const RAZORPAY_SCRIPT_URL = 'https://checkout.razorpay.com/v1/checkout.js';
 
 /**
  * Dynamically loads the Razorpay SDK script if not already loaded in the document.
+ * Includes timeout to prevent checkout freezing on mobile or restricted networks.
  * @returns {Promise<boolean>} True if script loaded successfully
  */
-export function loadRazorpayScript() {
+export function loadRazorpayScript(timeoutMs = 3500) {
   return new Promise((resolve) => {
-    if (window.Razorpay) {
+    if (typeof window !== 'undefined' && window.Razorpay) {
       resolve(true);
       return;
     }
 
+    let finished = false;
+    const timer = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        console.warn('Razorpay SDK script loading timed out after', timeoutMs, 'ms');
+        resolve(Boolean(window.Razorpay));
+      }
+    }, timeoutMs);
+
     const existingScript = document.querySelector(`script[src="${RAZORPAY_SCRIPT_URL}"]`);
     if (existingScript) {
-      existingScript.addEventListener('load', () => resolve(true));
-      existingScript.addEventListener('error', () => resolve(false));
+      if (window.Razorpay) {
+        clearTimeout(timer);
+        finished = true;
+        resolve(true);
+        return;
+      }
+      existingScript.addEventListener('load', () => {
+        if (!finished) {
+          finished = true;
+          clearTimeout(timer);
+          resolve(true);
+        }
+      });
+      existingScript.addEventListener('error', () => {
+        if (!finished) {
+          finished = true;
+          clearTimeout(timer);
+          resolve(false);
+        }
+      });
       return;
     }
 
     const script = document.createElement('script');
     script.src = RAZORPAY_SCRIPT_URL;
     script.async = true;
-    script.onload = () => resolve(true);
+    script.onload = () => {
+      if (!finished) {
+        finished = true;
+        clearTimeout(timer);
+        resolve(true);
+      }
+    };
     script.onerror = () => {
-      console.warn('Failed to load Razorpay SDK from checkout.razorpay.com');
-      resolve(false);
+      if (!finished) {
+        finished = true;
+        clearTimeout(timer);
+        console.warn('Failed to load Razorpay SDK from checkout.razorpay.com');
+        resolve(false);
+      }
     };
     document.body.appendChild(script);
   });
