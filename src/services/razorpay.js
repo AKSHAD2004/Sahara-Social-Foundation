@@ -109,6 +109,7 @@ export async function initializeRazorpayPayment({
   description = '',
   customer = {},
   notes = {},
+  onOpen = () => {},
   onSuccess = () => {},
   onDismiss = () => {},
   onError = () => {}
@@ -175,6 +176,9 @@ export async function initializeRazorpayPayment({
       }
     });
     rzpInstance.open();
+    if (typeof onOpen === 'function') {
+      onOpen();
+    }
   } catch (err) {
     console.error('Error opening Razorpay checkout:', err);
     if (typeof onError === 'function') {

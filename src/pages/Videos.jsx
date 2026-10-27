@@ -12,18 +12,14 @@ const Videos = () => {
   const [videos, setVideos] = useState(() => {
     try {
       const stored = dbService.getAll('videos');
-      if (Array.isArray(stored) && stored.length > 0) return stored;
+      if (Array.isArray(stored)) return stored;
     } catch (e) {}
-    return horizontalVideosData;
+    return [];
   });
 
   useEffect(() => {
     const unsub = dbService.subscribe('videos', (newVideos) => {
-      if (Array.isArray(newVideos) && newVideos.length > 0) {
-        setVideos(newVideos);
-      } else {
-        setVideos(horizontalVideosData);
-      }
+      setVideos(Array.isArray(newVideos) ? newVideos : []);
     });
     return unsub;
   }, []);

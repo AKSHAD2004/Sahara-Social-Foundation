@@ -341,10 +341,13 @@ export async function syncUserToFirebase(user) {
     try {
       await ensureFirebaseAuth().catch(() => {});
       const docRef = doc(db, 'users', userId);
-      await setDoc(docRef, {
-        ...cleanPayload,
-        firebaseUpdatedAt: serverTimestamp()
-      }, { merge: true });
+      await Promise.race([
+        setDoc(docRef, {
+          ...cleanPayload,
+          firebaseUpdatedAt: serverTimestamp()
+        }, { merge: true }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore sync timeout')), 2500))
+      ]);
       console.log(`[Firebase Cloud] User remembered to Firestore: users/${userId}`);
       return { success: true, id: userId, data: cleanPayload };
     } catch (err) {
@@ -355,7 +358,10 @@ export async function syncUserToFirebase(user) {
       console.warn(`[Firebase Cloud] User sync notice (${userId}):`, err.message);
       try {
         const docRef = doc(db, 'users', userId);
-        await setDoc(docRef, cleanPayload, { merge: true });
+        await Promise.race([
+          setDoc(docRef, cleanPayload, { merge: true }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore retry timeout')), 1500))
+        ]);
         return { success: true, id: userId, data: cleanPayload };
       } catch (retryErr) {
         return { success: false, error: retryErr.message, data: cleanPayload };

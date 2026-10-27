@@ -36,12 +36,9 @@ export default function HeroSlideList() {
     dbService.refreshFromFirebase('heroSlides').catch(() => {});
 
     const unsub = dbService.subscribe('heroSlides', (items) => {
-      if (!items || items.length === 0) {
-        setSlides(initialHeroSlides);
-      } else {
-        const sorted = [...items].sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
-        setSlides(sorted);
-      }
+      const list = Array.isArray(items) ? items : [];
+      const sorted = [...list].sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
+      setSlides(sorted);
     });
     return unsub;
   }, []);

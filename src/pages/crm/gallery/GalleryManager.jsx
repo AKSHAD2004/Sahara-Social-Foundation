@@ -41,11 +41,7 @@ export default function GalleryManager() {
     dbService.refreshFromFirebase('galleryPhotos').catch(() => {});
 
     const unsub = dbService.subscribe('galleryPhotos', (items) => {
-      if (!items || items.length === 0) {
-        setPhotos(initialGalleryPhotos);
-      } else {
-        setPhotos(items);
-      }
+      setPhotos(Array.isArray(items) ? items : []);
     });
     return unsub;
   }, []);

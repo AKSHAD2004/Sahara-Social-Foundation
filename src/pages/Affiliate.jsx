@@ -220,6 +220,14 @@ const Affiliate = () => {
     };
   }, [loggedAffiliate?.id]);
 
+  // Safe network timeout helper to ensure buttons NEVER freeze on "Registering...", "Logging in..." or hang
+  const withTimeout = (promise, ms = 2000) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
+    ]);
+  };
+
   // Handle Affiliate Registration
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -236,6 +244,12 @@ const Affiliate = () => {
 
       if (!regData.password || regData.password.trim().length < 4) {
         setRegError(language === 'mr' ? 'पासवर्ड किमान ४ अक्षरांचा असावा.' : 'Password must be at least 4 characters long.');
+        setIsRegistering(false);
+        return;
+      }
+
+      if (!regData.name || !regData.name.trim()) {
+        setRegError(language === 'mr' ? 'कृपया आपले पूर्ण नाव प्रविष्ट करा.' : 'Please enter your full name.');
         setIsRegistering(false);
         return;
       }
@@ -288,21 +302,12 @@ const Affiliate = () => {
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120'
       };
 
-      await dbService.add('users', newAffiliate);
+      // 1. Add to local database with safe timeout protection
+      await withTimeout(dbService.add('users', newAffiliate), 2000).catch((err) => {
+        console.warn('Local db addition notice:', err);
+      });
 
-      // Remember account directly to Cloud Firestore
-      await syncUserToFirebase(newAffiliate).catch((err) => console.warn('User cloud sync notice:', err));
-
-      // Attempt registration in Firebase Auth if email and password are provided
-      if (newAffiliate.email && newAffiliate.password) {
-        try {
-          await firebaseAuthService.register(newAffiliate.email, newAffiliate.password, newAffiliate).catch(() => {});
-        } catch (authErr) {
-          console.info('Firebase Auth note:', authErr?.message || authErr);
-        }
-      }
-
-      // Persist to local backup storage
+      // 2. Persist to local backup storage immediately
       try {
         const backupKey = 'sahara_custom_registered_users';
         const existing = JSON.parse(localStorage.getItem(backupKey) || '[]');
@@ -311,6 +316,15 @@ const Affiliate = () => {
         localStorage.setItem(backupKey, JSON.stringify(filtered));
       } catch (e) {}
 
+      // 3. Asynchronously sync to Cloud Firestore & Firebase Auth without blocking registration
+      withTimeout(syncUserToFirebase(newAffiliate), 2500).catch((err) => console.warn('User cloud sync notice:', err));
+
+      if (newAffiliate.email && newAffiliate.password) {
+        withTimeout(firebaseAuthService.register(newAffiliate.email, newAffiliate.password, newAffiliate), 2500).catch((authErr) => {
+          console.info('Firebase Auth note:', authErr?.message || authErr);
+        });
+      }
+
       dbService.addNotification({
         title: 'New Ambassador Registered',
         message: `${regData.name} registered as Ambassador (ID: ${code}).`,
@@ -318,14 +332,14 @@ const Affiliate = () => {
         link: '/crm/affiliates'
       });
 
-      // Use the current account on the website immediately
+      // 4. Activate current session and open dashboard immediately
       sessionStorage.removeItem('sahara_affiliate_logged_out');
       setLoggedAffiliate(newAffiliate);
       localStorage.setItem(STORAGE_AFFILIATE_KEY, JSON.stringify(newAffiliate));
 
       const successMessage = language === 'mr'
-        ? `अभिनंदन ${newAffiliate.name}! आपले आरोग्यदूत खाते Firebase मध्ये सुरक्षित सेव्ह झाले असून ते सक्रिय झाले आहे! आपला संदर्भ कोड: ${code}.`
-        : `Congratulations ${newAffiliate.name}! Your ambassador account is registered and remembered in Firebase! Ambassador ID: ${code}.`;
+        ? `अभिनंदन ${newAffiliate.name}! आपले आरोग्यदूत खाते सुरक्षित सेव्ह झाले असून ते सक्रिय झाले आहे! आपला संदर्भ कोड: ${code}.`
+        : `Congratulations ${newAffiliate.name}! Your ambassador account is registered and active! Ambassador ID: ${code}.`;
 
       setRegSuccessMsg(successMessage);
       setLoginError('');
@@ -337,14 +351,6 @@ const Affiliate = () => {
     } finally {
       setIsRegistering(false);
     }
-  };
-
-  // Safe network timeout helper to ensure buttons NEVER freeze on "Logging in..." or hang
-  const withTimeout = (promise, ms = 1500) => {
-    return Promise.race([
-      promise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
-    ]);
   };
 
   // Handle Affiliate Login

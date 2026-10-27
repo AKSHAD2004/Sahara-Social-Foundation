@@ -196,7 +196,7 @@ const Checkout = () => {
       ? matchingAffiliate.name 
       : (activeRefCode ? `Ambassador (${activeRefCode})` : '');
 
-    // 1. Create / Update Customer in CRM & Firebase Firestore
+    // 1. Create / Update Customer payload
     const cleanPhone = (formData.phone || '').replace(/\D/g, '').trim();
     const custId = customerUser?.id || `CUST-${cleanPhone || Date.now()}`;
     const customerPayload = {
@@ -217,12 +217,6 @@ const Checkout = () => {
       customerStatus: 'Active Buyer',
       notes: formData.healthNotes ? `Health Notes: ${formData.healthNotes}` : 'Website Checkout Order'
     };
-
-    try {
-      await dbService.saveCustomerProfile(customerPayload);
-    } catch (custErr) {
-      console.warn('Customer profile sync note:', custErr);
-    }
 
     // 2. Format products for CRM
     const productsList = cartItems.map((item) => ({
@@ -302,40 +296,11 @@ const Checkout = () => {
       console.warn('LocalStorage save error:', saveErr);
     }
 
-    // Save to CRM Local Reactive Store
+    // Clear cart immediately
     try {
-      await dbService.add('orders', crmOrder);
-    } catch (orderErr) {
-      console.warn('CRM order sync note:', orderErr);
-    }
-
-    // Instantly calculate and persist commission transaction so it appears in both Affiliate and Admin portals
-    try {
-      await dbService.processOrderCommission(crmOrder);
-    } catch (commErr) {
-      console.warn('Commission transaction trigger note:', commErr);
-    }
-
-    // Direct Cloud Firestore Sync Guarantee (Guaranteed write to Firestore)
-    try {
-      await syncOrderToFirebase(crmOrder);
-      console.log('[Checkout] Order successfully synchronized to Firebase Firestore:', orderId);
-    } catch (fbErr) {
-      console.warn('Direct Firebase Cloud order sync note:', fbErr);
-    }
-
-    // 4. Add CRM Notification
-    try {
-      dbService.addNotification({
-        title: isPaidOnlineFull ? 'नवीन ऑनलाईन ऑर्डर!' : (advancePaid > 0 ? 'नवीन COD ऑर्डर (ॲडव्हान्स प्राप्त)' : 'नवीन COD ऑर्डर!'),
-        message: isPaidOnlineFull
-          ? `ऑर्डर #${orderId} - ₹${grandTotal} पूर्ण भरणा (${formData.fullName}).`
-          : `ऑर्डर #${orderId} - ₹${grandTotal} (${formData.fullName}) - पार्सल डिलिव्हरीच्या वेळी देय.`,
-        type: 'order',
-        link: '/crm/orders'
-      });
-    } catch (notifErr) {
-      console.warn('CRM notification note:', notifErr);
+      clearCart();
+    } catch (cartErr) {
+      console.warn('Cart clearing error:', cartErr);
     }
 
     // Seamlessly associate buyer profile so they have direct access to their order
@@ -356,15 +321,55 @@ const Checkout = () => {
       }
     }
 
-    // Clear cart and proceed immediately to bill & order confirmation page
+    // INSTANTLY OPEN BILL / ORDER CONFIRMATION WITHOUT BLOCKING ON CLOUD NETWORK
+    setIsSubmitting(false);
+    setPaymentNotice('');
     try {
-      clearCart();
-    } catch (cartErr) {
-      console.warn('Cart clearing error:', cartErr);
+      navigate('/order-confirmation', { state: { order: orderDetails }, replace: true });
+    } catch (navErr) {
+      window.location.href = '/order-confirmation';
     }
 
-    setIsSubmitting(false);
-    navigate('/order-confirmation', { state: { order: orderDetails } });
+    // Perform CRM storage, commission processing, and Firebase Firestore synchronization in non-blocking background task
+    (async () => {
+      try {
+        await dbService.saveCustomerProfile(customerPayload);
+      } catch (custErr) {
+        console.warn('Customer profile sync note:', custErr);
+      }
+
+      try {
+        await dbService.add('orders', crmOrder);
+      } catch (orderErr) {
+        console.warn('CRM order sync note:', orderErr);
+      }
+
+      try {
+        await dbService.processOrderCommission(crmOrder);
+      } catch (commErr) {
+        console.warn('Commission transaction trigger note:', commErr);
+      }
+
+      try {
+        await syncOrderToFirebase(crmOrder);
+        console.log('[Checkout] Order successfully synchronized to Firebase Firestore:', orderId);
+      } catch (fbErr) {
+        console.warn('Direct Firebase Cloud order sync note:', fbErr);
+      }
+
+      try {
+        dbService.addNotification({
+          title: isPaidOnlineFull ? 'नवीन ऑनलाईन ऑर्डर!' : (advancePaid > 0 ? 'नवीन COD ऑर्डर (ॲडव्हान्स प्राप्त)' : 'नवीन COD ऑर्डर!'),
+          message: isPaidOnlineFull
+            ? `ऑर्डर #${orderId} - ₹${grandTotal} पूर्ण भरणा (${formData.fullName}).`
+            : `ऑर्डर #${orderId} - ₹${grandTotal} (${formData.fullName}) - पार्सल डिलिव्हरीच्या वेळी देय.`,
+          type: 'order',
+          link: '/crm/orders'
+        });
+      } catch (notifErr) {
+        console.warn('CRM notification note:', notifErr);
+      }
+    })();
   };
 
   const handlePlaceOrder = (e) => {
@@ -392,15 +397,15 @@ const Checkout = () => {
     const amountToPayNow = isCodToken ? codAdvanceAmount : grandTotal;
     const remainingCodBalance = isCodToken ? codBalanceDue : 0;
 
-    // Mobile safety timer: prevent button from indefinitely showing "Processing Order..."
-    const safetyTimer = setTimeout(() => {
+    // Safety timer ONLY for initial modal opening (cancelled immediately when popup opens)
+    let openTimer = setTimeout(() => {
       setIsSubmitting(false);
       setPaymentNotice(
         language === 'mr'
           ? 'पेमेंट विंडो उघडण्यास वेळ लागत आहे. कृपया पुन्हा प्रयत्न करा किंवा COD पर्याय निवडा.'
           : 'Payment window took too long to open. Please try again or choose Cash on Delivery.'
       );
-    }, 6500);
+    }, 7000);
 
     initializeRazorpayPayment({
       amountInRupees: amountToPayNow,
@@ -421,8 +426,17 @@ const Checkout = () => {
         advanceAmount: amountToPayNow,
         balanceDueOnDelivery: remainingCodBalance
       },
+      onOpen: () => {
+        // Razorpay modal is successfully opened; clear timeout so customer has unlimited time to pay
+        if (openTimer) {
+          clearTimeout(openTimer);
+          openTimer = null;
+        }
+        setPaymentNotice('');
+      },
       onSuccess: async (paymentResponse) => {
-        clearTimeout(safetyTimer);
+        if (openTimer) clearTimeout(openTimer);
+        setPaymentNotice('');
         try {
           await completeOrderPlacement(orderId, {
             ...paymentResponse,
@@ -435,15 +449,16 @@ const Checkout = () => {
         } catch (submitErr) {
           console.error('Order placement error after payment:', submitErr);
           setIsSubmitting(false);
-          setPaymentNotice(
-            language === 'mr'
-              ? 'पेमेंट पूर्ण झाले आहे, परंतु ऑर्डर जतन करताना अडचण आली. कृपया ग्राहक सेवेशी संपर्क साधा.'
-              : 'Payment completed, but there was an error saving the order. Please contact support with Txn ID: ' + (paymentResponse.razorpay_payment_id || '')
-          );
+          // Still navigate to bill confirmation if payment was captured
+          try {
+            navigate('/order-confirmation', { replace: true });
+          } catch (e) {
+            window.location.href = '/order-confirmation';
+          }
         }
       },
       onDismiss: () => {
-        clearTimeout(safetyTimer);
+        if (openTimer) clearTimeout(openTimer);
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'
@@ -452,7 +467,7 @@ const Checkout = () => {
         );
       },
       onError: (err) => {
-        clearTimeout(safetyTimer);
+        if (openTimer) clearTimeout(openTimer);
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'

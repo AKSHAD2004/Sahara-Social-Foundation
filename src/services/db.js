@@ -911,36 +911,41 @@ export const dbService = {
       } catch (e) {}
     }
 
-    // Sync to Cloud Firestore if connected
+    // Sync to Cloud Firestore if connected (non-blocking with timeout so UI never freezes)
     if (isFirebaseConfigured && firestoreDb) {
-      try {
-        await ensureFirebaseAuth().catch(() => {});
-        const docId = String(newItem.id || newItem.orderId);
-        const docRef = doc(firestoreDb, collectionName, docId);
-        const cleanItem = sanitizeForFirestore({
-          ...newItem,
-          id: docId,
-          orderId: newItem.orderId || docId,
-          syncedAt: new Date().toISOString()
-        });
-        await setDoc(docRef, cleanItem, { merge: true });
+      (async () => {
+        try {
+          await ensureFirebaseAuth().catch(() => {});
+          const docId = String(newItem.id || newItem.orderId);
+          const docRef = doc(firestoreDb, collectionName, docId);
+          const cleanItem = sanitizeForFirestore({
+            ...newItem,
+            id: docId,
+            orderId: newItem.orderId || docId,
+            syncedAt: new Date().toISOString()
+          });
+          await Promise.race([
+            setDoc(docRef, cleanItem, { merge: true }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore write timeout')), 2500))
+          ]);
 
-        if (collectionName === 'orders') {
-          await syncOrderToFirebase(cleanItem).catch(() => {});
-        } else if (collectionName === 'users') {
-          await syncUserToFirebase(cleanItem).catch(() => {});
-        }
-        console.log(`[Firestore Sync] Created document ${collectionName}/${docId}`);
-      } catch (err) {
-        if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded')) {
-          handleFirestoreQuotaExceeded(err);
-        } else {
-          console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
-          if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'add' } }));
+          if (collectionName === 'orders') {
+            syncOrderToFirebase(cleanItem).catch(() => {});
+          } else if (collectionName === 'users') {
+            syncUserToFirebase(cleanItem).catch(() => {});
+          }
+          console.log(`[Firestore Sync] Created document ${collectionName}/${docId}`);
+        } catch (err) {
+          if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded')) {
+            handleFirestoreQuotaExceeded(err);
+          } else {
+            console.warn(`Firestore Cloud write note (${collectionName}):`, err.message);
+            if (err?.code === 'permission-denied' && typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('firestore-permission-error', { detail: { collection: collectionName, operation: 'add' } }));
+            }
           }
         }
-      }
+      })();
     }
 
     // Auto audit log
@@ -1814,11 +1819,21 @@ export const dbService = {
           }
         }
 
-        const isOperational = ['commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(collectionName);
-        if (isOperational) {
-          state[collectionName] = [];
+        const allowEmptyCollections = [
+          'commissionTransactions',
+          'commissionPayouts',
+          'supportTickets',
+          'auditLogs',
+          'notifications',
+          'videos',
+          'galleryPhotos',
+          'heroSlides',
+          'reviews'
+        ];
+        if (allowEmptyCollections.includes(collectionName)) {
+          state[collectionName] = localItems;
           saveCollection(collectionName, false);
-          return [];
+          return localItems;
         }
         state[collectionName] = localItems.length > 0 ? localItems : (initialDataMap[collectionName] || []);
         saveCollection(collectionName, false);

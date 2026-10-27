@@ -10,7 +10,10 @@ import { compressImage } from '../../../utils/imageCompressor';
 import CrmModal from '../../../components/crm/CrmModal';
 
 export default function VideoManager() {
-  const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState(() => {
+    const list = dbService.getAll('videos');
+    return Array.isArray(list) ? list : [];
+  });
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showModal, setShowModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState(null);
@@ -48,11 +51,7 @@ export default function VideoManager() {
     dbService.refreshFromFirebase('videos').catch(() => {});
 
     const unsub = dbService.subscribe('videos', (items) => {
-      if (!items || items.length === 0) {
-        setVideos(initialVideos);
-      } else {
-        setVideos(items);
-      }
+      setVideos(Array.isArray(items) ? items : []);
     });
     return unsub;
   }, []);
@@ -178,12 +177,31 @@ export default function VideoManager() {
     if (window.confirm('Reset video library to official default videos?')) {
       setIsRestoring(true);
       try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('sahara_crm_deleted_videos');
+        }
         await dbService.setCollection('videos', initialVideos);
         showNotification('Official videos restored!');
       } catch (err) {
         alert('Error restoring: ' + err.message);
       } finally {
         setIsRestoring(false);
+      }
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (videos.length === 0) return;
+    if (window.confirm(`Are you sure you want to delete ALL ${videos.length} videos? They will not reappear.`)) {
+      try {
+        const currentVideos = [...videos];
+        for (const v of currentVideos) {
+          await dbService.delete('videos', v.id);
+        }
+        await dbService.setCollection('videos', []);
+        showNotification('All videos permanently deleted.');
+      } catch (err) {
+        alert('Error deleting all videos: ' + err.message);
       }
     }
   };
@@ -207,6 +225,19 @@ export default function VideoManager() {
         </div>
 
         <div className="crm-header-btn-group">
+          {videos.length > 0 && (
+            <button 
+              type="button" 
+              className="crm-btn crm-btn-secondary"
+              onClick={handleDeleteAll}
+              style={{ color: '#ef4444', borderColor: '#fca5a5' }}
+              title="Delete all videos permanently"
+            >
+              <Trash2 size={16} />
+              <span>Delete All</span>
+            </button>
+          )}
+
           <button 
             type="button" 
             className="crm-btn crm-btn-secondary"
@@ -409,6 +440,24 @@ export default function VideoManager() {
           </div>
         ))}
       </div>
+
+      {filteredVideos.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '3.5rem 1rem', backgroundColor: '#f8fafc', borderRadius: '16px', border: '1px dashed #cbd5e1', marginTop: '1rem' }}>
+          <VideoIcon size={44} style={{ color: '#94a3b8', marginBottom: '0.75rem' }} />
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>No videos found</h3>
+          <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
+            All videos have been removed. You can add new videos or restore official defaults anytime.
+          </p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+            <button type="button" className="crm-btn crm-btn-primary" onClick={handleOpenAdd}>
+              <Plus size={16} /> Add New Video
+            </button>
+            <button type="button" className="crm-btn crm-btn-secondary" onClick={handleRestoreDefaults}>
+              <RotateCcw size={16} /> Restore Default Videos
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add / Edit Video Modal */}
       {showModal && (
