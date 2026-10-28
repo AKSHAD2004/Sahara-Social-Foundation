@@ -96,7 +96,7 @@ export default function CommissionDashboard() {
               Active Commission Engine Mode: {settings.commissionCalculationType === 'progressive' ? 'Progressive Slab (Tiered)' : 'Flat Slab Calculation'}
             </div>
             <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>
-              Trigger Rule: Triggered only when Order is <strong>Delivered</strong> and Payment is <strong>Paid</strong>. Cancelled / Refunded orders automatically reverse commissions.
+              Trigger Rule: Commission is credited immediately when an <strong>Order is Placed</strong>. Cancelled / Refunded orders automatically reverse commissions.
             </div>
           </div>
           <span className="badge badge-success">Engine Active</span>

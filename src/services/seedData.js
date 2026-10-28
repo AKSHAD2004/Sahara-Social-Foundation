@@ -67,7 +67,7 @@ export const initialSettings = {
   address: 'Sahara Health Care Center, Opp. CPR Hospital, Kolhapur, Maharashtra 416002',
   currency: 'INR',
   commissionCalculationType: 'flat', // 'flat' or 'progressive'
-  commissionTrigger: 'delivered_paid', // 'delivered_paid' or 'paid'
+  commissionTrigger: 'order_placed', // 'order_placed', 'delivered_paid', or 'paid'
   commissionBasis: 'eligible_order_value',
   defaultReferralPrefix: 'SAHARA',
   payoutDayOfMonth: 30,

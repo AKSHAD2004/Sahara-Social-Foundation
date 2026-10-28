@@ -136,7 +136,7 @@ export default function Dashboard() {
 
   const totalOrders = orders.length;
   const monthlySales = orders
-    .filter((o) => o.paymentStatus === 'Paid' || o.orderStatus === 'Delivered')
+    .filter((o) => o.orderStatus !== 'Cancelled' && o.paymentStatus !== 'Refunded')
     .reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
 
   const pendingPayments = orders

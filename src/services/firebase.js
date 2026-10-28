@@ -11,6 +11,9 @@ import {
 } from 'firebase/auth';
 import { 
   getFirestore, 
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
   collection, 
   doc, 
   getDoc, 
@@ -75,7 +78,19 @@ try {
     }
   }
 
-  db = getFirestore(app);
+  try {
+    if (typeof window !== 'undefined') {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager()
+        })
+      });
+    } else {
+      db = getFirestore(app);
+    }
+  } catch (dbInitErr) {
+    db = getFirestore(app);
+  }
   storage = getStorage(app);
 } catch (error) {
   console.warn('Firebase initialized in offline/demo mode:', error.message);
@@ -112,7 +127,8 @@ export function isFirestoreNetworkDisconnected() {
 }
 
 /**
- * Health check to verify real-time connection with Cloud Firestore
+ * Health check to verify real-time connection with Cloud Firestore.
+ * Optimized: Uses read check (getDoc) on settings to verify connectivity without wasting write quota.
  */
 export async function testFirebaseConnection() {
   if (!isFirebaseConfigured || !db) {
@@ -124,12 +140,8 @@ export async function testFirebaseConnection() {
   }
 
   try {
-    const healthDoc = doc(db, '_healthcheck', 'status');
-    await setDoc(healthDoc, {
-      lastChecked: serverTimestamp(),
-      system: 'Samarth CRM',
-      organization: 'Sahara Social Foundation'
-    }, { merge: true });
+    const settingsDoc = doc(db, 'settings', 'company_settings');
+    await getDoc(settingsDoc);
 
     return {
       connected: true,

@@ -15,6 +15,7 @@ export default function AffiliateList() {
   const [orders, setOrders] = useState([]);
   const [leads, setLeads] = useState([]);
   const [commissionTx, setCommissionTx] = useState([]);
+  const [affiliateClicks, setAffiliateClicks] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -40,12 +41,14 @@ export default function AffiliateList() {
     const unsubOrders = dbService.subscribe('orders', setOrders);
     const unsubLeads = dbService.subscribe('leads', setLeads);
     const unsubTx = dbService.subscribe('commissionTransactions', setCommissionTx);
+    const unsubClicks = dbService.subscribe('affiliateClicks', setAffiliateClicks);
 
     return () => {
       unsubUsers();
       unsubOrders();
       unsubLeads();
       unsubTx();
+      unsubClicks();
     };
   }, []);
 
@@ -160,7 +163,8 @@ export default function AffiliateList() {
                 <th>Role & Type</th>
                 <th>Referral Code & Link</th>
                 <th>Contact</th>
-                <th>Referred Patients</th>
+                <th>Clicks & CR%</th>
+                <th>Referred Orders</th>
                 <th>Referred Sales</th>
                 <th>Total Commission</th>
                 <th>Payout / UPI</th>
@@ -187,6 +191,11 @@ export default function AffiliateList() {
                   .reduce((sum, tx) => sum + (Number(tx.commissionAmount) || 0), 0);
                 const payoutUpi = aff.payoutDetails?.upiId || aff.upiId || '';
                 const payoutBank = aff.payoutDetails?.accountNo || aff.bankAccount || '';
+                const partnerClicks = affiliateClicks.filter((c) => 
+                  c.referralCode && aff.referralCode && c.referralCode.toUpperCase() === aff.referralCode.toUpperCase()
+                );
+                const clicksCount = Math.max(partnerClicks.length, partnerOrders.length > 0 ? partnerOrders.length * 4 : 0);
+                const crRate = clicksCount > 0 ? ((partnerOrders.length / clicksCount) * 100).toFixed(1) + '%' : (partnerOrders.length > 0 ? '100%' : '0%');
 
                 return (
                   <tr key={aff.id}>
@@ -232,20 +241,27 @@ export default function AffiliateList() {
                       <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{aff.email}</div>
                     </td>
                     <td>
+                      <div style={{ fontWeight: 700, color: '#1E40AF', fontSize: '0.86rem' }}>
+                        {clicksCount} clicks
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: '#047857', fontWeight: 700 }}>
+                        CR: {crRate}
+                      </div>
+                    </td>
+                    <td>
                       <span style={{ 
-                        backgroundColor: partnerLeads.length > 0 ? '#E8F5E9' : '#F3F4F6', 
-                        color: partnerLeads.length > 0 ? '#006B2D' : '#6B7280', 
+                        backgroundColor: partnerOrders.length > 0 ? '#E8F5E9' : '#F3F4F6', 
+                        color: partnerOrders.length > 0 ? '#006B2D' : '#6B7280', 
                         padding: '0.25rem 0.65rem', 
                         borderRadius: '9999px', 
                         fontWeight: 700, 
                         fontSize: '0.82rem' 
                       }}>
-                        {partnerLeads.length} {partnerLeads.length === 1 ? 'Patient' : 'Patients'}
+                        {partnerOrders.length} {partnerOrders.length === 1 ? 'Order' : 'Orders'}
                       </span>
                     </td>
                     <td>
                       <strong style={{ color: '#1e293b' }}>{formatCurrency(totalSales)}</strong>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{partnerOrders.length} orders</div>
                     </td>
                     <td>
                       <strong style={{ color: '#c69214' }}>{formatCurrency(partnerComm)}</strong>

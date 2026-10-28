@@ -55,6 +55,10 @@
   background-color: var(--crm-bg);
   color: var(--crm-text);
   font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
 }
 
 /* Sidebar */
@@ -262,16 +266,22 @@
 
 /* Main Content Area */
 .crm-main-wrap {
-  flex: 1;
+  flex: 1 1 auto;
   margin-left: var(--crm-sidebar-width);
   display: flex;
   flex-direction: column;
   min-width: 0;
-  transition: margin-left 0.25s ease;
+  max-width: calc(100vw - var(--crm-sidebar-width));
+  width: calc(100vw - var(--crm-sidebar-width));
+  overflow-x: hidden !important;
+  transition: margin-left 0.25s ease, max-width 0.25s ease, width 0.25s ease;
+  box-sizing: border-box;
 }
 
 .crm-main-wrap.sidebar-collapsed {
   margin-left: var(--crm-sidebar-collapsed);
+  max-width: calc(100vw - var(--crm-sidebar-collapsed));
+  width: calc(100vw - var(--crm-sidebar-collapsed));
 }
 
 /* Header */
@@ -391,8 +401,13 @@
 
 /* Page Content Body */
 .crm-content {
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
 }
 
 .crm-page-header {
@@ -495,7 +510,10 @@
   border-radius: var(--crm-radius);
   box-shadow: var(--crm-shadow-sm);
   margin-bottom: 1.75rem;
-  overflow: hidden;
+  overflow-x: hidden !important;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .crm-card-header {
@@ -603,33 +621,43 @@
 
 /* Modern Data Table */
 .crm-table-wrapper {
-  overflow-x: auto;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
 }
 
 .crm-table {
-  width: 100%;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.875rem;
+  font-size: 0.84rem;
+  table-layout: auto;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
 .crm-table th {
   background: #f8fafc;
-  padding: 0.85rem 1.25rem;
+  padding: 0.75rem 0.65rem;
   font-weight: 600;
   color: var(--crm-text-muted);
   border-bottom: 1px solid var(--crm-border);
-  white-space: nowrap;
-  font-size: 0.78rem;
+  white-space: normal !important;
+  font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  word-break: normal;
 }
 
 .crm-table td {
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 0.65rem;
   border-bottom: 1px solid var(--crm-border);
   color: var(--crm-text);
   vertical-align: middle;
+  word-break: break-word;
 }
 
 .crm-table tbody tr:hover {
@@ -731,10 +759,12 @@
 /* Kanban Board */
 .crm-kanban-board {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
   gap: 1.25rem;
-  overflow-x: auto;
+  overflow-x: hidden !important;
   padding-bottom: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .crm-kanban-column {
@@ -898,10 +928,12 @@
 /* Customer 360 Tabs */
 .crm-tabs {
   display: flex;
+  flex-wrap: wrap;
   border-bottom: 2px solid var(--crm-border);
   gap: 0.5rem;
   margin-bottom: 1.5rem;
-  overflow-x: auto;
+  overflow-x: hidden !important;
+  max-width: 100%;
 }
 
 .crm-tab-btn {
@@ -1273,15 +1305,18 @@ body:has(.crm-app-container) #gt_float_wrapper,
     flex: 1 1 100% !important; /* Full width primary action button for effortless thumb clicks */
   }
   .crm-table-swipe-hint {
-    display: block;
+    display: none !important;
   }
   .crm-table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden !important;
     border-radius: var(--crm-radius);
+    width: 100% !important;
+    max-width: 100% !important;
   }
   .crm-table {
-    min-width: 680px;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   .crm-table th {
     padding: 0.65rem 0.85rem !important;
@@ -1477,4 +1512,43 @@ body:has(.crm-app-container) #gt_float_wrapper,
   color: #b91c1c;
   transform: translateY(-1px);
 }
+
+/* =========================================================
+   STRICT NO-HORIZONTAL-SCROLL POLICY FOR CRM ONLY
+   ========================================================= */
+html:has(.crm-app-container),
+body:has(.crm-app-container) {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+.crm-app-container,
+.crm-main-wrap,
+.crm-content,
+.crm-card,
+.crm-card-body,
+.crm-table-wrapper,
+.crm-table,
+.crm-header,
+.crm-toolbar,
+.crm-stats-grid,
+.crm-tabs,
+.crm-kanban-board {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.crm-table {
+  min-width: 0 !important;
+  width: 100% !important;
+  table-layout: auto !important;
+}
+
+.crm-table th,
+.crm-table td {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
 

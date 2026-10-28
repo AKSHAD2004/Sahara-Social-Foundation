@@ -392,9 +392,10 @@ service cloud.firestore {
                 <label className="crm-form-label">Commission Eligibility Trigger</label>
                 <select
                   className="crm-form-select"
-                  value={settings.commissionTrigger || 'delivered_paid'}
+                  value={settings.commissionTrigger || 'order_placed'}
                   onChange={(e) => setSettings({ ...settings, commissionTrigger: e.target.value })}
                 >
+                  <option value="order_placed">When Order is Placed (Immediate Commission)</option>
                   <option value="delivered_paid">Order Delivered AND Payment Confirmed</option>
                   <option value="paid">Payment Confirmed Only</option>
                 </select>

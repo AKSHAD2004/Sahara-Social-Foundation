@@ -126,7 +126,7 @@ export default function CommissionSlabs() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '1.5rem' }}>
         {/* Slabs Configuration Box */}
         <div>
           {/* Calculation Type Toggle */}

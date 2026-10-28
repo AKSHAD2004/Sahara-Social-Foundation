@@ -10,7 +10,11 @@ import {
   ArrowLeft,
   AlertCircle,
   Zap,
-  Lock
+  Lock,
+  Award,
+  Tag,
+  X,
+  Check
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -105,6 +109,84 @@ const Checkout = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Affiliate & Ambassador Referral Code Management
+  const [activeRefCode, setActiveRefCode] = useState(() => {
+    try {
+      const saved = (
+        localStorage.getItem('sahara_active_ref') || 
+        sessionStorage.getItem('sahara_active_ref') || 
+        (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('ref') : '') ||
+        ''
+      ).trim().toUpperCase();
+      return saved;
+    } catch (e) {
+      return '';
+    }
+  });
+  const [matchedAffiliate, setMatchedAffiliate] = useState(null);
+  const [referralInput, setReferralInput] = useState('');
+  const [refMsg, setRefMsg] = useState({ text: '', type: '' });
+  const [isEditingRef, setIsEditingRef] = useState(false);
+
+  useEffect(() => {
+    if (activeRefCode) {
+      const allUsers = dbService.getAll('users') || [];
+      const found = allUsers.find(
+        (u) => (u.referralCode && u.referralCode.toUpperCase() === activeRefCode.toUpperCase()) ||
+               (u.phone && u.phone.replace(/\D/g, '') === activeRefCode.replace(/\D/g, ''))
+      );
+      if (found) {
+        setMatchedAffiliate(found);
+      } else {
+        setMatchedAffiliate({ name: 'Community Ambassador', referralCode: activeRefCode });
+      }
+    } else {
+      setMatchedAffiliate(null);
+    }
+  }, [activeRefCode]);
+
+  const handleApplyReferral = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const clean = referralInput.trim().toUpperCase();
+    if (!clean) {
+      setRefMsg({ 
+        text: language === 'mr' ? 'कृपया वैध संदर्भ कोड टाका.' : 'Please enter a referral code.', 
+        type: 'error' 
+      });
+      return;
+    }
+    const allUsers = dbService.getAll('users') || [];
+    const found = allUsers.find(
+      (u) => (u.referralCode && u.referralCode.toUpperCase() === clean) ||
+             (u.phone && u.phone.replace(/\D/g, '') === clean.replace(/\D/g, ''))
+    );
+    const resolvedCode = found?.referralCode || clean;
+    setActiveRefCode(resolvedCode);
+    setMatchedAffiliate(found || { name: 'Community Ambassador', referralCode: resolvedCode });
+    localStorage.setItem('sahara_active_ref', resolvedCode);
+    localStorage.setItem('sahara_active_ref_time', Date.now().toString());
+    sessionStorage.setItem('sahara_active_ref', resolvedCode);
+    try {
+      dbService.trackAffiliateClick(resolvedCode, '/checkout', 'manual_checkout_input');
+    } catch (err) {}
+    setRefMsg({
+      text: language === 'mr' 
+        ? `✅ संदर्भ कोड '${resolvedCode}' यशस्वीरित्या लागू झाला!` 
+        : `✅ Referral code '${resolvedCode}' applied successfully!`,
+      type: 'success'
+    });
+    setIsEditingRef(false);
+    setReferralInput('');
+  };
+
+  const handleRemoveReferral = () => {
+    setActiveRefCode('');
+    setMatchedAffiliate(null);
+    localStorage.removeItem('sahara_active_ref');
+    sessionStorage.removeItem('sahara_active_ref');
+    setRefMsg({ text: '', type: '' });
+  };
+
   const COD_MIN_ADVANCE = 200;
   const isCodToken = formData.paymentMethod === 'cod_advance';
   const isCodStandard = formData.paymentMethod === 'cod';
@@ -167,8 +249,9 @@ const Checkout = () => {
   };
 
   const completeOrderPlacement = async (orderId, paymentDetails = {}) => {
-    // 0. Resolve active affiliate referral code across localStorage, sessionStorage, and URL
-    let activeRefCode = (
+    // 0. Resolve active affiliate referral code across state, localStorage, sessionStorage, and URL
+    const effectiveRefCode = (
+      activeRefCode || 
       localStorage.getItem('sahara_active_ref') || 
       sessionStorage.getItem('sahara_active_ref') || 
       (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('ref') : '') ||
@@ -185,16 +268,16 @@ const Checkout = () => {
       }
     } catch (e) {}
 
-    const matchingAffiliate = activeRefCode
-      ? allUsers.find((u) => u.referralCode && u.referralCode.toUpperCase() === activeRefCode.toUpperCase())
+    const matchingAffiliate = effectiveRefCode
+      ? allUsers.find((u) => u.referralCode && u.referralCode.toUpperCase() === effectiveRefCode.toUpperCase())
       : null;
 
     const assignedAffiliateId = matchingAffiliate 
       ? matchingAffiliate.id 
-      : (activeRefCode ? `usr_aff_${activeRefCode.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : '');
+      : (effectiveRefCode ? `usr_aff_${effectiveRefCode.toLowerCase().replace(/[^a-z0-9]/g, '_')}` : '');
     const assignedAffiliateName = matchingAffiliate 
       ? matchingAffiliate.name 
-      : (activeRefCode ? `Ambassador (${activeRefCode})` : '');
+      : (effectiveRefCode ? `Ambassador (${effectiveRefCode})` : '');
 
     // 1. Create / Update Customer payload
     const cleanPhone = (formData.phone || '').replace(/\D/g, '').trim();
@@ -211,7 +294,7 @@ const Checkout = () => {
       city: formData.city,
       state: formData.state,
       pincode: formData.pincode,
-      leadSource: activeRefCode ? 'Affiliate' : 'Website Direct',
+      leadSource: effectiveRefCode ? 'Affiliate' : 'Website Direct',
       assignedEmployee: 'usr_emp_akash',
       assignedAffiliate: assignedAffiliateId,
       customerStatus: 'Active Buyer',
@@ -258,7 +341,7 @@ const Checkout = () => {
       assignedEmployee: 'usr_emp_akash',
       assignedAffiliate: assignedAffiliateId,
       affiliateName: assignedAffiliateName,
-      referralCode: activeRefCode || (matchingAffiliate ? matchingAffiliate.referralCode : ''),
+      referralCode: effectiveRefCode || (matchingAffiliate ? matchingAffiliate.referralCode : ''),
       commissionStatus: 'Eligible',
       orderDate: new Date().toISOString(),
       deliveredDate: null,
@@ -330,7 +413,7 @@ const Checkout = () => {
       window.location.href = '/order-confirmation';
     }
 
-    // Perform CRM storage, commission processing, and Firebase Firestore synchronization in non-blocking background task
+    // Perform CRM storage and Firebase Firestore synchronization cleanly (single optimized write)
     (async () => {
       try {
         await dbService.saveCustomerProfile(customerPayload);
@@ -342,19 +425,6 @@ const Checkout = () => {
         await dbService.add('orders', crmOrder);
       } catch (orderErr) {
         console.warn('CRM order sync note:', orderErr);
-      }
-
-      try {
-        await dbService.processOrderCommission(crmOrder);
-      } catch (commErr) {
-        console.warn('Commission transaction trigger note:', commErr);
-      }
-
-      try {
-        await syncOrderToFirebase(crmOrder);
-        console.log('[Checkout] Order successfully synchronized to Firebase Firestore:', orderId);
-      } catch (fbErr) {
-        console.warn('Direct Firebase Cloud order sync note:', fbErr);
       }
 
       try {
@@ -809,6 +879,199 @@ const Checkout = () => {
                     onChange={(e) => setFormData({ ...formData, healthNotes: e.target.value })}
                   />
                 </div>
+              </div>
+
+              {/* Affiliate Marketing / Ambassador Referral Attribution Box */}
+              <div className="checkout-card" style={{
+                backgroundColor: activeRefCode && !isEditingRef ? '#F0FDF4' : '#ffffff',
+                borderRadius: '20px',
+                padding: '1.4rem 1.75rem',
+                border: activeRefCode && !isEditingRef ? '1.5px solid #86EFAC' : '1px solid #E1E9DF',
+                boxShadow: '0 4px 15px rgba(0, 107, 45, 0.04)',
+                marginBottom: '2rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: activeRefCode ? '#DCFCE7' : '#F1F5F9',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: activeRefCode ? '#166534' : '#475569'
+                    }}>
+                      <Award size={18} />
+                    </div>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '1rem', color: '#006B2D', fontWeight: 800 }}>
+                        {language === 'mr' ? 'आरोग्यदूत संदर्भ (Affiliate / Ambassador Code)' : 'Affiliate Ambassador Referral'}
+                      </h4>
+                      <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                        {language === 'mr' ? 'स्थानिक आरोग्यदूतांना मदत व थेट सवलत ट्रॅकिंग' : 'Direct community partner support and referral tracking'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {activeRefCode && !isEditingRef && (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingRef(true)}
+                      style={{
+                        background: 'none',
+                        border: '1px solid #86EFAC',
+                        backgroundColor: '#ffffff',
+                        color: '#166534',
+                        padding: '0.3rem 0.75rem',
+                        borderRadius: '8px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {language === 'mr' ? 'बदला' : 'Change Code'}
+                    </button>
+                  )}
+                </div>
+
+                {activeRefCode && !isEditingRef ? (
+                  <div style={{
+                    backgroundColor: '#ffffff',
+                    border: '1.5px solid #BBF7D0',
+                    borderRadius: '14px',
+                    padding: '0.9rem 1.15rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <CheckCircle2 size={20} color="#16A34A" />
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#166534' }}>
+                            {matchedAffiliate?.name || 'Authorized Ambassador'}
+                          </span>
+                          <span style={{
+                            backgroundColor: '#DCFCE7',
+                            color: '#15803D',
+                            padding: '0.15rem 0.55rem',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.04em'
+                          }}>
+                            {activeRefCode}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.77rem', color: '#4B5563', marginTop: '0.15rem' }}>
+                          {language === 'mr'
+                            ? 'या खरेदीचे श्रेय व सहकार्य या आरोग्यदूताला थेट प्राप्त होईल.'
+                            : 'This order is attributed to this verified affiliate ambassador.'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleRemoveReferral}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#DC2626',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        padding: '0.3rem 0.6rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
+                      }}
+                    >
+                      <X size={14} />
+                      <span>{language === 'mr' ? 'काढून टाका' : 'Remove'}</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                      <div style={{ position: 'relative', flex: '1 1 240px' }}>
+                        <input
+                          type="text"
+                          placeholder={language === 'mr' ? 'उदा. SAHARA-RAHUL-407 किंवा फोन' : 'e.g. SAHARA-RAHUL-407 or Phone'}
+                          value={referralInput}
+                          onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
+                          style={{
+                            width: '100%',
+                            padding: '0.65rem 0.9rem',
+                            borderRadius: '10px',
+                            border: '1.5px solid #CBD5E1',
+                            fontSize: '0.88rem',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            outline: 'none'
+                          }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleApplyReferral}
+                        style={{
+                          backgroundColor: '#006B2D',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '10px',
+                          padding: '0.65rem 1.25rem',
+                          fontSize: '0.86rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          boxShadow: '0 2px 8px rgba(0, 107, 45, 0.15)'
+                        }}
+                      >
+                        <Tag size={15} />
+                        <span>{language === 'mr' ? 'लागू करा (Apply)' : 'Apply Code'}</span>
+                      </button>
+                      {isEditingRef && (
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingRef(false)}
+                          style={{
+                            backgroundColor: '#F1F5F9',
+                            color: '#475569',
+                            border: 'none',
+                            borderRadius: '10px',
+                            padding: '0.65rem 0.95rem',
+                            fontSize: '0.84rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {language === 'mr' ? 'रद्द' : 'Cancel'}
+                        </button>
+                      )}
+                    </div>
+
+                    {refMsg.text && (
+                      <div style={{
+                        marginTop: '0.6rem',
+                        fontSize: '0.82rem',
+                        color: refMsg.type === 'error' ? '#DC2626' : '#16A34A',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
+                      }}>
+                        {refMsg.type === 'error' ? <AlertCircle size={14} /> : <CheckCircle2 size={14} />}
+                        <span>{refMsg.text}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Payment Method Option with Razorpay Integration */}

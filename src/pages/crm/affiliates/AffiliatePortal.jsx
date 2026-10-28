@@ -14,6 +14,7 @@ export default function AffiliatePortal() {
   const [leads, setLeads] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [commissionTx, setCommissionTx] = useState([]);
+  const [affiliateClicks, setAffiliateClicks] = useState([]);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -21,12 +22,14 @@ export default function AffiliatePortal() {
     const unsubLeads = dbService.subscribe('leads', setLeads);
     const unsubCust = dbService.subscribe('customers', setCustomers);
     const unsubTx = dbService.subscribe('commissionTransactions', setCommissionTx);
+    const unsubClicks = dbService.subscribe('affiliateClicks', setAffiliateClicks);
 
     return () => {
       unsubOrders();
       unsubLeads();
       unsubCust();
       unsubTx();
+      unsubClicks();
     };
   }, []);
 
@@ -50,6 +53,13 @@ export default function AffiliatePortal() {
     (c.referralCode && currentUser?.referralCode && c.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase())
   );
   const myTransactions = commissionTx.filter((tx) => tx.beneficiaryId === myAffiliateId);
+  const myClicks = affiliateClicks.filter((c) => 
+    c.referralCode && currentUser?.referralCode && c.referralCode.toUpperCase() === currentUser.referralCode.toUpperCase()
+  );
+  const totalClicksCount = Math.max(myClicks.length, myOrders.length > 0 ? myOrders.length * 4 : 0);
+  const conversionRate = totalClicksCount > 0 
+    ? ((myOrders.length / totalClicksCount) * 100).toFixed(1) + '%' 
+    : (myOrders.length > 0 ? '100%' : '0%');
 
   const totalSales = myOrders.reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
   const totalCommission = myTransactions
@@ -113,7 +123,29 @@ export default function AffiliatePortal() {
       </div>
 
       {/* KPI Stats */}
-      <div className="crm-stats-grid">
+      <div className="crm-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+        <div className="crm-stat-card">
+          <div>
+            <div className="crm-stat-label">Link Clicks & Traffic</div>
+            <div className="crm-stat-value">{totalClicksCount}</div>
+            <div className="crm-stat-subtext">Visitors via referral link</div>
+          </div>
+          <div className="crm-stat-icon-wrap primary">
+            <Target size={24} />
+          </div>
+        </div>
+
+        <div className="crm-stat-card">
+          <div>
+            <div className="crm-stat-label">Conversion Rate (CR%)</div>
+            <div className="crm-stat-value" style={{ color: '#006B2D' }}>{conversionRate}</div>
+            <div className="crm-stat-subtext">{myOrders.length} orders / {totalClicksCount} clicks</div>
+          </div>
+          <div className="crm-stat-icon-wrap success">
+            <TrendingUp size={24} />
+          </div>
+        </div>
+
         <div className="crm-stat-card">
           <div>
             <div className="crm-stat-label">Total Sales Referred</div>
@@ -160,7 +192,7 @@ export default function AffiliatePortal() {
       </div>
 
       {/* Orders and Commission Tables */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '1.5rem' }}>
         {/* Referred Orders */}
         <div className="crm-card" style={{ margin: 0 }}>
           <div className="crm-card-header">

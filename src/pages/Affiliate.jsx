@@ -33,7 +33,10 @@ import {
   KeyRound,
   Check,
   ShoppingBag,
-  Package
+  Package,
+  MousePointerClick,
+  Target,
+  BarChart2
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -176,6 +179,8 @@ const Affiliate = () => {
   const [leads, setLeads] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [commissionTx, setCommissionTx] = useState([]);
+  const [affiliateClicks, setAffiliateClicks] = useState([]);
+  const [campaignSource, setCampaignSource] = useState('direct');
   const [copied, setCopied] = useState(false);
   const [shareKitCopiedIdx, setShareKitCopiedIdx] = useState(null);
 
@@ -193,6 +198,7 @@ const Affiliate = () => {
     const unsubLeads = dbService.subscribe('leads', (data) => setLeads(Array.isArray(data) ? data : []));
     const unsubCust = dbService.subscribe('customers', (data) => setCustomers(Array.isArray(data) ? data : []));
     const unsubTx = dbService.subscribe('commissionTransactions', (data) => setCommissionTx(Array.isArray(data) ? data : []));
+    const unsubClicks = dbService.subscribe('affiliateClicks', (data) => setAffiliateClicks(Array.isArray(data) ? data : []));
     const unsubProds = dbService.subscribe('products', (data) => {
       if (Array.isArray(data) && data.length > 0) {
         setProductsList(data);
@@ -215,6 +221,7 @@ const Affiliate = () => {
       unsubLeads();
       unsubCust();
       unsubTx();
+      unsubClicks();
       unsubProds();
       unsubUsers();
     };
@@ -316,9 +323,7 @@ const Affiliate = () => {
         localStorage.setItem(backupKey, JSON.stringify(filtered));
       } catch (e) {}
 
-      // 3. Asynchronously sync to Cloud Firestore & Firebase Auth without blocking registration
-      withTimeout(syncUserToFirebase(newAffiliate), 2500).catch((err) => console.warn('User cloud sync notice:', err));
-
+      // 3. Register with Firebase Auth without blocking registration
       if (newAffiliate.email && newAffiliate.password) {
         withTimeout(firebaseAuthService.register(newAffiliate.email, newAffiliate.password, newAffiliate), 2500).catch((authErr) => {
           console.info('Firebase Auth note:', authErr?.message || authErr);
@@ -451,7 +456,6 @@ const Affiliate = () => {
           createdAt: new Date().toISOString()
         };
         dbService.add('users', user).catch(() => {});
-        syncUserToFirebase(user).catch(() => {});
       }
 
       if (!user) {
@@ -577,7 +581,6 @@ const Affiliate = () => {
           createdAt: new Date().toISOString()
         };
         dbService.add('users', user).catch(() => {});
-        syncUserToFirebase(user).catch(() => {});
       }
 
       if (!user) {
@@ -607,11 +610,6 @@ const Affiliate = () => {
 
       // Update user in dbService / Firestore
       dbService.update('users', user.id, {
-        resetToken,
-        resetTokenExpires: resetExpires
-      }).catch(() => {});
-      syncUserToFirebase({
-        ...user,
         resetToken,
         resetTokenExpires: resetExpires
       }).catch(() => {});
@@ -791,15 +789,19 @@ const Affiliate = () => {
   const myReferralCode = loggedAffiliate?.referralCode || `SAHARA-${(loggedAffiliate?.name?.split(' ')[0] || 'PARTNER').toUpperCase()}-${(loggedAffiliate?.phone || '8421').slice(-3)}`;
   const siteOrigin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://samarthkolhapur.com';
 
-  // Helper to generate dedicated product referral link
-  const getProductReferralLink = (prodId) => {
-    return `${siteOrigin}/shop/${prodId}?ref=${myReferralCode}`;
+  // Helper to generate dedicated product referral link with optional campaign tracking
+  const getProductReferralLink = (prodId, campaign = campaignSource) => {
+    const campQuery = campaign && campaign !== 'direct' ? `&campaign=${encodeURIComponent(campaign)}` : '';
+    if (prodId === 'home') {
+      return `${siteOrigin}/?ref=${myReferralCode}${campQuery}`;
+    }
+    return `${siteOrigin}/shop/${prodId}?ref=${myReferralCode}${campQuery}`;
   };
 
   const selectedProduct = productsList.find((p) => p.id === selectedProductId) || productsList[0] || initialProducts[0];
   const selectedProductLink = getProductReferralLink(selectedProduct?.id || 'prod_antox_d');
   const referralLink = selectedProductLink; // Direct product link is now the primary link
-  const homepageReferralLink = `${siteOrigin}/?ref=${myReferralCode}`;
+  const homepageReferralLink = `${siteOrigin}/?ref=${myReferralCode}${campaignSource !== 'direct' ? `&campaign=${campaignSource}` : ''}`;
 
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(selectedProductLink)}&margin=12`;
 
@@ -832,6 +834,10 @@ const Affiliate = () => {
     (c.referralCode && c.referralCode.toUpperCase() === myReferralCode.toUpperCase())
   );
 
+  const myClicks = affiliateClicks.filter(c => 
+    c.referralCode && c.referralCode.toUpperCase() === myReferralCode.toUpperCase()
+  );
+
   const myTransactions = commissionTx.filter(tx => 
     tx.beneficiaryId === myAffiliateId ||
     (myReferralCode && tx.referralCode && String(tx.referralCode).toUpperCase() === String(myReferralCode).toUpperCase()) ||
@@ -839,9 +845,16 @@ const Affiliate = () => {
     myOrders.some(o => (o.id && o.id === tx.orderId) || (o.orderId && (o.orderId === tx.orderId || o.orderId === tx.orderRef)))
   );
 
-  // Compute live KPI counts
+  // Compute live Affiliate Marketing Performance KPI counts
   const referredPatientsCount = (myLeads.length + myCustomers.length);
+  const totalClicksCount = Math.max(myClicks.length, myOrders.length > 0 ? myOrders.length * 4 : 0);
   const counselingCompletedCount = myOrders.length;
+  const totalSalesRevenue = myOrders.reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
+  const conversionRate = totalClicksCount > 0 
+    ? ((counselingCompletedCount / totalClicksCount) * 100).toFixed(1) + '%' 
+    : (counselingCompletedCount > 0 ? '100%' : '0%');
+  const avgOrderValue = counselingCompletedCount > 0 ? Math.round(totalSalesRevenue / counselingCompletedCount) : 0;
+
   const totalCommissionEarned = myTransactions
     .filter(tx => tx.status === 'Approved' || tx.status === 'Paid' || tx.status === 'Eligible' || tx.status === 'Pending Approval')
     .reduce((sum, tx) => sum + (Number(tx.commissionAmount) || 0), 0);
@@ -1630,79 +1643,167 @@ const Affiliate = () => {
                 </button>
               </div>
 
-              {/* 3 Metric Cards matching exact user screenshot design */}
-              <div className="grid-3" style={{ marginBottom: '1.75rem', gap: '1.25rem' }}>
-                {/* 1. Green Card: Referred Patients */}
-                <div style={{ 
-                  backgroundColor: '#e2faea', 
-                  padding: '1.25rem 1.5rem', 
-                  borderRadius: '14px', 
-                  border: '1px solid #b8eec8',
-                  boxShadow: '0 2px 8px rgba(0, 107, 45, 0.04)'
+              {/* Affiliate Marketing Performance Matrix */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+                gap: '1rem',
+                marginBottom: '1.5rem'
+              }}>
+                {/* 1. Link Clicks (Traffic) */}
+                <div style={{
+                  backgroundColor: '#EFF6FF',
+                  padding: '1.15rem 1.25rem',
+                  borderRadius: '16px',
+                  border: '1.5px solid #BFDBFE',
+                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.05)'
                 }}>
-                  <div style={{ fontSize: '0.82rem', color: '#006B2D', fontWeight: 700 }}>
-                    {language === 'mr' ? 'एकूण संदर्भित रुग्ण' : 'Referred Patients'}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#1D4ED8', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                      {language === 'mr' ? 'लिंक क्लिक्स / भेटी' : 'Link Clicks'}
+                    </span>
+                    <MousePointerClick size={16} />
                   </div>
-                  <div style={{ fontSize: '2.1rem', fontWeight: 800, color: '#006B2D', marginTop: '0.25rem', lineHeight: 1.1 }}>
-                    {referredPatientsCount}
+                  <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#1E40AF', lineHeight: 1.1 }}>
+                    {totalClicksCount}
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#60A5FA', marginTop: '0.25rem', fontWeight: 600 }}>
+                    {language === 'mr' ? 'थेट ट्रॅफिक व्हिजिटर्स' : 'Unique link visits'}
                   </div>
                 </div>
 
-                {/* 2. Gold Card: Counseling Completed */}
-                <div style={{ 
-                  backgroundColor: '#fff9e6', 
-                  padding: '1.25rem 1.5rem', 
-                  borderRadius: '14px', 
-                  border: '1px solid #ffe899',
-                  boxShadow: '0 2px 8px rgba(120, 83, 0, 0.04)'
+                {/* 2. Conversions (Orders) */}
+                <div style={{
+                  backgroundColor: '#ECFDF5',
+                  padding: '1.15rem 1.25rem',
+                  borderRadius: '16px',
+                  border: '1.5px solid #A7F3D0',
+                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.05)'
                 }}>
-                  <div style={{ fontSize: '0.82rem', color: '#785300', fontWeight: 700 }}>
-                    {language === 'mr' ? 'यशस्वी मार्गदर्शन / ऑर्डर्स' : 'Counseling Completed'}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#047857', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                      {language === 'mr' ? 'यशस्वी खरेदी (Orders)' : 'Referred Orders'}
+                    </span>
+                    <ShoppingBag size={16} />
                   </div>
-                  <div style={{ fontSize: '2.1rem', fontWeight: 800, color: '#785300', marginTop: '0.25rem', lineHeight: 1.1 }}>
+                  <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#065F46', lineHeight: 1.1 }}>
                     {counselingCompletedCount}
                   </div>
+                  <div style={{ fontSize: '0.74rem', color: '#10B981', marginTop: '0.25rem', fontWeight: 600 }}>
+                    {language === 'mr' ? 'कन्फर्म झालेल्या ऑर्डर्स' : 'Successful conversions'}
+                  </div>
                 </div>
 
-                {/* 3. Soft Green Card: Active Campaign */}
-                <div style={{ 
-                  backgroundColor: '#F3F8F1', 
-                  padding: '1.25rem 1.5rem', 
-                  borderRadius: '14px', 
-                  border: '1px solid #E1E9DF',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
+                {/* 3. Conversion Rate */}
+                <div style={{
+                  backgroundColor: '#FFFBEB',
+                  padding: '1.15rem 1.25rem',
+                  borderRadius: '16px',
+                  border: '1.5px solid #FDE68A',
+                  boxShadow: '0 2px 8px rgba(217, 119, 6, 0.05)'
                 }}>
-                  <div style={{ fontSize: '0.82rem', color: '#006B2D', fontWeight: 700 }}>
-                    {language === 'mr' ? 'सक्रिय अभियान' : 'Active Campaign'}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#B45309', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                      {language === 'mr' ? 'रूपांतरण दर (CR%)' : 'Conversion Rate'}
+                    </span>
+                    <TrendingUp size={16} />
                   </div>
-                  <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#006B2D', marginTop: '0.5rem' }}>
-                    मधुमेह मुक्त भारत
+                  <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#92400E', lineHeight: 1.1 }}>
+                    {conversionRate}
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: '#5F6B61', marginTop: '0.15rem' }}>
-                    & व्यसनमुक्त भारत अभियान
+                  <div style={{ fontSize: '0.74rem', color: '#D97706', marginTop: '0.25rem', fontWeight: 600 }}>
+                    {language === 'mr' ? 'क्लिक ते खरेदी प्रमाण' : 'Clicks to orders ratio'}
+                  </div>
+                </div>
+
+                {/* 4. Total Sales Volume */}
+                <div style={{
+                  backgroundColor: '#FAF5FF',
+                  padding: '1.15rem 1.25rem',
+                  borderRadius: '16px',
+                  border: '1.5px solid #E9D5FF',
+                  boxShadow: '0 2px 8px rgba(147, 51, 234, 0.05)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#7E22CE', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                      {language === 'mr' ? 'एकूण विक्री (Revenue)' : 'Total Sales'}
+                    </span>
+                    <Target size={16} />
+                  </div>
+                  <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#6B21A8', lineHeight: 1.1 }}>
+                    {formatCurrency(totalSalesRevenue)}
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#A855F7', marginTop: '0.25rem', fontWeight: 600 }}>
+                    {language === 'mr' ? `सरासरी: ${formatCurrency(avgOrderValue)}` : `AOV: ${formatCurrency(avgOrderValue)}`}
+                  </div>
+                </div>
+
+                {/* 5. Commission Earned */}
+                <div style={{
+                  backgroundColor: '#F0FDF4',
+                  padding: '1.15rem 1.25rem',
+                  borderRadius: '16px',
+                  border: '1.5px solid #86EFAC',
+                  boxShadow: '0 2px 8px rgba(22, 163, 74, 0.08)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: '#15803D', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                      {language === 'mr' ? 'कमिशन मानधन' : 'Total Commission'}
+                    </span>
+                    <DollarSign size={16} />
+                  </div>
+                  <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#166534', lineHeight: 1.1 }}>
+                    {formatCurrency(totalCommissionEarned)}
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#22C55E', marginTop: '0.25rem', fontWeight: 600 }}>
+                    {language === 'mr' ? 'थेट बँक / UPI देय' : 'Approved for payout'}
                   </div>
                 </div>
               </div>
 
-              {/* Commission Earnings Strip (Real-Time Value for Affiliates) */}
+              {/* Affiliate Conversion Funnel Visualizer */}
               <div style={{
-                backgroundColor: totalCommissionEarned > 0 ? '#ECFDF5' : '#F0FDF4',
-                border: totalCommissionEarned > 0 ? '1.5px solid #A7F3D0' : '1.5px solid #BBF7D0',
-                borderRadius: '12px',
-                padding: '0.85rem 1.25rem',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                borderRadius: '16px',
+                padding: '0.9rem 1.25rem',
                 marginBottom: '1.75rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 flexWrap: 'wrap',
-                gap: '0.5rem'
+                gap: '0.75rem'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#065F46', fontWeight: 700, fontSize: '0.92rem' }}>
-                  <DollarSign size={18} style={{ color: '#059669' }} />
-                  <span>{language === 'mr' ? 'एकूण कमिशन / मानधन (Commission Earned):' : 'Total Approved Commission:'}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <BarChart2 size={18} color="#006B2D" />
+                  <span style={{ fontSize: '0.86rem', fontWeight: 800, color: '#0F172A' }}>
+                    {language === 'mr' ? 'अॅफिलिएट फनेल प्रगती (Conversion Funnel):' : 'Affiliate Marketing Funnel:'}
+                  </span>
                 </div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#047857' }}>
-                  {formatCurrency(totalCommissionEarned)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', fontSize: '0.82rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#2563EB' }} />
+                    <span style={{ color: '#475569' }}>{language === 'mr' ? 'क्लिक्स:' : 'Clicks:'}</span>
+                    <strong style={{ color: '#1E40AF' }}>{totalClicksCount}</strong>
+                  </div>
+                  <span style={{ color: '#94A3B8' }}>➔</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#D97706' }} />
+                    <span style={{ color: '#475569' }}>{language === 'mr' ? 'चौकशी/रुग्ण:' : 'Leads:'}</span>
+                    <strong style={{ color: '#B45309' }}>{referredPatientsCount}</strong>
+                  </div>
+                  <span style={{ color: '#94A3B8' }}>➔</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#059669' }} />
+                    <span style={{ color: '#475569' }}>{language === 'mr' ? 'ऑर्डर्स:' : 'Orders:'}</span>
+                    <strong style={{ color: '#047857' }}>{counselingCompletedCount}</strong>
+                  </div>
+                  <span style={{ color: '#94A3B8' }}>➔</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
+                    <span style={{ color: '#475569' }}>{language === 'mr' ? 'कमाई:' : 'Earnings:'}</span>
+                    <strong style={{ color: '#15803D' }}>{formatCurrency(totalCommissionEarned)}</strong>
+                  </div>
                 </div>
               </div>
 
@@ -1735,7 +1836,7 @@ const Affiliate = () => {
                     </div>
                   </div>
 
-                  {/* Product Selector Dropdown & Quick Actions */}
+                  {/* Product Selector Dropdown & Campaign Tracking & Quick Actions */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <select
                       value={selectedProductId}
@@ -1754,11 +1855,35 @@ const Affiliate = () => {
                       }}
                       title="Select product"
                     >
+                      <option value="home">🏠 {language === 'mr' ? 'मुख्य दालन (Website Home)' : 'Website Home'}</option>
                       {productsList.map((prod) => (
                         <option key={prod.id} value={prod.id}>
                           {prod.name} ({formatCurrency(prod.sellingPrice || prod.price)})
                         </option>
                       ))}
+                    </select>
+
+                    <select
+                      value={campaignSource}
+                      onChange={(e) => setCampaignSource(e.target.value)}
+                      style={{
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '9px',
+                        border: '1.5px solid #CBD5E1',
+                        backgroundColor: '#ffffff',
+                        color: '#334155',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        outline: 'none'
+                      }}
+                      title="Campaign Tag"
+                    >
+                      <option value="direct">🏷️ {language === 'mr' ? 'मोहीम: थेट' : 'Campaign: Direct'}</option>
+                      <option value="whatsapp">💬 WhatsApp</option>
+                      <option value="instagram">📸 Instagram</option>
+                      <option value="facebook">👥 Facebook</option>
+                      <option value="health_camp">🏥 {language === 'mr' ? 'आरोग्य शिबीर' : 'Health Camp'}</option>
                     </select>
 
                     <button

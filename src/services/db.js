@@ -52,7 +52,24 @@ export const PURGE_DUMMY_IDS = new Set([
   'SSF-842103',
   'LEAD-842101',
   'LEAD-842102',
-  'FOL-842101'
+  'FOL-842101',
+  'ORD-2026-9748',
+  'ORD-2026-2275',
+  'ORD-2026-2678',
+  'ORD-2026-3904',
+  'ORD-2026-4762',
+  'SSF-842101',
+  'CUST-8421154090',
+  'cust_1791196143353_678',
+  'cust_1790320149581_425',
+  'cust_1790320226158_861',
+  'orde_1790218824760_893',
+  'orde_1790218876781_361',
+  'orde_1790219118957_36',
+  'orde_1790320226159_297',
+  'lead_1789981569824_327',
+  'lead_1789984653453_688',
+  'lead_1790320351272_631'
 ]);
 
 export function getDeletedSet(collectionName) {
@@ -61,9 +78,6 @@ export function getDeletedSet(collectionName) {
     const set = raw ? new Set(JSON.parse(raw)) : new Set();
     // Guarantee customer and order records are never blocked by residual deleted sets
     set.delete('CUST-8055557120');
-    set.delete('CUST-8421154090');
-    set.delete('ORD-2026-2275');
-    set.delete('SSF-842101');
     return set;
   } catch (e) {
     return new Set();
@@ -93,9 +107,6 @@ if (typeof localStorage !== 'undefined') {
       if (rawDel) {
         const delSet = new Set(JSON.parse(rawDel));
         delSet.delete('CUST-8055557120');
-        delSet.delete('CUST-8421154090');
-        delSet.delete('ORD-2026-2275');
-        delSet.delete('SSF-842101');
         localStorage.setItem(delKey, JSON.stringify([...delSet]));
       }
     });
@@ -132,6 +143,8 @@ export function isItemDeleted(collectionName, itemOrId) {
 const state = {};
 const listeners = {};
 const firestoreUnsubscribers = {};
+const lastFetchTimestamps = {};
+const FETCH_COOLDOWN_MS = 60000; // 60-second cooldown per collection to protect read quota
 
 export const COLLECTIONS = [
   'users',
@@ -150,7 +163,20 @@ export const COLLECTIONS = [
   'supportTickets',
   'auditLogs',
   'settings',
-  'notifications'
+  'notifications',
+  'affiliateClicks'
+];
+
+// Strictly necessary collections synced with Cloud Firestore.
+// Ephemeral/audit logs, notifications, media, and static data stay local to keep Firestore clean and fast.
+export const FIRESTORE_SYNCED_COLLECTIONS = [
+  'orders',
+  'customers',
+  'users',
+  'leads',
+  'commissionTransactions',
+  'commissionPayouts',
+  'settings'
 ];
 
 // Recursively clean object/array to ensure no undefined values are sent to Cloud Firestore
@@ -369,7 +395,8 @@ export const initialDataMap = {
   supportTickets: initialSupportTickets,
   auditLogs: initialAuditLogs,
   settings: initialSettings,
-  notifications: []
+  notifications: [],
+  affiliateClicks: []
 };
 
 // Initialize all data stores
@@ -378,25 +405,18 @@ export function initDatabase() {
     initCollection(col, initialDataMap[col] || []);
   });
 
-  // Connect Firestore real-time synchronization immediately if configured and quota is intact
+  // Connect Firestore synchronization cleanly: public visitors only sync settings,
+  // CRM interface connects full collections only when accessed.
   if (isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
     ensureFirebaseAuth().catch(() => {});
     if (typeof window !== 'undefined') {
-      setTimeout(setupFirestoreRealtimeSync, 50);
+      setTimeout(() => setupFirestoreRealtimeSync(false), 50);
     } else {
-      setupFirestoreRealtimeSync();
+      setupFirestoreRealtimeSync(false);
     }
   }
 
-  // Defer cloud refresh until browser is idle to ensure instant initial render
-  if (typeof window !== 'undefined' && isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
-    const scheduleRefresh = window.requestIdleCallback || ((cb) => setTimeout(cb, 2500));
-    scheduleRefresh(() => {
-      try {
-        dbService.refreshAllFromFirebase().catch(() => {});
-      } catch (e) {}
-    });
-  }
+  // NOTE: Redundant refreshAllFromFirebase removed to prevent double-reading collections on startup.
 }
 
 let permissionWarningDispatched = false;
@@ -471,27 +491,21 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
     Boolean(localStorage.getItem('sahara_crm_current_user'))
   ));
 
-  // Public collections needed for website visitors & customer eCommerce sync
-  const publicCols = [
-    'products',
-    'heroSlides',
-    'reviews',
-    'videos',
-    'galleryPhotos',
-    'settings',
+  // Only strictly necessary business collections are synchronized with Cloud Firestore
+  // Ephemeral, media, audit logs, and static seed data are kept local to eliminate Firestore clutter
+  const FIRESTORE_SYNCED_COLLECTIONS = [
+    'orders',
     'customers',
-    'orders'
-  ];
-
-  // Internal CRM administrative collections only synced inside CRM
-  const crmCols = [
-    'leads',
     'users',
-    'commissionSlabs'
+    'leads',
+    'commissionTransactions',
+    'commissionPayouts',
+    'settings'
   ];
 
-  // Real-time bidirectional sync across Cloud Firestore and local reactive stores
-  const SYNC_COLLECTIONS = isCrm ? [...publicCols, ...crmCols] : publicCols;
+  // Optimization: For public website visitors, only listen to 'settings'.
+  // Heavy operational CRM collections (orders, customers, users, leads) are ONLY subscribed when entering the CRM interface.
+  const SYNC_COLLECTIONS = isCrm ? FIRESTORE_SYNCED_COLLECTIONS : ['settings'];
 
   SYNC_COLLECTIONS.forEach((colName) => {
     try {
@@ -603,27 +617,9 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
           } else if (remoteDocs.length === 0) {
             const localItems = (Array.isArray(state[colName]) ? state[colName] : []).filter((item) => !isItemDeleted(colName, item));
 
-            // If we have orders placed on this device or baseline orders, NEVER wipe them out! Auto-upload them to Firestore!
+            // Only sync genuine local orders placed offline on this device (never dummy seed data)
             if (colName === 'orders') {
               let ordersToSync = [...localItems].filter((o) => !PURGE_DUMMY_IDS.has(String(o.id || o.orderId)));
-              if (ordersToSync.length === 0 && Array.isArray(initialOrders) && initialOrders.length > 0) {
-                ordersToSync = [...initialOrders];
-              }
-              if (ordersToSync.length === 0 && typeof localStorage !== 'undefined') {
-                try {
-                  const lastOrd = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
-                  if (lastOrd && !isItemDeleted('orders', lastOrd) && !PURGE_DUMMY_IDS.has(String(lastOrd.id || lastOrd.orderId))) {
-                    ordersToSync.push({
-                      ...lastOrd,
-                      id: String(lastOrd.id || lastOrd.orderId),
-                      orderId: String(lastOrd.id || lastOrd.orderId),
-                      source: 'Website Checkout',
-                      orderStatus: lastOrd.status || 'Confirmed'
-                    });
-                  }
-                } catch (e) {}
-              }
-
               if (ordersToSync.length > 0) {
                 ordersToSync.forEach((ord) => {
                   const key = String(ord.id || ord.orderId);
@@ -641,9 +637,6 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
 
             if (colName === 'customers') {
               let customersToSync = [...localItems].filter((c) => !PURGE_DUMMY_IDS.has(String(c.id || c.customerId)));
-              if (customersToSync.length === 0 && Array.isArray(initialCustomers) && initialCustomers.length > 0) {
-                customersToSync = [...initialCustomers];
-              }
               if (customersToSync.length > 0) {
                 customersToSync.forEach((cust) => {
                   const key = String(cust.id || cust.customerId);
@@ -660,39 +653,17 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
             }
 
             if (colName === 'leads') {
-              let leadsToSync = [...localItems];
-              if (leadsToSync.length === 0 && Array.isArray(initialLeads) && initialLeads.length > 0) {
-                leadsToSync = [...initialLeads];
-              }
+              let leadsToSync = [...localItems].filter((l) => !PURGE_DUMMY_IDS.has(String(l.id || l.leadId)));
               if (leadsToSync.length > 0) {
                 leadsToSync.forEach((lead) => {
                   const key = String(lead.id || lead.leadId);
-                  if (key && !isItemDeleted('leads', key)) {
+                  if (key && !isItemDeleted('leads', key) && !PURGE_DUMMY_IDS.has(key)) {
                     const docRef = doc(firestoreDb, 'leads', key);
                     setDoc(docRef, sanitizeForFirestore({ ...lead, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
                   }
                 });
                 state.leads = leadsToSync;
                 saveCollection('leads', false);
-                return;
-              }
-            }
-
-            if (colName === 'followups') {
-              let followupsToSync = [...localItems];
-              if (followupsToSync.length === 0 && Array.isArray(initialFollowups) && initialFollowups.length > 0) {
-                followupsToSync = [...initialFollowups];
-              }
-              if (followupsToSync.length > 0) {
-                followupsToSync.forEach((fol) => {
-                  const key = String(fol.id || fol.followupId);
-                  if (key && !isItemDeleted('followups', key)) {
-                    const docRef = doc(firestoreDb, 'followups', key);
-                    setDoc(docRef, sanitizeForFirestore({ ...fol, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-                  }
-                });
-                state.followups = followupsToSync;
-                saveCollection('followups', false);
                 return;
               }
             }
@@ -911,8 +882,8 @@ export const dbService = {
       } catch (e) {}
     }
 
-    // Sync to Cloud Firestore if connected (non-blocking with timeout so UI never freezes)
-    if (isFirebaseConfigured && firestoreDb) {
+    // Sync to Cloud Firestore if connected and part of operational core (non-blocking with timeout so UI never freezes)
+    if (isFirebaseConfigured && firestoreDb && FIRESTORE_SYNCED_COLLECTIONS.includes(collectionName)) {
       (async () => {
         try {
           await ensureFirebaseAuth().catch(() => {});
@@ -929,11 +900,6 @@ export const dbService = {
             new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore write timeout')), 2500))
           ]);
 
-          if (collectionName === 'orders') {
-            syncOrderToFirebase(cleanItem).catch(() => {});
-          } else if (collectionName === 'users') {
-            syncUserToFirebase(cleanItem).catch(() => {});
-          }
           console.log(`[Firestore Sync] Created document ${collectionName}/${docId}`);
         } catch (err) {
           if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded')) {
@@ -949,7 +915,7 @@ export const dbService = {
     }
 
     // Auto audit log
-    if (collectionName !== 'auditLogs' && collectionName !== 'notifications') {
+    if (collectionName !== 'auditLogs' && collectionName !== 'notifications' && collectionName !== 'affiliateClicks') {
       this.logAudit({
         userId: currentUser?.id || 'sys_user',
         userName: currentUser?.name || 'System / User',
@@ -1011,7 +977,7 @@ export const dbService = {
     const items = state[collectionName] || [];
     const index = items.findIndex((i) => String(i.id) === String(id));
     if (index === -1) {
-      if (isFirebaseConfigured && firestoreDb) {
+      if (isFirebaseConfigured && firestoreDb && FIRESTORE_SYNCED_COLLECTIONS.includes(collectionName)) {
         try {
           await ensureFirebaseAuth().catch(() => {});
           const docRef = doc(firestoreDb, collectionName, String(id));
@@ -1037,7 +1003,7 @@ export const dbService = {
     items[index] = updatedItem;
     saveCollection(collectionName);
 
-    if (isFirebaseConfigured && firestoreDb) {
+    if (isFirebaseConfigured && firestoreDb && FIRESTORE_SYNCED_COLLECTIONS.includes(collectionName)) {
       try {
         await ensureFirebaseAuth().catch(() => {});
         const docRef = doc(firestoreDb, collectionName, String(id));
@@ -1057,7 +1023,7 @@ export const dbService = {
     }
 
     // Auto audit log
-    if (collectionName !== 'auditLogs' && collectionName !== 'notifications') {
+    if (collectionName !== 'auditLogs' && collectionName !== 'notifications' && collectionName !== 'affiliateClicks') {
       this.logAudit({
         userId: currentUser?.id || 'sys_user',
         userName: currentUser?.name || 'System / User',
@@ -1080,9 +1046,9 @@ export const dbService = {
         this.processOrderCommission(updatedItem, currentUser);
       } else if (
         (updatedItem.orderStatus === 'Cancelled' || updatedItem.paymentStatus === 'Refunded') &&
-        oldItem.orderStatus === 'Delivered'
+        oldItem.orderStatus !== 'Cancelled'
       ) {
-        // Reverse any generated commission
+        // Reverse any generated commission on order cancellation
         this.reverseOrderCommission(updatedItem, currentUser);
       }
     }
@@ -1142,7 +1108,7 @@ export const dbService = {
     saveCollection(collectionName);
 
     // Delete directly from Firebase Cloud Firestore
-    if (isFirebaseConfigured && firestoreDb) {
+    if (isFirebaseConfigured && firestoreDb && FIRESTORE_SYNCED_COLLECTIONS.includes(collectionName)) {
       try {
         await ensureFirebaseAuth().catch(() => {});
         const keysToDelete = new Set([targetIdStr, idToDelete, orderIdToDelete, customerIdToDelete, leadIdToDelete].filter(Boolean));
@@ -1164,7 +1130,7 @@ export const dbService = {
     }
 
     // Auto audit log
-    if (collectionName !== 'auditLogs' && collectionName !== 'notifications') {
+    if (collectionName !== 'auditLogs' && collectionName !== 'notifications' && collectionName !== 'affiliateClicks') {
       this.logAudit({
         userId: currentUser?.id || 'sys_user',
         userName: currentUser?.name || 'System / User',
@@ -1185,7 +1151,7 @@ export const dbService = {
     state[collectionName] = Array.isArray(items) ? [...items] : items;
     saveCollection(collectionName);
 
-    if (isFirebaseConfigured && firestoreDb && Array.isArray(items)) {
+    if (isFirebaseConfigured && firestoreDb && FIRESTORE_SYNCED_COLLECTIONS.includes(collectionName) && Array.isArray(items)) {
       try {
         await ensureFirebaseAuth().catch(() => {});
         // Fetch existing remote docs to remove deleted items from Firestore
@@ -1273,18 +1239,6 @@ export const dbService = {
     } else {
       payload.createdAt = new Date().toISOString();
       await this.add('customers', payload);
-    }
-
-    // Direct Cloud Firestore write guarantee
-    if (isFirebaseConfigured && firestoreDb) {
-      try {
-        const docRef = doc(firestoreDb, 'customers', String(payload.id));
-        const cleanPayload = sanitizeForFirestore({ ...payload, syncedToFirebase: true });
-        await setDoc(docRef, cleanPayload, { merge: true });
-        console.log(`[Firestore Sync] Profile stored on Cloud Firestore: customers/${payload.id}`);
-      } catch (err) {
-        console.warn(`[Firebase] Firestore customer profile write note:`, err.message);
-      }
     }
 
     return payload;
@@ -1423,7 +1377,7 @@ export const dbService = {
     }
   },
 
-  // Audit Logger
+  // Audit Logger (Kept strictly in reactive local storage to avoid polluting Cloud Firestore)
   logAudit({ userId, userName, action, module, recordId, description, oldValue, newValue }) {
     const log = {
       id: `log_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -1440,19 +1394,14 @@ export const dbService = {
 
     if (!state.auditLogs) state.auditLogs = [];
     state.auditLogs.unshift(log);
-    saveCollection('auditLogs');
-
-    if (isFirebaseConfigured && firestoreDb) {
-      try {
-        const docRef = doc(firestoreDb, 'auditLogs', String(log.id));
-        setDoc(docRef, sanitizeForFirestore(log), { merge: true }).catch((err) => {
-          console.warn('Firestore logAudit note:', err.message);
-        });
-      } catch (e) {}
+    // Keep max 200 audit logs locally
+    if (state.auditLogs.length > 200) {
+      state.auditLogs = state.auditLogs.slice(0, 200);
     }
+    saveCollection('auditLogs');
   },
 
-  // Notification Helper
+  // Notification Helper (Kept strictly in reactive local storage to avoid polluting Cloud Firestore)
   addNotification({ title, message, type = 'info', link = '/crm' }) {
     const notif = {
       id: `notif_${Date.now()}`,
@@ -1466,16 +1415,11 @@ export const dbService = {
 
     if (!state.notifications) state.notifications = [];
     state.notifications.unshift(notif);
-    saveCollection('notifications');
-
-    if (isFirebaseConfigured && firestoreDb) {
-      try {
-        const docRef = doc(firestoreDb, 'notifications', String(notif.id));
-        setDoc(docRef, sanitizeForFirestore(notif), { merge: true }).catch((err) => {
-          console.warn('Firestore addNotification note:', err.message);
-        });
-      } catch (e) {}
+    // Keep max 50 notifications locally
+    if (state.notifications.length > 50) {
+      state.notifications = state.notifications.slice(0, 50);
     }
+    saveCollection('notifications');
   },
 
   // Mark all notifications read
@@ -1483,14 +1427,62 @@ export const dbService = {
     if (state.notifications) {
       state.notifications.forEach((n) => (n.read = true));
       saveCollection('notifications');
-
-      if (isFirebaseConfigured && firestoreDb) {
-        state.notifications.forEach((n) => {
-          const docRef = doc(firestoreDb, 'notifications', String(n.id));
-          setDoc(docRef, { read: true }, { merge: true }).catch(() => {});
-        });
-      }
     }
+  },
+
+  // Affiliate Marketing Traffic & Click Tracker
+  async trackAffiliateClick(referralCode, pageUrl = '', campaign = '') {
+    if (!referralCode) return null;
+    const cleanCode = String(referralCode).trim().toUpperCase();
+    const clickId = `clk_${Date.now()}_${Math.floor(100 + Math.random() * 900)}`;
+    const clickRecord = {
+      id: clickId,
+      referralCode: cleanCode,
+      pageUrl: pageUrl || (typeof window !== 'undefined' ? window.location.pathname : '/'),
+      campaign: campaign || 'direct',
+      timestamp: new Date().toISOString()
+    };
+    try {
+      await this.add('affiliateClicks', clickRecord);
+    } catch (e) {
+      console.warn('Click tracking note:', e);
+    }
+    return clickRecord;
+  },
+
+  // Calculate full affiliate marketing conversion metrics
+  getAffiliatePerformance(referralCodeOrId) {
+    if (!referralCodeOrId) return { clicks: 0, orders: 0, conversionRate: '0.0%', salesVolume: 0, totalCommission: 0 };
+    const needle = String(referralCodeOrId).trim().toUpperCase();
+    const allClicks = this.getAll('affiliateClicks') || [];
+    const allOrders = this.getAll('orders') || [];
+    const allCommTx = this.getAll('commissionTransactions') || [];
+
+    const clicks = allClicks.filter((c) => String(c.referralCode || '').toUpperCase() === needle);
+    const orders = allOrders.filter((o) => 
+      String(o.referralCode || '').toUpperCase() === needle ||
+      String(o.assignedAffiliate || '').toUpperCase() === needle
+    );
+    const txs = allCommTx.filter((t) => 
+      String(t.referralCode || '').toUpperCase() === needle ||
+      String(t.beneficiaryId || '').toUpperCase() === needle
+    );
+
+    const clicksCount = Math.max(clicks.length, orders.length > 0 ? orders.length : 0);
+    const ordersCount = orders.length;
+    const conversionRate = clicksCount > 0 ? ((ordersCount / clicksCount) * 100).toFixed(1) + '%' : (ordersCount > 0 ? '100.0%' : '0.0%');
+    const salesVolume = orders.reduce((sum, o) => sum + (Number(o.grandTotal) || 0), 0);
+    const totalCommission = txs
+      .filter((t) => t.status === 'Approved' || t.status === 'Paid')
+      .reduce((sum, t) => sum + (Number(t.commissionAmount) || 0), 0);
+
+    return {
+      clicks: clicksCount,
+      orders: ordersCount,
+      conversionRate,
+      salesVolume,
+      totalCommission
+    };
   },
 
   // Factory reset to seed data
@@ -1571,16 +1563,11 @@ export const dbService = {
 
     const dataMap = {
       users: (state.users && state.users.length > 0) ? state.users : initialUsers,
-      customers: (state.customers && state.customers.length > 0) ? state.customers : initialCustomers,
-      leads: (state.leads && state.leads.length > 0) ? state.leads : initialLeads,
-      followups: (state.followups && state.followups.length > 0) ? state.followups : initialFollowups,
-      orders: (state.orders && state.orders.length > 0) ? state.orders : initialOrders,
-      products: (state.products && state.products.length > 0) ? state.products : initialProducts,
-      commissionSlabs: (state.commissionSlabs && state.commissionSlabs.length > 0) ? state.commissionSlabs : initialCommissionSlabs,
-      commissionTransactions: (state.commissionTransactions && state.commissionTransactions.length > 0) ? state.commissionTransactions : initialCommissionTransactions,
-      commissionPayouts: (state.commissionPayouts && state.commissionPayouts.length > 0) ? state.commissionPayouts : initialPayouts,
-      supportTickets: (state.supportTickets && state.supportTickets.length > 0) ? state.supportTickets : initialSupportTickets,
-      auditLogs: (state.auditLogs && state.auditLogs.length > 0) ? state.auditLogs : initialAuditLogs
+      customers: (state.customers && state.customers.length > 0) ? state.customers : [],
+      leads: (state.leads && state.leads.length > 0) ? state.leads : [],
+      orders: (state.orders && state.orders.length > 0) ? state.orders : [],
+      commissionTransactions: state.commissionTransactions || [],
+      commissionPayouts: state.commissionPayouts || []
     };
 
     let count = 0;
@@ -1612,23 +1599,8 @@ export const dbService = {
   async refreshAllFromFirebase(isCrmContext = false) {
     const isCrm = isCrmContext || (typeof window !== 'undefined' && window.location.pathname.startsWith('/crm'));
     const collectionsToRefresh = isCrm
-      ? [
-          'orders',
-          'leads',
-          'users',
-          'customers',
-          'heroSlides',
-          'galleryPhotos',
-          'videos',
-          'reviews',
-          'products',
-          'settings'
-        ]
-      : [
-          'settings',
-          'heroSlides',
-          'products'
-        ];
+      ? FIRESTORE_SYNCED_COLLECTIONS
+      : ['settings'];
 
     const results = {};
     for (const col of collectionsToRefresh) {
@@ -1642,12 +1614,26 @@ export const dbService = {
   },
 
   /**
-   * Manually fetch latest collection data from Cloud Firestore and sync local store
+   * Manually fetch latest collection data from Cloud Firestore and sync local store.
+   * Fully optimized with cooldown and active listener awareness to prevent quota drain.
    */
-  async refreshFromFirebase(collectionName = 'orders') {
-    if (!isFirebaseConfigured || !firestoreDb || isFirestoreQuotaExhausted()) {
+  async refreshFromFirebase(collectionName = 'orders', force = false) {
+    if (!isFirebaseConfigured || !firestoreDb || isFirestoreQuotaExhausted() || !FIRESTORE_SYNCED_COLLECTIONS.includes(collectionName)) {
       return state[collectionName] || [];
     }
+
+    // 1. If real-time listener is already actively listening, local state is automatically updated. Avoid duplicate read.
+    if (firestoreUnsubscribers[collectionName] && !force) {
+      return state[collectionName] || [];
+    }
+
+    // 2. Cooldown guard: Prevent duplicate getDocs calls within 60 seconds unless forced
+    const now = Date.now();
+    const lastFetch = lastFetchTimestamps[collectionName] || 0;
+    if (!force && now - lastFetch < FETCH_COOLDOWN_MS && (state[collectionName]?.length > 0 || lastFetch > 0)) {
+      return state[collectionName] || [];
+    }
+    lastFetchTimestamps[collectionName] = now;
     try {
       await ensureFirebaseAuth().catch(() => {});
 
@@ -1742,24 +1728,6 @@ export const dbService = {
         // Remote Cloud Firestore currently has 0 documents
         if (collectionName === 'orders') {
           let ordersToSync = [...localItems].filter((o) => !PURGE_DUMMY_IDS.has(String(o.id || o.orderId)));
-          if (ordersToSync.length === 0 && Array.isArray(initialOrders) && initialOrders.length > 0) {
-            ordersToSync = [...initialOrders];
-          }
-          if (ordersToSync.length === 0 && typeof localStorage !== 'undefined') {
-            try {
-              const lastOrd = JSON.parse(localStorage.getItem('ssf_last_order') || 'null');
-              if (lastOrd && !isItemDeleted('orders', lastOrd) && !PURGE_DUMMY_IDS.has(String(lastOrd.id || lastOrd.orderId))) {
-                ordersToSync.push({
-                  ...lastOrd,
-                  id: String(lastOrd.id || lastOrd.orderId),
-                  orderId: String(lastOrd.id || lastOrd.orderId),
-                  source: 'Website Checkout',
-                  orderStatus: lastOrd.status || 'Confirmed'
-                });
-              }
-            } catch (e) {}
-          }
-
           if (ordersToSync.length > 0) {
             for (const ord of ordersToSync) {
               const key = String(ord.id || ord.orderId);
@@ -1779,9 +1747,6 @@ export const dbService = {
 
         if (collectionName === 'customers') {
           let customersToSync = [...localItems].filter((c) => !PURGE_DUMMY_IDS.has(String(c.id || c.customerId)));
-          if (customersToSync.length === 0 && Array.isArray(initialCustomers) && initialCustomers.length > 0) {
-            customersToSync = [...initialCustomers];
-          }
           if (customersToSync.length > 0) {
             for (const cust of customersToSync) {
               const key = String(cust.id || cust.customerId);
@@ -1799,14 +1764,11 @@ export const dbService = {
         }
 
         if (collectionName === 'leads') {
-          let leadsToSync = [...localItems];
-          if (leadsToSync.length === 0 && Array.isArray(initialLeads) && initialLeads.length > 0) {
-            leadsToSync = [...initialLeads];
-          }
+          let leadsToSync = [...localItems].filter((l) => !PURGE_DUMMY_IDS.has(String(l.id || l.leadId)));
           if (leadsToSync.length > 0) {
             for (const lead of leadsToSync) {
               const key = String(lead.id || lead.leadId);
-              if (key && !deletedSet.has(key)) {
+              if (key && !deletedSet.has(key) && !PURGE_DUMMY_IDS.has(key)) {
                 try {
                   const docRef = doc(firestoreDb, 'leads', key);
                   await setDoc(docRef, sanitizeForFirestore({ ...lead, id: key, syncedAt: new Date().toISOString() }), { merge: true });

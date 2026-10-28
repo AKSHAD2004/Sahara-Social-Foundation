@@ -131,7 +131,9 @@ export function calculateCommission(salesAmount = 0, slabs = [], calculationType
 }
 
 /**
- * Checks whether an order meets commission generation criteria (Delivered & Paid or Paid depending on settings).
+ * Checks whether an order meets commission generation criteria.
+ * Order-Placed Commission Flow: Commission is generated immediately when an order is placed.
+ * Only Cancelled or Refunded orders are excluded.
  */
 export function isOrderCommissionEligible(order, settings = {}) {
   if (!order) return false;
@@ -143,7 +145,7 @@ export function isOrderCommissionEligible(order, settings = {}) {
     return false;
   }
 
-  // All valid orders (Delivered, Confirmed, Shipped, Processing, Paid) qualify for sales commission calculation
+  // All valid placed orders immediately qualify for sales commission calculation upon placement
   return true;
 }
 

@@ -237,7 +237,7 @@ export default function OrderList() {
       assignedAffiliate: newOrderForm.assignedAffiliate || '',
       employeeName: employees.find((e) => e.id === newOrderForm.assignedEmployee)?.name || employees[0]?.name || '',
       affiliateName: affiliates.find((a) => a.id === newOrderForm.assignedAffiliate)?.name || '',
-      commissionStatus: newOrderForm.orderStatus === 'Delivered' && newOrderForm.paymentStatus === 'Paid' ? 'Generated' : 'Pending',
+      commissionStatus: newOrderForm.orderStatus === 'Cancelled' ? 'Cancelled' : 'Generated',
       orderDate: new Date().toISOString(),
       deliveredDate: newOrderForm.orderStatus === 'Delivered' ? new Date().toISOString() : null,
       shippingAddress: newOrderForm.shippingAddress || 'Kolhapur, Maharashtra'

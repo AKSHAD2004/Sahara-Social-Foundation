@@ -37,6 +37,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './routes/ProtectedRoute';
+import { dbService } from './services/db';
 
 // CRM Components & Pages (Lazy Loaded so public visitors never download CRM code)
 const CrmLayout = lazy(() => import('./components/crm/CrmLayout'));
@@ -93,11 +94,36 @@ function AppTracker() {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // Track ?ref=SAHARA... in URL parameters
+    // Track ?ref=SAHARA... in URL parameters (30-day affiliate attribution window)
     const params = new URLSearchParams(location.search);
     const refCode = params.get('ref');
     if (refCode) {
-      localStorage.setItem('sahara_active_ref', refCode.toUpperCase());
+      const cleanRef = refCode.trim().toUpperCase();
+      localStorage.setItem('sahara_active_ref', cleanRef);
+      localStorage.setItem('sahara_active_ref_time', Date.now().toString());
+      sessionStorage.setItem('sahara_active_ref', cleanRef);
+
+      const campaign = params.get('campaign') || params.get('utm_campaign') || 'direct_link';
+      const sessionClickKey = `sahara_ref_click_${cleanRef}_${location.pathname}`;
+      if (!sessionStorage.getItem(sessionClickKey)) {
+        sessionStorage.setItem(sessionClickKey, 'true');
+        try {
+          dbService.trackAffiliateClick(cleanRef, location.pathname, campaign);
+        } catch (e) {}
+      }
+    } else {
+      // Check 30-day attribution expiration
+      try {
+        const storedTime = localStorage.getItem('sahara_active_ref_time');
+        if (storedTime) {
+          const daysPassed = (Date.now() - Number(storedTime)) / (1000 * 60 * 60 * 24);
+          if (daysPassed > 30) {
+            localStorage.removeItem('sahara_active_ref');
+            localStorage.removeItem('sahara_active_ref_time');
+            sessionStorage.removeItem('sahara_active_ref');
+          }
+        }
+      } catch (e) {}
     }
 
     // Toggle GTranslate visibility: keep clean on CRM login and dashboard

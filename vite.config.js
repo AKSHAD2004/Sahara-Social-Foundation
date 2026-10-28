@@ -31,9 +31,14 @@ function syncFavicon() {
 
 function syncSlides() {
   try {
+    const publicDir = path.resolve(__dirname, 'public')
+    const slide1 = path.join(publicDir, 'slide-antox-d.jpg')
+    const slide2 = path.join(publicDir, 'slide-antox-amrut.jpg')
+    if (fs.existsSync(slide1) && fs.existsSync(slide2)) {
+      return
+    }
     const src1 = 'C:\\Users\\hp\\.gemini\\antigravity\\brain\\1063b621-a072-4128-b62a-e63ec48eade1\\.user_uploaded\\media_1790845004738.jpg'
     const src2 = 'C:\\Users\\hp\\.gemini\\antigravity\\brain\\1063b621-a072-4128-b62a-e63ec48eade1\\.user_uploaded\\media_1790845049239.jpg'
-    const publicDir = path.resolve(__dirname, 'public')
     if (fs.existsSync(src1)) {
       fs.copyFileSync(src1, path.join(publicDir, 'slide-antox-d.jpg'))
       fs.copyFileSync(src1, path.join(publicDir, 'hero-slide-1.jpg'))
@@ -57,6 +62,9 @@ function syncClinicalPdf() {
       fs.mkdirSync(reportsDir, { recursive: true })
     }
     const targetPdf = path.join(reportsDir, 'Antox-D-Clinical-Study-Report.pdf')
+    if (fs.existsSync(targetPdf) && fs.statSync(targetPdf).size > 100000) {
+      return true
+    }
     const userPdf = 'C:\\Users\\hp\\.gemini\\antigravity\\brain\\15e38a52-3c71-40ac-97d0-992c8cf16187\\.user_uploaded\\media_1790937161122.pdf'
     if (fs.existsSync(userPdf)) {
       fs.copyFileSync(userPdf, targetPdf)
@@ -664,6 +672,9 @@ export default defineConfig({
     target: 'es2020',
     cssCodeSplit: true,
     chunkSizeWarningLimit: 1200,
+    minify: 'esbuild',
+    sourcemap: false,
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
