@@ -900,23 +900,6 @@ const ProductDetails = () => {
               </span>
             </div>
 
-            {/* Mandatory Post-Order Helpline Guideline Alert */}
-            <div style={{
-              backgroundColor: '#fff9e6',
-              borderLeft: '4px solid #FFC928',
-              padding: '0.85rem 1rem',
-              borderRadius: '8px',
-              marginBottom: '1.35rem',
-              fontSize: '0.88rem',
-              color: '#785300',
-              lineHeight: 1.5
-            }}>
-              <strong>{language === 'mr' ? 'महत्त्वाची सूचना (Important):' : 'Regimen Guidance:'}</strong><br />
-              <span style={{ color: '#17251B' }}>
-                {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
-              </span>
-            </div>
-
             {/* Product Description */}
             <p style={{ fontSize: '0.95rem', color: '#172033', lineHeight: 1.65, marginBottom: '1.35rem' }}>
               {language === 'mr' ? displayProduct.descriptionMr : displayProduct.descriptionEn}

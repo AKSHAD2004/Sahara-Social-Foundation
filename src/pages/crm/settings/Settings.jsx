@@ -444,13 +444,13 @@ service cloud.firestore {
                   <input
                     type="text"
                     className="crm-input"
-                    placeholder="rzp_test_TStMSRZCVUy6Aw"
+                    placeholder="rzp_test_TtgREonNV37lbM"
                     value={settings.razorpayKeyId || ''}
                     onChange={(e) => setSettings({ ...settings, razorpayKeyId: e.target.value })}
                   />
                 </div>
                 <span style={{ fontSize: '0.78rem', color: '#6b7280', display: 'block', marginTop: '0.35rem' }}>
-                  Default active test key: <code>rzp_test_TStMSRZCVUy6Aw</code>. Remember to also add this as <code>VITE_RAZORPAY_KEY_ID</code> in Vercel Environment Variables.
+                  Default active test key: <code>rzp_test_TtgREonNV37lbM</code>. Remember to also add this as <code>VITE_RAZORPAY_KEY_ID</code> in Vercel Environment Variables.
                 </span>
               </div>
             </div>

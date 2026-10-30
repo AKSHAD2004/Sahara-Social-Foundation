@@ -242,11 +242,6 @@ export default function CrmSidebar({ collapsed, onToggleCollapse, mobileOpen, on
               {!collapsed && <span>Users & Roles</span>}
             </NavLink>
 
-            <NavLink to="/crm/audit-logs" className="crm-nav-link" onClick={onCloseMobile}>
-              <FileText size={18} />
-              {!collapsed && <span>Audit Logs</span>}
-            </NavLink>
-
             <NavLink to="/crm/settings" className="crm-nav-link" onClick={onCloseMobile}>
               <Settings size={18} />
               {!collapsed && <span>Settings</span>}

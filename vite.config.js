@@ -1,8 +1,10 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import createOrderHandler from './api/create-order.js'
+import verifyPaymentHandler from './api/verify-payment.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -661,34 +663,96 @@ syncFavicon()
 syncSlides()
 generateClinicalReportPdf()
 
+function razorpayDevApiPlugin() {
+  return {
+    name: 'razorpay-dev-api',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const url = req.url ? req.url.split('?')[0] : ''
+        if (url === '/api/create-order' || url === '/api/verify-payment') {
+          let rawBody = ''
+          req.on('data', chunk => {
+            rawBody += chunk
+          })
+          req.on('end', async () => {
+            try {
+              req.body = rawBody ? JSON.parse(rawBody) : {}
+            } catch (e) {
+              req.body = rawBody
+            }
+
+            if (!res.status) {
+              res.status = (code) => {
+                res.statusCode = code
+                return res
+              }
+            }
+            if (!res.json) {
+              res.json = (data) => {
+                res.setHeader('Content-Type', 'application/json')
+                res.end(JSON.stringify(data))
+                return res
+              }
+            }
+
+            try {
+              if (url === '/api/create-order') {
+                await createOrderHandler(req, res)
+              } else if (url === '/api/verify-payment') {
+                await verifyPaymentHandler(req, res)
+              }
+            } catch (err) {
+              console.error(`[Dev API Error] ${url}:`, err)
+              if (!res.headersSent) {
+                res.statusCode = 500
+                res.setHeader('Content-Type', 'application/json')
+                res.end(JSON.stringify({ error: err.message || 'Internal dev server error' }))
+              }
+            }
+          })
+          return
+        }
+        next()
+      })
+    }
+  }
+}
+
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-    open: false
-  },
-  build: {
-    target: 'es2020',
-    cssCodeSplit: true,
-    chunkSizeWarningLimit: 1200,
-    minify: 'esbuild',
-    sourcemap: false,
-    reportCompressedSize: false,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('firebase')) {
-              return 'vendor-firebase';
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  process.env.RAZORPAY_KEY_ID = env.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || 'rzp_test_Tu3tzgEtDCjdSa'
+  process.env.RAZORPAY_KEY_SECRET = env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET || 'vSkMObdTXknolHr6bsEvawaL'
+  process.env.VITE_RAZORPAY_KEY_ID = env.VITE_RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_Tu3tzgEtDCjdSa'
+
+  return {
+    plugins: [react(), razorpayDevApiPlugin()],
+    server: {
+      port: 5173,
+      open: false
+    },
+    build: {
+      target: 'es2020',
+      cssCodeSplit: true,
+      chunkSizeWarningLimit: 1200,
+      minify: 'esbuild',
+      sourcemap: false,
+      reportCompressedSize: false,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('firebase')) {
+                return 'vendor-firebase';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+              }
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+                return 'vendor-react';
+              }
+              return 'vendor-deps';
             }
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-              return 'vendor-react';
-            }
-            return 'vendor-deps';
           }
         }
       }

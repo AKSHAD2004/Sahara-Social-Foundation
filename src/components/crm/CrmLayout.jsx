@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import CrmSidebar from './CrmSidebar';
 import CrmHeader from './CrmHeader';
 import CrmMobileBottomBar from './CrmMobileBottomBar';
-import { setupFirestoreRealtimeSync } from '../../services/db';
+import { setupFirestoreRealtimeSync, unsubscribeFirestoreRealtimeSync } from '../../services/db';
 import '../../styles/crm.css';
 
 export default function CrmLayout() {
@@ -12,8 +12,12 @@ export default function CrmLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    // Ensure all CRM administrative collections are subscribed in real-time
+    // Ensure CRM administrative collections are subscribed with query bounds
     setupFirestoreRealtimeSync(true);
+    return () => {
+      // Detach listeners when exiting CRM to eliminate background read usage
+      unsubscribeFirestoreRealtimeSync();
+    };
   }, []);
 
   return (

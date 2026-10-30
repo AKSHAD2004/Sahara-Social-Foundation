@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
-import { organizationInfo } from '../data/websiteData';
 import { getComboItems } from '../utils/comboHelper';
 
 const Cart = () => {
@@ -300,23 +299,6 @@ const Cart = () => {
                   <span>{language === 'mr' ? 'एकूण रक्कम' : 'Total Amount'}</span>
                   <span>₹{grandTotal}</span>
                 </div>
-              </div>
-
-              {/* Mandatory Helpline Reminder Notice */}
-              <div style={{
-                backgroundColor: '#fff9e6',
-                borderLeft: '4px solid #FFC928',
-                padding: '0.75rem 0.95rem',
-                borderRadius: '8px',
-                fontSize: '0.82rem',
-                color: '#785300',
-                lineHeight: 1.5,
-                marginBottom: '1.25rem'
-              }}>
-                <strong>{language === 'mr' ? 'महत्त्वाचे:' : 'Note:'}</strong>{' '}
-                <span style={{ color: '#17251B' }}>
-                  {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
-                </span>
               </div>
 
               <button

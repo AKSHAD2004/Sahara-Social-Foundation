@@ -216,18 +216,19 @@ const Account = () => {
         });
       };
 
-      // 1. Initial local lookup
+      // 1. Initial local lookup (0 Firestore reads)
       const currentOrders = dbService.getAll('orders') || [];
       const localMatches = filterCustomerOrders(currentOrders);
       if (localMatches.length > 0) {
         setOrders(localMatches);
+      } else {
+        // 2. If not found in local cache, query ONLY this customer's orders (targeted, limit 20)
+        dbService.fetchCustomerOrders(customerUser).then((custOrders) => {
+          if (custOrders && custOrders.length > 0) {
+            setOrders(filterCustomerOrders(custOrders));
+          }
+        }).catch(() => {});
       }
-
-      // 2. Fetch fresh from Cloud Firestore across any device
-      dbService.refreshFromFirebase('orders').then((refreshed) => {
-        const remoteMatches = filterCustomerOrders(refreshed);
-        setOrders(remoteMatches);
-      }).catch(() => {});
     }
 
     const unsubOrders = dbService.subscribe('orders', (allOrders) => {

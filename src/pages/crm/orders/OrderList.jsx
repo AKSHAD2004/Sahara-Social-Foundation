@@ -1,12 +1,11 @@
 // Complete Order Management Module for Sahara Social Foundation CRM
 import React, { useState, useEffect } from 'react';
 import { 
-  ShoppingBag, Plus, Search, Filter, Eye, Truck, 
+  ShoppingBag, Plus, Search, Filter, Eye, Truck, Globe,
   CreditCard, CheckCircle2, AlertTriangle, ArrowRight, Check, RotateCcw, Trash2 
 } from 'lucide-react';
 import { formatCurrency, formatDate, getStatusBadgeClass } from '../../../utils/formatters';
-import { dbService, getDeletedSet, isFirestoreQuotaExhausted, handleFirestoreQuotaExceeded } from '../../../services/db';
-import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot, disconnectFirestoreNetwork } from '../../../services/firebase';
+import { dbService, getDeletedSet } from '../../../services/db';
 import CrmModal from '../../../components/crm/CrmModal';
 import ExportButton from '../../../components/crm/ExportButton';
 
@@ -20,6 +19,7 @@ export default function OrderList() {
   const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('ALL');
   const [sourceFilter, setSourceFilter] = useState('ALL');
+  const [activeKpi, setActiveKpi] = useState('all');
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncNotice, setSyncNotice] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -43,18 +43,12 @@ export default function OrderList() {
     setIsSyncing(true);
     setSyncNotice('');
     try {
-      if (isFirestoreQuotaExhausted()) {
-        const localOrders = dbService.getCollection('orders');
-        setOrders(localOrders);
-        setSyncNotice('⚡ Local Reactive Cache: Running at top speed (Cloud quota reached for today).');
+      const refreshed = await dbService.refreshFromFirebase('orders', true);
+      if (Array.isArray(refreshed) && refreshed.length > 0) {
+        setOrders(refreshed);
+        setSyncNotice(`✓ Synced ${refreshed.length} orders live from Cloud Firestore!`);
       } else {
-        const refreshed = await dbService.refreshFromFirebase('orders');
-        if (Array.isArray(refreshed) && refreshed.length > 0) {
-          setOrders(refreshed);
-          setSyncNotice(`✓ Synced ${refreshed.length} orders live from Cloud Firestore!`);
-        } else {
-          setSyncNotice(`✓ Firebase connected. Orders are up to date.`);
-        }
+        setSyncNotice(`✓ Orders are up to date.`);
       }
       setTimeout(() => setSyncNotice(''), 4500);
     } catch (e) {
@@ -65,46 +59,6 @@ export default function OrderList() {
   };
 
   useEffect(() => {
-    // Initial fetch from Cloud Firestore with auto-upload of any pending local orders (only if quota intact)
-    if (!isFirestoreQuotaExhausted()) {
-      dbService.refreshFromFirebase('orders').then((refreshed) => {
-        if (Array.isArray(refreshed)) {
-          const deletedIds = getDeletedSet('orders');
-          setOrders(refreshed.filter((o) => !deletedIds.has(String(o.id || '')) && !deletedIds.has(String(o.orderId || ''))));
-        }
-      }).catch(() => {});
-    }
-
-    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device sync (only if quota intact)
-    let unsubFirestoreOrders = () => {};
-    if (isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
-      try {
-        const colRef = collection(firestoreDb, 'orders');
-        unsubFirestoreOrders = onSnapshot(colRef, (snapshot) => {
-          const deletedIds = getDeletedSet('orders');
-          const liveOrders = snapshot.docs
-            .map((d) => ({ id: d.id, ...d.data() }))
-            .filter((o) => !deletedIds.has(String(o.id || '')) && !deletedIds.has(String(o.orderId || '')));
-
-          liveOrders.sort((a, b) => {
-            const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
-            const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
-            return dateB - dateA;
-          });
-          setOrders(liveOrders);
-        }, (err) => {
-          if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded') || err?.message?.includes('resource-exhausted')) {
-            if (typeof unsubFirestoreOrders === 'function') unsubFirestoreOrders();
-            handleFirestoreQuotaExceeded(err);
-          } else {
-            console.warn('Direct Firestore orders listener note:', err.message);
-          }
-        });
-      } catch (err) {
-        console.warn('Direct Firestore listener setup note:', err.message);
-      }
-    }
-
     // Active subscription to reactive store as fallback & local store sync
     const unsubOrders = dbService.subscribe('orders', (currentOrders) => {
       const deletedIds = getDeletedSet('orders');
@@ -128,39 +82,11 @@ export default function OrderList() {
       }
     });
 
-    // Mobile background sync heartbeat (polls every 15s) and visibility handler for mobile browsers
-    const heartbeatTimer = setInterval(() => {
-      if (!isFirestoreQuotaExhausted()) {
-        dbService.refreshFromFirebase('orders').then((refreshed) => {
-          if (Array.isArray(refreshed) && refreshed.length > 0) {
-            setOrders(refreshed);
-          }
-        }).catch(() => {});
-      }
-    }, 15000);
-
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted()) {
-        dbService.refreshFromFirebase('orders').then((refreshed) => {
-          if (Array.isArray(refreshed) && refreshed.length > 0) {
-            setOrders(refreshed);
-          }
-        }).catch(() => {});
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibility);
-    window.addEventListener('focus', handleVisibility);
-
     return () => {
-      unsubFirestoreOrders();
       unsubOrders();
       unsubCust();
       unsubProd();
       unsubUsers();
-      clearInterval(heartbeatTimer);
-      document.removeEventListener('visibilitychange', handleVisibility);
-      window.removeEventListener('focus', handleVisibility);
     };
   }, []);
 
@@ -168,6 +94,41 @@ export default function OrderList() {
     const src = String(o.source || '').toLowerCase();
     const idStr = String(o.id || o.orderId || '');
     return src.includes('website') || idStr.startsWith('ORD-') || idStr.startsWith('SSF-');
+  };
+
+  const handleKpiClick = (kpiType) => {
+    if (activeKpi === kpiType && kpiType !== 'all') {
+      setActiveKpi('all');
+      setSourceFilter('ALL');
+      setPaymentStatusFilter('ALL');
+      setOrderStatusFilter('ALL');
+    } else {
+      setActiveKpi(kpiType);
+      if (kpiType === 'all') {
+        setSourceFilter('ALL');
+        setPaymentStatusFilter('ALL');
+        setOrderStatusFilter('ALL');
+      } else if (kpiType === 'online') {
+        setSourceFilter('WEBSITE');
+        setPaymentStatusFilter('ALL');
+        setOrderStatusFilter('ALL');
+      } else if (kpiType === 'paid') {
+        setPaymentStatusFilter('Paid');
+        setSourceFilter('ALL');
+        setOrderStatusFilter('ALL');
+      } else if (kpiType === 'pending_delivery') {
+        setPaymentStatusFilter('ALL');
+        setSourceFilter('ALL');
+        setOrderStatusFilter('ALL');
+      }
+    }
+
+    setTimeout(() => {
+      const target = document.getElementById('orders-table-card');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 60);
   };
 
   const filteredOrders = orders
@@ -186,7 +147,12 @@ export default function OrderList() {
       const isWeb = isWebsiteOrder(o);
       const matchSource = sourceFilter === 'ALL' || (sourceFilter === 'WEBSITE' ? isWeb : !isWeb);
 
-      return matchSearch && matchOrderStatus && matchPaymentStatus && matchSource;
+      // Dedicated filter for Pending Delivery KPI
+      const matchKpi = activeKpi === 'pending_delivery'
+        ? (o.orderStatus !== 'Delivered' && o.orderStatus !== 'Cancelled')
+        : true;
+
+      return matchSearch && matchOrderStatus && matchPaymentStatus && matchSource && matchKpi;
     })
     .sort((a, b) => {
       const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
@@ -358,28 +324,156 @@ export default function OrderList() {
         </div>
       )}
 
-      {/* Top Summary Metrics */}
-      <div className="crm-stats-grid crm-stats-grid-responsive" style={{ marginBottom: '1.25rem' }}>
-        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #1b4d3e' }}>
-          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Total Orders</div>
-          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', marginTop: '0.2rem' }}>{orders.length}</div>
+      {/* Top Summary Metrics - Clickable Interactive Filter Buttons */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+        gap: '1rem',
+        marginBottom: '1.5rem'
+      }}>
+        {/* Button 1: Total Orders */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => handleKpiClick('all')}
+          onKeyDown={(e) => e.key === 'Enter' && handleKpiClick('all')}
+          className="crm-stat-card"
+          style={{
+            padding: '1rem 1.25rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeKpi === 'all' ? '2px solid #0f172a' : '1px solid var(--crm-border)',
+            backgroundColor: activeKpi === 'all' ? '#f8fafc' : 'var(--crm-surface)',
+            boxShadow: activeKpi === 'all' ? '0 4px 14px rgba(15, 23, 42, 0.15)' : 'var(--crm-shadow-sm)',
+            transform: activeKpi === 'all' ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to view all orders"
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+              <span className="crm-stat-label">Total Orders</span>
+              {activeKpi === 'all' && (
+                <span style={{ fontSize: '0.66rem', fontWeight: 700, color: '#0f172a', backgroundColor: '#e2e8f0', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                  ✓ ACTIVE
+                </span>
+              )}
+            </div>
+            <div className="crm-stat-value" style={{ fontSize: '1.5rem', fontWeight: 800 }}>{orders.length}</div>
+            <div className="crm-stat-subtext">Click to view all channels</div>
+          </div>
+          <div className="crm-stat-icon-wrap primary" style={{ width: '44px', height: '44px' }}>
+            <ShoppingBag size={20} />
+          </div>
         </div>
-        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #006B2D' }}>
-          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>🌐 Online Orders</div>
-          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#006B2D', marginTop: '0.2rem' }}>{websiteOrdersCount}</div>
+
+        {/* Button 2: Online Orders */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => handleKpiClick('online')}
+          onKeyDown={(e) => e.key === 'Enter' && handleKpiClick('online')}
+          className="crm-stat-card"
+          style={{
+            padding: '1rem 1.25rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeKpi === 'online' ? '2px solid #006B2D' : '1px solid var(--crm-border)',
+            backgroundColor: activeKpi === 'online' ? '#f0fdf4' : 'var(--crm-surface)',
+            boxShadow: activeKpi === 'online' ? '0 4px 14px rgba(0, 107, 45, 0.2)' : 'var(--crm-shadow-sm)',
+            transform: activeKpi === 'online' ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to filter Website & Razorpay online orders"
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+              <span className="crm-stat-label">Online Orders</span>
+              {activeKpi === 'online' && (
+                <span style={{ fontSize: '0.66rem', fontWeight: 700, color: '#006B2D', backgroundColor: '#bbf7d0', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                  ✓ ACTIVE
+                </span>
+              )}
+            </div>
+            <div className="crm-stat-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#006B2D' }}>{websiteOrdersCount}</div>
+            <div className="crm-stat-subtext">Click to filter website orders</div>
+          </div>
+          <div className="crm-stat-icon-wrap success" style={{ width: '44px', height: '44px' }}>
+            <Globe size={20} />
+          </div>
         </div>
-        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #16a34a' }}>
-          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Paid Volume</div>
-          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a', marginTop: '0.2rem' }}>{formatCurrency(totalRevenue)}</div>
+
+        {/* Button 3: Paid Volume */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => handleKpiClick('paid')}
+          onKeyDown={(e) => e.key === 'Enter' && handleKpiClick('paid')}
+          className="crm-stat-card"
+          style={{
+            padding: '1rem 1.25rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeKpi === 'paid' ? '2px solid #16a34a' : '1px solid var(--crm-border)',
+            backgroundColor: activeKpi === 'paid' ? '#f0fdf4' : 'var(--crm-surface)',
+            boxShadow: activeKpi === 'paid' ? '0 4px 14px rgba(22, 163, 74, 0.2)' : 'var(--crm-shadow-sm)',
+            transform: activeKpi === 'paid' ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to filter Paid orders only"
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+              <span className="crm-stat-label">Paid Volume</span>
+              {activeKpi === 'paid' && (
+                <span style={{ fontSize: '0.66rem', fontWeight: 700, color: '#15803d', backgroundColor: '#bbf7d0', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                  ✓ ACTIVE
+                </span>
+              )}
+            </div>
+            <div className="crm-stat-value" style={{ fontSize: '1.45rem', fontWeight: 800, color: '#16a34a' }}>{formatCurrency(totalRevenue)}</div>
+            <div className="crm-stat-subtext">Click to filter cleared payments</div>
+          </div>
+          <div className="crm-stat-icon-wrap accent" style={{ width: '44px', height: '44px' }}>
+            <CreditCard size={20} />
+          </div>
         </div>
-        <div className="crm-card crm-metric-card" style={{ borderLeft: '4px solid #eab308' }}>
-          <div className="crm-metric-label" style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Pending Delivery</div>
-          <div className="crm-metric-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#854d0e', marginTop: '0.2rem' }}>{pendingDeliveryCount}</div>
+
+        {/* Button 4: Pending Delivery */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => handleKpiClick('pending_delivery')}
+          onKeyDown={(e) => e.key === 'Enter' && handleKpiClick('pending_delivery')}
+          className="crm-stat-card"
+          style={{
+            padding: '1rem 1.25rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: activeKpi === 'pending_delivery' ? '2px solid #d97706' : '1px solid var(--crm-border)',
+            backgroundColor: activeKpi === 'pending_delivery' ? '#fffbeb' : 'var(--crm-surface)',
+            boxShadow: activeKpi === 'pending_delivery' ? '0 4px 14px rgba(217, 119, 6, 0.2)' : 'var(--crm-shadow-sm)',
+            transform: activeKpi === 'pending_delivery' ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to filter orders pending delivery"
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+              <span className="crm-stat-label">Pending Delivery</span>
+              {activeKpi === 'pending_delivery' && (
+                <span style={{ fontSize: '0.66rem', fontWeight: 700, color: '#b45309', backgroundColor: '#fde68a', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                  ✓ ACTIVE
+                </span>
+              )}
+            </div>
+            <div className="crm-stat-value" style={{ fontSize: '1.5rem', fontWeight: 800, color: '#b45309' }}>{pendingDeliveryCount}</div>
+            <div className="crm-stat-subtext">Click to view pending shipments</div>
+          </div>
+          <div className="crm-stat-icon-wrap warning" style={{ width: '44px', height: '44px' }}>
+            <Truck size={20} />
+          </div>
         </div>
       </div>
 
       {/* Main Table Card */}
-      <div className="crm-card">
+      <div className="crm-card" id="orders-table-card">
         <div className="crm-toolbar">
           <div className="crm-toolbar-search">
             <Search size={16} color="#64748b" />
@@ -431,10 +525,6 @@ export default function OrderList() {
           </div>
         </div>
 
-        <div className="crm-table-swipe-hint">
-          <span>↔ Swipe table horizontally to see full details & actions</span>
-        </div>
-
         <div className="crm-table-wrapper">
           <table className="crm-table">
             <thead>
@@ -446,7 +536,7 @@ export default function OrderList() {
                 <th>Payment Status</th>
                 <th>Order Status</th>
                 <th>Order Date</th>
-                <th>Actions</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

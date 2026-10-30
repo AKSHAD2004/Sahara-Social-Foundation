@@ -18,11 +18,19 @@ export default function Reports() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    setOrders(dbService.getAll('orders'));
-    setLeads(dbService.getAll('leads'));
-    setCustomers(dbService.getAll('customers'));
-    setCommissionTx(dbService.getAll('commissionTransactions'));
-    setUsers(dbService.getAll('users'));
+    const unsubOrders = dbService.subscribe('orders', setOrders);
+    const unsubLeads = dbService.subscribe('leads', setLeads);
+    const unsubCust = dbService.subscribe('customers', setCustomers);
+    const unsubTx = dbService.subscribe('commissionTransactions', setCommissionTx);
+    const unsubUsers = dbService.subscribe('users', setUsers);
+
+    return () => {
+      unsubOrders();
+      unsubLeads();
+      unsubCust();
+      unsubTx();
+      unsubUsers();
+    };
   }, []);
 
   // Product-wise sales aggregation
@@ -109,7 +117,7 @@ export default function Reports() {
                 </h3>
               </div>
               <div className="crm-card-body">
-                <SalesBarChart />
+                <SalesBarChart orders={orders} commissionTx={commissionTx} />
               </div>
             </div>
 
@@ -186,7 +194,7 @@ export default function Reports() {
                 <h3 className="crm-card-title">Lead Sources</h3>
               </div>
               <div className="crm-card-body">
-                <LeadSourceDonut />
+                <LeadSourceDonut leads={leads} customers={customers} orders={orders} />
               </div>
             </div>
 
@@ -195,7 +203,7 @@ export default function Reports() {
                 <h3 className="crm-card-title">Inquiry to Customer Conversion Pipeline</h3>
               </div>
               <div className="crm-card-body">
-                <ConversionFunnel />
+                <ConversionFunnel leads={leads} orders={orders} customers={customers} />
               </div>
             </div>
           </div>

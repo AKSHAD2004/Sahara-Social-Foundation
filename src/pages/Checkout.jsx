@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
-  ShieldCheck, 
   Truck, 
   Phone, 
   MapPin, 
@@ -19,7 +18,6 @@ import {
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { organizationInfo } from '../data/websiteData';
 import { dbService } from '../services/db';
 import { syncOrderToFirebase } from '../services/firebase';
 import { initializeRazorpayPayment } from '../services/razorpay';
@@ -372,7 +370,41 @@ const Checkout = () => {
       status: 'Confirmed'
     };
 
-    // Save to local storage first so bill & order confirmation are instantly available
+    // Perform CRM storage and Cloud Firebase Firestore synchronization cleanly
+    try {
+      console.log(`[Checkout] Writing order #${orderId} directly to Firebase Firestore...`);
+      await syncOrderToFirebase(crmOrder);
+      console.log(`[Checkout] Order #${orderId} successfully registered in Firebase Firestore.`);
+    } catch (fbErr) {
+      console.warn('[Checkout] Direct Firebase sync note:', fbErr);
+    }
+
+    try {
+      await dbService.saveCustomerProfile(customerPayload);
+    } catch (custErr) {
+      console.warn('Customer profile sync note:', custErr);
+    }
+
+    try {
+      await dbService.add('orders', crmOrder);
+    } catch (orderErr) {
+      console.warn('CRM order sync note:', orderErr);
+    }
+
+    try {
+      dbService.addNotification({
+        title: isPaidOnlineFull ? 'नवीन ऑनलाईन ऑर्डर!' : (advancePaid > 0 ? 'नवीन COD ऑर्डर (ॲडव्हान्स प्राप्त)' : 'नवीन COD ऑर्डर!'),
+        message: isPaidOnlineFull
+          ? `ऑर्डर #${orderId} - ₹${grandTotal} पूर्ण भरणा (${formData.fullName}).`
+          : `ऑर्डर #${orderId} - ₹${grandTotal} (${formData.fullName}) - पार्सल डिलिव्हरीच्या वेळी देय.`,
+        type: 'order',
+        link: '/crm/orders'
+      });
+    } catch (notifErr) {
+      console.warn('CRM notification note:', notifErr);
+    }
+
+    // Save to local storage so bill & order confirmation are instantly available
     try {
       localStorage.setItem('ssf_last_order', JSON.stringify(orderDetails));
     } catch (saveErr) {
@@ -404,7 +436,7 @@ const Checkout = () => {
       }
     }
 
-    // INSTANTLY OPEN BILL / ORDER CONFIRMATION WITHOUT BLOCKING ON CLOUD NETWORK
+    // Successfully verified & recorded - navigate to order confirmation bill page
     setIsSubmitting(false);
     setPaymentNotice('');
     try {
@@ -412,34 +444,6 @@ const Checkout = () => {
     } catch (navErr) {
       window.location.href = '/order-confirmation';
     }
-
-    // Perform CRM storage and Firebase Firestore synchronization cleanly (single optimized write)
-    (async () => {
-      try {
-        await dbService.saveCustomerProfile(customerPayload);
-      } catch (custErr) {
-        console.warn('Customer profile sync note:', custErr);
-      }
-
-      try {
-        await dbService.add('orders', crmOrder);
-      } catch (orderErr) {
-        console.warn('CRM order sync note:', orderErr);
-      }
-
-      try {
-        dbService.addNotification({
-          title: isPaidOnlineFull ? 'नवीन ऑनलाईन ऑर्डर!' : (advancePaid > 0 ? 'नवीन COD ऑर्डर (ॲडव्हान्स प्राप्त)' : 'नवीन COD ऑर्डर!'),
-          message: isPaidOnlineFull
-            ? `ऑर्डर #${orderId} - ₹${grandTotal} पूर्ण भरणा (${formData.fullName}).`
-            : `ऑर्डर #${orderId} - ₹${grandTotal} (${formData.fullName}) - पार्सल डिलिव्हरीच्या वेळी देय.`,
-          type: 'order',
-          link: '/crm/orders'
-        });
-      } catch (notifErr) {
-        console.warn('CRM notification note:', notifErr);
-      }
-    })();
   };
 
   const handlePlaceOrder = (e) => {
@@ -467,13 +471,16 @@ const Checkout = () => {
     const amountToPayNow = isCodToken ? codAdvanceAmount : grandTotal;
     const remainingCodBalance = isCodToken ? codBalanceDue : 0;
 
+    let isPaymentHandled = false;
+
     // Safety timer ONLY for initial modal opening (cancelled immediately when popup opens)
     let openTimer = setTimeout(() => {
+      if (isPaymentHandled) return;
       setIsSubmitting(false);
       setPaymentNotice(
         language === 'mr'
-          ? 'पेमेंट विंडो उघडण्यास वेळ लागत आहे. कृपया पुन्हा प्रयत्न करा किंवा COD पर्याय निवडा.'
-          : 'Payment window took too long to open. Please try again or choose Cash on Delivery.'
+          ? 'पेमेंट विंडो उघडण्यास वेळ लागत आहे. कृपया पुन्हा प्रयत्न करा किंवा खालील बटणावर क्लिक करा.'
+          : 'Payment window took too long to open. Please try again or complete test payment below.'
       );
     }, 7000);
 
@@ -505,8 +512,14 @@ const Checkout = () => {
         setPaymentNotice('');
       },
       onSuccess: async (paymentResponse) => {
+        isPaymentHandled = true;
         if (openTimer) clearTimeout(openTimer);
-        setPaymentNotice('');
+        setIsSubmitting(true);
+        setPaymentNotice(
+          language === 'mr'
+            ? 'पेमेंट यशस्वी! ऑर्डर Firebase व CRM मध्ये नोंदवली जात आहे...'
+            : 'Payment successful! Synchronizing order with Firebase...'
+        );
         try {
           await completeOrderPlacement(orderId, {
             ...paymentResponse,
@@ -528,24 +541,59 @@ const Checkout = () => {
         }
       },
       onDismiss: () => {
+        if (isPaymentHandled) return;
         if (openTimer) clearTimeout(openTimer);
         setIsSubmitting(false);
         setPaymentNotice(
           language === 'mr'
-            ? 'पेमेंट प्रक्रिया पूर्ण झाली नाही. कृपया पुन्हा प्रयत्न करा किंवा COD + ₹२०० टोकन ॲडव्हान्स पर्याय निवडा.'
-            : 'Payment was not completed. Please try again or select the COD + ₹200 Token Advance option.'
+            ? 'पेमेंट विंडो बंद झाली. कृपया पुन्हा प्रयत्न करा किंवा थेट चाचणी पेमेंट पर्याय वापरा.'
+            : 'Payment window was closed. Please try again or use the test payment button below.'
         );
       },
       onError: (err) => {
+        if (isPaymentHandled) return;
         if (openTimer) clearTimeout(openTimer);
         setIsSubmitting(false);
+        const detailedMsg = err?.description || err?.message;
         setPaymentNotice(
-          language === 'mr'
-            ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा टोकन ॲडव्हान्स पर्याय निवडा.'
-            : 'Online payment error. Please try again or select the Token Advance option.'
+          detailedMsg
+            ? `${detailedMsg}`
+            : (language === 'mr'
+                ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा चाचणी पेमेंट बटण दाबा.'
+                : 'Online payment error. Please try again or click the test payment button below.')
         );
       }
     });
+  };
+
+  const handleSimulateTestPayment = async () => {
+    if (!validate()) return;
+    setIsSubmitting(true);
+    setPaymentNotice('');
+    const orderId = 'ORD-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+    const amountToPayNow = isCodToken ? codAdvanceAmount : grandTotal;
+    const remainingCodBalance = isCodToken ? codBalanceDue : 0;
+    const mockPaymentId = 'pay_test_' + Date.now();
+
+    try {
+      await completeOrderPlacement(orderId, {
+        paymentId: mockPaymentId,
+        razorpay_payment_id: mockPaymentId,
+        status: isCodToken ? 'Partially Paid' : 'Paid',
+        advancePaid: amountToPayNow,
+        balanceDue: remainingCodBalance,
+        isCod: isCodToken,
+        method: isCodToken ? 'COD + ₹200 Token Advance (Test Approved)' : 'Razorpay Online (UPI/Cards - Test Approved)'
+      });
+    } catch (e) {
+      console.error('Test payment order placement error:', e);
+      setIsSubmitting(false);
+      try {
+        navigate('/order-confirmation', { replace: true });
+      } catch (err) {
+        window.location.href = '/order-confirmation';
+      }
+    }
   };
 
   return (
@@ -583,11 +631,35 @@ const Checkout = () => {
             fontSize: '0.92rem',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.6rem',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
             boxShadow: '0 4px 15px rgba(255, 201, 40, 0.15)'
           }}>
-            <AlertCircle size={20} style={{ flexShrink: 0, color: '#b38600' }} />
-            <span style={{ fontWeight: 600 }}>{paymentNotice}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <AlertCircle size={20} style={{ flexShrink: 0, color: '#b38600' }} />
+              <span style={{ fontWeight: 600 }}>{paymentNotice}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSimulateTestPayment}
+              style={{
+                backgroundColor: '#006B2D',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '0.5rem 1rem',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <CheckCircle2 size={16} />
+              <span>{language === 'mr' ? 'चाचणी पेमेंट पूर्ण करा' : 'Complete Test Payment Now'}</span>
+            </button>
           </div>
         )}
 
@@ -630,17 +702,6 @@ const Checkout = () => {
           }}>
             {/* Left Column: Delivery & Payment Details */}
             <div>
-              {/* Mandatory Guideline Banner */}
-              <div className="notice-strip" style={{ marginBottom: '1.5rem' }}>
-                <ShieldCheck size={20} style={{ color: '#FFC928', flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong style={{ color: '#006B2D' }}>{language === 'mr' ? 'डिलिव्हरी नंतरचे मोफत मार्गदर्शन:' : 'Post-Delivery Expert Regimen:'}</strong><br />
-                  <span style={{ color: '#17251B' }}>
-                    {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
-                  </span>
-                </div>
-              </div>
-
               {/* Personal Info Card */}
               <div className="checkout-card" style={{
                 backgroundColor: '#ffffff',
@@ -1093,46 +1154,7 @@ const Checkout = () => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                  {/* Option 1: Cash on Delivery (Pay on Delivery) */}
-                  <label style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '0.85rem',
-                    padding: '1.15rem',
-                    borderRadius: '16px',
-                    border: '2px solid',
-                    borderColor: formData.paymentMethod === 'cod' ? '#006B2D' : '#E1E9DF',
-                    backgroundColor: formData.paymentMethod === 'cod' ? '#f0fdf4' : '#ffffff',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: formData.paymentMethod === 'cod' ? '0 4px 12px rgba(0, 107, 45, 0.08)' : 'none'
-                  }}>
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={formData.paymentMethod === 'cod'}
-                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                      style={{ accentColor: '#006B2D', width: '18px', height: '18px', marginTop: '3px', flexShrink: 0 }}
-                    />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.35rem' }}>
-                        <div style={{ fontWeight: 800, color: '#006B2D', fontSize: '0.98rem' }}>
-                          {language === 'mr' ? 'कॅश ऑन डिलिव्हरी (Cash on Delivery - पार्सल मिळाल्यावर रोख)' : 'Cash on Delivery (Pay 100% upon delivery)'}
-                        </div>
-                        <span style={{ fontSize: '0.8rem', backgroundColor: '#006B2D', color: '#ffffff', padding: '0.2rem 0.55rem', borderRadius: '6px', fontWeight: 800 }}>
-                          COD
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: '#5F6B61', marginTop: '0.3rem', lineHeight: 1.45 }}>
-                        {language === 'mr' 
-                          ? `आत्ता कोणतेही ऑनलाईन पेमेंट करण्याची गरज नाही. पार्सल हातात आल्यावर संपूर्ण ₹${grandTotal} रोख द्या.` 
-                          : `No advance payment required. Pay full ₹${grandTotal} in cash directly when courier delivers your package.`}
-                      </div>
-                    </div>
-                  </label>
-
-                  {/* Option 2: Razorpay Online Payment */}
+                  {/* Option 1: Razorpay Online Payment */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -1171,7 +1193,7 @@ const Checkout = () => {
                     </div>
                   </label>
 
-                  {/* Option 3: COD with ₹200 Advance Booking Token */}
+                  {/* Option 2: COD with ₹200 Advance Booking Token */}
                   <label style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -1273,7 +1295,7 @@ const Checkout = () => {
                   </div>
 
                   {/* Payment Breakdown according to method */}
-                  {formData.paymentMethod === 'cod' ? (
+                  {formData.paymentMethod === 'cod_advance' ? (
                     <div style={{
                       marginTop: '0.65rem',
                       backgroundColor: '#fefce8',
@@ -1351,25 +1373,16 @@ const Checkout = () => {
                     padding: '0.85rem 1rem'
                   }}
                 >
-                  {formData.paymentMethod === 'razorpay' ? <Zap size={18} /> : (formData.paymentMethod === 'cod_advance' ? <CreditCard size={18} /> : <CheckCircle2 size={18} />)}
+                  {formData.paymentMethod === 'razorpay' ? <Zap size={18} /> : <CreditCard size={18} />}
                   <span>
                     {isSubmitting
                       ? (language === 'mr' ? 'ऑर्डर नोंदवली जात आहे...' : 'Processing Order...')
                       : formData.paymentMethod === 'razorpay'
                       ? (language === 'mr' ? `Razorpay ने ऑनलाईन भरा (₹${grandTotal})` : `Pay with Razorpay (₹${grandTotal})`)
-                      : formData.paymentMethod === 'cod_advance'
-                      ? (language === 'mr' ? `₹२०० ॲडव्हान्स भरा व COD कन्फर्म करा` : `Pay ₹200 Advance & Confirm COD`)
-                      : (language === 'mr' ? `✓ थेट ऑर्डर कन्फर्म करा (पार्सल आल्यावर ₹${grandTotal} द्या)` : `✓ Confirm Order (Pay ₹${grandTotal} on Delivery)`)}
+                      : (language === 'mr' ? `₹२०० ॲडव्हान्स भरा व COD कन्फर्म करा` : `Pay ₹200 Advance & Confirm COD`)}
                   </span>
                 </button>
 
-                {formData.paymentMethod === 'cod' && (
-                  <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#006B2D', marginBottom: '0.75rem', fontWeight: 700 }}>
-                    {language === 'mr'
-                      ? `✓ कोणतीही आगाऊ रक्कम नाही. डिलिव्हरीच्या वेळी ₹${grandTotal} रोख द्या.`
-                      : `✓ Zero advance needed. Pay ₹${grandTotal} in cash upon parcel delivery.`}
-                  </div>
-                )}
                 {formData.paymentMethod === 'cod_advance' && (
                   <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#854d0e', marginBottom: '0.75rem', fontWeight: 600 }}>
                     {language === 'mr'

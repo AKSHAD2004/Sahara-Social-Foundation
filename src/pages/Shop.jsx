@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShoppingBag, 
   Search, 
-  ShieldCheck, 
   Phone
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -152,19 +151,6 @@ const Shop = () => {
 
       <section className="section" style={{ backgroundColor: '#F3F8F1' }}>
         <div className="container">
-          {/* Post-order Call Guideline Notice */}
-          <div className="notice-strip" style={{ marginBottom: '2rem' }}>
-            <ShieldCheck size={22} style={{ color: '#FFC928', flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <strong style={{ fontSize: '0.95rem', color: '#006B2D' }}>
-                {language === 'mr' ? 'महत्त्वाची सूचना (Important Notice):' : 'Important Notice:'}
-              </strong><br />
-              <span style={{ color: '#17251B' }}>
-                {language === 'mr' ? organizationInfo.contact.orderGuidelineNoteMr : organizationInfo.contact.orderGuidelineNote}
-              </span>
-            </div>
-          </div>
-
           {/* Filter & Search Bar */}
           <div className="shop-filter-bar" style={{
             backgroundColor: '#ffffff',

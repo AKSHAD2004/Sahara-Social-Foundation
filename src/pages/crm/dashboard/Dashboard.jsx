@@ -7,8 +7,7 @@ import {
   RefreshCw, Globe, PackageCheck, AlertCircle, Eye, Phone
 } from 'lucide-react';
 import { formatCurrency, formatDate, formatPhone, getStatusBadgeClass } from '../../../utils/formatters';
-import { dbService, isFirestoreQuotaExhausted, handleFirestoreQuotaExceeded } from '../../../services/db';
-import { isFirebaseConfigured, db as firestoreDb, collection, onSnapshot } from '../../../services/firebase';
+import { dbService } from '../../../services/db';
 import { SalesBarChart, LeadSourceDonut, ConversionFunnel } from '../../../components/crm/Charts';
 import Customer360Modal from '../../../components/crm/Customer360Modal';
 import CrmModal from '../../../components/crm/CrmModal';
@@ -40,14 +39,13 @@ export default function Dashboard() {
     setIsSyncing(true);
     setSyncNotice('');
     try {
-      const refreshedOrders = await dbService.refreshFromFirebase('orders');
+      const refreshedOrders = await dbService.refreshFromFirebase('orders', true);
       if (Array.isArray(refreshedOrders) && refreshedOrders.length > 0) {
         setOrders(refreshedOrders);
       }
-      await dbService.refreshFromFirebase('customers');
-      await dbService.refreshFromFirebase('leads');
-      await dbService.refreshFromFirebase('users');
-      setSyncNotice('✓ All orders, leads, and partner records live-synced from Cloud Firestore!');
+      await dbService.refreshFromFirebase('customers', true);
+      await dbService.refreshFromFirebase('leads', true);
+      setSyncNotice('✓ All records live-synced from Cloud Firestore!');
       setTimeout(() => setSyncNotice(''), 4500);
     } catch (e) {
       setSyncNotice('Sync note: ' + e.message);
@@ -64,53 +62,7 @@ export default function Dashboard() {
     const unsubTx = dbService.subscribe('commissionTransactions', setCommissionTx);
     const unsubTkt = dbService.subscribe('supportTickets', setTickets);
 
-    // Direct Real-time Cloud Firestore subscription for instantaneous cross-device orders (only if quota intact)
-    let unsubFirestoreOrders = () => {};
-    if (isFirebaseConfigured && firestoreDb && !isFirestoreQuotaExhausted()) {
-      try {
-        const colRef = collection(firestoreDb, 'orders');
-        unsubFirestoreOrders = onSnapshot(colRef, (snapshot) => {
-          const liveOrders = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-          if (liveOrders.length > 0) {
-            liveOrders.sort((a, b) => {
-              const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
-              const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
-              return dateB - dateA;
-            });
-            setOrders(liveOrders);
-          }
-        }, (err) => {
-          if (err?.code === 'resource-exhausted' || err?.message?.includes('Quota exceeded') || err?.message?.includes('resource-exhausted')) {
-            if (typeof unsubFirestoreOrders === 'function') unsubFirestoreOrders();
-            handleFirestoreQuotaExceeded(err);
-          } else {
-            console.warn('Direct Firestore orders listener note:', err.message);
-          }
-        });
-      } catch (err) {
-        console.warn('Direct Firestore orders setup note:', err.message);
-      }
-    }
-
-    // Initial fresh pull from Cloud Firestore (only if quota intact)
-    if (!isFirestoreQuotaExhausted()) {
-      dbService.refreshFromFirebase('orders').then((res) => {
-        if (Array.isArray(res) && res.length > 0) setOrders(res);
-      }).catch(() => {});
-    }
-
-    // Mobile device sync heartbeat (every 15 seconds)
-    const mobileSyncTimer = setInterval(() => {
-      if (document.visibilityState === 'visible' && !isFirestoreQuotaExhausted()) {
-        dbService.refreshFromFirebase('orders').then((res) => {
-          if (Array.isArray(res) && res.length > 0) setOrders(res);
-        }).catch(() => {});
-      }
-    }, 15000);
-
     return () => {
-      unsubFirestoreOrders();
-      clearInterval(mobileSyncTimer);
       unsubCust();
       unsubLeads();
       unsubOrders();
@@ -289,12 +241,14 @@ export default function Dashboard() {
         <div className="crm-card" style={{ margin: 0 }}>
           <div className="crm-card-header">
             <h3 className="crm-card-title">
-              <TrendingUp size={18} style={{ color: '#1b4d3e' }} /> Monthly Revenue & Sales Growth
+              <TrendingUp size={18} style={{ color: '#006B2D' }} /> Monthly Revenue & Sales Growth
             </h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>FY 2026-27</span>
+            <span style={{ fontSize: '0.78rem', color: '#006B2D', fontWeight: 600, backgroundColor: '#e6f4ea', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+              Live Firestore • FY 2026-27
+            </span>
           </div>
           <div className="crm-card-body">
-            <SalesBarChart />
+            <SalesBarChart orders={orders} commissionTx={commissionTx} />
           </div>
         </div>
 
@@ -304,14 +258,17 @@ export default function Dashboard() {
             <h3 className="crm-card-title">
               <Target size={18} style={{ color: '#c69214' }} /> Lead Source Distribution
             </h3>
+            <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+              {leads.length + customers.length + orders.length} Total Touchpoints
+            </span>
           </div>
           <div className="crm-card-body">
-            <LeadSourceDonut />
-            <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
+            <LeadSourceDonut leads={leads} customers={customers} orders={orders} />
+            <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
               <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-                Sales Conversion Funnel
+                Sales Conversion Funnel (Live Pipeline)
               </div>
-              <ConversionFunnel />
+              <ConversionFunnel leads={leads} orders={orders} customers={customers} />
             </div>
           </div>
         </div>
@@ -382,7 +339,7 @@ export default function Dashboard() {
                     <th>Payment Status</th>
                     <th>Order Status</th>
                     <th>Date / Time</th>
-                    <th>Action</th>
+                    <th style={{ textAlign: 'right' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>

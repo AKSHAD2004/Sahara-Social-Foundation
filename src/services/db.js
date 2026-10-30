@@ -30,6 +30,9 @@ import {
   deleteDoc,
   onSnapshot,
   getDocs,
+  query,
+  where,
+  limit,
   writeBatch,
   serverTimestamp,
   ensureFirebaseAuth,
@@ -84,32 +87,19 @@ export function getDeletedSet(collectionName) {
   }
 }
 
-// Cleanse any residual dummy records from browser storage on init
+// Cleanse any residual operational records from browser storage on init
+const CRM_CLEAN_VERSION_KEY = 'sahara_crm_fresh_data_v2026';
 if (typeof localStorage !== 'undefined') {
   try {
-    ['orders', 'customers', 'leads', 'followups'].forEach((col) => {
-      const k = STORAGE_PREFIX + col;
-      const raw = localStorage.getItem(k);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          const cleaned = parsed.filter((item) => {
-            const id = String(item.id || item.orderId || item.customerId || item.leadId || '');
-            return !PURGE_DUMMY_IDS.has(id);
-          });
-          localStorage.setItem(k, JSON.stringify(cleaned));
-        }
-      }
-    });
-    ['orders', 'customers'].forEach((col) => {
-      const delKey = DELETED_STORAGE_PREFIX + col;
-      const rawDel = localStorage.getItem(delKey);
-      if (rawDel) {
-        const delSet = new Set(JSON.parse(rawDel));
-        delSet.delete('CUST-8055557120');
-        localStorage.setItem(delKey, JSON.stringify([...delSet]));
-      }
-    });
+    const isCleaned = localStorage.getItem(CRM_CLEAN_VERSION_KEY);
+    if (!isCleaned) {
+      ['orders', 'customers', 'leads', 'followups', 'commissionTransactions', 'commissionPayouts', 'supportTickets', 'notifications', 'auditLogs'].forEach((col) => {
+        localStorage.removeItem(STORAGE_PREFIX + col);
+        localStorage.removeItem(DELETED_STORAGE_PREFIX + col);
+      });
+      localStorage.removeItem('ssf_last_order');
+      localStorage.setItem(CRM_CLEAN_VERSION_KEY, 'true');
+    }
   } catch (e) {}
 }
 
@@ -144,7 +134,7 @@ const state = {};
 const listeners = {};
 const firestoreUnsubscribers = {};
 const lastFetchTimestamps = {};
-const FETCH_COOLDOWN_MS = 60000; // 60-second cooldown per collection to protect read quota
+const FETCH_COOLDOWN_MS = 300000; // 5-minute cooldown per collection to eliminate redundant reads
 
 export const COLLECTIONS = [
   'users',
@@ -480,32 +470,29 @@ function handleFirestorePermissionError(source, colName, err) {
   }
 }
 
-// Setup live listeners to Cloud Firestore
+// Unsubscribe all active live Firestore listeners cleanly
+export function unsubscribeFirestoreRealtimeSync() {
+  Object.keys(firestoreUnsubscribers).forEach((key) => {
+    try {
+      if (typeof firestoreUnsubscribers[key] === 'function') {
+        firestoreUnsubscribers[key]();
+      }
+      delete firestoreUnsubscribers[key];
+    } catch (e) {}
+  });
+}
+
+// Setup live listeners to Cloud Firestore (Ultra-low reads & zero auto-writes)
 export function setupFirestoreRealtimeSync(forceCrm = false) {
   if (isFirestoreQuotaExhausted() || (typeof window !== 'undefined' && window.__firestoreQuotaExceeded)) {
     return;
   }
 
-  const isCrm = forceCrm || (typeof window !== 'undefined' && (
-    window.location.pathname.startsWith('/crm') ||
-    Boolean(localStorage.getItem('sahara_crm_current_user'))
-  ));
+  // Public visitors NEVER listen to CRM collections. Only active CRM routes attach listeners.
+  const isCrm = forceCrm || (typeof window !== 'undefined' && window.location.pathname.startsWith('/crm'));
 
-  // Only strictly necessary business collections are synchronized with Cloud Firestore
-  // Ephemeral, media, audit logs, and static seed data are kept local to eliminate Firestore clutter
-  const FIRESTORE_SYNCED_COLLECTIONS = [
-    'orders',
-    'customers',
-    'users',
-    'leads',
-    'commissionTransactions',
-    'commissionPayouts',
-    'settings'
-  ];
-
-  // Optimization: For public website visitors, only listen to 'settings'.
-  // Heavy operational CRM collections (orders, customers, users, leads) are ONLY subscribed when entering the CRM interface.
-  const SYNC_COLLECTIONS = isCrm ? FIRESTORE_SYNCED_COLLECTIONS : ['settings'];
+  // Strictly operational collections with query limit to prevent reading thousands of legacy docs
+  const SYNC_COLLECTIONS = isCrm ? ['orders', 'customers', 'leads', 'settings'] : ['settings'];
 
   SYNC_COLLECTIONS.forEach((colName) => {
     try {
@@ -524,243 +511,58 @@ export function setupFirestoreRealtimeSync(forceCrm = false) {
           }
         }, (err) => handleFirestorePermissionError('sync-settings', colName, err));
       } else {
-        const colRef = collection(firestoreDb, colName);
-        firestoreUnsubscribers[colName] = onSnapshot(colRef, (snapshot) => {
+        // Query bounded to latest 100 items - drastically reduces initial read quota usage
+        const colQuery = query(collection(firestoreDb, colName), limit(100));
+        firestoreUnsubscribers[colName] = onSnapshot(colQuery, (snapshot) => {
           const remoteDocs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+          const deletedSet = getDeletedSet(colName);
 
-          if (colName === 'products') {
-            // Core catalog guarantee: ALL official products must ALWAYS be present, never disappear!
-            const defaultProds = initialProducts;
-            const remoteMap = new Map(remoteDocs.map((p) => [String(p.id), p]));
+          // In-memory filter: NEVER issue deleteDoc or setDoc calls inside a snapshot listener!
+          const activeRemoteDocs = remoteDocs.filter((rDoc) => {
+            const rId = String(rDoc.id || '');
+            const rOrd = String(rDoc.orderId || '');
+            const rCust = String(rDoc.customerId || '');
+            const rLead = String(rDoc.leadId || '');
+            return !deletedSet.has(rId) && !PURGE_DUMMY_IDS.has(rId) &&
+                   (!rOrd || (!deletedSet.has(rOrd) && !PURGE_DUMMY_IDS.has(rOrd))) &&
+                   (!rCust || (!deletedSet.has(rCust) && !PURGE_DUMMY_IDS.has(rCust))) &&
+                   (!rLead || (!deletedSet.has(rLead) && !PURGE_DUMMY_IDS.has(rLead)));
+          });
 
-            // Overlay remote updates onto initial catalog
-            const fullCatalog = defaultProds.map((defP) => {
-              const remote = remoteMap.get(String(defP.id)) || remoteDocs.find((r) => r.sku && r.sku === defP.sku);
-              if (remote) {
-                return {
-                  ...defP,
-                  ...remote,
-                  id: defP.id,
-                  price: Number(remote.price !== undefined ? remote.price : defP.price),
-                  sellingPrice: Number(remote.sellingPrice !== undefined ? remote.sellingPrice : (remote.price || defP.sellingPrice)),
-                  mrp: Number(remote.mrp !== undefined ? remote.mrp : defP.mrp),
-                  stock: remote.stock !== undefined ? Number(remote.stock) : defP.stock,
-                  image: remote.image || defP.image
-                };
-              }
-              return defP;
+          const remoteMap = new Map(activeRemoteDocs.map((d) => [String(d.id || d.orderId), d]));
+          const localItems = (Array.isArray(state[colName]) ? state[colName] : []).filter((item) => !isItemDeleted(colName, item));
+          const mergedDocs = [...activeRemoteDocs];
+
+          // Merge genuine local items in memory without writing back to Firestore
+          localItems.forEach((localItem) => {
+            const localKey = String(localItem.id || localItem.orderId || localItem.customerId || localItem.leadId || '');
+            if (localKey && !remoteMap.has(localKey) && !isItemDeleted(colName, localItem) && !PURGE_DUMMY_IDS.has(localKey)) {
+              mergedDocs.push(localItem);
+            }
+          });
+
+          // Ensure newest records are always on top
+          if (colName === 'orders' || colName === 'leads' || colName === 'notifications') {
+            mergedDocs.sort((a, b) => {
+              const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+              const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+              return dateB - dateA;
             });
+          }
 
-            // Append any additional custom products added in Firestore
-            remoteDocs.forEach((r) => {
-              if (!defaultProds.some((dp) => String(dp.id) === String(r.id) || (dp.sku && dp.sku === r.sku))) {
-                fullCatalog.push(r);
-              }
-            });
-
-            const currentJson = JSON.stringify(state.products || []);
-            const newJson = JSON.stringify(fullCatalog);
-            if (currentJson !== newJson) {
-              state.products = fullCatalog;
-              saveCollection('products', false);
-            }
-          } else if (colName === 'commissionSlabs') {
-            const defaultSlabs = initialCommissionSlabs;
-            const remoteMap = new Map(remoteDocs.map((s) => [String(s.id), s]));
-            const fullSlabs = defaultSlabs.map((defS) => remoteMap.get(String(defS.id)) || defS);
-            remoteDocs.forEach((r) => {
-              if (!defaultSlabs.some((ds) => String(ds.id) === String(r.id))) fullSlabs.push(r);
-            });
-            const currentJson = JSON.stringify(state.commissionSlabs || []);
-            const newJson = JSON.stringify(fullSlabs);
-            if (currentJson !== newJson) {
-              state.commissionSlabs = fullSlabs;
-              saveCollection('commissionSlabs', false);
-            }
-          } else if (colName === 'users') {
-            const defaultUsers = initialUsers;
-            const remoteMap = new Map(remoteDocs.map((u) => [String(u.id), u]));
-            const fullUsers = defaultUsers.map((defU) => remoteMap.get(String(defU.id)) || defU);
-            remoteDocs.forEach((r) => {
-              if (!defaultUsers.some((du) => String(du.id) === String(r.id)) && !isItemDeleted('users', r)) {
-                fullUsers.push(r);
-              }
-            });
-
-            // CRITICAL: Preserve any locally registered users in state.users or custom backup
-            const currentLocalUsers = (Array.isArray(state.users) ? state.users : []).filter((u) => !isItemDeleted('users', u));
-            currentLocalUsers.forEach((locU) => {
-              const locId = String(locU.id);
-              const exists = fullUsers.some((fu) => 
-                String(fu.id) === locId || 
-                (locU.phone && fu.phone && String(locU.phone).replace(/\D/g, '') === String(fu.phone).replace(/\D/g, '')) ||
-                (locU.email && fu.email && locU.email.toLowerCase().trim() === fu.email.toLowerCase().trim())
-              );
-              if (!exists) {
-                fullUsers.push(locU);
-              }
-            });
-
-            const currentJson = JSON.stringify(state.users || []);
-            const newJson = JSON.stringify(fullUsers);
-            if (currentJson !== newJson) {
-              state.users = fullUsers;
-              saveCollection('users', false);
-            }
-          } else if (colName === 'heroSlides') {
-            // Filter out any broken base64 slides, fall back to official initial slides
-            const validSlides = remoteDocs.filter((s) => s.image && !s.image.startsWith('data:'));
-            const finalSlides = validSlides.length > 0 ? validSlides : initialHeroSlides;
-            finalSlides.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
-            state.heroSlides = finalSlides;
-            saveCollection('heroSlides', false);
-          } else if (remoteDocs.length === 0) {
-            const localItems = (Array.isArray(state[colName]) ? state[colName] : []).filter((item) => !isItemDeleted(colName, item));
-
-            // Only sync genuine local orders placed offline on this device (never dummy seed data)
-            if (colName === 'orders') {
-              let ordersToSync = [...localItems].filter((o) => !PURGE_DUMMY_IDS.has(String(o.id || o.orderId)));
-              if (ordersToSync.length > 0) {
-                ordersToSync.forEach((ord) => {
-                  const key = String(ord.id || ord.orderId);
-                  if (key && !isItemDeleted('orders', key) && !PURGE_DUMMY_IDS.has(key)) {
-                    const docRef = doc(firestoreDb, 'orders', key);
-                    setDoc(docRef, sanitizeForFirestore({ ...ord, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-                    console.log(`[Firestore live sync] Auto-uploaded order ${key} to Firestore!`);
-                  }
-                });
-                state.orders = ordersToSync;
-                saveCollection('orders', false);
-                return;
-              }
-            }
-
-            if (colName === 'customers') {
-              let customersToSync = [...localItems].filter((c) => !PURGE_DUMMY_IDS.has(String(c.id || c.customerId)));
-              if (customersToSync.length > 0) {
-                customersToSync.forEach((cust) => {
-                  const key = String(cust.id || cust.customerId);
-                  if (key && !isItemDeleted('customers', key) && !PURGE_DUMMY_IDS.has(key)) {
-                    const docRef = doc(firestoreDb, 'customers', key);
-                    setDoc(docRef, sanitizeForFirestore({ ...cust, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-                    console.log(`[Firestore live sync] Auto-uploaded customer ${key} to Firestore!`);
-                  }
-                });
-                state.customers = customersToSync;
-                saveCollection('customers', false);
-                return;
-              }
-            }
-
-            if (colName === 'leads') {
-              let leadsToSync = [...localItems].filter((l) => !PURGE_DUMMY_IDS.has(String(l.id || l.leadId)));
-              if (leadsToSync.length > 0) {
-                leadsToSync.forEach((lead) => {
-                  const key = String(lead.id || lead.leadId);
-                  if (key && !isItemDeleted('leads', key) && !PURGE_DUMMY_IDS.has(key)) {
-                    const docRef = doc(firestoreDb, 'leads', key);
-                    setDoc(docRef, sanitizeForFirestore({ ...lead, id: key, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-                  }
-                });
-                state.leads = leadsToSync;
-                saveCollection('leads', false);
-                return;
-              }
-            }
-
-            const isOperational = ['commissionTransactions', 'commissionPayouts', 'supportTickets', 'auditLogs', 'notifications'].includes(colName);
-            if (isOperational) {
-              state[colName] = [];
-              saveCollection(colName, false);
-              return;
-            }
-
-            state[colName] = localItems.length > 0 ? localItems : (initialDataMap[colName] || []);
+          // Guard against redundant state updates and re-renders
+          const currentJson = JSON.stringify(state[colName] || []);
+          const newJson = JSON.stringify(mergedDocs);
+          if (currentJson !== newJson) {
+            state[colName] = mergedDocs;
             saveCollection(colName, false);
-          } else {
-            // Remote Cloud Firestore has documents: purge any deleted/unwanted ones and synchronize
-            const activeRemoteDocs = [];
-            for (const rDoc of remoteDocs) {
-              const rKey = String(rDoc.id || rDoc.orderId || rDoc.customerId || '');
-              if (isItemDeleted(colName, rDoc) || PURGE_DUMMY_IDS.has(rKey)) {
-                // Clean from Cloud Firestore if found remotely
-                const dRef = doc(firestoreDb, colName, rDoc.id);
-                deleteDoc(dRef).catch(() => {});
-              } else {
-                activeRemoteDocs.push(rDoc);
-              }
-            }
-
-            const remoteMap = new Map(activeRemoteDocs.map((d) => [String(d.id || d.orderId), d]));
-            const localItems = Array.isArray(state[colName]) ? state[colName] : [];
-            const mergedDocs = [...activeRemoteDocs];
-
-            // Only preserve and upload local orders placed directly from this device while offline (NEVER deleted!)
-            if (colName === 'orders') {
-              const orderCandidates = localItems.length > 0 ? localItems : (initialOrders || []);
-              orderCandidates.forEach((localItem) => {
-                const localKey = String(localItem.id || localItem.orderId || '');
-                if (
-                  localKey &&
-                  !isItemDeleted('orders', localItem) &&
-                  !remoteMap.has(localKey)
-                ) {
-                  mergedDocs.unshift(localItem);
-                  const docRef = doc(firestoreDb, colName, localKey);
-                  setDoc(docRef, sanitizeForFirestore({ ...localItem, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-                }
-              });
-            }
-
-            // Also preserve customers if not in remote
-            if (colName === 'customers') {
-              const custCandidates = localItems.length > 0 ? localItems : (initialCustomers || []);
-              custCandidates.forEach((localCust) => {
-                const localKey = String(localCust.id || localCust.customerId || '');
-                if (localKey && !isItemDeleted('customers', localCust) && !remoteMap.has(localKey)) {
-                  mergedDocs.push(localCust);
-                  const docRef = doc(firestoreDb, colName, localKey);
-                  setDoc(docRef, sanitizeForFirestore({ ...localCust, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-                }
-              });
-            }
-
-            // Also preserve leads if not in remote
-            if (colName === 'leads') {
-              const leadCandidates = localItems.length > 0 ? localItems : (initialLeads || []);
-              leadCandidates.forEach((localLead) => {
-                const localKey = String(localLead.id || localLead.leadId || '');
-                if (localKey && !isItemDeleted('leads', localLead) && !remoteMap.has(localKey)) {
-                  mergedDocs.push(localLead);
-                  const docRef = doc(firestoreDb, colName, localKey);
-                  setDoc(docRef, sanitizeForFirestore({ ...localLead, id: localKey, syncedAt: new Date().toISOString() }), { merge: true }).catch(() => {});
-                }
-              });
-            }
-
-            // Ensure orders, leads, and notifications are sorted newest first
-            if (colName === 'orders' || colName === 'leads' || colName === 'notifications') {
-              mergedDocs.sort((a, b) => {
-                const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
-                const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
-                return dateB - dateA;
-              });
-            }
-
-            // Guard against redundant state updates and re-renders
-            const currentJson = JSON.stringify(state[colName] || []);
-            const newJson = JSON.stringify(mergedDocs);
-            if (currentJson !== newJson) {
-              state[colName] = mergedDocs;
-              saveCollection(colName, false);
-            }
           }
         }, (err) => {
           handleFirestorePermissionError('sync', colName, err);
         });
       }
     } catch (err) {
-      console.warn(`Firestore sync registration failed for ${colName}:`, err.message);
+      console.warn(`Firestore sync registration note for ${colName}:`, err.message);
     }
   });
 }
@@ -1627,13 +1429,14 @@ export const dbService = {
       return state[collectionName] || [];
     }
 
-    // 2. Cooldown guard: Prevent duplicate getDocs calls within 60 seconds unless forced
+    // 2. Cooldown guard: Prevent duplicate getDocs calls within 5 minutes unless explicitly forced
     const now = Date.now();
     const lastFetch = lastFetchTimestamps[collectionName] || 0;
     if (!force && now - lastFetch < FETCH_COOLDOWN_MS && (state[collectionName]?.length > 0 || lastFetch > 0)) {
       return state[collectionName] || [];
     }
     lastFetchTimestamps[collectionName] = now;
+
     try {
       await ensureFirebaseAuth().catch(() => {});
 
@@ -1649,161 +1452,115 @@ export const dbService = {
         return state.settings || initialSettings;
       }
 
-      const colRef = collection(firestoreDb, collectionName);
-      const snap = await getDocs(colRef);
+      // Query with limit(100) to protect read quota
+      const colQuery = query(collection(firestoreDb, collectionName), limit(100));
+      const snap = await getDocs(colQuery);
       const rawRemoteDocs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       const deletedSet = getDeletedSet(collectionName);
 
-      // Filter out and purge any remotely returned docs that were marked as deleted
-      const remoteDocs = [];
-      for (const rDoc of rawRemoteDocs) {
+      // In-memory filter: NEVER call deleteDoc inside refresh!
+      const activeRemoteDocs = rawRemoteDocs.filter((rDoc) => {
         const rId = String(rDoc.id || '');
         const rOrd = String(rDoc.orderId || '');
         const rCust = String(rDoc.customerId || '');
         const rLead = String(rDoc.leadId || '');
-        if (deletedSet.has(rId) || (rOrd && deletedSet.has(rOrd)) || (rCust && deletedSet.has(rCust)) || (rLead && deletedSet.has(rLead))) {
-          const dRef = doc(firestoreDb, collectionName, rDoc.id);
-          deleteDoc(dRef).catch((dErr) => {
-            if (dErr?.code === 'resource-exhausted' || dErr?.message?.includes('Quota exceeded') || dErr?.message?.includes('resource-exhausted')) {
-              handleFirestoreQuotaExceeded(dErr);
-            }
-          });
-        } else {
-          remoteDocs.push(rDoc);
-        }
-      }
-
-      const localItems = (Array.isArray(state[collectionName]) ? state[collectionName] : []).filter((item) => {
-        const iId = String(item.id || '');
-        const iOrd = String(item.orderId || '');
-        const iCust = String(item.customerId || '');
-        const iLead = String(item.leadId || '');
-        return !deletedSet.has(iId) && (!iOrd || !deletedSet.has(iOrd)) && (!iCust || !deletedSet.has(iCust)) && (!iLead || !deletedSet.has(iLead));
+        return !deletedSet.has(rId) && !PURGE_DUMMY_IDS.has(rId) &&
+               (!rOrd || (!deletedSet.has(rOrd) && !PURGE_DUMMY_IDS.has(rOrd))) &&
+               (!rCust || (!deletedSet.has(rCust) && !PURGE_DUMMY_IDS.has(rCust))) &&
+               (!rLead || (!deletedSet.has(rLead) && !PURGE_DUMMY_IDS.has(rLead)));
       });
 
-      if (remoteDocs.length > 0) {
-        const remoteMap = new Map(remoteDocs.map((d) => [String(d.id || d.orderId), d]));
-        const merged = [...remoteDocs];
+      const localItems = (Array.isArray(state[collectionName]) ? state[collectionName] : []).filter((item) => !isItemDeleted(collectionName, item));
+      const remoteMap = new Map(activeRemoteDocs.map((d) => [String(d.id || d.orderId), d]));
+      const merged = [...activeRemoteDocs];
 
-        // ONLY for orders placed offline on this device: preserve and upload them (NEVER deleted!)
-        if (collectionName === 'orders') {
-          for (const local of localItems) {
-            const key = String(local.id || local.orderId || '');
-            const ordKey = String(local.orderId || '');
-            if (
-              key &&
-              !deletedSet.has(key) &&
-              (!ordKey || !deletedSet.has(ordKey)) &&
-              !remoteMap.has(key) &&
-              (local.source === 'Website Checkout' || local.orderStatus === 'Confirmed')
-            ) {
-              merged.unshift(local);
-              try {
-                const docRef = doc(firestoreDb, collectionName, key);
-                const cleanDoc = sanitizeForFirestore({ ...local, id: key, syncedAt: new Date().toISOString() });
-                await setDoc(docRef, cleanDoc, { merge: true });
-                console.log(`[Firestore live sync] Auto-uploaded local ${collectionName}/${key} to Firestore!`);
-              } catch (err) {
-                console.warn(`[Firestore live sync] Error uploading ${key}:`, err.message);
-              }
-            }
-          }
+      // Pure in-memory merge without background write calls
+      localItems.forEach((local) => {
+        const key = String(local.id || local.orderId || local.customerId || local.leadId || '');
+        if (key && !remoteMap.has(key) && !deletedSet.has(key) && !PURGE_DUMMY_IDS.has(key)) {
+          merged.push(local);
         }
+      });
 
-        // Sort collection items properly
-        if (collectionName === 'orders' || collectionName === 'leads' || collectionName === 'notifications' || collectionName === 'reviews') {
-          merged.sort((a, b) => {
-            const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
-            const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
-            return dateB - dateA;
-          });
-        } else if (collectionName === 'heroSlides') {
-          merged.sort((a, b) => (Number(a.displayOrder) || 99) - (Number(b.displayOrder) || 99));
-        }
-
-        state[collectionName] = merged;
-        saveCollection(collectionName, false);
-        return merged;
-      } else {
-        // Remote Cloud Firestore currently has 0 documents
-        if (collectionName === 'orders') {
-          let ordersToSync = [...localItems].filter((o) => !PURGE_DUMMY_IDS.has(String(o.id || o.orderId)));
-          if (ordersToSync.length > 0) {
-            for (const ord of ordersToSync) {
-              const key = String(ord.id || ord.orderId);
-              if (key && !deletedSet.has(key) && !PURGE_DUMMY_IDS.has(key)) {
-                try {
-                  const docRef = doc(firestoreDb, 'orders', key);
-                  await setDoc(docRef, sanitizeForFirestore({ ...ord, id: key, syncedAt: new Date().toISOString() }), { merge: true });
-                  console.log(`[Firestore live sync] Auto-uploaded local order ${key} to Firestore!`);
-                } catch (err) {}
-              }
-            }
-            state.orders = ordersToSync;
-            saveCollection('orders', false);
-            return ordersToSync;
-          }
-        }
-
-        if (collectionName === 'customers') {
-          let customersToSync = [...localItems].filter((c) => !PURGE_DUMMY_IDS.has(String(c.id || c.customerId)));
-          if (customersToSync.length > 0) {
-            for (const cust of customersToSync) {
-              const key = String(cust.id || cust.customerId);
-              if (key && !deletedSet.has(key) && !PURGE_DUMMY_IDS.has(key)) {
-                try {
-                  const docRef = doc(firestoreDb, 'customers', key);
-                  await setDoc(docRef, sanitizeForFirestore({ ...cust, id: key, syncedAt: new Date().toISOString() }), { merge: true });
-                } catch (err) {}
-              }
-            }
-            state.customers = customersToSync;
-            saveCollection('customers', false);
-            return customersToSync;
-          }
-        }
-
-        if (collectionName === 'leads') {
-          let leadsToSync = [...localItems].filter((l) => !PURGE_DUMMY_IDS.has(String(l.id || l.leadId)));
-          if (leadsToSync.length > 0) {
-            for (const lead of leadsToSync) {
-              const key = String(lead.id || lead.leadId);
-              if (key && !deletedSet.has(key) && !PURGE_DUMMY_IDS.has(key)) {
-                try {
-                  const docRef = doc(firestoreDb, 'leads', key);
-                  await setDoc(docRef, sanitizeForFirestore({ ...lead, id: key, syncedAt: new Date().toISOString() }), { merge: true });
-                } catch (err) {}
-              }
-            }
-            state.leads = leadsToSync;
-            saveCollection('leads', false);
-            return leadsToSync;
-          }
-        }
-
-        const allowEmptyCollections = [
-          'commissionTransactions',
-          'commissionPayouts',
-          'supportTickets',
-          'auditLogs',
-          'notifications',
-          'videos',
-          'galleryPhotos',
-          'heroSlides',
-          'reviews'
-        ];
-        if (allowEmptyCollections.includes(collectionName)) {
-          state[collectionName] = localItems;
-          saveCollection(collectionName, false);
-          return localItems;
-        }
-        state[collectionName] = localItems.length > 0 ? localItems : (initialDataMap[collectionName] || []);
-        saveCollection(collectionName, false);
-        return state[collectionName];
+      // Sort newest first
+      if (collectionName === 'orders' || collectionName === 'leads' || collectionName === 'notifications' || collectionName === 'reviews') {
+        merged.sort((a, b) => {
+          const dateA = new Date(a.orderDate || a.createdAt || a.syncedAt || 0).getTime();
+          const dateB = new Date(b.orderDate || b.createdAt || b.syncedAt || 0).getTime();
+          return dateB - dateA;
+        });
       }
+
+      state[collectionName] = merged;
+      saveCollection(collectionName, false);
+      return merged;
     } catch (err) {
       handleFirestorePermissionError('refresh', collectionName, err);
     }
     return state[collectionName] || [];
+  },
+
+  /**
+   * Targeted customer order retrieval: Queries ONLY the logged-in customer's orders
+   * rather than reading the entire database collection. Zero reads if already in local cache!
+   */
+  async fetchCustomerOrders(customerUser) {
+    if (!customerUser) return [];
+
+    const cleanPhone = (customerUser.phone || customerUser.mobileNumber || '').replace(/\D/g, '').trim();
+    const custId = customerUser.id ? String(customerUser.id) : null;
+
+    // Check local store first - 0 reads!
+    const localOrders = state.orders || [];
+    const localMatches = localOrders.filter((o) => {
+      const oPhone = String(o.customerMobile || o.customerPhone || o.phone || '').replace(/\D/g, '');
+      const matchPhone = cleanPhone && oPhone && (oPhone === cleanPhone || oPhone.endsWith(cleanPhone) || cleanPhone.endsWith(oPhone));
+      const matchCustId = custId && (o.customerId === custId || o.id === custId);
+      return matchPhone || matchCustId;
+    });
+
+    if (localMatches.length > 0) {
+      return localMatches;
+    }
+
+    if (!isFirebaseConfigured || !firestoreDb || isFirestoreQuotaExhausted()) {
+      return [];
+    }
+
+    try {
+      await ensureFirebaseAuth().catch(() => {});
+      const fetched = [];
+
+      // Targeted single-customer query with limit(20)
+      if (cleanPhone && cleanPhone.length >= 10) {
+        const qPhone = query(collection(firestoreDb, 'orders'), where('customerMobile', '==', cleanPhone), limit(20));
+        const snap = await getDocs(qPhone);
+        snap.docs.forEach((d) => fetched.push({ id: d.id, ...d.data() }));
+      }
+
+      if (fetched.length === 0 && custId) {
+        const qCust = query(collection(firestoreDb, 'orders'), where('customerId', '==', custId), limit(20));
+        const snap = await getDocs(qCust);
+        snap.docs.forEach((d) => fetched.push({ id: d.id, ...d.data() }));
+      }
+
+      if (fetched.length > 0) {
+        const existing = state.orders || [];
+        const existingMap = new Map(existing.map((o) => [String(o.id || o.orderId), o]));
+        fetched.forEach((f) => {
+          const k = String(f.id || f.orderId);
+          if (k && !existingMap.has(k)) {
+            existing.unshift(f);
+          }
+        });
+        state.orders = existing;
+        saveCollection('orders', false);
+      }
+
+      return fetched;
+    } catch (e) {
+      console.warn('Targeted customer order query note:', e.message);
+      return [];
+    }
   }
 };

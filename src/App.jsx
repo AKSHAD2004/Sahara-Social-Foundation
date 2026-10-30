@@ -64,7 +64,6 @@ const SupportTicketList = lazy(() => import('./pages/crm/support/SupportTicketLi
 const Reports = lazy(() => import('./pages/crm/reports/Reports'));
 const Notifications = lazy(() => import('./pages/crm/notifications/Notifications'));
 const UserList = lazy(() => import('./pages/crm/users/UserList'));
-const AuditLogs = lazy(() => import('./pages/crm/audit/AuditLogs'));
 const Settings = lazy(() => import('./pages/crm/settings/Settings'));
 
 // Lightweight Page Loading Spinner
@@ -227,7 +226,6 @@ function App() {
                   <Route path="reports" element={<Reports />} />
                   <Route path="notifications" element={<Notifications />} />
                   <Route path="users" element={<UserList />} />
-                  <Route path="audit-logs" element={<AuditLogs />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
 

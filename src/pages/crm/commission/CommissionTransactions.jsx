@@ -130,6 +130,10 @@ export default function CommissionTransactions() {
           </div>
         </div>
 
+        <div className="crm-table-swipe-hint">
+          <span>↔ Swipe table horizontally to view full details & actions</span>
+        </div>
+
         <div className="crm-table-wrapper">
           <table className="crm-table">
             <thead>

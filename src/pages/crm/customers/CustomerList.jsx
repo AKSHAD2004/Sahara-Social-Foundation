@@ -285,7 +285,6 @@ export default function CustomerList() {
           </div>
         </div>
 
-        {/* Data Table */}
         <div className="crm-table-wrapper">
           <table className="crm-table">
             <thead>
@@ -297,7 +296,7 @@ export default function CustomerList() {
                 <th>Source</th>
                 <th>Status</th>
                 <th>Last Contact</th>
-                <th>Actions</th>
+                <th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -311,64 +310,75 @@ export default function CustomerList() {
                 filteredCustomers.map((customer) => (
                   <tr key={customer.id}>
                     <td>
-                      <strong>{customer.customerId || customer.id}</strong>
+                      <strong style={{ fontSize: '0.78rem', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>
+                        {customer.customerId || customer.id}
+                      </strong>
                     </td>
                     <td>
-                      <div style={{ fontWeight: 600, color: '#1e293b' }}>{customer.fullName}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{customer.gender || 'Patient'}</div>
+                      <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.82rem' }}>{customer.fullName}</div>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{customer.gender || 'Patient'}</div>
                     </td>
                     <td>
-                      <div>{formatPhone(customer.mobileNumber || customer.phone)}</div>
+                      <div style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                        {formatPhone(customer.mobileNumber || customer.phone)}
+                      </div>
                       {customer.email && (
-                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{customer.email}</div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', wordBreak: 'break-all' }}>{customer.email}</div>
                       )}
                     </td>
                     <td>
-                      {customer.city}, {customer.state}
+                      <span style={{ fontSize: '0.78rem' }}>
+                        {customer.city}{customer.state ? `, ${customer.state}` : ''}
+                      </span>
                     </td>
-                    <td>
-                      <span className="badge badge-neutral">{customer.leadSource}</span>
+                    <td style={{ textAlign: 'center' }}>
+                      <span className="badge badge-neutral" style={{ fontSize: '0.68rem', padding: '0.15rem 0.45rem' }}>
+                        {customer.leadSource}
+                      </span>
                     </td>
-                    <td>
-                      <span className={`badge ${getStatusBadgeClass(customer.customerStatus)}`}>
+                    <td style={{ textAlign: 'center' }}>
+                      <span className={`badge ${getStatusBadgeClass(customer.customerStatus)}`} style={{ fontSize: '0.68rem', padding: '0.15rem 0.45rem' }}>
                         {customer.customerStatus}
                       </span>
                     </td>
-                    <td>{formatDate(customer.lastContactDate || customer.createdDate)}</td>
+                    <td style={{ fontSize: '0.76rem', whiteSpace: 'nowrap' }}>
+                      {formatDate(customer.lastContactDate || customer.createdDate)}
+                    </td>
                     <td>
-                      <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                         <button
                           className="crm-btn crm-btn-secondary crm-btn-sm"
+                          style={{ padding: '0.2rem 0.4rem', fontSize: '0.72rem' }}
                           onClick={() => setSelectedCustomer(customer)}
                           title="View 360° Profile"
                         >
-                          <Eye size={13} /> 360°
+                          <Eye size={12} /> 360°
                         </button>
                         <button
                           className="crm-btn crm-btn-sm"
-                          style={{ background: '#25D366', color: '#fff' }}
+                          style={{ background: '#25D366', color: '#fff', padding: '0.2rem 0.4rem' }}
                           onClick={() => {
                             const phone = (customer.whatsappNumber || customer.mobileNumber).replace(/\D/g, '');
                             window.open(`https://wa.me/91${phone}`, '_blank');
                           }}
                           title="WhatsApp"
                         >
-                          <MessageSquare size={13} />
+                          <MessageSquare size={12} />
                         </button>
                         <button
                           className="crm-icon-btn"
                           style={{
-                            width: '30px',
-                            height: '30px',
+                            width: '26px',
+                            height: '26px',
                             color: '#ef4444',
                             border: '1px solid #fee2e2',
-                            borderRadius: '6px',
-                            backgroundColor: '#fff'
+                            borderRadius: '4px',
+                            padding: 0
                           }}
                           onClick={() => handleDeleteCustomer(customer)}
                           title="Delete Customer"
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={12} />
                         </button>
                       </div>
                     </td>

@@ -217,7 +217,7 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
                       alt={language === 'mr' ? slide.titleMr : slide.titleEn}
                       className="hero-slide-img"
                       loading={index === 0 ? "eager" : "lazy"}
-                      fetchPriority={index === 0 ? "high" : "low"}
+                      fetchpriority={index === 0 ? "high" : "low"}
                       decoding="async"
                       onError={(e) => {
                         if (slide.fallback && e.target.src !== slide.fallback) {

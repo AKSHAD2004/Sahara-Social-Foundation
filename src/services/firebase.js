@@ -26,6 +26,7 @@ import {
   query, 
   where, 
   orderBy, 
+  limit,
   writeBatch,
   serverTimestamp,
   disableNetwork,
@@ -83,7 +84,8 @@ try {
       db = initializeFirestore(app, {
         localCache: persistentLocalCache({
           tabManager: persistentMultipleTabManager()
-        })
+        }),
+        experimentalAutoDetectLongPolling: true
       });
     } else {
       db = getFirestore(app);
@@ -425,6 +427,7 @@ export {
   query,
   where,
   orderBy,
+  limit,
   writeBatch,
   serverTimestamp,
   disableNetwork,

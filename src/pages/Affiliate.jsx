@@ -50,6 +50,7 @@ import {
   collection, 
   query, 
   where, 
+  limit,
   getDocs, 
   doc, 
   setDoc 
@@ -416,20 +417,18 @@ const Affiliate = () => {
         return (cleanPhone && cleanPhone.length === 10 && uPhone === cleanPhone) || uEmail === cleanIdent || uCode === cleanIdent;
       });
 
-      // 2. If not found in memory, try Cloud Firestore with a strict 1.5s timeout (never hang)
+      // 2. If not found in memory, try Cloud Firestore with a strict 1.5s timeout (limit 1 to minimize reads)
       if (!user && firestoreDb) {
         try {
-          const qEmail = query(collection(firestoreDb, 'users'), where('email', '==', cleanIdent));
+          const qEmail = query(collection(firestoreDb, 'users'), where('email', '==', cleanIdent), limit(1));
           const snapEmail = await withTimeout(getDocs(qEmail), 1500).catch(() => null);
           if (snapEmail && !snapEmail.empty) {
             user = { id: snapEmail.docs[0].id, ...snapEmail.docs[0].data() };
-            dbService.add('users', user).catch(() => {});
           } else if (cleanPhone && cleanPhone.length === 10) {
-            const qPhone = query(collection(firestoreDb, 'users'), where('phone', '==', cleanPhone));
+            const qPhone = query(collection(firestoreDb, 'users'), where('phone', '==', cleanPhone), limit(1));
             const snapPhone = await withTimeout(getDocs(qPhone), 1500).catch(() => null);
             if (snapPhone && !snapPhone.empty) {
               user = { id: snapPhone.docs[0].id, ...snapPhone.docs[0].data() };
-              dbService.add('users', user).catch(() => {});
             }
           }
         } catch (fsErr) {
@@ -492,9 +491,6 @@ const Affiliate = () => {
       setRegSuccessMsg('');
       setLoginError('');
       setActiveTab('dashboard');
-
-      // Sync user in background non-blockingly
-      syncUserToFirebase(user).catch(() => {});
     } catch (err) {
       setLoginError(err.message || 'Login error. Please try again.');
     } finally {
@@ -541,20 +537,18 @@ const Affiliate = () => {
         return (cleanPhone && cleanPhone.length === 10 && uPhone === cleanPhone) || uEmail === cleanIdent || uCode === cleanIdent;
       });
 
-      // If not in local cache, query Cloud Firestore with timeout
+      // If not in local cache, query Cloud Firestore with timeout (limit 1 to minimize reads)
       if (!user && firestoreDb) {
         try {
-          const qEmail = query(collection(firestoreDb, 'users'), where('email', '==', cleanIdent));
+          const qEmail = query(collection(firestoreDb, 'users'), where('email', '==', cleanIdent), limit(1));
           const snapEmail = await withTimeout(getDocs(qEmail), 1500).catch(() => null);
           if (snapEmail && !snapEmail.empty) {
             user = { id: snapEmail.docs[0].id, ...snapEmail.docs[0].data() };
-            dbService.add('users', user).catch(() => {});
           } else if (cleanPhone && cleanPhone.length === 10) {
-            const qPhone = query(collection(firestoreDb, 'users'), where('phone', '==', cleanPhone));
+            const qPhone = query(collection(firestoreDb, 'users'), where('phone', '==', cleanPhone), limit(1));
             const snapPhone = await withTimeout(getDocs(qPhone), 1500).catch(() => null);
             if (snapPhone && !snapPhone.empty) {
               user = { id: snapPhone.docs[0].id, ...snapPhone.docs[0].data() };
-              dbService.add('users', user).catch(() => {});
             }
           }
         } catch (fsErr) {
