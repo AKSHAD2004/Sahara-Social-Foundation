@@ -185,6 +185,36 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
     resetTimer();
   }, [resetTimer]);
 
+  // Mobile Touch Swipe Handling (Smooth finger swipe left/right on phones)
+  const touchStartXRef = useRef(0);
+  const touchStartYRef = useRef(0);
+
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      touchStartXRef.current = e.touches[0].clientX;
+      touchStartYRef.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStartXRef.current) return;
+    const touchEndX = e.changedTouches?.[0]?.clientX || 0;
+    const touchEndY = e.changedTouches?.[0]?.clientY || 0;
+    const diffX = touchStartXRef.current - touchEndX;
+    const diffY = touchStartYRef.current - touchEndY;
+
+    // Trigger on deliberate horizontal swipe (> 40px)
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+      if (diffX > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+    touchStartXRef.current = 0;
+    touchStartYRef.current = 0;
+  };
+
   // Keep slideshow continuously moving forward
   useEffect(() => {
     resetTimer();
@@ -199,9 +229,14 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
       <div className="hero-ambient-glow" />
 
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        {/* 1. SLIDESHOW VISIBLE FIRST AT THE TOP */}
+        {/* 1. SLIDESHOW VISIBLE FIRST AT THE TOP (Responsive Desktop + Mobile View) */}
         <div className="hero-slideshow-wrapper">
-          <div className="hero-slideshow-container notranslate" translate="no">
+          <div 
+            className="hero-slideshow-container notranslate" 
+            translate="no"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             {/* Slides Wrapper */}
             <div className="hero-slides-wrapper">
               {slides.map((slide, index) => {
@@ -212,20 +247,25 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
                     className={`hero-slide-item ${isActive ? 'slide-active' : ''}`}
                     aria-hidden={!isActive}
                   >
-                    <img
-                      src={slide.image}
-                      alt={language === 'mr' ? slide.titleMr : slide.titleEn}
-                      className="hero-slide-img"
-                      loading={index === 0 ? "eager" : "lazy"}
-                      fetchpriority={index === 0 ? "high" : "low"}
-                      decoding="async"
-                      onError={(e) => {
-                        if (slide.fallback && e.target.src !== slide.fallback) {
-                          e.target.onerror = null;
-                          e.target.src = slide.fallback;
-                        }
-                      }}
-                    />
+                    <picture className="hero-slide-picture">
+                      {slide.mobileImage && (
+                        <source media="(max-width: 768px)" srcSet={slide.mobileImage} />
+                      )}
+                      <img
+                        src={slide.image}
+                        alt={language === 'mr' ? slide.titleMr : slide.titleEn}
+                        className="hero-slide-img"
+                        loading={index === 0 ? "eager" : "lazy"}
+                        fetchPriority={index === 0 ? "high" : "low"}
+                        decoding="async"
+                        onError={(e) => {
+                          if (slide.fallback && e.target.src !== slide.fallback) {
+                            e.target.onerror = null;
+                            e.target.src = slide.fallback;
+                          }
+                        }}
+                      />
+                    </picture>
                   </div>
                 );
               })}
@@ -404,10 +444,16 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
           transform: scale(1) translateZ(0);
         }
 
+        .hero-slide-picture {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+
         .hero-slide-img {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
           object-position: center;
           display: block;
           border-radius: 15px;
@@ -593,38 +639,64 @@ const Hero = ({ onOpenConsultation, customSlides = null }) => {
 
         @media (max-width: 768px) {
           .hero-section {
-            padding: 0.65rem 0 0.85rem 0 !important;
+            padding: 0.5rem 0 0.85rem 0 !important;
           }
 
           .hero-slideshow-wrapper {
             margin-bottom: 0.65rem;
-            padding: 0;
+            padding: 0 0.35rem;
           }
 
           .hero-slideshow-container {
             aspect-ratio: 16 / 9;
-            border-radius: 13px;
-            border-width: 2.5px;
+            border-radius: 14px;
+            border-width: 2px;
+            box-shadow: 0 8px 24px rgba(0, 107, 45, 0.16);
+          }
+
+          .hero-slide-img {
+            border-radius: 12px;
+            object-fit: cover;
+            object-position: center;
           }
 
           .hero-slide-counter {
-            bottom: 10px;
-            right: 12px;
-            font-size: 0.72rem;
-            padding: 0.2rem 0.6rem;
+            bottom: 8px;
+            right: 10px;
+            font-size: 0.70rem;
+            padding: 0.18rem 0.55rem;
+            background: rgba(4, 32, 14, 0.82);
+            border-color: rgba(255, 201, 40, 0.4);
           }
 
           .hero-carousel-arrow {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
+            background: rgba(4, 32, 14, 0.70);
+            border-width: 1.5px;
           }
 
           .arrow-prev {
-            left: 8px;
+            left: 6px;
           }
 
           .arrow-next {
-            right: 8px;
+            right: 6px;
+          }
+
+          .hero-slide-dots {
+            bottom: 8px;
+            gap: 5px;
+            padding: 3px 8px;
+          }
+
+          .hero-slide-dot {
+            width: 6px;
+            height: 6px;
+          }
+
+          .hero-slide-dot.dot-active {
+            width: 16px;
           }
 
           .hero-action-bar-wrapper {

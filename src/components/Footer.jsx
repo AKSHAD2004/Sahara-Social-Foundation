@@ -7,7 +7,8 @@ import {
   ShieldAlert, 
   Heart, 
   ExternalLink,
-  Users
+  Users,
+  ShieldCheck
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { organizationInfo, socialLinks } from '../data/websiteData';
@@ -205,6 +206,11 @@ const Footer = () => {
                     <span className="link-bullet">• </span>{language === 'mr' ? 'परतावा' : 'Refunds'}
                   </Link>
                 </li>
+                <li>
+                  <Link to="/crm" className="footer-link">
+                    <span className="link-bullet">• </span>{language === 'mr' ? 'अ‍ॅडमिन वर्कस्पेस (CRM)' : 'Admin Workspace (CRM)'}
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -290,10 +296,21 @@ const Footer = () => {
             © {new Date().getFullYear()} {organizationInfo.name} ({organizationInfo.nameMr}) | Founded & Led by <strong>Sana Sayyad</strong>.
           </div>
 
-          <div className="footer-bottom-links" style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
-            <Link to="/privacy-policy" style={{ color: '#d1fae5' }}>Privacy Policy</Link>
-            <Link to="/refund-policy" style={{ color: '#d1fae5' }}>Refund Policy</Link>
-            <Link to="/contact" style={{ color: '#d1fae5' }}>Help & Support</Link>
+          <div className="footer-bottom-right">
+            <div className="footer-bottom-links">
+              <Link to="/privacy-policy" style={{ color: '#d1fae5' }}>Privacy Policy</Link>
+              <Link to="/refund-policy" style={{ color: '#d1fae5' }}>Refund Policy</Link>
+              <Link to="/contact" style={{ color: '#d1fae5' }}>Help & Support</Link>
+            </div>
+
+            <Link
+              to="/crm"
+              className="footer-admin-workspace-btn"
+              title={language === 'mr' ? 'अ‍ॅडमिन वर्कस्पेस (CRM)' : 'Admin Workspace (CRM)'}
+            >
+              <ShieldCheck size={14} />
+              <span>{language === 'mr' ? 'अ‍ॅडमिन वर्कस्पेस' : 'Admin Workspace'}</span>
+            </Link>
           </div>
         </div>
 
@@ -404,6 +421,44 @@ const Footer = () => {
           gap: 1rem;
           font-size: 0.82rem;
           color: #a7f0ba;
+        }
+
+        .footer-bottom-right {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+          flex-wrap: wrap;
+        }
+
+        .footer-bottom-links {
+          display: flex;
+          gap: 1.25rem;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+
+        .footer-admin-workspace-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          padding: 0.35rem 0.85rem;
+          background: rgba(255, 201, 40, 0.12);
+          border: 1px solid rgba(255, 201, 40, 0.45);
+          color: #FFC928 !important;
+          font-size: 0.78rem;
+          font-weight: 700;
+          border-radius: 999px;
+          text-decoration: none;
+          transition: all 0.25s ease;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-admin-workspace-btn:hover {
+          background: #FFC928;
+          color: #04200e !important;
+          border-color: #FFC928;
+          box-shadow: 0 4px 12px rgba(255, 201, 40, 0.35);
+          transform: translateY(-1px);
         }
 
         .footer-medical-disclaimer {
@@ -660,6 +715,19 @@ const Footer = () => {
             gap: 0.6rem !important;
             justify-content: center !important;
             font-size: 0.65rem !important;
+          }
+
+          .footer-bottom-right {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 0.4rem !important;
+            width: 100% !important;
+          }
+
+          .footer-admin-workspace-btn {
+            font-size: 0.72rem !important;
+            padding: 0.28rem 0.75rem !important;
+            margin-top: 0.15rem !important;
           }
 
           .footer-medical-disclaimer {

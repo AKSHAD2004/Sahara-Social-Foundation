@@ -554,13 +554,23 @@ const Checkout = () => {
         if (isPaymentHandled) return;
         if (openTimer) clearTimeout(openTimer);
         setIsSubmitting(false);
+
+        // Remove any lingering Razorpay iframe or dark backdrop so the page is never frozen/stuck
+        try {
+          const iframes = document.querySelectorAll('iframe.razorpay-checkout-frame');
+          iframes.forEach((f) => f.remove());
+          const backdrop = document.querySelector('.razorpay-backdrop');
+          if (backdrop) backdrop.remove();
+          document.body.style.overflow = '';
+        } catch (e) {}
+
         const detailedMsg = err?.description || err?.message;
         setPaymentNotice(
           detailedMsg
             ? `${detailedMsg}`
             : (language === 'mr'
-                ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा चाचणी पेमेंट बटण दाबा.'
-                : 'Online payment error. Please try again or click the test payment button below.')
+                ? 'ऑनलाईन पेमेंटमध्ये अडचण आली. कृपया पुन्हा प्रयत्न करा किंवा खालील पर्यायी चाचणी पेमेंट बटण दाबा.'
+                : 'Payment could not be completed on the gateway. Please retry or click the test completion button below.')
         );
       }
     });

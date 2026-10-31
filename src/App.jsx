@@ -198,6 +198,7 @@ function App() {
                   }
                 >
                   <Route index element={<CrmDashboard />} />
+                  <Route path="dashboard" element={<CrmDashboard />} />
                   <Route path="customers" element={<CustomerList />} />
                   <Route path="leads" element={<LeadList />} />
                   <Route path="followups" element={<FollowupList />} />

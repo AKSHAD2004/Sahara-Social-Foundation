@@ -400,6 +400,7 @@ export const initialHeroSlides = [
   {
     id: 'slide_1',
     image: '/slide-antox-d.jpg',
+    mobileImage: '',
     fallback: '/hero-slide-1.jpg',
     pillText: 'Antox D + Antox T',
     badgeEn: 'Antox D + Antox T • Diabetes Care',
@@ -412,6 +413,7 @@ export const initialHeroSlides = [
   {
     id: 'slide_2',
     image: '/slide-vyasanmukt.jpg',
+    mobileImage: '',
     fallback: '/slide-vyasanmukt.jpg',
     pillText: 'Antox B-AL-NICO SPRAY + Antox T',
     badgeEn: 'Addiction-Free Campaign • Antox B-AL-NICO + Antox T',
@@ -424,6 +426,7 @@ export const initialHeroSlides = [
   {
     id: 'slide_3',
     image: '/slide-rogmukt-hlk.jpg',
+    mobileImage: '',
     fallback: '/slide-rogmukt-hlk.jpg',
     pillText: 'Antox HLK + Antox T',
     badgeEn: 'Disease-Free Campaign • Heart, Liver & Kidney Care',
@@ -436,6 +439,7 @@ export const initialHeroSlides = [
   {
     id: 'slide_4',
     image: '/slide-vednamukt.jpg',
+    mobileImage: '',
     fallback: '/slide-vednamukt.jpg',
     pillText: 'Antox PN Powder + Oil',
     badgeEn: 'Pain-Free Campaign • Joint, Bone & Spine Care',
@@ -448,6 +452,7 @@ export const initialHeroSlides = [
   {
     id: 'slide_5',
     image: '/slide-rogmukt-bacid.jpg',
+    mobileImage: '',
     fallback: '/slide-rogmukt-bacid.jpg',
     pillText: 'Antox B-Acid + Antox T',
     badgeEn: 'Disease-Free Campaign • Acidity & Digestion Care',
@@ -460,6 +465,7 @@ export const initialHeroSlides = [
   {
     id: 'slide_6',
     image: '/slide-rogmukt-antox-x.jpg',
+    mobileImage: '',
     fallback: '/slide-rogmukt-antox-x.jpg',
     pillText: 'Antox X + Antox T',
     badgeEn: 'Disease-Free Campaign • Vitality & Men Strength',
@@ -472,6 +478,7 @@ export const initialHeroSlides = [
   {
     id: 'slide_7',
     image: '/slide-antox-amrut.jpg',
+    mobileImage: '',
     fallback: '/hero-slide-2.jpg',
     pillText: 'Antox Amrut 51 + Antox T',
     badgeEn: 'Pre-Clinically Tested • Sharir Shuddhi Panchakarma',

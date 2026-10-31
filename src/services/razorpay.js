@@ -323,9 +323,18 @@ export async function initializeRazorpayPayment({
   try {
     const rzpInstance = new window.Razorpay(options);
     rzpInstance.on('payment.failed', function (response) {
-      console.error('Razorpay payment failed:', response.error);
+      console.warn('Razorpay payment failed or cancelled by user:', response.error);
+      // Automatically clean up Razorpay modal backdrop iframe if stuck
+      try {
+        const iframes = document.querySelectorAll('iframe.razorpay-checkout-frame');
+        iframes.forEach((f) => f.remove());
+        const backdrop = document.querySelector('.razorpay-backdrop');
+        if (backdrop) backdrop.remove();
+        document.body.style.overflow = '';
+      } catch (e) {}
+
       if (typeof onError === 'function') {
-        onError(response.error || new Error('Payment failed on gateway'));
+        onError(response.error || new Error('Payment was not completed.'));
       }
     });
     rzpInstance.open();
@@ -334,6 +343,13 @@ export async function initializeRazorpayPayment({
     }
   } catch (err) {
     console.error('Error opening Razorpay checkout:', err);
+    try {
+      const iframes = document.querySelectorAll('iframe.razorpay-checkout-frame');
+      iframes.forEach((f) => f.remove());
+      const backdrop = document.querySelector('.razorpay-backdrop');
+      if (backdrop) backdrop.remove();
+      document.body.style.overflow = '';
+    } catch (e) {}
     if (typeof onError === 'function') {
       onError(err);
     }
